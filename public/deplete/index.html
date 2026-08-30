@@ -194,6 +194,35 @@
   .lvl.was{color:var(--dimmer);text-decoration:line-through;text-decoration-thickness:3px}
   .lvl.now{color:var(--red-hot)}
   .arrow{font-family:var(--mono);font-size:22px;color:var(--dimmer)}
+  .dgn{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(20px,3.4vw,30px);
+    line-height:1.05;
+    color:var(--text);
+    flex:1 1 100%;
+    text-shadow:0 0 26px rgba(200,30,30,.35);
+  }
+  .dgn[hidden]{display:none}
+  .maker{
+    display:flex;
+    flex-wrap:wrap;
+    gap:9px;
+    align-items:center;
+    margin-top:16px;
+  }
+  .maker[hidden]{display:none}
+  .maker select,.maker input{
+    font-family:var(--mono);
+    font-size:12.5px;
+    padding:10px 11px;
+    color:var(--text);
+    background:var(--panel-2);
+    border:1px solid var(--line-hot);
+    border-radius:2px;
+  }
+  .maker input{width:6.5em}
+  .maker select:focus,.maker input:focus{outline:none;border-color:var(--red)}
   .drop-meta{
     flex:1 1 200px;
     font-family:var(--mono);
@@ -270,11 +299,12 @@
 
   .form{
     display:grid;
-    grid-template-columns:1.1fr 1.4fr auto;
+    grid-template-columns:1fr 1.3fr 1.3fr auto;
     gap:9px;
     margin-top:22px;
   }
-  @media (max-width:640px){.form{grid-template-columns:1fr}}
+  @media (max-width:900px){.form{grid-template-columns:1fr 1fr}}
+  @media (max-width:560px){.form{grid-template-columns:1fr}}
   .form input{
     font-family:var(--mono);
     font-size:13px;
@@ -385,12 +415,19 @@
       <span class="lvl was" id="wasLvl">+15</span>
       <span class="arrow">→</span>
       <span class="lvl now" id="nowLvl">+14</span>
+      <span class="dgn" id="dgnName" hidden></span>
       <div class="drop-meta">
         Timer: <b>expired</b><br>
         Deaths: <b>more than zero</b><br>
         Interrupts available: <b>plenty</b><br>
         Interrupts used: <b>you already know</b>
       </div>
+    </div>
+
+    <div class="maker" id="maker" hidden>
+      <select id="mkDgn" aria-label="Dungeon"><option value="">Dungeon…</option></select>
+      <input id="mkLvl" type="number" min="2" max="40" value="15" aria-label="Key level">
+      <button class="btn ghost" id="mkCopy" type="button">Copy link</button>
     </div>
 
     <p class="prose">Twenty-eight minutes. Five people. One key, which is now a worse key. Nobody is getting that back, so the least anyone can do is be honest about how it went.</p>
@@ -424,6 +461,7 @@
     <div class="form" id="ownerForm" hidden>
       <input id="avName" type="text" placeholder="Name-Realm" maxlength="60" autocomplete="off">
       <input id="avLink" type="url" placeholder="raider.io link (optional)" maxlength="300" autocomplete="off">
+      <input id="avNote" type="text" placeholder="What they did" maxlength="120" autocomplete="off">
       <button class="btn" id="avAdd" type="button">Add</button>
     </div>
     <div class="form" id="ownerTools" hidden style="grid-template-columns:auto auto;justify-content:start;margin-top:9px">
@@ -447,6 +485,17 @@
 
 <script>
   /* ---- the shared list: edit these entries to publish them for everyone ---- */
+  var DUNGEONS = [
+    {k:'KR',  n:"Kings' Rest"},
+    {k:'MR',  n:"Murder Row"},
+    {k:'TOS', n:"Temple of Sethraliss"},
+    {k:'RLP', n:"Ruby Life Pools"},
+    {k:'BV',  n:"The Blinding Vale"},
+    {k:'AOF', n:"Altar of Fangs"},
+    {k:'DON', n:"Den of Nalorakk"},
+    {k:'VSA', n:"Voidscar Arena"}
+  ];
+
   /* ---- published tally: everyone sees this number ---- */
   var DEPLETED = 1;
 
@@ -461,14 +510,57 @@
 
 (function(){
   /* ---- the key level drop, from ?lvl=12 if you want it accurate ---- */
+  var curLvl = 15, curDgn = '';
   try {
     var q = new URLSearchParams(location.search);
     var lvl = parseInt(q.get('lvl'), 10);
-    if (!isNaN(lvl) && lvl > 1 && lvl < 40){
-      document.getElementById('wasLvl').textContent = '+' + lvl;
-      document.getElementById('nowLvl').textContent = '+' + (lvl - 1);
-    }
+    if (!isNaN(lvl) && lvl > 1 && lvl < 40) curLvl = lvl;
+    var d = (q.get('d') || '').toUpperCase();
+    if (d) curDgn = d;
   } catch (e){}
+
+  function dgnName(k){
+    for (var i = 0; i < DUNGEONS.length; i++) if (DUNGEONS[i].k === k) return DUNGEONS[i].n;
+    return '';
+  }
+
+  function paintDrop(){
+    document.getElementById('wasLvl').textContent = '+' + curLvl;
+    document.getElementById('nowLvl').textContent = '+' + (curLvl - 1);
+    var el = document.getElementById('dgnName');
+    var nm = dgnName(curDgn);
+    el.textContent = nm;
+    el.hidden = !nm;
+  }
+  paintDrop();
+
+  /* ---- owner builds the link they send ---- */
+  var mkDgn = document.getElementById('mkDgn');
+  DUNGEONS.forEach(function(d){
+    var o = document.createElement('option');
+    o.value = d.k; o.textContent = d.n;
+    mkDgn.appendChild(o);
+  });
+  mkDgn.value = curDgn;
+  document.getElementById('mkLvl').value = String(curLvl);
+
+  function syncFromMaker(){
+    var v = parseInt(document.getElementById('mkLvl').value, 10);
+    if (!isNaN(v) && v > 1 && v < 40) curLvl = v;
+    curDgn = mkDgn.value;
+    paintDrop();
+  }
+  mkDgn.addEventListener('change', syncFromMaker);
+  document.getElementById('mkLvl').addEventListener('input', syncFromMaker);
+
+  document.getElementById('mkCopy').addEventListener('click', function(){
+    syncFromMaker();
+    var url = location.origin + location.pathname + '?lvl=' + curLvl + (curDgn ? '&d=' + curDgn : '');
+    var b = document.getElementById('mkCopy');
+    try { navigator.clipboard.writeText(url); b.textContent = 'Copied'; }
+    catch (e){ b.textContent = 'Copy failed'; }
+    setTimeout(function(){ b.textContent = 'Copy link'; }, 1600);
+  });
 
   /* ---- running total of bricked keys ---- */
   var nEl = document.getElementById('tallyN');
@@ -500,6 +592,7 @@
   var emptyEl = document.getElementById('avEmpty');
   var nameEl  = document.getElementById('avName');
   var linkEl  = document.getElementById('avLink');
+  var noteEl  = document.getElementById('avNote');
 
   function load(){
     try { return JSON.parse(localStorage.getItem('deplete.avoid') || '[]'); }
@@ -561,7 +654,7 @@
       n.className = 'av-n';
       n.textContent = r.name;                       // textContent: never parsed as markup
       var when = document.createElement('span');
-      when.textContent = r.when || '';
+      when.textContent = [r.note, r.when].filter(Boolean).join(' · ');
       n.appendChild(when);
 
       var l = document.createElement('span');
@@ -607,10 +700,11 @@
     rows.unshift({
       name: name.slice(0, 60),
       link: safeUrl((linkEl.value || '').trim()),
+      note: ((noteEl.value || '').trim()).slice(0, 120),
       when: new Date().toLocaleDateString()
     });
     save(rows.slice(0, 200));
-    nameEl.value = ''; linkEl.value = '';
+    nameEl.value = ''; linkEl.value = ''; noteEl.value = '';
     render();
     nameEl.focus();
   }
@@ -626,7 +720,7 @@
   }
   function applyOwner(){
     var on = ownerOn();
-    ['ownerForm','ownerNote','ownerTools','addOne','resetTally'].forEach(function(id){
+    ['ownerForm','ownerNote','ownerTools','addOne','resetTally','maker'].forEach(function(id){
       var el = document.getElementById(id);
       if (el) el.hidden = !on;
     });
@@ -649,7 +743,7 @@
              '      name:  ' + JSON.stringify(r.name) + ',' + NL +
              '      realm: "",' + NL +
              '      link:  ' + JSON.stringify(r.link || '') + ',' + NL +
-             '      note:  ""' + NL +
+             '      note:  ' + JSON.stringify(r.note || '') + NL +
              '    }';
     }).join(',' + NL);
     var btn = document.getElementById('avExport');
@@ -663,7 +757,7 @@
   });
 
   document.getElementById('avAdd').addEventListener('click', add);
-  [nameEl, linkEl].forEach(function(el){
+  [nameEl, linkEl, noteEl].forEach(function(el){
     el.addEventListener('keydown', function(e){ if (e.key === 'Enter') add(); });
   });
 
