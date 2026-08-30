@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="The key is depleted. A post-mortem nobody asked for.">
+<meta name="theme-color" content="#0A0B11">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Key Depleted">
+<meta property="og:description" content="Twenty-eight minutes. Gone. Here is what happened.">
+<meta property="og:url" content="https://shaiyex.com/deplete/">
+<meta name="twitter:card" content="summary">
+<title>Key Depleted</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Grenze+Gotisch:wght@600;800&family=JetBrains+Mono:wght@400;700&display=swap">
+
+<style>
+  :root{
+    --ink:#050406;
+    --panel:#0E090B;
+    --panel-2:#150E11;
+    --line:#2A181C;
+    --line-hot:#452428;
+    --text:#EDE4E4;
+    --dim:#A08E90;
+    --dimmer:#6E5B5E;
+    --red:#C81E1E;
+    --red-hot:#FF4A46;
+    --amber:#E9A83C;
+    --green:#58C08A;
+
+    --display:"Grenze Gotisch","Trajan Pro",Georgia,serif;
+    --body:"Archivo","Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:"JetBrains Mono",Consolas,ui-monospace,monospace;
+    --wrap:74ch;
+  }
+  *{box-sizing:border-box}
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(120% 70% at 50% -8%, #3A0A0E 0%, rgba(58,10,14,0) 60%),
+      radial-gradient(90% 60% at 50% 108%, #240609 0%, rgba(36,6,9,0) 60%),
+      var(--ink);
+    background-attachment:fixed;
+    color:var(--text);
+    font-family:var(--body);
+    font-size:17px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .page{
+    max-width:var(--wrap);
+    margin:0 auto;
+    padding:clamp(30px,6vw,60px) clamp(18px,5vw,28px) 90px;
+    display:flex;
+    flex-direction:column;
+    gap:clamp(46px,8vw,74px);
+  }
+
+  /* ---------- blacklist button ---------- */
+  .bl-btn{
+    position:fixed;
+    top:0;left:50%;
+    transform:translateX(-50%);
+    z-index:65;
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:11px 22px 12px;
+    font-family:"JetBrains Mono","IBM Plex Mono",Consolas,monospace;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:#FFD9D7;
+    text-decoration:none;
+    background:linear-gradient(180deg,#2A0A0C,#140406);
+    border:1px solid #6E2224;
+    border-top:none;
+    border-radius:0 0 3px 3px;
+    box-shadow:0 0 26px rgba(200,30,30,.45), 0 0 60px rgba(200,30,30,.22);
+    animation:blPulse 3.4s ease-in-out infinite;
+    transition:color .2s ease, border-color .2s ease;
+  }
+  .bl-btn::before{content:"";width:7px;height:7px;border-radius:50%;background:#FF4A46;box-shadow:0 0 10px #FF4A46}
+  .bl-btn:hover{color:#fff;border-color:#C81E1E;box-shadow:0 0 40px rgba(200,30,30,.75)}
+  .bl-btn:focus-visible{outline:2px solid #FF4A46;outline-offset:3px}
+  @keyframes blPulse{
+    0%,100%{box-shadow:0 0 20px rgba(200,30,30,.35), 0 0 50px rgba(200,30,30,.16)}
+    50%{box-shadow:0 0 34px rgba(200,30,30,.6), 0 0 78px rgba(200,30,30,.3)}
+  }
+  @media (max-width:520px){.bl-btn{font-size:10px;padding:9px 14px 10px;letter-spacing:.14em}}
+
+  .bleed{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background:
+      radial-gradient(90% 55% at 50% 0%, rgba(200,30,30,.16), rgba(200,30,30,0) 62%),
+      radial-gradient(70% 45% at 0% 100%, rgba(200,30,30,.12), rgba(200,30,30,0) 60%),
+      radial-gradient(70% 45% at 100% 100%, rgba(200,30,30,.12), rgba(200,30,30,0) 60%);
+    animation:bleed 7s ease-in-out infinite;
+  }
+  @keyframes bleed{0%,100%{opacity:.65}50%{opacity:1}}
+  .page{position:relative;z-index:1}
+
+  .backlink{
+    position:fixed;
+    bottom:16px;left:16px;
+    z-index:60;
+    font-family:var(--mono);
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--dim);
+    background:rgba(18,20,31,.85);
+    border:1px solid var(--line-hot);
+    border-radius:2px;
+    padding:7px 12px 8px;
+    text-decoration:none;
+    transition:color .2s ease, border-color .2s ease;
+  }
+  .backlink:hover{color:var(--text);border-color:var(--red)}
+
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:11.5px;
+    font-weight:700;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--red);
+    margin:0;
+  }
+
+  h1{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(52px,13vw,110px);
+    line-height:.88;
+    margin:.2em 0 0;
+    color:var(--red-hot);
+    text-shadow:0 0 24px rgba(255,74,70,.85), 0 0 70px rgba(200,30,30,.6), 0 0 160px rgba(200,30,30,.35);
+    animation:flicker 5s steps(1) infinite;
+  }
+  @keyframes flicker{
+    0%,92%,100%{opacity:1}
+    93%{opacity:.55}
+    94%{opacity:1}
+    96%{opacity:.7}
+    97%{opacity:1}
+  }
+
+  h2{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(28px,5.6vw,42px);
+    line-height:1.02;
+    text-wrap:balance;
+    margin:0;
+  }
+
+  .sec-head{display:flex;flex-direction:column;gap:.45em;margin-bottom:1.3em}
+  p{margin:1em 0 0}
+  .prose{color:var(--dim);max-width:62ch}
+  .prose strong{color:var(--text);font-weight:600}
+
+  /* ---------- the drop ---------- */
+  .drop{
+    margin-top:clamp(26px,5vw,38px);
+    display:flex;
+    align-items:center;
+    gap:clamp(14px,4vw,28px);
+    flex-wrap:wrap;
+    padding:22px 24px;
+    background:linear-gradient(160deg, rgba(200,30,30,.09), rgba(200,30,30,0) 62%), var(--panel);
+    border:1px solid var(--line-hot);
+    border-left:3px solid var(--red);
+    box-shadow:0 0 40px rgba(200,30,30,.14) inset, 0 0 26px rgba(200,30,30,.10);
+    border-radius:2px;
+  }
+  .lvl{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(44px,9vw,72px);
+    line-height:.9;
+    font-variant-numeric:tabular-nums;
+  }
+  .lvl.was{color:var(--dimmer);text-decoration:line-through;text-decoration-thickness:3px}
+  .lvl.now{color:var(--red-hot)}
+  .arrow{font-family:var(--mono);font-size:22px;color:var(--dimmer)}
+  .drop-meta{
+    flex:1 1 200px;
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.06em;
+    line-height:1.8;
+    color:var(--dimmer);
+  }
+  .drop-meta b{color:var(--text);font-weight:700}
+
+  /* ---------- autopsy ---------- */
+  .log{
+    padding:16px 18px;
+    font-family:var(--mono);
+    font-size:12.5px;
+    line-height:1.9;
+    overflow-x:auto;
+    white-space:nowrap;
+    color:var(--dimmer);
+    background:linear-gradient(180deg, rgba(200,30,30,.06), rgba(200,30,30,0) 55%), var(--panel);
+    border:1px solid var(--line-hot);
+    border-radius:2px;
+    box-shadow:0 0 30px rgba(200,30,30,.1) inset;
+  }
+  .log .ts{color:#4E5068}
+  .log .bad{color:var(--red)}
+  .log .say{color:var(--amber)}
+  .log .end{color:var(--red-hot);font-weight:700}
+
+  /* ---------- excuses ---------- */
+  .list{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+  .row{
+    display:grid;
+    grid-template-columns:minmax(120px,1fr) 2.1fr;
+    gap:6px 22px;
+    padding:14px 2px;
+    border-bottom:1px solid var(--line);
+    align-items:baseline;
+  }
+  .row dt{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--red);
+    text-decoration:line-through;
+    text-decoration-thickness:1px;
+    margin:0;
+  }
+  .row dd{margin:0;color:var(--dim);font-size:15.5px;line-height:1.5}
+  @media (max-width:520px){.row{grid-template-columns:1fr}}
+
+  /* ---------- counter ---------- */
+  .tally{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    flex-wrap:wrap;
+    padding:20px 22px;
+    background:linear-gradient(120deg, rgba(214,65,63,.1), rgba(214,65,63,0) 60%), var(--panel);
+    border:1px solid var(--line-hot);
+    border-radius:2px;
+  }
+  .tally-n{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(44px,9vw,68px);
+    line-height:.9;
+    color:var(--red-hot);
+    font-variant-numeric:tabular-nums;
+  }
+  .tally-l{
+    flex:1 1 180px;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.13em;
+    text-transform:uppercase;
+    color:var(--dimmer);
+    line-height:1.6;
+  }
+
+  /* ---------- buttons + inputs ---------- */
+  button{font:inherit;cursor:pointer}
+  .btn{
+    font-family:var(--mono);
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    padding:11px 16px;
+    color:#0A0B11;
+    background:var(--red);
+    border:1px solid var(--red-hot);
+    border-radius:2px;
+  }
+  .btn:hover{background:var(--red-hot)}
+  .btn.ghost{
+    background:transparent;
+    color:var(--dim);
+    border-color:var(--line-hot);
+  }
+  .btn.ghost:hover{color:var(--text);border-color:var(--red)}
+  .btn:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+  .form{
+    display:grid;
+    grid-template-columns:1.1fr 1.4fr auto;
+    gap:9px;
+    margin-top:22px;
+  }
+  @media (max-width:640px){.form{grid-template-columns:1fr}}
+  .form input{
+    font-family:var(--mono);
+    font-size:13px;
+    padding:11px 12px;
+    color:var(--text);
+    background:var(--panel-2);
+    border:1px solid var(--line-hot);
+    border-radius:2px;
+  }
+  .form input::placeholder{color:var(--dimmer)}
+  .form input:focus{outline:none;border-color:var(--red)}
+
+  /* ---------- avoid list ---------- */
+  .note{
+    margin-top:14px;
+    padding:12px 16px;
+    border-left:2px solid var(--line-hot);
+    background:var(--panel);
+    font-family:var(--mono);
+    font-size:11.5px;
+    line-height:1.7;
+    color:var(--dimmer);
+  }
+  .note b{color:var(--dim);font-weight:700}
+
+  .avoid{display:flex;flex-direction:column;margin-top:22px;border-top:1px solid var(--line)}
+  .avoid[hidden]{display:none}
+  .av{
+    display:grid;
+    grid-template-columns:1.2fr 1.6fr auto;
+    gap:6px 16px;
+    padding:12px 2px;
+    border-bottom:1px solid var(--line);
+    align-items:center;
+  }
+  .av-n{font-weight:600;font-size:16px;word-break:break-word}
+  .av-n span{display:block;font-family:var(--mono);font-size:11px;color:var(--dimmer);font-weight:400}
+  .av-l{font-family:var(--mono);font-size:12px;word-break:break-all}
+  .av-l a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(233,168,60,.3)}
+  .av-l a:hover{border-bottom-color:var(--amber)}
+  .av-tag{
+    font-family:var(--mono);
+    font-size:9.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--red-hot);
+    justify-self:end;
+  }
+  .av-tag.local{
+    display:inline-block;
+    margin-top:3px;
+    color:var(--dimmer);
+    justify-self:auto;
+  }
+  .av-x{
+    background:none;
+    border:none;
+    color:var(--dimmer);
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.1em;
+    padding:4px 6px;
+    justify-self:end;
+  }
+  .av-x:hover{color:var(--red)}
+  @media (max-width:640px){
+    .av{grid-template-columns:1fr auto}
+    .av-l{grid-column:1/-1}
+  }
+  .empty{
+    padding:22px 2px;
+    color:var(--dimmer);
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.04em;
+  }
+
+  footer{
+    border-top:1px solid var(--line);
+    padding-top:22px;
+    font-family:var(--mono);
+    font-size:11.5px;
+    line-height:1.9;
+    letter-spacing:.04em;
+    color:var(--dimmer);
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important}
+  }
+</style>
+</head>
+<body>
+
+<div class="bleed" aria-hidden="true"></div>
+
+<a class="bl-btn" href="#blacklist">Blacklist</a>
+
+<a class="backlink" href="/">← shaiyex.com</a>
+
+<div class="page">
+
+  <header>
+    <p class="eyebrow">Post-mortem · nobody asked for this</p>
+    <h1>Key Depleted.</h1>
+
+    <div class="drop">
+      <span class="lvl was" id="wasLvl">+12</span>
+      <span class="arrow">→</span>
+      <span class="lvl now" id="nowLvl">+11</span>
+      <div class="drop-meta">
+        Timer: <b>expired</b><br>
+        Deaths: <b>more than zero</b><br>
+        Interrupts available: <b>plenty</b><br>
+        Interrupts used: <b>you already know</b>
+      </div>
+    </div>
+
+    <p class="prose">Twenty-eight minutes. Five people. One key, which is now a worse key. Nobody is getting that back, so the least anyone can do is be honest about how it went.</p>
+  </header>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Autopsy</p>
+      <h2>Everybody in that group knows what happened.</h2>
+    </div>
+
+    <div class="log">
+      <div><span class="ts">[00:04:12]</span> Pull started. Timer comfortable. Everything fine.</div>
+      <div><span class="ts">[00:04:19]</span> Caster begins casting. Bar visible. Extremely visible.</div>
+      <div><span class="ts">[00:04:21]</span> <span class="bad">Cast NOT interrupted.</span> Three interrupts off cooldown.</div>
+      <div><span class="ts">[00:04:21]</span> <span class="bad">Healer dies.</span></div>
+      <div><span class="ts">[00:04:23]</span> <span class="say">Someone:</span> "heals?"</div>
+      <div><span class="ts">[00:04:31]</span> Everyone else dies, in order of how far they ran.</div>
+      <div><span class="ts">[00:04:40]</span> <span class="say">Someone:</span> "tank pulled too much"</div>
+      <div><span class="ts">[00:04:44]</span> Combat ends. 4 minutes lost to a run back.</div>
+      <div><span class="ts">[00:26:58]</span> Second boss. Same cast. Same result.</div>
+      <div><span class="ts">[00:28:03]</span> <span class="end">TIMER EXPIRED. KEY DEPLETED.</span></div>
+      <div><span class="ts">[00:28:07]</span> <span class="say">Someone:</span> "gg" — then leaves before the last boss.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Things that were said</p>
+      <h2>None of these are reasons.</h2>
+    </div>
+
+    <dl class="list">
+      <div class="row"><dt>"kick cd"</dt><dd>Fifteen seconds. The pull was forty seconds ago. We can both read the same combat log.</dd></div>
+      <div class="row"><dt>"sry dc"</dt><dd>You were typing.</dd></div>
+      <div class="row"><dt>"tank pulled too much"</dt><dd>There is a timer. The timer is the entire reason this game mode exists.</dd></div>
+      <div class="row"><dt>"healer diff"</dt><dd>The healer was healing through a cast that was supposed to be stopped. That is not a diff, that is a job you outsourced.</dd></div>
+      <div class="row"><dt>"my ms is bad"</dt><dd>Your ms was fine for the damage meter.</dd></div>
+      <div class="row"><dt>"first time here"</dt><dd>The cast bar renders identically in every dungeon. You do not need lore to press a button.</dd></div>
+      <div class="row"><dt>"gg" <em style="font-style:normal;color:var(--dimmer)">(leaves at 2%)</em></dt><dd>The single most expensive two letters in the game.</dd></div>
+    </dl>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Running total</p>
+      <h2>How often this happens.</h2>
+    </div>
+
+    <div class="tally">
+      <span class="tally-n" id="tallyN">0</span>
+      <span class="tally-l">Keys bricked<br>since you started counting</span>
+      <button class="btn" id="addOne" type="button">Log another</button>
+      <button class="btn ghost" id="resetTally" type="button">Reset</button>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow" id="blacklist">Never again</p>
+      <h2>Blacklist.</h2>
+    </div>
+
+    <p class="prose">Do not invite. The listed ones are published — anyone who opens this page sees them. Anything you add yourself stays in your own browser until it gets promoted to the list.</p>
+
+    <div class="form">
+      <input id="avName" type="text" placeholder="Name-Realm" maxlength="60" autocomplete="off">
+      <input id="avLink" type="url" placeholder="raider.io link (optional)" maxlength="300" autocomplete="off">
+      <button class="btn" id="avAdd" type="button">Add</button>
+    </div>
+
+    <p class="note"><b>Two lists, one page.</b> <b>Listed</b> entries are published in the page itself and everyone sees them. <b>Yours only</b> entries live in this browser and nobody else can see them — tell me which ones to publish and they move up.</p>
+
+    <div class="avoid" id="avList"></div>
+    <p class="empty" id="avEmpty">Nobody listed yet. Optimistic.</p>
+  </section>
+
+  <footer>
+    <div>KEY DEPLETED · post-mortem</div>
+    <div>Sent because the key is gone and nobody wants to talk about why.</div>
+    <div>The briefing that would have prevented this: <a href="/kick/" style="color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(233,168,60,.3)">shaiyex.com/kick</a></div>
+  </footer>
+
+</div>
+
+<script>
+  /* ---- the shared list: edit these entries to publish them for everyone ---- */
+  var BLACKLIST = [
+    {
+      name:  'Wannatotem',
+      realm: 'Twisting Nether (EU)',
+      link:  'https://raider.io/characters/eu/twisting-nether/Wannatotem',
+      note:  'Added after a depleted key.'
+    }
+  ];
+
+(function(){
+  /* ---- the key level drop, from ?lvl=12 if you want it accurate ---- */
+  try {
+    var q = new URLSearchParams(location.search);
+    var lvl = parseInt(q.get('lvl'), 10);
+    if (!isNaN(lvl) && lvl > 1 && lvl < 40){
+      document.getElementById('wasLvl').textContent = '+' + lvl;
+      document.getElementById('nowLvl').textContent = '+' + (lvl - 1);
+    }
+  } catch (e){}
+
+  /* ---- running total of bricked keys ---- */
+  var nEl = document.getElementById('tallyN');
+  function readN(){
+    try { return parseInt(localStorage.getItem('deplete.count') || '0', 10) || 0; }
+    catch (e){ return 0; }
+  }
+  function writeN(v){
+    try { localStorage.setItem('deplete.count', String(v)); } catch (e){}
+    nEl.textContent = String(v);
+  }
+  writeN(readN());
+  document.getElementById('addOne').addEventListener('click', function(){ writeN(readN() + 1); });
+  document.getElementById('resetTally').addEventListener('click', function(){ writeN(0); });
+
+  /* ---- avoid list: this browser only, never sent anywhere ---- */
+  var listEl  = document.getElementById('avList');
+  var emptyEl = document.getElementById('avEmpty');
+  var nameEl  = document.getElementById('avName');
+  var linkEl  = document.getElementById('avLink');
+
+  function load(){
+    try { return JSON.parse(localStorage.getItem('deplete.avoid') || '[]'); }
+    catch (e){ return []; }
+  }
+  function save(rows){
+    try { localStorage.setItem('deplete.avoid', JSON.stringify(rows)); } catch (e){}
+  }
+
+  function safeUrl(u){
+    if (!u) return '';
+    try {
+      var p = new URL(u);
+      return (p.protocol === 'http:' || p.protocol === 'https:') ? p.href : '';
+    } catch (e){ return ''; }
+  }
+
+  function render(){
+    var local = load();
+    listEl.innerHTML = '';
+    emptyEl.hidden = (BLACKLIST.length + local.length) > 0;
+
+    // published entries first — everyone who opens the page sees these
+    BLACKLIST.forEach(function(r){
+      var wrap = document.createElement('div');
+      wrap.className = 'av';
+
+      var n = document.createElement('span');
+      n.className = 'av-n';
+      n.textContent = r.name;
+      var sub = document.createElement('span');
+      sub.textContent = [r.realm, r.note].filter(Boolean).join(' · ');
+      n.appendChild(sub);
+
+      var l = document.createElement('span');
+      l.className = 'av-l';
+      var u = safeUrl(r.link);
+      if (u){
+        var a = document.createElement('a');
+        a.href = u; a.target = '_blank'; a.rel = 'noopener noreferrer';
+        a.textContent = u.replace(/^https?:\/\//, '').slice(0, 52);
+        l.appendChild(a);
+      } else { l.textContent = '—'; l.style.color = 'var(--dimmer)'; }
+
+      var tag = document.createElement('span');
+      tag.className = 'av-tag';
+      tag.textContent = 'Listed';
+
+      wrap.appendChild(n); wrap.appendChild(l); wrap.appendChild(tag);
+      listEl.appendChild(wrap);
+    });
+
+    var rows = local;
+    rows.forEach(function(r, i){
+      var wrap = document.createElement('div');
+      wrap.className = 'av';
+
+      var n = document.createElement('span');
+      n.className = 'av-n';
+      n.textContent = r.name;                       // textContent: never parsed as markup
+      var when = document.createElement('span');
+      when.textContent = r.when || '';
+      n.appendChild(when);
+
+      var l = document.createElement('span');
+      l.className = 'av-l';
+      var url = safeUrl(r.link);
+      if (url){
+        var a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = url.replace(/^https?:\/\//, '').slice(0, 52);
+        l.appendChild(a);
+      } else {
+        l.textContent = '—';
+        l.style.color = 'var(--dimmer)';
+      }
+
+      var mine = document.createElement('span');
+      mine.className = 'av-tag local';
+      mine.textContent = 'Yours only';
+      n.appendChild(mine);
+
+      var x = document.createElement('button');
+      x.className = 'av-x';
+      x.type = 'button';
+      x.textContent = 'Remove';
+      x.addEventListener('click', function(){
+        var cur = load();
+        cur.splice(i, 1);
+        save(cur);
+        render();
+      });
+
+      wrap.appendChild(n); wrap.appendChild(l); wrap.appendChild(x);
+      listEl.appendChild(wrap);
+    });
+  }
+
+  function add(){
+    var name = (nameEl.value || '').trim();
+    if (!name) { nameEl.focus(); return; }
+    var rows = load();
+    rows.unshift({
+      name: name.slice(0, 60),
+      link: safeUrl((linkEl.value || '').trim()),
+      when: new Date().toLocaleDateString()
+    });
+    save(rows.slice(0, 200));
+    nameEl.value = ''; linkEl.value = '';
+    render();
+    nameEl.focus();
+  }
+
+  document.getElementById('avAdd').addEventListener('click', add);
+  [nameEl, linkEl].forEach(function(el){
+    el.addEventListener('keydown', function(e){ if (e.key === 'Enter') add(); });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

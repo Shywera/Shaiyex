@@ -1148,6 +1148,40 @@
   /* out of the way while a run is live, like the mute button */
   body.locked .backlink{opacity:0;pointer-events:none}
 
+  /* ---------- blacklist button ---------- */
+  .bl-btn{
+    position:fixed;
+    top:0;left:50%;
+    transform:translateX(-50%);
+    z-index:65;
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:11px 22px 12px;
+    font-family:"JetBrains Mono","IBM Plex Mono",Consolas,monospace;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:#FFD9D7;
+    text-decoration:none;
+    background:linear-gradient(180deg,#2A0A0C,#140406);
+    border:1px solid #6E2224;
+    border-top:none;
+    border-radius:0 0 3px 3px;
+    box-shadow:0 0 26px rgba(200,30,30,.45), 0 0 60px rgba(200,30,30,.22);
+    animation:blPulse 3.4s ease-in-out infinite;
+    transition:color .2s ease, border-color .2s ease;
+  }
+  .bl-btn::before{content:"";width:7px;height:7px;border-radius:50%;background:#FF4A46;box-shadow:0 0 10px #FF4A46}
+  .bl-btn:hover{color:#fff;border-color:#C81E1E;box-shadow:0 0 40px rgba(200,30,30,.75)}
+  .bl-btn:focus-visible{outline:2px solid #FF4A46;outline-offset:3px}
+  @keyframes blPulse{
+    0%,100%{box-shadow:0 0 20px rgba(200,30,30,.35), 0 0 50px rgba(200,30,30,.16)}
+    50%{box-shadow:0 0 34px rgba(200,30,30,.6), 0 0 78px rgba(200,30,30,.3)}
+  }
+  @media (max-width:520px){.bl-btn{font-size:10px;padding:9px 14px 10px;letter-spacing:.14em}}
+
   /* ---------- master mute ---------- */
   #mute{
     position:fixed;
@@ -1173,6 +1207,7 @@
   #mute:hover{color:var(--text);border-color:var(--amber)}
   /* out of the way mid-run — a stray click here would kill the music */
   body.locked #mute{opacity:0;pointer-events:none}
+  body.locked .bl-btn{opacity:0;pointer-events:none}
   #mute:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
   #mute .eq{display:flex;align-items:flex-end;gap:2px;height:12px}
   #mute .eq i{
@@ -1723,6 +1758,7 @@
 <body>
 
 
+<a class="bl-btn" href="/deplete/#blacklist">Blacklist</a>
 <a class="backlink" href="/">← shaiyex.com</a>
 
 <div class="page">
