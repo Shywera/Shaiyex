@@ -48,7 +48,10 @@
 
   body{
     margin:0;
-    background:var(--ink);
+    background:
+      linear-gradient(180deg, #10142A 0%, rgba(16,20,42,0) 900px),
+      var(--ink);
+    background-attachment:fixed;
     color:var(--text);
     font-family:var(--body);
     font-size:17px;
@@ -110,19 +113,19 @@
     position:relative;
     margin:0 calc(-1 * clamp(18px,5vw,28px));
     padding:clamp(46px,10vw,86px) clamp(18px,5vw,28px) clamp(34px,6vw,52px);
-    overflow:hidden;
     border-bottom:1px solid var(--line);
-    background:linear-gradient(180deg, #10142A 0%, var(--ink) 78%);
   }
   #rays{
-    position:absolute;
-    top:-30%;left:50%;
-    transform:translateX(-50%);
-    width:min(1000px,168%);
-    height:150%;
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
     pointer-events:none;
-    opacity:.62;
+    opacity:.55;
+    z-index:0;
   }
+  /* everything sits above the light */
+  .hero, .page, footer{position:relative;z-index:1}
   .hero-inner{
     position:relative;
     max-width:var(--wrap);
@@ -219,6 +222,56 @@
     text-transform:uppercase;
     color:var(--dimmer);
     line-height:1.55;
+  }
+
+  /* ---------- this season ---------- */
+  .keys{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(216px,1fr));
+    gap:9px;
+  }
+  .key{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    padding:12px 14px 13px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    transition:border-color .25s ease, background .25s ease;
+  }
+  .key:hover{border-color:var(--gold-deep);background:var(--panel-2)}
+  .key-lvl{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:23px;
+    line-height:1;
+    color:var(--gold);
+    font-variant-numeric:tabular-nums;
+    min-width:2.4em;
+  }
+  .key-name{flex:1 1 auto;font-size:14.5px;line-height:1.3;color:var(--text)}
+  .key-score{
+    font-family:var(--mono);
+    font-size:11.5px;
+    color:var(--dimmer);
+    font-variant-numeric:tabular-nums;
+  }
+
+  .raid{margin-top:26px;display:flex;flex-direction:column;border-top:1px solid var(--line)}
+  .raid-row{
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:10px 18px;
+    padding:12px 2px;
+    border-bottom:1px solid var(--line);
+    align-items:baseline;
+  }
+  .raid-n{font-weight:600;font-size:16.5px}
+  .raid-p{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--gold);
+    font-variant-numeric:tabular-nums;
   }
 
   /* ---------- key/value ---------- */
@@ -940,14 +993,14 @@
       </div>
       <div class="ms-right">
         <div class="ms-stat">
-          <span class="ms-n" data-count="2878.9" data-dec="1">2,878.9</span>
+          <span class="ms-n" data-count="3212.4" data-dec="1">3,212.4</span>
           <span class="ms-l">Mythic+ score<br>current season, healer</span>
         </div>
         <div class="ms-stat">
           <span class="ms-n" data-count="20530">20,530</span>
           <span class="ms-l">Achievement<br>points</span>
         </div>
-        <span class="ms-live">Raider.IO · 29 Aug 2026</span>
+        <span class="ms-live">Raider.IO · 30 Aug 2026</span>
       </div>
     </div>
   </section>
@@ -999,6 +1052,31 @@
         <span class="stat-l">Guilds that died<br>on my watch</span>
       </div>
     </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">This season</p>
+      <h2>Where the keys and the raid actually are.</h2>
+      <p class="sec-lede">Eight dungeons, every one of them timed, at 312 item level. Pulled from Raider.IO on 30 August 2026 — not typed in by hand and quietly left to rot.</p>
+    </div>
+
+    <div class="keys">
+        <div class="key"><span class="key-lvl">+15</span><span class="key-name">Kings' Rest</span><span class="key-score">413</span></div>
+        <div class="key"><span class="key-lvl">+15</span><span class="key-name">Murder Row</span><span class="key-score">412</span></div>
+        <div class="key"><span class="key-lvl">+14</span><span class="key-name">Temple of Sethraliss</span><span class="key-score">399.2</span></div>
+        <div class="key"><span class="key-lvl">+14</span><span class="key-name">Ruby Life Pools</span><span class="key-score">398.2</span></div>
+        <div class="key"><span class="key-lvl">+14</span><span class="key-name">The Blinding Vale</span><span class="key-score">397.7</span></div>
+        <div class="key"><span class="key-lvl">+14</span><span class="key-name">Altar of Fangs</span><span class="key-score">397.7</span></div>
+        <div class="key"><span class="key-lvl">+14</span><span class="key-name">Den of Nalorakk</span><span class="key-score">397.4</span></div>
+        <div class="key"><span class="key-lvl">+14</span><span class="key-name">Voidscar Arena</span><span class="key-score">397.2</span></div>
+    </div>
+
+    <div class="raid">
+      <div class="raid-row"><span class="raid-n">The Venomous Abyss</span><span class="raid-p">6/8 Heroic</span></div>
+      <div class="raid-row"><span class="raid-n">The Tidebound Grotto</span><span class="raid-p">1/1 Heroic</span></div>
+    </div>
+    <p class="prose" style="margin-top:18px">Current tier is heroic clears while I find a roster worth pushing mythic with. The mythic history is further down.</p>
   </section>
 
   <section>
@@ -1676,7 +1754,6 @@
         requestAnimationFrame(function(){
           var y = window.scrollY;
           if (y < window.innerHeight * 1.2){
-            rays.style.transform = 'translateX(-50%) translateY(' + (y * 0.22) + 'px)';
             hero.style.setProperty('--fade', String(Math.max(1 - y / (window.innerHeight * 0.9), 0)));
           }
           ticking = false;
