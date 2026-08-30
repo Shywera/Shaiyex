@@ -1099,6 +1099,28 @@
     white-space:nowrap;
   }
 
+  .backlink{
+    position:fixed;
+    bottom:16px;left:16px;
+    z-index:47;
+    font-family:var(--mono);
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--dim);
+    background:rgba(18,20,31,.85);
+    border:1px solid var(--line-hot);
+    border-radius:2px;
+    padding:7px 12px 8px;
+    text-decoration:none;
+    transition:opacity .3s ease, color .2s ease, border-color .2s ease;
+  }
+  .backlink:hover{color:var(--text);border-color:var(--amber)}
+  .backlink:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+  /* out of the way while a run is live, like the mute button */
+  body.locked .backlink{opacity:0;pointer-events:none}
+
   /* ---------- master mute ---------- */
   #mute{
     position:fixed;
@@ -1673,6 +1695,8 @@
 </head>
 <body>
 
+
+<a class="backlink" href="/">← shaiyex.com</a>
 
 <div class="page">
 
