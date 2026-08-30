@@ -227,6 +227,14 @@
     color:var(--red-hot);
     font-variant-numeric:tabular-nums;
   }
+  .tally-hint{
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:.1em;
+    color:var(--amber);
+    flex:1 1 100%;
+  }
+  .tally-hint[hidden]{display:none}
   .tally-l{
     flex:1 1 180px;
     font-family:var(--mono);
@@ -398,9 +406,10 @@
 
     <div class="tally">
       <span class="tally-n" id="tallyN">0</span>
-      <span class="tally-l">Keys bricked<br>since you started counting</span>
-      <button class="btn" id="addOne" type="button">Log another</button>
-      <button class="btn ghost" id="resetTally" type="button">Reset</button>
+      <span class="tally-l">Keys bricked<br>and counting</span>
+      <button class="btn" id="addOne" type="button" hidden>Log another</button>
+      <button class="btn ghost" id="resetTally" type="button" hidden>Reset</button>
+      <span class="tally-hint" id="tallyHint" hidden></span>
     </div>
   </section>
 
@@ -438,6 +447,9 @@
 
 <script>
   /* ---- the shared list: edit these entries to publish them for everyone ---- */
+  /* ---- published tally: everyone sees this number ---- */
+  var DEPLETED = 1;
+
   var BLACKLIST = [
     {
       name:  'Wannatotem',
@@ -460,17 +472,28 @@
 
   /* ---- running total of bricked keys ---- */
   var nEl = document.getElementById('tallyN');
-  function readN(){
-    try { return parseInt(localStorage.getItem('deplete.count') || '0', 10) || 0; }
+  var hintEl = document.getElementById('tallyHint');
+
+  function readBump(){
+    try { return parseInt(localStorage.getItem('deplete.bump') || '0', 10) || 0; }
     catch (e){ return 0; }
   }
-  function writeN(v){
-    try { localStorage.setItem('deplete.count', String(v)); } catch (e){}
-    nEl.textContent = String(v);
+  function writeBump(v){
+    try { localStorage.setItem('deplete.bump', String(v)); } catch (e){}
+    paintTally();
   }
-  writeN(readN());
-  document.getElementById('addOne').addEventListener('click', function(){ writeN(readN() + 1); });
-  document.getElementById('resetTally').addEventListener('click', function(){ writeN(0); });
+  function paintTally(){
+    var bump = ownerOn() ? readBump() : 0;
+    nEl.textContent = String(DEPLETED + bump);
+    if (hintEl){
+      hintEl.hidden = !(ownerOn() && bump > 0);
+      hintEl.textContent = bump > 0
+        ? ('Published number is ' + DEPLETED + '. Tell me to set it to ' + (DEPLETED + bump) + '.')
+        : '';
+    }
+  }
+  document.getElementById('addOne').addEventListener('click', function(){ writeBump(readBump() + 1); });
+  document.getElementById('resetTally').addEventListener('click', function(){ writeBump(0); });
 
   /* ---- avoid list: this browser only, never sent anywhere ---- */
   var listEl  = document.getElementById('avList');
@@ -603,10 +626,11 @@
   }
   function applyOwner(){
     var on = ownerOn();
-    ['ownerForm','ownerNote','ownerTools'].forEach(function(id){
+    ['ownerForm','ownerNote','ownerTools','addOne','resetTally'].forEach(function(id){
       var el = document.getElementById(id);
       if (el) el.hidden = !on;
     });
+    paintTally();
     render();
   }
   try {
