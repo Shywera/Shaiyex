@@ -275,24 +275,6 @@
   }
 
   /* ---------- key/value ---------- */
-  .kv{display:flex;flex-direction:column;border-top:1px solid var(--line)}
-  .kv-row{
-    display:grid;
-    grid-template-columns:minmax(112px,.7fr) 2fr;
-    gap:4px 22px;
-    padding:11px 2px;
-    border-bottom:1px solid var(--line);
-    align-items:baseline;
-  }
-  .kv-k{
-    font-family:var(--mono);
-    font-size:10.5px;
-    font-weight:600;
-    letter-spacing:.15em;
-    text-transform:uppercase;
-    color:var(--dimmer);
-  }
-  .kv-v{color:var(--text);font-size:16.5px}
   @media (max-width:520px){.kv-row{grid-template-columns:1fr}}
 
   /* ---------- pull quote ---------- */
@@ -456,102 +438,13 @@
   @media (max-width:600px){.link-row{grid-template-columns:1fr}}
 
   /* ---------- takes ---------- */
-  .takes{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
-  .take{background:var(--ink-2);padding:18px 18px 20px;display:flex;flex-direction:column;gap:9px}
-  .take-h{
-    font-family:var(--mono);
-    font-size:10.5px;
-    font-weight:600;
-    letter-spacing:.17em;
-    text-transform:uppercase;
-  }
-  .take.good .take-h{color:var(--mint)}
-  .take.bad .take-h{color:var(--red)}
-  .take p{margin:0;font-size:16px;line-height:1.5;color:var(--dim)}
   @media (max-width:600px){.takes{grid-template-columns:1fr}}
 
   /* ---------- recipe ---------- */
-  .recipe{display:grid;grid-template-columns:.82fr 1.4fr;gap:34px}
   @media (max-width:680px){.recipe{grid-template-columns:1fr;gap:26px}}
-  .ing{list-style:none;padding:0;margin:0;display:flex;flex-direction:column}
-  .ing li{
-    padding:6px 0;
-    border-bottom:1px solid var(--line);
-    font-size:15px;
-    color:var(--dim);
-    font-variant-numeric:tabular-nums;
-  }
-  .ing .sub{
-    font-family:var(--mono);
-    font-size:10px;
-    letter-spacing:.15em;
-    text-transform:uppercase;
-    color:var(--gold);
-    border-bottom:none;
-    padding-top:16px;
-  }
-  .steps{margin:0;padding-left:1.35em;display:flex;flex-direction:column;gap:8px}
-  .steps li{color:var(--dim);font-size:16px;line-height:1.5;padding-left:.2em}
-  .steps li::marker{color:var(--gold);font-family:var(--mono);font-size:12.5px}
 
   /* ---------- music ---------- */
-  .tiers{display:flex;flex-direction:column;border-top:1px solid var(--line);margin-bottom:28px}
-  .tier-row{
-    display:grid;
-    grid-template-columns:46px 1fr;
-    gap:16px;
-    padding:10px 2px;
-    border-bottom:1px solid var(--line);
-    align-items:center;
-  }
-  .tier-badge{
-    font-family:var(--display);
-    font-weight:800;
-    font-size:21px;
-    text-align:center;
-    padding:4px 0 6px;
-    color:var(--ink);
-    line-height:1;
-  }
-  .t-s{background:var(--gold)}
-  .t-a{background:var(--pink)}
-  .t-b{background:#8E96B8}
-  .t-f{background:var(--red)}
-  .t-n{background:var(--mint)}
-  .tier-what{font-size:16px;color:var(--dim)}
 
-  .songs{width:100%;border-collapse:collapse;font-size:15px}
-  .songs caption{
-    text-align:left;
-    font-family:var(--mono);
-    font-size:10.5px;
-    letter-spacing:.15em;
-    text-transform:uppercase;
-    color:var(--dimmer);
-    padding-bottom:11px;
-  }
-  .songs th{
-    text-align:left;
-    font-family:var(--mono);
-    font-size:10px;
-    font-weight:600;
-    letter-spacing:.14em;
-    text-transform:uppercase;
-    color:var(--dimmer);
-    padding:0 14px 8px 0;
-    border-bottom:1px solid var(--line-hot);
-  }
-  .songs td{padding:8px 14px 8px 0;border-bottom:1px solid var(--line);vertical-align:baseline}
-  .songs td:first-child{color:var(--gold);font-family:var(--mono);font-size:12px;letter-spacing:.03em;white-space:nowrap}
-  .songs td:nth-child(2){color:var(--text)}
-  .songs td:last-child{
-    font-family:var(--mono);
-    font-size:12px;
-    color:var(--dim);
-    font-variant-numeric:tabular-nums;
-    white-space:nowrap;
-  }
-  .table-scroll{overflow-x:auto}
 
   footer{
     border-top:1px solid var(--line);
@@ -1040,7 +933,7 @@
       </div>
       <div class="pitch-line">
         <span class="pitch-mark">III.</span>
-        <p>I've been an officer, run boosting communities, and watched seven guilds die from the inside. <b>I know exactly what a roster looks like three weeks before it collapses</b> — and I'd quite like to not see it again.</p>
+        <p>I've been an officer and watched seven guilds die from the inside. <b>I know exactly what a roster looks like three weeks before it collapses</b> — and I'd quite like to not see it again.</p>
       </div>
 
       <p class="pitch-close">What I want is embarrassingly simple: a guild that still exists in six months.</p>
@@ -1097,25 +990,6 @@
     <p class="prose" style="margin-top:18px">Current tier is heroic clears while I find a roster worth pushing mythic with. The mythic history is further down.</p>
   </section>
 
-  <section>
-    <div class="sec-head">
-      <p class="eyebrow">General</p>
-      <h2>The human behind it.</h2>
-    </div>
-
-    <div class="kv">
-      <div class="kv-row"><span class="kv-k">Call me</span><span class="kv-v">Shy</span></div>
-      <div class="kv-row"><span class="kv-k">Age</span><span class="kv-v">26</span></div>
-      <div class="kv-row"><span class="kv-k">Gender</span><span class="kv-v">Just a chill guy</span></div>
-      <div class="kv-row"><span class="kv-k">Country</span><span class="kv-v">Croatia</span></div>
-      <div class="kv-row"><span class="kv-k">Study</span><span class="kv-v">Graphic design — finished 17.09.2025</span></div>
-      <div class="kv-row"><span class="kv-k">Work</span><span class="kv-v">Process engineer and procurement</span></div>
-      <div class="kv-row"><span class="kv-k">Current main</span><span class="kv-v">Shaiyex — Holy Paladin, EU–Argent Dawn</span></div>
-      <div class="kv-row"><span class="kv-k">Guild</span><span class="kv-v">&lt;Deception&gt;</span></div>
-      <div class="kv-row"><span class="kv-k">Pronouns</span><span class="kv-v">Healer wannabe</span></div>
-      <div class="kv-row"><span class="kv-k">Spot</span><span class="kv-v">Any — flex player</span></div>
-    </div>
-  </section>
 
   <section>
     <div class="sec-head">
@@ -1267,16 +1141,6 @@
     </div>
   </section>
 
-  <section>
-    <div class="sec-head">
-      <p class="eyebrow">The long version</p>
-      <h2>How it actually went.</h2>
-    </div>
-    <p class="prose">I started in Argus, then quit, because I spent my sub money on my ex. Came back in BFA purely for a transmog — I wanted the Battle of Dazar'alor plate set, so I joined a guild to get it. I stayed through Eternal Palace, at which point it became clear I'd accidentally started raiding and quite liked it.</p>
-    <p class="prose">Then Ny'alotha: an invite to a top-700 guild, 12/12 mythic. The guild disbanded. Shadowlands was six guilds and four classes, most of them ending the same way — one died at 2/10 because it couldn't find a priest, which remains the funniest sentence in this document. I held still through Sanctum and Sepulcher as a warrior, moved up when progress stalled, and when no warrior spot was worth taking, went back to healing for Fated and the start of Dragonflight.</p>
-    <p class="prose">The guild after that was home for a year and a half, until it ended in April 2024 and I stopped for a while. I came back for Queen Ansurek, then a JOB happened, because WORKING IS FUN. Tried again in Dimensius, trialled as a healer somewhere new, and ended it myself when the ask turned into 200 dungeons to gear for two reclears in a season that was already over.</p>
-    <p class="prose"><b>The pattern isn't me leaving good guilds. It's good guilds running out of road.</b> I've never left one that was working, and I'd very much like the next one to make that sentence boring.</p>
-  </section>
 
   <section>
     <div class="sec-head">
@@ -1363,147 +1227,8 @@
     </div>
   </section>
 
-  <section>
-    <div class="sec-head">
-      <p class="eyebrow">Self-assessment</p>
-      <h2>What I like and don't like about myself as a raider.</h2>
-    </div>
 
-    <div class="takes">
-      <div class="take good">
-        <span class="take-h">Like</span>
-        <p>I'm competitive, and I actually enjoy mechanics. The part most people treat as a tax on their DPS is the part I show up for.</p>
-      </div>
-      <div class="take bad">
-        <span class="take-h">Dislike</span>
-        <p>I chase whatever the roster needs. It has made me genuinely useful and it has made my armory look unhinged, and I'm aware which of those an officer notices first.</p>
-      </div>
-    </div>
 
-    <p class="prose">I improve fast — fights, mechanics, classes. I understand a pull within a few attempts and then wait while the room catches up over the next sixty. I don't repeat mistakes, and you will never have to ask me to drop damage for a mechanic. <b>Prog first, guild second, meter never.</b></p>
-
-    <p class="prose">I've also managed boosting communities — Gallywix, Fat Boosts (now Dawn), Oblivion — and co-founded one, Shrouded, with Sara (Richan) and Rebecca, which ran the German markets through Shadowlands until cross-realm gold trading was banned. Practically, that means I'm used to organising a large number of people who do not report to me and are all slightly late.</p>
-  </section>
-
-  <section>
-    <div class="sec-head">
-      <p class="eyebrow">Thanks for reading</p>
-      <h2>Lemon squares.</h2>
-      <p class="sec-lede">You've read this far, so you get the recipe. It is called lemon squares and it is, on close inspection, a two-layer cake. I have chosen not to resolve this. It works.</p>
-    </div>
-
-    <div class="recipe">
-      <ul class="ing">
-        <li class="sub">Cake</li>
-        <li>2 ½ cups all-purpose flour</li>
-        <li>2 ½ tsp baking powder</li>
-        <li>½ tsp salt</li>
-        <li>1 cup softened unsalted butter</li>
-        <li>2 cups granulated sugar</li>
-        <li>4 large eggs</li>
-        <li>1 tsp vanilla extract</li>
-        <li>Zest of 2 lemons</li>
-        <li>Juice of 2 lemons</li>
-        <li>1 cup whole milk</li>
-        <li class="sub">Lemon glaze</li>
-        <li>1 cup powdered sugar</li>
-        <li>2–3 tbsp lemon juice</li>
-        <li class="sub">Lemon buttercream</li>
-        <li>1 cup softened unsalted butter</li>
-        <li>4 cups powdered sugar</li>
-        <li>Zest of 1 lemon</li>
-        <li>Juice of 1 lemon</li>
-        <li>Yellow food colouring (optional)</li>
-      </ul>
-
-      <ol class="steps">
-        <li>Preheat oven to 175 °C. Grease and flour two round cake pans.</li>
-        <li>Whisk flour, baking powder and salt together in a bowl. Set aside.</li>
-        <li>Cream butter and sugar in a large bowl until fluffy.</li>
-        <li>Beat in eggs one at a time, followed by the vanilla.</li>
-        <li>Add lemon zest and juice to the butter mixture. Mix well.</li>
-        <li>Gradually add the dry ingredients, alternating with the milk. Start and end with dry. Mix until just combined.</li>
-        <li>Divide the batter between the pans and smooth the tops.</li>
-        <li>Bake 25–30 minutes, or until a toothpick comes out clean.</li>
-        <li>Cool 10 minutes, then transfer to a wire rack to cool completely.</li>
-        <li>Whisk powdered sugar and lemon juice for the glaze, adjusting consistency as needed.</li>
-        <li>Brush the glaze over the cooled cakes to soak up the tangy goodness.</li>
-        <li>For the buttercream, beat butter until creamy, then gradually add powdered sugar, zest and juice. Add colouring if you want it.</li>
-        <li>Place one layer on a plate, spread with buttercream, add the second layer, then frost the whole thing.</li>
-        <li>Decorate with extra zest or lemon slices if you're feeling fancy.</li>
-        <li>Slice, serve, enjoy.</li>
-      </ol>
-    </div>
-  </section>
-
-  <section>
-    <div class="sec-head">
-      <p class="eyebrow">For your gym playlist</p>
-      <h2>Music, ranked.</h2>
-    </div>
-
-    <div class="tiers">
-      <div class="tier-row"><span class="tier-badge t-s">S</span><span class="tier-what">Hardstyle, Melbourne bounce, hardbass, happy hardcore</span></div>
-      <div class="tier-row"><span class="tier-badge t-a">A</span><span class="tier-what">Phonk, frenchcore</span></div>
-      <div class="tier-row"><span class="tier-badge t-b">B</span><span class="tier-what">Everything else on the list below</span></div>
-      <div class="tier-row"><span class="tier-badge t-f">F</span><span class="tier-what">Croatian turbo folk</span></div>
-      <div class="tier-row"><span class="tier-badge t-n">NEW</span><span class="tier-what">Hardtekk</span></div>
-    </div>
-
-    <div class="links" style="margin-bottom:30px">
-      <div class="link-row">
-        <span class="link-what">Good mix <span>2,000+ songs, all genres</span></span>
-        <span class="link-a"><a href="https://youtube.com/playlist?list=PLqU1GWjqCbV1vkZRT_sQEIdhOyX2gp8ma" target="_blank" rel="noopener">Open playlist</a></span>
-      </div>
-      <div class="link-row">
-        <span class="link-what">God tier <span>Favourites, 200+ songs</span></span>
-        <span class="link-a"><a href="https://youtube.com/playlist?list=PLqU1GWjqCbV1BUZffHpcdkqYvVm9ZF9Vy" target="_blank" rel="noopener">Open playlist</a></span>
-      </div>
-      <div class="link-row">
-        <span class="link-what">Best per genre <span>The tier list below</span></span>
-        <span class="link-a"><a href="https://youtube.com/playlist?list=PLqU1GWjqCbV3we4o_kxDcpfACHon5o_F_" target="_blank" rel="noopener">Open playlist</a></span>
-      </div>
-    </div>
-
-    <div class="table-scroll">
-      <table class="songs">
-        <caption>Best song per genre — and the exact part you have to hear to review it properly</caption>
-        <thead>
-          <tr><th scope="col">Genre</th><th scope="col">Song</th><th scope="col">Listen</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Modern hardstyle</td><td>Let Your Mind Free</td><td>1:00–1:52</td></tr>
-          <tr><td>Euphoric hardstyle</td><td>Castles in the Sky</td><td>1:25–2:30</td></tr>
-          <tr><td>Oldschool hardstyle</td><td>Scrap Attack</td><td>3:00–4:05</td></tr>
-          <tr><td>Demon phonk</td><td>Dxrk</td><td>0:00–0:30</td></tr>
-          <tr><td>Chill electro</td><td>Melodies</td><td>0:30–1:10</td></tr>
-          <tr><td>Mixmatch</td><td>GDay x Migos x DG x M</td><td>0:00–0:45</td></tr>
-          <tr><td>Country</td><td>Chicken Fried</td><td>0:50–1:20</td></tr>
-          <tr><td>Hype ish</td><td>Enemy</td><td>0:20–0:55</td></tr>
-          <tr><td>Shamanistics</td><td>Fire</td><td>1:05–1:30</td></tr>
-          <tr><td>Phonk</td><td>Murder in My Mind</td><td>0:40–1:05</td></tr>
-          <tr><td>Rock</td><td>Kickstart My Heart</td><td>3:25–4:00</td></tr>
-          <tr><td>Eurobeat</td><td>Holding Out for a Hero</td><td>0:50–1:30</td></tr>
-          <tr><td>Metal</td><td>Fade to Black</td><td>1:20–2:40</td></tr>
-          <tr><td>Industrial</td><td>Tanzdiktator</td><td>0:50–1:15</td></tr>
-          <tr><td>Symphonic metal</td><td>Reign of Terror</td><td>0:50–2:20</td></tr>
-          <tr><td>Happy hardcore</td><td>Now That I've Found You</td><td>0:20–1:40</td></tr>
-          <tr><td>Synth pop</td><td>Always on My Mind</td><td>2:20–3:45</td></tr>
-          <tr><td>Kid mashup</td><td>Clap Your Hands</td><td>0:30–1:05</td></tr>
-          <tr><td>Trance</td><td>Flying High</td><td>0:00–0:50</td></tr>
-          <tr><td>Cybergoth</td><td>Glass Alice</td><td>3:40–4:30</td></tr>
-          <tr><td>Hardbass</td><td>Balalaika</td><td>1:20–2:25</td></tr>
-          <tr><td>Ecnebi</td><td>İzmir Marşı</td><td>2:00–3:05</td></tr>
-          <tr><td>Rap</td><td>Devil's Barfight!!</td><td>1:00–2:40</td></tr>
-          <tr><td>Pop</td><td>Love Not War</td><td>0:50–1:30</td></tr>
-          <tr><td>K-pop</td><td>Number Nine</td><td>1:30–2:35</td></tr>
-          <tr><td>Deep house</td><td>Alchemy</td><td>2:45–3:40</td></tr>
-          <tr><td>Frenchcore</td><td>Drink</td><td>0:00–2:30</td></tr>
-          <tr><td>Hardbass</td><td>Xsp Balalajka</td><td>1:05–2:25</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
 
   <footer>
     <div>WHO THIS GUY — raiding application · Shy</div>
