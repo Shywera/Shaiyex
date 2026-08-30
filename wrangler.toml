@@ -1,0 +1,7 @@
+name = "shaiyex"
+compatibility_date = "2025-05-01"
+
+# a static-assets-only Worker: no script, just the files in public/
+[assets]
+directory = "./public"
+not_found_handling = "none"
