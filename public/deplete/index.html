@@ -205,44 +205,8 @@
   .drop-meta b{color:var(--text);font-weight:700}
 
   /* ---------- autopsy ---------- */
-  .log{
-    padding:16px 18px;
-    font-family:var(--mono);
-    font-size:12.5px;
-    line-height:1.9;
-    overflow-x:auto;
-    white-space:nowrap;
-    color:var(--dimmer);
-    background:linear-gradient(180deg, rgba(200,30,30,.06), rgba(200,30,30,0) 55%), var(--panel);
-    border:1px solid var(--line-hot);
-    border-radius:2px;
-    box-shadow:0 0 30px rgba(200,30,30,.1) inset;
-  }
-  .log .ts{color:#4E5068}
-  .log .bad{color:var(--red)}
-  .log .say{color:var(--amber)}
-  .log .end{color:var(--red-hot);font-weight:700}
 
   /* ---------- excuses ---------- */
-  .list{display:flex;flex-direction:column;border-top:1px solid var(--line)}
-  .row{
-    display:grid;
-    grid-template-columns:minmax(120px,1fr) 2.1fr;
-    gap:6px 22px;
-    padding:14px 2px;
-    border-bottom:1px solid var(--line);
-    align-items:baseline;
-  }
-  .row dt{
-    font-family:var(--mono);
-    font-size:13px;
-    color:var(--red);
-    text-decoration:line-through;
-    text-decoration-thickness:1px;
-    margin:0;
-  }
-  .row dd{margin:0;color:var(--dim);font-size:15.5px;line-height:1.5}
-  @media (max-width:520px){.row{grid-template-columns:1fr}}
 
   /* ---------- counter ---------- */
   .tally{
@@ -424,43 +388,7 @@
     <p class="prose">Twenty-eight minutes. Five people. One key, which is now a worse key. Nobody is getting that back, so the least anyone can do is be honest about how it went.</p>
   </header>
 
-  <section>
-    <div class="sec-head">
-      <p class="eyebrow">Autopsy</p>
-      <h2>Everybody in that group knows what happened.</h2>
-    </div>
 
-    <div class="log">
-      <div><span class="ts">[00:04:12]</span> Pull started. Timer comfortable. Everything fine.</div>
-      <div><span class="ts">[00:04:19]</span> Caster begins casting. Bar visible. Extremely visible.</div>
-      <div><span class="ts">[00:04:21]</span> <span class="bad">Cast NOT interrupted.</span> Three interrupts off cooldown.</div>
-      <div><span class="ts">[00:04:21]</span> <span class="bad">Healer dies.</span></div>
-      <div><span class="ts">[00:04:23]</span> <span class="say">Someone:</span> "heals?"</div>
-      <div><span class="ts">[00:04:31]</span> Everyone else dies, in order of how far they ran.</div>
-      <div><span class="ts">[00:04:40]</span> <span class="say">Someone:</span> "tank pulled too much"</div>
-      <div><span class="ts">[00:04:44]</span> Combat ends. 4 minutes lost to a run back.</div>
-      <div><span class="ts">[00:26:58]</span> Second boss. Same cast. Same result.</div>
-      <div><span class="ts">[00:28:03]</span> <span class="end">TIMER EXPIRED. KEY DEPLETED.</span></div>
-      <div><span class="ts">[00:28:07]</span> <span class="say">Someone:</span> "gg" — then leaves before the last boss.</div>
-    </div>
-  </section>
-
-  <section>
-    <div class="sec-head">
-      <p class="eyebrow">Things that were said</p>
-      <h2>None of these are reasons.</h2>
-    </div>
-
-    <dl class="list">
-      <div class="row"><dt>"kick cd"</dt><dd>Fifteen seconds. The pull was forty seconds ago. We can both read the same combat log.</dd></div>
-      <div class="row"><dt>"sry dc"</dt><dd>You were typing.</dd></div>
-      <div class="row"><dt>"tank pulled too much"</dt><dd>There is a timer. The timer is the entire reason this game mode exists.</dd></div>
-      <div class="row"><dt>"healer diff"</dt><dd>The healer was healing through a cast that was supposed to be stopped. That is not a diff, that is a job you outsourced.</dd></div>
-      <div class="row"><dt>"my ms is bad"</dt><dd>Your ms was fine for the damage meter.</dd></div>
-      <div class="row"><dt>"first time here"</dt><dd>The cast bar renders identically in every dungeon. You do not need lore to press a button.</dd></div>
-      <div class="row"><dt>"gg" <em style="font-style:normal;color:var(--dimmer)">(leaves at 2%)</em></dt><dd>The single most expensive two letters in the game.</dd></div>
-    </dl>
-  </section>
 
   <section>
     <div class="sec-head">
@@ -482,15 +410,19 @@
       <h2>Blacklist.</h2>
     </div>
 
-    <p class="prose">Do not invite. The listed ones are published — anyone who opens this page sees them. Anything you add yourself stays in your own browser until it gets promoted to the list.</p>
+    <p class="prose">Do not invite. This list is maintained by me — you cannot add to it.</p>
 
-    <div class="form">
+    <div class="form" id="ownerForm" hidden>
       <input id="avName" type="text" placeholder="Name-Realm" maxlength="60" autocomplete="off">
       <input id="avLink" type="url" placeholder="raider.io link (optional)" maxlength="300" autocomplete="off">
       <button class="btn" id="avAdd" type="button">Add</button>
     </div>
+    <div class="form" id="ownerTools" hidden style="grid-template-columns:auto auto;justify-content:start;margin-top:9px">
+      <button class="btn ghost" id="avExport" type="button">Copy for publishing</button>
+      <button class="btn ghost" id="avLock" type="button">Lock</button>
+    </div>
 
-    <p class="note"><b>Two lists, one page.</b> <b>Listed</b> entries are published in the page itself and everyone sees them. <b>Yours only</b> entries live in this browser and nobody else can see them — tell me which ones to publish and they move up.</p>
+    <p class="note" id="ownerNote" hidden><b>Owner mode.</b> Anything you add here is staged in this browser only. Hit <b>Copy for publishing</b> and send me the result to put it on the live list that everyone sees.</p>
 
     <div class="avoid" id="avList"></div>
     <p class="empty" id="avEmpty">Nobody listed yet. Optimistic.</p>
@@ -565,7 +497,7 @@
   function render(){
     var local = load();
     listEl.innerHTML = '';
-    emptyEl.hidden = (BLACKLIST.length + local.length) > 0;
+    emptyEl.hidden = (BLACKLIST.length + (ownerOn() ? local.length : 0)) > 0;
 
     // published entries first — everyone who opens the page sees these
     BLACKLIST.forEach(function(r){
@@ -597,7 +529,7 @@
       listEl.appendChild(wrap);
     });
 
-    var rows = local;
+    var rows = ownerOn() ? local : [];
     rows.forEach(function(r, i){
       var wrap = document.createElement('div');
       wrap.className = 'av';
@@ -660,12 +592,58 @@
     nameEl.focus();
   }
 
+  /* ---- only the owner gets the add form ---- */
+  var OWNER_KEY = 'deplete.owner';
+  function ownerOn(){
+    try { return localStorage.getItem(OWNER_KEY) === '1'; } catch (e){ return false; }
+  }
+  function setOwner(v){
+    try { v ? localStorage.setItem(OWNER_KEY,'1') : localStorage.removeItem(OWNER_KEY); } catch (e){}
+    applyOwner();
+  }
+  function applyOwner(){
+    var on = ownerOn();
+    ['ownerForm','ownerNote','ownerTools'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.hidden = !on;
+    });
+    render();
+  }
+  try {
+    var qs = new URLSearchParams(location.search);
+    if (qs.get('owner') === '1') setOwner(true);
+    if (qs.get('owner') === '0') setOwner(false);
+  } catch (e){}
+
+  document.getElementById('avLock').addEventListener('click', function(){ setOwner(false); });
+  document.getElementById('avExport').addEventListener('click', function(){
+    var rows = load();
+    if (!rows.length) return;
+    var NL = String.fromCharCode(10);
+    var out = rows.map(function(r){
+      return '    {' + NL +
+             '      name:  ' + JSON.stringify(r.name) + ',' + NL +
+             '      realm: "",' + NL +
+             '      link:  ' + JSON.stringify(r.link || '') + ',' + NL +
+             '      note:  ""' + NL +
+             '    }';
+    }).join(',' + NL);
+    var btn = document.getElementById('avExport');
+    try {
+      navigator.clipboard.writeText(out);
+      btn.textContent = 'Copied';
+    } catch (e){
+      btn.textContent = 'Copy failed';
+    }
+    setTimeout(function(){ btn.textContent = 'Copy for publishing'; }, 1800);
+  });
+
   document.getElementById('avAdd').addEventListener('click', add);
   [nameEl, linkEl].forEach(function(el){
     el.addEventListener('keydown', function(e){ if (e.key === 'Enter') add(); });
   });
 
-  render();
+  applyOwner();
 })();
 </script>
 </body>
