@@ -113,6 +113,33 @@
     border-radius:2px;
   }
 
+  /* ---------- whose key is it ---------- */
+  .pov{
+    display:inline-flex;
+    gap:1px;
+    margin-top:18px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .pov button{
+    font-family:var(--mono);
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:.13em;
+    text-transform:uppercase;
+    padding:9px 15px 10px;
+    background:var(--panel);
+    color:var(--dimmer);
+    border:none;
+    cursor:pointer;
+    transition:color .2s ease, background .2s ease;
+  }
+  .pov button:hover{color:var(--text)}
+  .pov button[aria-pressed="true"]{background:var(--amber);color:#0A0B11}
+  .pov button:focus-visible{outline:2px solid var(--violet);outline-offset:-2px}
+
   /* ---------- hero cast simulator ---------- */
   .sim{
     margin-top:clamp(30px,6vw,44px);
@@ -1701,9 +1728,13 @@
 <div class="page">
 
   <header>
-    <p class="eyebrow">Mandatory briefing · you have been invited provisionally</p>
+    <p class="eyebrow" id="pEyebrow" data-alt="Mandatory briefing · I just joined your group">Mandatory briefing · you have been invited provisionally</p>
     <h1>You Have An Interrupt.<br><span class="beg">Use It Or Get Out.</span></h1>
-    <p class="lede">You're one of three pug DPS I have never met, and history says at least one of you is about to cost us this key by standing there watching a cast bar fill up like it's a screensaver. <strong>So before you read a single word of the rest of this page, you're going to prove you can press one button.</strong> It's not a raid mechanic. It's a bar and a key.</p>
+    <p class="lede" id="pLede" data-alt="I just joined your key and I have never met any of you, and history says at least one of us is about to lose it by standing there watching a cast bar fill up like it's a screensaver. &lt;strong&gt;So before anyone pulls, everyone here proves they can press one button — me first.&lt;/strong&gt; It's not a raid mechanic. It's a bar and a key.">You're one of three pug DPS I have never met, and history says at least one of you is about to cost us this key by standing there watching a cast bar fill up like it's a screensaver. <strong>So before you read a single word of the rest of this page, you're going to prove you can press one button.</strong> It's not a raid mechanic. It's a bar and a key.</p>
+    <div class="pov" role="group" aria-label="Whose key is this">
+      <button type="button" id="povMine" aria-pressed="true">It's my key</button>
+      <button type="button" id="povJoined" aria-pressed="false">I just joined</button>
+    </div>
 
     <div class="sim panel" id="sim" data-state="idle">
       <div class="caster">
@@ -1778,7 +1809,7 @@
     </div>
 
     <div class="rule-body">
-      <p>I mean it and I'm not being polite about it. Drop group at the summoning stone and I'll thank you. Drop group at 4% on the last boss with the key already bricked and 31 minutes of four other people's evening in the bin, and I will remember your name, your realm, and your transmog.</p>
+      <p id="pRule" data-alt="I mean it about myself too. If I cannot hold up my end, kick me at the summoning stone and I will thank you for it. Losing it at 4% on the last boss with the key already bricked and 31 minutes of five people's evening in the bin is the version nobody recovers from.">I mean it and I'm not being polite about it. Drop group at the summoning stone and I'll thank you. Drop group at 4% on the last boss with the key already bricked and 31 minutes of four other people's evening in the bin, and I will remember your name, your realm, and your transmog.</p>
       <p><strong>I do not care about your damage.</strong> I have never once looked at a wipe and thought "man, if that Warlock had 40k more DPS." I have looked at a wipe four hundred times and thought "nobody pressed the button."</p>
       <p>You can be a title player. Rank 1 on your spec, world ranked, the whole CV. If you don't kick, you're a very well-geared spectator, and I'd rather bring a Fury Warrior who has never seen the dungeon but knows what Pummel does.</p>
 
@@ -1960,7 +1991,7 @@
   <section>
     <div class="sec-head">
       <p class="eyebrow">Ready check</p>
-      <h2>Sign it or I'm re-listing the key.</h2>
+      <h2 id="pReady" data-alt="Sign it, and I will hold myself to the same.">Sign it or I'm re-listing the key.</h2>
     </div>
 
     <div class="pledge panel">
@@ -1975,7 +2006,7 @@
       </div>
 
       <div class="result pass" id="resPass" hidden>
-        <h3>Fine. You're in.</h3>
+        <h3 id="pPass" data-alt="Good. Then we might time this.">Fine. You're in.</h3>
         <p>Invite accepted. Don't make me send you this link a second time — there is no second link, there's just a kick from the group.</p>
       </div>
 
@@ -1989,7 +2020,7 @@
 
   <footer>
     <div>KICK OR LEAVE · pre-key briefing v1</div>
-    <div><b>You received this link because you are in my group and I have been hurt before.</b></div>
+    <div id="pFoot" data-alt="&lt;b&gt;You received this link because we are in the same group and I have been hurt before.&lt;/b&gt;"><b>You received this link because you are in my group and I have been hurt before.</b></div>
     <div><b>No addons required. No logs will be linked. Press the button.</b></div>
     <div><b>Music: "Monkeys Spinning Monkeys" — Kevin MacLeod (incompetech.com), licensed under Creative Commons: By Attribution 4.0.</b></div>
   </footer>
@@ -2905,7 +2936,7 @@
   var HIT_LINES = [
     "INTERRUPTED. That's it. That's the entire job. You can do this.",
     "Two in a row. Already above the median pug.",
-    "Three. This would be a personal record for most of my DPS.",
+    "Three. This would be a personal record for most pugs.",
     "Four. One more and I'm sending you an invite."
   ];
 
@@ -3023,8 +3054,8 @@
       return {t:'Untouchable.', c:'good', s:'Fifteen casts, zero misses, averaging ' + ms +
         'ms — through blood, screen shake and everything else this page could throw at you. I have played with people who could not do that in a clean UI.'};
     }
-    if (avg < 220) return {t:'Inhuman.',    c:'good', s:'All ' + total + ', averaging ' + ms + 'ms. Either you main rogue or you are not a person. Either way, come to my key immediately.'};
-    if (avg < 300) return {t:'Elite.',      c:'good', s:'All ' + total + ', averaging ' + ms + 'ms. That is a real interrupt rotation. I would take you over most of my guild.'};
+    if (avg < 220) return {t:'Inhuman.',    c:'good', s:'All ' + total + ', averaging ' + ms + 'ms. Either you main rogue or you are not a person. ' + pv('Either way, come to my key immediately.', 'Either way, I am glad you are in this group.')};
+    if (avg < 300) return {t:'Elite.',      c:'good', s:'All ' + total + ', averaging ' + ms + 'ms. That is a real interrupt rotation. ' + pv('I would take you over most of my guild.', 'That is better than most groups I land in.')};
     if (avg < 400) return {t:'Sharp.',      c:'good', s:'All ' + total + ', averaging ' + ms + 'ms. Comfortably above the median pug — you will catch everything that matters.'};
     if (avg < 520) return {t:'Acceptable.', c:'mid',  s:'All ' + total + ', averaging ' + ms + 'ms. Not one miss, which is what counts, but the slow ones would have been close.'};
     return {t:'Survived.', c:'mid', s:'All ' + total + ', averaging ' + ms + 'ms. You never missed, but at that speed you are relying on long casts to save you.'};
@@ -4252,6 +4283,45 @@
     var real = d.textContent;
     d.textContent = corrupt(real, 3);
     setInterval(function(){ d.textContent = corrupt(real, 3); }, 2600);
+  })();
+
+  /* ---- whose key is it: the page reads either way ---- */
+  var joined = false;
+  try { joined = localStorage.getItem('kick.pov') === 'joined'; } catch (e){}
+
+  var POV_IDS = ['pEyebrow','pLede','pRule','pReady','pPass','pFoot'];
+  var povOrig = {};
+
+  function pv(mineTxt, joinedTxt){ return joined ? joinedTxt : mineTxt; }
+
+  function applyPov(){
+    for (var i = 0; i < POV_IDS.length; i++){
+      var el = document.getElementById(POV_IDS[i]);
+      if (!el) continue;
+      if (!(POV_IDS[i] in povOrig)) povOrig[POV_IDS[i]] = el.innerHTML;
+      var alt = el.getAttribute('data-alt');
+      el.innerHTML = (joined && alt) ? alt : povOrig[POV_IDS[i]];
+    }
+    var t1 = document.getElementById('bootTitle');
+    var t2 = document.getElementById('winTitle');
+    if (t1) t1.textContent = pv('Fuck Off Out Of My Key.', 'Then This Is Going To Go Badly.');
+    if (t2) t2.textContent = pv('Come To My Key.', 'Good. We Might Time This.');
+    var bm = document.getElementById('povMine'), bj = document.getElementById('povJoined');
+    if (bm) bm.setAttribute('aria-pressed', String(!joined));
+    if (bj) bj.setAttribute('aria-pressed', String(joined));
+  }
+
+  function setPov(v){
+    joined = v;
+    try { localStorage.setItem('kick.pov', v ? 'joined' : 'mine'); } catch (e){}
+    applyPov();
+  }
+
+  (function(){
+    var bm = document.getElementById('povMine'), bj = document.getElementById('povJoined');
+    if (bm) bm.addEventListener('click', function(){ setPov(false); });
+    if (bj) bj.addEventListener('click', function(){ setPov(true); });
+    applyPov();
   })();
 
   setTally();
