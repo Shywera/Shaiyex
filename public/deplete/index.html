@@ -496,7 +496,7 @@
     {k:'VSA', n:"Voidscar Arena"}
   ];
 
-  /* ---- published tally: everyone sees this number ---- */
+  /* ---- published values: overwritten by /blacklist.json when it loads ---- */
   var DEPLETED = 1;
 
   var BLACKLIST = [
@@ -762,6 +762,18 @@
   });
 
   applyOwner();
+
+  /* ---- the published list and tally come from the spreadsheet ---- */
+  fetch('/blacklist.json', {cache: 'no-cache'})
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if (!d) return;
+      if (typeof d.depleted === 'number') DEPLETED = d.depleted;
+      if (Array.isArray(d.entries)) BLACKLIST = d.entries;
+      paintTally();
+      render();
+    })
+    .catch(function(){});
 })();
 </script>
 </body>
