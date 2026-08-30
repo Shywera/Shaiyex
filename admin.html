@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blacklist admin — local only</title>
+<style>
+  :root{
+    --ink:#08070A; --panel:#101015; --panel-2:#17171F;
+    --line:#26262F; --line-hot:#3A3A47;
+    --text:#ECEAE6; --dim:#9C99A4; --dimmer:#6A6773;
+    --red:#D6413F; --red-hot:#FF5C58; --green:#58C08A; --amber:#E9A83C;
+    --mono:ui-monospace,"Cascadia Mono",Consolas,monospace;
+    --sans:"Segoe UI",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;padding:28px 24px 80px;
+    background:var(--ink);color:var(--text);
+    font-family:var(--sans);font-size:15px;line-height:1.55;
+  }
+  .wrap{max-width:1080px;margin:0 auto}
+
+  h1{font-size:26px;margin:0;letter-spacing:-.01em}
+  .sub{color:var(--dim);margin:6px 0 0;font-size:14px}
+  .local{
+    display:inline-block;margin-top:14px;padding:8px 12px;
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;
+    color:var(--green);border:1px solid #234634;background:#0D1B14;border-radius:3px;
+  }
+
+  .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:22px 0 18px}
+  button{
+    font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;
+    padding:10px 14px;border-radius:3px;cursor:pointer;
+    background:var(--panel-2);color:var(--text);border:1px solid var(--line-hot);
+  }
+  button:hover{border-color:var(--dim)}
+  button.primary{background:var(--red);border-color:var(--red-hot);color:#0B0A0C}
+  button.primary:hover{background:var(--red-hot)}
+  button.ok{background:#17301F;border-color:#2C5A3C;color:var(--green)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+
+  .status{font-family:var(--mono);font-size:12px;color:var(--dimmer);margin-left:auto}
+  .status.good{color:var(--green)}
+  .status.bad{color:var(--red-hot)}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:18px;margin-bottom:18px}
+  .card h2{font-size:13px;font-family:var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:0 0 14px}
+
+  .count{display:flex;align-items:center;gap:14px}
+  .count input{width:110px;font-size:26px;font-family:var(--mono);text-align:center}
+
+  table{width:100%;border-collapse:collapse}
+  th{
+    text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--dimmer);padding:0 8px 8px 0;font-weight:600;
+  }
+  td{padding:5px 8px 5px 0;vertical-align:middle}
+  input[type=text],input[type=url],input[type=number]{
+    width:100%;font-family:var(--mono);font-size:12.5px;padding:9px 10px;
+    color:var(--text);background:var(--panel-2);
+    border:1px solid var(--line-hot);border-radius:3px;
+  }
+  input:focus{outline:none;border-color:var(--amber)}
+  .del{padding:8px 10px;color:var(--dimmer);background:none;border:1px solid transparent}
+  .del:hover{color:var(--red-hot);border-color:var(--line-hot)}
+  .empty{color:var(--dimmer);font-family:var(--mono);font-size:12.5px;padding:10px 0}
+
+  details{margin-top:22px}
+  summary{cursor:pointer;font-family:var(--mono);font-size:12px;color:var(--dimmer)}
+  pre{
+    background:var(--panel);border:1px solid var(--line);border-radius:4px;
+    padding:14px;overflow:auto;font-family:var(--mono);font-size:12px;color:var(--dim);
+    max-height:280px;
+  }
+  code{font-family:var(--mono);color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Blacklist admin</h1>
+  <p class="sub">Edits <code>public\blacklist.json</code>, which the deplete page reads. Nothing here is on the internet.</p>
+  <p class="local" id="localTag">Local file — this page is not deployed</p>
+
+  <div class="bar">
+    <button class="primary" id="open">Open blacklist.json</button>
+    <button id="save" disabled>Save</button>
+    <button id="download">Download instead</button>
+    <span class="status" id="status">No file open</span>
+  </div>
+
+  <div class="card">
+    <h2>Depleted keys</h2>
+    <div class="count">
+      <input type="number" id="depleted" min="0" max="99999" value="0">
+      <button id="plus">+1</button>
+      <button id="minus">−1</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Blacklist</h2>
+    <table>
+      <thead>
+        <tr><th style="width:18%">Name</th><th style="width:20%">Realm</th><th style="width:32%">Link</th><th style="width:26%">Reason</th><th></th></tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p class="empty" id="empty">No entries.</p>
+    <div class="bar" style="margin:14px 0 0">
+      <button id="add">Add row</button>
+    </div>
+  </div>
+
+  <details>
+    <summary>What gets written</summary>
+    <pre id="preview">{}</pre>
+  </details>
+
+  <details>
+    <summary>How this works</summary>
+    <pre>1. Open blacklist.json  - pick shaiyex\public\blacklist.json
+2. Edit the rows
+3. Save                 - writes straight back to that file
+4. Run Push.bat         - commits and pushes, site updates in ~30s
+
+If your browser will not let a page write files, use
+Download instead and replace public\blacklist.json by hand.
+
+Editing here and editing blacklist.xlsx are two separate
+routes to the same file. Running "Publish blacklist.bat"
+rebuilds the JSON from the spreadsheet and will overwrite
+anything you changed here.</pre>
+  </details>
+
+</div>
+
+<script>
+(function(){
+  var handle = null;
+  var state  = { depleted: 0, entries: [] };
+
+  var rowsEl = document.getElementById('rows');
+  var emptyEl = document.getElementById('empty');
+  var depEl  = document.getElementById('depleted');
+  var statusEl = document.getElementById('status');
+  var saveBtn = document.getElementById('save');
+  var preview = document.getElementById('preview');
+
+  var canPick = typeof window.showOpenFilePicker === 'function';
+  if (!canPick){
+    document.getElementById('open').textContent = 'Load blacklist.json';
+  }
+
+  function say(msg, kind){
+    statusEl.textContent = msg;
+    statusEl.className = 'status' + (kind ? ' ' + kind : '');
+  }
+
+  function json(){
+    var clean = state.entries
+      .filter(function(e){ return (e.name || '').trim(); })
+      .map(function(e){
+        var link = (e.link || '').trim();
+        if (!/^https?:\/\//i.test(link)) link = '';
+        return {
+          name:  (e.name  || '').trim(),
+          realm: (e.realm || '').trim(),
+          link:  link,
+          note:  (e.note  || '').trim()
+        };
+      });
+    return JSON.stringify({ depleted: Number(state.depleted) || 0, entries: clean }, null, 1);
+  }
+
+  function paint(){
+    rowsEl.innerHTML = '';
+    state.entries.forEach(function(e, i){
+      var tr = document.createElement('tr');
+      [['name','text','Name-Realm'],['realm','text','Realm'],
+       ['link','url','https://raider.io/...'],['note','text','What they did']]
+      .forEach(function(f){
+        var td = document.createElement('td');
+        var inp = document.createElement('input');
+        inp.type = f[1] === 'url' ? 'url' : 'text';
+        inp.placeholder = f[2];
+        inp.value = e[f[0]] || '';
+        inp.addEventListener('input', function(){
+          state.entries[i][f[0]] = inp.value;
+          preview.textContent = json();
+        });
+        td.appendChild(inp);
+        tr.appendChild(td);
+      });
+      var td = document.createElement('td');
+      var del = document.createElement('button');
+      del.className = 'del';
+      del.textContent = 'Remove';
+      del.addEventListener('click', function(){
+        state.entries.splice(i, 1);
+        paint();
+      });
+      td.appendChild(del);
+      tr.appendChild(td);
+      rowsEl.appendChild(tr);
+    });
+    emptyEl.hidden = state.entries.length > 0;
+    depEl.value = state.depleted;
+    preview.textContent = json();
+  }
+
+  function adopt(text){
+    try {
+      var d = JSON.parse(text);
+      state.depleted = Number(d.depleted) || 0;
+      state.entries  = Array.isArray(d.entries) ? d.entries : [];
+    } catch (e){
+      say('That file is not valid JSON', 'bad');
+      return false;
+    }
+    paint();
+    return true;
+  }
+
+  document.getElementById('open').addEventListener('click', async function(){
+    if (canPick){
+      try {
+        var picked = await window.showOpenFilePicker({
+          types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
+        });
+        handle = picked[0];
+        var f = await handle.getFile();
+        if (adopt(await f.text())){
+          saveBtn.disabled = false;
+          say('Open: ' + handle.name, 'good');
+        }
+      } catch (e){ /* cancelled */ }
+    } else {
+      var inp = document.createElement('input');
+      inp.type = 'file';
+      inp.accept = '.json,application/json';
+      inp.addEventListener('change', function(){
+        var f = inp.files && inp.files[0];
+        if (!f) return;
+        var fr = new FileReader();
+        fr.onload = function(){
+          if (adopt(fr.result)) say('Loaded ' + f.name + ' — use Download to save', 'good');
+        };
+        fr.readAsText(f);
+      });
+      inp.click();
+    }
+  });
+
+  saveBtn.addEventListener('click', async function(){
+    if (!handle) return;
+    try {
+      var w = await handle.createWritable();
+      await w.write(json());
+      await w.close();
+      say('Saved. Now run Push.bat', 'good');
+    } catch (e){
+      say('Could not write: ' + e.message, 'bad');
+    }
+  });
+
+  document.getElementById('download').addEventListener('click', function(){
+    var blob = new Blob([json()], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'blacklist.json';
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
+    say('Downloaded — replace public\\blacklist.json with it');
+  });
+
+  document.getElementById('add').addEventListener('click', function(){
+    state.entries.push({ name:'', realm:'', link:'', note:'' });
+    paint();
+    var last = rowsEl.querySelector('tr:last-child input');
+    if (last) last.focus();
+  });
+
+  depEl.addEventListener('input', function(){
+    state.depleted = Number(depEl.value) || 0;
+    preview.textContent = json();
+  });
+  document.getElementById('plus').addEventListener('click', function(){
+    state.depleted = (Number(state.depleted) || 0) + 1; paint();
+  });
+  document.getElementById('minus').addEventListener('click', function(){
+    state.depleted = Math.max(0, (Number(state.depleted) || 0) - 1); paint();
+  });
+
+  if (location.protocol !== 'file:'){
+    document.getElementById('localTag').textContent =
+      'Warning: this page is being served over ' + location.protocol + ' — it belongs on your disk only';
+    document.getElementById('localTag').style.color = 'var(--red-hot)';
+    document.getElementById('localTag').style.borderColor = '#5A2422';
+    document.getElementById('localTag').style.background = '#1B0E0E';
+  }
+
+  paint();
+})();
+</script>
+</body>
+</html>
