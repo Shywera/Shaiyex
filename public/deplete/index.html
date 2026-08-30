@@ -106,7 +106,14 @@
       radial-gradient(70% 45% at 100% 100%, rgba(200,30,30,.12), rgba(200,30,30,0) 60%);
     animation:bleed 7s ease-in-out infinite;
   }
-  @keyframes bleed{0%,100%{opacity:.65}50%{opacity:1}}
+  @keyframes bleed{
+    0%,100%{opacity:.62}
+    46%{opacity:.9}
+    49%{opacity:.28}
+    56%{opacity:.34}
+    60%{opacity:.85}
+    84%{opacity:.5}
+  }
   .page{position:relative;z-index:1}
 
   .backlink{
@@ -146,14 +153,24 @@
     margin:.2em 0 0;
     color:var(--red-hot);
     text-shadow:0 0 24px rgba(255,74,70,.85), 0 0 70px rgba(200,30,30,.6), 0 0 160px rgba(200,30,30,.35);
-    animation:flicker 5s steps(1) infinite;
+    animation:neon 7.5s steps(1) infinite;
+    will-change:opacity,transform;
   }
-  @keyframes flicker{
-    0%,92%,100%{opacity:1}
-    93%{opacity:.55}
-    94%{opacity:1}
-    96%{opacity:.7}
-    97%{opacity:1}
+  /* a tube on its way out: snaps off, leans, buzzes back */
+  @keyframes neon{
+    0%,16%   {opacity:1;   transform:none;                           text-shadow:0 0 24px rgba(255,74,70,.85), 0 0 70px rgba(200,30,30,.6), 0 0 160px rgba(200,30,30,.35)}
+    17%      {opacity:.18; transform:translateX(-4px) skewX(-2.5deg);text-shadow:0 0 8px rgba(255,74,70,.25)}
+    18%      {opacity:1;   transform:none;                           text-shadow:0 0 24px rgba(255,74,70,.85), 0 0 70px rgba(200,30,30,.6), 0 0 160px rgba(200,30,30,.35)}
+    19%      {opacity:.10; transform:translateX(3px) skewX(1.5deg);  text-shadow:none}
+    21%,48%  {opacity:1;   transform:none;                           text-shadow:0 0 24px rgba(255,74,70,.85), 0 0 70px rgba(200,30,30,.6), 0 0 160px rgba(200,30,30,.35)}
+    49%,55%  {opacity:.08; transform:translateX(-6px) skewX(2deg);   text-shadow:none}
+    56%      {opacity:.75; transform:translateX(-2px);               text-shadow:0 0 8px rgba(255,74,70,.25)}
+    57%      {opacity:.12; transform:translateX(2px);                text-shadow:none}
+    59%,83%  {opacity:1;   transform:none;                           text-shadow:0 0 24px rgba(255,74,70,.85), 0 0 70px rgba(200,30,30,.6), 0 0 160px rgba(200,30,30,.35)}
+    84%      {opacity:.22; transform:translateX(5px) skewX(-1.5deg); text-shadow:0 0 8px rgba(255,74,70,.25)}
+    85%      {opacity:1;   transform:translateX(1px);                text-shadow:0 0 24px rgba(255,74,70,.85), 0 0 70px rgba(200,30,30,.6), 0 0 160px rgba(200,30,30,.35)}
+    86%      {opacity:.3;  transform:translateX(-1px);               text-shadow:none}
+    88%,100% {opacity:1;   transform:none;                           text-shadow:0 0 24px rgba(255,74,70,.85), 0 0 70px rgba(200,30,30,.6), 0 0 160px rgba(200,30,30,.35)}
   }
 
   h2{
@@ -417,10 +434,10 @@
       <span class="lvl now" id="nowLvl">+14</span>
       <span class="dgn" id="dgnName" hidden></span>
       <div class="drop-meta">
-        Timer: <b>expired</b><br>
-        Deaths: <b>more than zero</b><br>
+        Died on: <b>the first pull</b><br>
         Interrupts available: <b>plenty</b><br>
-        Interrupts used: <b>you already know</b>
+        Interrupts used: <b>none</b><br>
+        Said afterwards: <b>gg go next</b>
       </div>
     </div>
 
@@ -430,7 +447,7 @@
       <button class="btn ghost" id="mkCopy" type="button">Copy link</button>
     </div>
 
-    <p class="prose">Twenty-eight minutes. Five people. One key, which is now a worse key. Nobody is getting that back, so the least anyone can do is be honest about how it went.</p>
+    <p class="prose">Most of them do not survive the first pull. Nobody kicks, the healer dies, and it is gg go next before a single boss has gone down. Twenty-eight minutes some nights, ninety seconds on the rest.</p>
   </header>
 
 
