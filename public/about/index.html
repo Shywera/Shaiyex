@@ -422,6 +422,24 @@
   .cls-n::before{content:"";width:7px;height:7px;background:var(--c);flex:0 0 auto}
   .cls-w{font-size:14px;color:var(--dim);line-height:1.42}
 
+  .cls-logs{display:flex;flex-direction:column;gap:3px;margin-top:4px}
+  .cls-log{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.06em;
+    color:var(--c);
+    border-bottom:none;
+    opacity:.85;
+    transition:opacity .2s ease;
+  }
+  .cls-log:hover{opacity:1;border-bottom:none}
+  .cls-nolog{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.06em;
+    color:var(--dimmer);
+  }
+
   /* ---------- link list ---------- */
   .links{display:flex;flex-direction:column;border-top:1px solid var(--line)}
   .link-row{
@@ -1262,98 +1280,60 @@
 
   <section>
     <div class="sec-head">
-      <p class="eyebrow">Alts</p>
-      <h2>Classes I can play at a high level.</h2>
+      <p class="eyebrow">Classes &amp; receipts</p>
+      <h2>Nine classes, and the logs for each of them.</h2>
+      <p class="sec-lede">Every class I can play at a high level, with the parses attached. One of them has no logs and I have said so rather than quietly leaving it off the list.</p>
     </div>
 
     <div class="cgrid">
-      <div class="cls main" style="--c:#F48CBA"><span class="cls-n">Paladin</span><span class="cls-w">Holy and ret — most of BFA, plus Manaforge. The main.</span></div>
-      <div class="cls" style="--c:#C69B6D"><span class="cls-n">Warrior</span><span class="cls-w">Sanctum, Sepulcher, Vault — arms and fury</span></div>
-      <div class="cls" style="--c:#AAD372"><span class="cls-n">Hunter</span><span class="cls-w">No proof. It's hunter though.</span></div>
-      <div class="cls" style="--c:#FFF468"><span class="cls-n">Rogue</span><span class="cls-w">Amirdrassil, most bosses on all three specs</span></div>
-      <div class="cls" style="--c:#8788EE"><span class="cls-n">Warlock</span><span class="cls-w">Subbed in when the guild had none</span></div>
-      <div class="cls" style="--c:#00FF98"><span class="cls-n">Monk</span><span class="cls-w">DPS and heal — Castle Nathria</span></div>
-      <div class="cls" style="--c:#0070DD"><span class="cls-n">Shaman</span><span class="cls-w">Resto — Fated raids and CN</span></div>
-      <div class="cls" style="--c:#FFFFFF"><span class="cls-n">Priest</span><span class="cls-w">Shadow and holy — Aberrus</span></div>
-      <div class="cls" style="--c:#3FC7EB"><span class="cls-n">Mage</span><span class="cls-w">Nerub-ar Palace</span></div>
+      <div class="cls main" style="--c:#F48CBA">
+        <span class="cls-n">Paladin</span>
+        <span class="cls-w">Holy and ret. Most of BFA, and the current main.</span>
+        <span class="cls-logs"><a class="cls-log" href="https://www.warcraftlogs.com/character/eu/ravencrest/shyabel?zone=44" target="_blank" rel="noopener">Manaforge reclear →</a><a class="cls-log" href="https://www.warcraftlogs.com/character/eu/ravencrest/novaren?zone=24" target="_blank" rel="noopener">Most of BFA →</a></span>
+      </div>
+      <div class="cls" style="--c:#C69B6D">
+        <span class="cls-n">Warrior</span>
+        <span class="cls-w">Arms and fury. Sanctum, Sepulcher and Vault.</span>
+        <span class="cls-logs"><a class="cls-log" href="https://www.warcraftlogs.com/character/id/60903228?zone=31" target="_blank" rel="noopener">Sanctum → Vault →</a></span>
+      </div>
+      <div class="cls" style="--c:#3FC7EB">
+        <span class="cls-n">Mage</span>
+        <span class="cls-w">Nerub-ar Palace, through to Queen Ansurek.</span>
+        <span class="cls-logs"><a class="cls-log" href="https://www.warcraftlogs.com/character/eu/argent-dawn/shyveth?zone=38" target="_blank" rel="noopener">Queen Ansurek →</a></span>
+      </div>
+      <div class="cls" style="--c:#FFF468">
+        <span class="cls-n">Rogue</span>
+        <span class="cls-w">Amirdrassil. Most bosses on all three specs.</span>
+        <span class="cls-logs"><a class="cls-log" href="https://www.warcraftlogs.com/character/eu/ravencrest/shaiyex?zone=35" target="_blank" rel="noopener">Amirdrassil →</a></span>
+      </div>
+      <div class="cls" style="--c:#FFFFFF">
+        <span class="cls-n">Priest</span>
+        <span class="cls-w">Shadow and holy, through Aberrus.</span>
+        <span class="cls-logs"><a class="cls-log" href="https://www.warcraftlogs.com/character/eu/ravencrest/shyvella#zone=33" target="_blank" rel="noopener">Aberrus →</a></span>
+      </div>
+      <div class="cls" style="--c:#8788EE">
+        <span class="cls-n">Warlock</span>
+        <span class="cls-w">Subbed in when the guild had none. Currently Dimensius.</span>
+        <span class="cls-logs"><a class="cls-log" href="https://www.warcraftlogs.com/character/eu/argent-dawn/shyrilxz?zone=44" target="_blank" rel="noopener">Dimensius →</a></span>
+      </div>
+      <div class="cls" style="--c:#00FF98">
+        <span class="cls-n">Monk</span>
+        <span class="cls-w">DPS and heal, in Castle Nathria.</span>
+        <span class="cls-logs"><a class="cls-log" href="https://www.warcraftlogs.com/character/eu/argent-dawn/shaiyex?zone=29#zone=26" target="_blank" rel="noopener">Castle Nathria →</a></span>
+      </div>
+      <div class="cls" style="--c:#0070DD">
+        <span class="cls-n">Shaman</span>
+        <span class="cls-w">Resto, through the Fated raids and CN.</span>
+        <span class="cls-logs"><a class="cls-log" href="https://www.warcraftlogs.com/character/eu/ravencrest/shaiye?zone=29#partition=4&amp;difficulty=5" target="_blank" rel="noopener">Fated →</a></span>
+      </div>
+      <div class="cls" style="--c:#AAD372">
+        <span class="cls-n">Hunter</span>
+        <span class="cls-w">No proof. It's hunter though.</span>
+        <span class="cls-logs"><span class="cls-nolog">No logs</span></span>
+      </div>
     </div>
-  </section>
 
-  <section>
-    <div class="sec-head">
-      <p class="eyebrow">Receipts</p>
-      <h2>Warcraft Logs.</h2>
-      <p class="sec-lede">Ten characters, seven expansions. Current mains first, then the archive — every link opens the parses directly.</p>
-    </div>
-
-    <div class="loggrid">
-      <a class="logcard" style="--c:#F48CBA" href="https://raider.io/characters/eu/argent-dawn/Shaiyex" target="_blank" rel="noopener">
-        <span class="log-cls">Holy Paladin · Main</span>
-        <span class="log-name">Shaiyex</span>
-        <span class="log-meta">Argent Dawn · &lt;Deception&gt; · 2,878.9 M+</span>
-        <span class="log-go">Raider.IO →</span>
-      </a>
-      <a class="logcard" style="--c:#8788EE" href="https://www.warcraftlogs.com/character/eu/argent-dawn/shyrilxz?zone=44" target="_blank" rel="noopener">
-        <span class="log-cls">Warlock · Current</span>
-        <span class="log-name">Shyrilxz</span>
-        <span class="log-meta">Argent Dawn · Dimensius</span>
-        <span class="log-go">Warcraft Logs →</span>
-      </a>
-      <a class="logcard" style="--c:#F48CBA" href="https://www.warcraftlogs.com/character/eu/ravencrest/shyabel?zone=44" target="_blank" rel="noopener">
-        <span class="log-cls">Paladin · Current</span>
-        <span class="log-name">Shyabel</span>
-        <span class="log-meta">Ravencrest · Manaforge reclear</span>
-        <span class="log-go">Warcraft Logs →</span>
-      </a>
-      <a class="logcard" style="--c:#3FC7EB" href="https://www.warcraftlogs.com/character/eu/argent-dawn/shyveth?zone=38" target="_blank" rel="noopener">
-        <span class="log-cls">Mage</span>
-        <span class="log-name">Shyveth</span>
-        <span class="log-meta">Argent Dawn · Queen Ansurek</span>
-        <span class="log-go">Warcraft Logs →</span>
-      </a>
-      <a class="logcard" style="--c:#FFF468" href="https://www.warcraftlogs.com/character/eu/ravencrest/shaiyex?zone=35" target="_blank" rel="noopener">
-        <span class="log-cls">Rogue · All three specs</span>
-        <span class="log-name">Shaiyex</span>
-        <span class="log-meta">Ravencrest · Amirdrassil</span>
-        <span class="log-go">Warcraft Logs →</span>
-      </a>
-      <a class="logcard" style="--c:#FFFFFF" href="https://www.warcraftlogs.com/character/eu/ravencrest/shyvella#zone=33" target="_blank" rel="noopener">
-        <span class="log-cls">Priest · Shadow + Holy</span>
-        <span class="log-name">Shyvella</span>
-        <span class="log-meta">Ravencrest · Aberrus</span>
-        <span class="log-go">Warcraft Logs →</span>
-      </a>
-      <a class="logcard" style="--c:#F48CBA" href="https://www.warcraftlogs.com/character/eu/ravencrest/novaren?zone=24" target="_blank" rel="noopener">
-        <span class="log-cls">Paladin</span>
-        <span class="log-name">Novaren</span>
-        <span class="log-meta">Ravencrest · Most of BFA</span>
-        <span class="log-go">Warcraft Logs →</span>
-      </a>
-      <a class="logcard" style="--c:#C69B6D" href="https://www.warcraftlogs.com/character/id/60903228?zone=31" target="_blank" rel="noopener">
-        <span class="log-cls">Warrior · Arms + Fury</span>
-        <span class="log-name">Warrior</span>
-        <span class="log-meta">Sanctum · Sepulcher · Vault</span>
-        <span class="log-go">Warcraft Logs →</span>
-      </a>
-      <a class="logcard" style="--c:#0070DD" href="https://www.warcraftlogs.com/character/eu/ravencrest/shaiye?zone=29#partition=4&amp;difficulty=5" target="_blank" rel="noopener">
-        <span class="log-cls">Resto Shaman</span>
-        <span class="log-name">Shaiye</span>
-        <span class="log-meta">Ravencrest · Fated</span>
-        <span class="log-go">Warcraft Logs →</span>
-      </a>
-      <a class="logcard" style="--c:#00FF98" href="https://www.warcraftlogs.com/character/eu/argent-dawn/shaiyex?zone=29#zone=26" target="_blank" rel="noopener">
-        <span class="log-cls">Windwalker Monk</span>
-        <span class="log-name">Shaiyex</span>
-        <span class="log-meta">Argent Dawn · Castle Nathria</span>
-        <span class="log-go">Warcraft Logs →</span>
-      </a>
-      <a class="logcard" style="--c:#E8C36B" href="https://raider.io/characters/eu/argent-dawn/Shyrawr" target="_blank" rel="noopener">
-        <span class="log-cls">Last season main</span>
-        <span class="log-name">Shyrawr</span>
-        <span class="log-meta">Argent Dawn · No raiding</span>
-        <span class="log-go">Raider.IO →</span>
-      </a>
-    </div>
+    <p class="prose" style="margin-top:20px">Last season’s main was <a href="https://raider.io/characters/eu/argent-dawn/Shyrawr" target="_blank" rel="noopener">Shyrawr</a>, which did no raiding — it is on Raider.IO if you want it.</p>
   </section>
 
   <section>
