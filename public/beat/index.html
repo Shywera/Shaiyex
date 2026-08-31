@@ -4,33 +4,33 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Every kick is a cast bar. Interrupt it or someone dies.">
-<meta name="theme-color" content="#07030F">
+<meta name="description" content="Kings' Rest, on the beat. Interrupt every cast or your group dies.">
+<meta name="theme-color" content="#0A0710">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Interrupt On The Beat">
-<meta property="og:description" content="150 BPM. 228 casts. Four people who die if you miss.">
+<meta property="og:title" content="Kings' Rest On The Beat">
+<meta property="og:description" content="Normal, Heroic, Mythic. Four lanes. 150 BPM.">
 <meta property="og:url" content="https://shaiyex.com/beat/">
 <meta name="twitter:card" content="summary">
-<title>Interrupt On The Beat</title>
+<title>Kings' Rest On The Beat</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap">
 
 <style>
   :root{
-    --ink:#07030F;
-    --panel:#120B1F;
-    --line:#2C1B4A;
-    --line-hot:#4A2C82;
-    --text:#F5EEFF;
-    --dim:#A897C8;
-    --dimmer:#6E5F91;
+    --ink:#0A0710;
+    --panel:#150F22;
+    --line:#2E2140;
+    --line-hot:#4E3A6B;
+    --text:#F3ECDC;
+    --dim:#B4A68F;
+    --dimmer:#7C6E5E;
 
-    --hot:#FF2BD1;      /* hardstyle magenta */
-    --cool:#00E0FF;
-    --volt:#B14BFF;
-    --acid:#C6FF3D;
-    --bad:#FF3B3B;
+    --gold:#E8C468;
+    --jade:#2FD8C3;
+    --violet:#A96CFF;
+    --rose:#FF3FA4;
+    --bad:#FF4B4B;
 
     --display:"Bebas Neue","Arial Narrow",sans-serif;
     --body:"Archivo","Segoe UI",Helvetica,Arial,sans-serif;
@@ -42,64 +42,56 @@
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0;
-    background:var(--ink);
-    color:var(--text);
-    font-family:var(--body);
-    -webkit-font-smoothing:antialiased;
-    overflow:hidden;
-    touch-action:manipulation;
+    margin:0;background:var(--ink);color:var(--text);
+    font-family:var(--body);-webkit-font-smoothing:antialiased;
+    overflow:hidden;touch-action:manipulation;
   }
 
-  /* ---------- room ---------- */
+  /* ---------- the tomb ---------- */
   .lights{
     position:fixed;inset:0;z-index:0;pointer-events:none;
     background:
-      radial-gradient(60% 50% at 15% 0%,   rgba(255,43,209,.26), rgba(255,43,209,0) 62%),
-      radial-gradient(58% 46% at 85% 6%,   rgba(0,224,255,.22),  rgba(0,224,255,0) 62%),
-      radial-gradient(80% 60% at 50% 104%, rgba(177,75,255,.30), rgba(177,75,255,0) 64%);
-    opacity:calc(.26 + var(--p) * .12);
+      radial-gradient(62% 50% at 18% 0%,   rgba(232,196,104,.22), rgba(232,196,104,0) 62%),
+      radial-gradient(56% 44% at 84% 8%,   rgba(47,216,195,.16),  rgba(47,216,195,0) 62%),
+      radial-gradient(82% 62% at 50% 104%, rgba(169,108,255,.26), rgba(169,108,255,0) 64%);
+    opacity:calc(.3 + var(--p) * .12);
   }
   .floor{
     position:fixed;inset:-20% -20% -45%;z-index:0;pointer-events:none;
     background:
-      repeating-linear-gradient(90deg, rgba(177,75,255,.18) 0 1px, rgba(0,0,0,0) 1px 76px),
-      repeating-linear-gradient( 0deg, rgba(0,224,255,.10) 0 1px, rgba(0,0,0,0) 1px 76px);
+      repeating-linear-gradient(90deg, rgba(232,196,104,.15) 0 1px, rgba(0,0,0,0) 1px 76px),
+      repeating-linear-gradient( 0deg, rgba(169,108,255,.10) 0 1px, rgba(0,0,0,0) 1px 76px);
     transform:perspective(680px) rotateX(66deg);
-    opacity:.12;
+    opacity:.13;
     -webkit-mask-image:linear-gradient(180deg, rgba(0,0,0,0) 42%, #000 100%);
     mask-image:linear-gradient(180deg, rgba(0,0,0,0) 42%, #000 100%);
   }
-  /* no blend modes and no animated full screen shadows.
-     both of those repaint the entire viewport on every single frame. */
   .scan{
     position:fixed;inset:0;z-index:6;pointer-events:none;
-    background:repeating-linear-gradient(180deg, rgba(0,0,0,.18) 0 1px, rgba(0,0,0,0) 1px 4px);
-    opacity:.3;
+    background:repeating-linear-gradient(180deg, rgba(0,0,0,.16) 0 1px, rgba(0,0,0,0) 1px 4px);
+    opacity:.28;
   }
 
-  /* ---------- stage ---------- */
   .stage{
-    position:relative;z-index:2;
-    height:100%;
+    position:relative;z-index:2;height:100%;
     display:flex;flex-direction:column;
-    padding:clamp(10px,2vw,18px);
-    gap:clamp(8px,1.4vw,14px);
+    padding:clamp(10px,2vw,18px);gap:clamp(8px,1.4vw,14px);
   }
 
-  /* ---------- top bar ---------- */
-  .top{
-    display:flex;align-items:flex-start;justify-content:space-between;
-    gap:14px;flex-wrap:wrap;
-  }
-  .brand{display:flex;align-items:baseline;gap:10px}
+  .top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+  .brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
   .brand-t{
     font-family:var(--display);font-size:clamp(20px,3vw,30px);
-    line-height:1;letter-spacing:.02em;color:var(--text);
+    line-height:1;letter-spacing:.02em;color:var(--gold);
   }
   .brand-s{
     font-family:var(--mono);font-size:9.5px;font-weight:700;
-    letter-spacing:.18em;text-transform:uppercase;color:var(--hot);
+    letter-spacing:.18em;text-transform:uppercase;color:var(--dimmer);
+  }
+  #diffTag{
+    font-family:var(--mono);font-size:9px;font-weight:700;
+    letter-spacing:.16em;text-transform:uppercase;
+    padding:2px 7px 3px;border:1px solid currentColor;border-radius:2px;
   }
   .stats{display:flex;gap:clamp(10px,2vw,22px);align-items:flex-end}
   .stat{text-align:right;line-height:1}
@@ -112,18 +104,14 @@
     font-family:var(--mono);font-size:9px;font-weight:700;
     letter-spacing:.16em;text-transform:uppercase;color:var(--dimmer);
   }
-  #combo b{color:var(--acid)}
+  #combo b{color:var(--gold)}
   #combo.big b{font-size:clamp(30px,5vw,50px)}
 
-  /* ---------- party ---------- */
   .party{display:flex;gap:8px;flex-wrap:wrap}
   .pf{
-    flex:1 1 0;min-width:96px;
-    padding:8px 10px 9px;
-    background:var(--panel);
-    border:1px solid var(--line);
-    border-left:3px solid var(--k);
-    border-radius:2px;
+    flex:1 1 0;min-width:96px;padding:8px 10px 9px;
+    background:var(--panel);border:1px solid var(--line);
+    border-left:3px solid var(--k);border-radius:2px;
     position:relative;overflow:hidden;
     transition:opacity .3s ease, filter .3s ease;
   }
@@ -137,52 +125,42 @@
     font-size:9px;letter-spacing:.1em;
   }
   .pf-r{
-    font-family:var(--mono);font-size:8.5px;
-    letter-spacing:.12em;text-transform:uppercase;color:var(--dimmer);
-    margin-top:2px;
+    font-family:var(--mono);font-size:8.5px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--dimmer);margin-top:2px;
   }
-  .pf-hp{
-    margin-top:7px;height:5px;border-radius:2px;
-    background:#241634;overflow:hidden;
-  }
+  .pf-hp{margin-top:7px;height:5px;border-radius:2px;background:#2A1F3A;overflow:hidden}
   .pf-hp i{
     display:block;height:100%;width:100%;
     background:linear-gradient(90deg, var(--k), #fff);
     transition:width .25s ease;
   }
   .pf.hurt{border-color:#7A2A2A}
-  .pf.hurt .pf-hp i{background:linear-gradient(90deg,#FF3B3B,#FF9A9A)}
-  .pf.dead{opacity:.35;filter:grayscale(1)}
+  .pf.hurt .pf-hp i{background:linear-gradient(90deg,#FF4B4B,#FFA0A0)}
+  .pf.dead{opacity:.32;filter:grayscale(1)}
   .pf.dead .pf-hp i{width:0}
   .pf.dead::after{
-    content:"DEAD";
-    position:absolute;right:8px;top:7px;
+    content:"DEAD";position:absolute;right:8px;top:7px;
     font-family:var(--mono);font-size:9px;font-weight:700;
     letter-spacing:.14em;color:var(--bad);
   }
   .pf.rez{animation:rez .7s ease}
   @keyframes rez{
-    0%{box-shadow:0 0 0 rgba(198,255,61,0)}
-    35%{box-shadow:0 0 34px rgba(198,255,61,.85)}
-    100%{box-shadow:0 0 0 rgba(198,255,61,0)}
+    0%{box-shadow:0 0 0 rgba(232,196,104,0)}
+    35%{box-shadow:0 0 34px rgba(232,196,104,.85)}
+    100%{box-shadow:0 0 0 rgba(232,196,104,0)}
   }
 
-  /* ---------- playfield ---------- */
   .field{
     position:relative;flex:1 1 auto;min-height:300px;
-    border:1px solid var(--line);
-    border-radius:3px;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0) 40%),
-      #0C0618;
+    border:1px solid var(--line);border-radius:3px;
+    background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0) 40%), #0E0918;
     overflow:hidden;
   }
   #pf{display:block;width:100%;height:100%}
   .judge{
     position:absolute;left:0;right:0;top:50%;
     text-align:center;pointer-events:none;
-    font-family:var(--display);
-    font-size:clamp(24px,4.4vw,44px);
+    font-family:var(--display);font-size:clamp(24px,4.4vw,44px);
     line-height:1;opacity:0;
   }
   .judge.on{animation:judge .5s ease-out forwards}
@@ -193,13 +171,13 @@
     100%{opacity:0;transform:scale(1.04)}
   }
   .sect{
-    position:absolute;left:0;right:0;bottom:10px;
+    position:absolute;left:0;right:0;top:10px;
     text-align:center;pointer-events:none;
     font-family:var(--mono);font-size:10px;font-weight:700;
-    letter-spacing:.3em;text-transform:uppercase;color:var(--dimmer);
+    letter-spacing:.24em;text-transform:uppercase;color:var(--dim);
   }
+  .sect b{color:var(--gold);font-weight:700}
 
-  /* ---------- bottom ---------- */
   .bottom{
     display:flex;align-items:center;justify-content:space-between;
     gap:12px;flex-wrap:wrap;
@@ -213,72 +191,87 @@
     border:1px solid var(--line-hot);border-radius:2px;color:var(--dim);
   }
   #calm{
-    font:inherit;cursor:pointer;
-    padding:4px 10px 5px;
-    color:var(--dim);background:rgba(18,11,31,.9);
+    font:inherit;cursor:pointer;padding:4px 10px 5px;
+    color:var(--dim);background:rgba(21,15,34,.9);
     border:1px solid var(--line-hot);border-radius:2px;
   }
-  #calm:hover{color:var(--text);border-color:var(--cool)}
-  #calm.on{color:#07030F;background:var(--acid);border-color:#E4FF8A}
-  /* easy on the eyes: the room stops moving, the lane still reads */
-  body.calm .lights{opacity:.16}
-  body.calm .floor{opacity:.06}
-  body.calm .judge.on{animation-duration:.32s}
+  #calm:hover{color:var(--text);border-color:var(--jade)}
+  #calm.on{color:#0A0710;background:var(--gold);border-color:#FFE39A}
+  body.calm .lights{opacity:.2}
+  body.calm .floor{opacity:.07}
 
   /* ---------- overlays ---------- */
   .over{
     position:fixed;inset:0;z-index:40;
     display:grid;place-items:center;text-align:center;padding:24px;
     background:
-      radial-gradient(78% 60% at 50% 45%, rgba(177,75,255,.26) 0%, rgba(7,3,15,.985) 74%),
+      radial-gradient(78% 60% at 50% 45%, rgba(169,108,255,.2) 0%, rgba(10,7,16,.985) 74%),
       var(--ink);
     transition:opacity .4s ease;
   }
   .over.gone{opacity:0;pointer-events:none}
-  .over-in{max-width:660px;width:100%}
+  .over-in{max-width:700px;width:100%}
   .ov-k{
     font-family:var(--mono);font-size:11px;font-weight:700;
-    letter-spacing:.26em;text-transform:uppercase;color:var(--cool);margin:0;
+    letter-spacing:.26em;text-transform:uppercase;color:var(--jade);margin:0;
   }
   .ov-t{
-    font-family:var(--display);
-    font-size:clamp(46px,12vw,120px);line-height:.84;margin:.1em 0 0;
-    color:var(--text);
-    text-shadow:-4px 0 var(--hot), 4px 0 var(--cool), 0 0 70px rgba(177,75,255,.6);
+    font-family:var(--display);font-size:clamp(44px,11vw,110px);
+    line-height:.84;margin:.1em 0 0;color:var(--gold);
+    text-shadow:0 0 60px rgba(232,196,104,.35);
   }
-  .ov-s{margin:18px auto 0;max-width:46ch;color:var(--dim);font-size:15px;line-height:1.6}
+  .ov-s{margin:16px auto 0;max-width:52ch;color:var(--dim);font-size:15px;line-height:1.6}
   .ov-s b{color:var(--text);font-weight:600}
-  .btn{
-    margin-top:26px;font-family:var(--display);
-    font-size:clamp(22px,4.6vw,36px);letter-spacing:.06em;
-    padding:11px 42px 13px;color:#07030F;background:var(--acid);
-    border:1px solid #E4FF8A;border-radius:2px;cursor:pointer;
-    box-shadow:0 0 46px rgba(198,255,61,.42);
-  }
-  .btn:hover{background:#D9FF6E}
-  .btn:active{transform:translateY(2px)}
-  .btn:focus-visible{outline:2px solid var(--cool);outline-offset:4px}
-  .btn.alt{
-    background:transparent;color:var(--dim);
-    border-color:var(--line-hot);box-shadow:none;
-    font-size:clamp(16px,3vw,22px);padding:9px 24px 11px;margin-left:10px;
-  }
-  .btn.alt:hover{color:var(--text);border-color:var(--cool)}
 
-  /* result card */
+  .diffs{
+    display:grid;grid-template-columns:repeat(3,1fr);
+    gap:10px;margin:26px auto 0;max-width:620px;
+  }
+  .diff{
+    font:inherit;cursor:pointer;text-align:left;
+    padding:14px 14px 15px;
+    background:var(--panel);border:1px solid var(--line);
+    border-top:3px solid var(--c);border-radius:2px;
+    transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+  .diff:hover{transform:translateY(-3px);border-color:var(--c);box-shadow:0 12px 30px rgba(0,0,0,.5)}
+  .diff-n{
+    display:block;font-family:var(--display);font-size:26px;
+    line-height:1;color:var(--c);letter-spacing:.02em;
+  }
+  .diff-d{
+    display:block;margin-top:7px;
+    font-family:var(--mono);font-size:9.5px;line-height:1.7;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--dimmer);
+  }
+  .diff-1{--c:var(--jade)}
+  .diff-2{--c:var(--gold)}
+  .diff-3{--c:var(--rose)}
+  @media (max-width:620px){ .diffs{grid-template-columns:1fr} }
+
+  .btn{
+    margin-top:22px;font-family:var(--display);
+    font-size:clamp(20px,4vw,32px);letter-spacing:.06em;
+    padding:10px 36px 12px;color:#0A0710;background:var(--gold);
+    border:1px solid #FFE39A;border-radius:2px;cursor:pointer;
+    box-shadow:0 0 42px rgba(232,196,104,.35);
+  }
+  .btn:hover{background:#F5D689}
+  .btn:active{transform:translateY(2px)}
+  .btn.alt{
+    background:transparent;color:var(--dim);border-color:var(--line-hot);
+    box-shadow:none;font-size:clamp(15px,2.6vw,20px);padding:8px 20px 10px;margin-left:10px;
+  }
+  .btn.alt:hover{color:var(--text);border-color:var(--jade)}
+
   .grade{
-    font-family:var(--display);
-    font-size:clamp(80px,20vw,190px);line-height:.8;
-    margin:.06em 0 0;
-    text-shadow:0 0 60px currentColor;
+    font-family:var(--display);font-size:clamp(70px,17vw,160px);
+    line-height:.8;margin:.06em 0 0;text-shadow:0 0 60px currentColor;
   }
-  .rows{
-    margin:22px auto 0;max-width:420px;
-    border-top:1px solid var(--line);
-  }
+  .rows{margin:20px auto 0;max-width:420px;border-top:1px solid var(--line)}
   .row{
     display:flex;justify-content:space-between;align-items:baseline;
-    padding:9px 2px;border-bottom:1px solid var(--line);
+    padding:8px 2px;border-bottom:1px solid var(--line);
     font-family:var(--mono);font-size:11px;
     letter-spacing:.12em;text-transform:uppercase;color:var(--dim);
   }
@@ -286,28 +279,16 @@
     font-family:var(--display);font-size:22px;line-height:1;
     color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:.02em;
   }
-  .row.hot b{color:var(--hot)}
-  .row.good b{color:var(--acid)}
+  .row.hot b{color:var(--gold)}
+  .row.good b{color:var(--jade)}
   .row.bad b{color:var(--bad)}
-
   .cal{
-    margin-top:16px;font-family:var(--mono);font-size:10px;
+    margin-top:14px;font-family:var(--mono);font-size:10px;
     letter-spacing:.12em;text-transform:uppercase;color:var(--dimmer);
   }
-  .cal b{color:var(--cool)}
 
-  @media (max-width:640px){
-    .pf-k{
-    display:inline-block;margin-left:5px;padding:1px 5px 2px;
-    border:1px solid var(--k);border-radius:2px;color:var(--k);
-    font-size:9px;letter-spacing:.1em;
-  }
-  .pf-r{display:none}
-    .stats{gap:12px}
-  }
-  @media (prefers-reduced-motion:reduce){
-    *{animation-duration:.01ms !important}
-  }
+  @media (max-width:640px){ .pf-r{display:none} .stats{gap:12px} }
+  @media (prefers-reduced-motion:reduce){ *{animation-duration:.01ms !important} }
 </style>
 </head>
 <body>
@@ -316,14 +297,15 @@
 <div class="floor" aria-hidden="true"></div>
 <div class="scan" aria-hidden="true"></div>
 
-<audio id="track" src="track.mp3" preload="auto"></audio>
+<audio id="track" src="whoareyou-v2.mp3" preload="auto"></audio>
 
 <div class="stage">
 
   <div class="top">
     <div class="brand">
-      <span class="brand-t">Interrupt on the beat</span>
+      <span class="brand-t">Kings' Rest</span>
       <span class="brand-s">150 BPM</span>
+      <span id="diffTag">Normal</span>
     </div>
     <div class="stats">
       <div class="stat" id="combo"><b>0</b><span>Combo</span></div>
@@ -333,21 +315,21 @@
   </div>
 
   <div class="party" id="party">
-    <div class="pf" style="--k:#7FB6E8" data-i="0">
-      <div class="pf-n">Tank <span class="pf-k">D</span></div><div class="pf-r">Holds it together</div>
-      <div class="pf-hp"><i></i></div>
+    <div class="pf" style="--k:#E8C468" data-i="0">
+      <div class="pf-n">Tank <span class="pf-k">D</span></div>
+      <div class="pf-r">Holds it together</div><div class="pf-hp"><i></i></div>
     </div>
-    <div class="pf" style="--k:#FF2BD1" data-i="1">
-      <div class="pf-n">Dps 1 <span class="pf-k">F</span></div><div class="pf-r">Says unlucky</div>
-      <div class="pf-hp"><i></i></div>
+    <div class="pf" style="--k:#FF3FA4" data-i="1">
+      <div class="pf-n">Dps 1 <span class="pf-k">F</span></div>
+      <div class="pf-r">Says unlucky</div><div class="pf-hp"><i></i></div>
     </div>
-    <div class="pf" style="--k:#C6FF3D" data-i="2">
-      <div class="pf-n">Dps 2 <span class="pf-k">J</span></div><div class="pf-r">Never kicks</div>
-      <div class="pf-hp"><i></i></div>
+    <div class="pf" style="--k:#2FD8C3" data-i="2">
+      <div class="pf-n">Dps 2 <span class="pf-k">J</span></div>
+      <div class="pf-r">Never kicks</div><div class="pf-hp"><i></i></div>
     </div>
-    <div class="pf" style="--k:#00E0FF" data-i="3">
-      <div class="pf-n">Dps 3 <span class="pf-k">K</span></div><div class="pf-r">Typing</div>
-      <div class="pf-hp"><i></i></div>
+    <div class="pf" style="--k:#A96CFF" data-i="3">
+      <div class="pf-n">Dps 3 <span class="pf-k">K</span></div>
+      <div class="pf-r">Typing</div><div class="pf-hp"><i></i></div>
     </div>
   </div>
 
@@ -369,11 +351,23 @@
 
 <div class="over" id="gate">
   <div class="over-in">
-    <p class="ov-k">Rhythm mode</p>
-    <p class="ov-t">Who Are You</p>
-    <p class="ov-s">Four lanes, one per person in your group. <b>D and F for the left two, J and K for the right two.</b> Hit the key when the cast reaches the line. Miss twice on the same person and they die. Four deaths and the key is over.</p>
-    <p class="ov-s" style="margin-top:10px"><b>236 casts. 150 BPM.</b> Thirty perfects in a row is a battle res. The last drop is not survivable by reacting, you have to feel it.</p>
-    <button class="btn" id="start" type="button">Pull</button>
+    <p class="ov-k">Interrupt on the beat</p>
+    <p class="ov-t">Kings' Rest</p>
+    <p class="ov-s">Four lanes, one per person in your group. <b>D and F for the left two, J and K for the right two.</b> Press the key as the cast reaches the line. Every cast in here is a real Kings' Rest cast, and every one of them is interruptible.</p>
+    <div class="diffs">
+      <button class="diff diff-1" data-d="normal" type="button">
+        <span class="diff-n">Normal</span>
+        <span class="diff-d">236 casts<br>Wide window<br>Two lives each</span>
+      </button>
+      <button class="diff diff-2" data-d="heroic" type="button">
+        <span class="diff-n">Heroic</span>
+        <span class="diff-d">444 casts<br>Tight window<br>Two lives each</span>
+      </button>
+      <button class="diff diff-3" data-d="mythic" type="button">
+        <span class="diff-n">Mythic</span>
+        <span class="diff-d">611 casts<br>No window<br>One life each</span>
+      </button>
+    </div>
     <p class="cal">Sound on. If your hits feel off, nudge the offset with the arrow keys</p>
   </div>
 </div>
@@ -391,6 +385,7 @@
     <p class="ov-k" id="rk">Key complete</p>
     <p class="grade" id="grade">S</p>
     <div class="rows">
+      <div class="row"><span>Difficulty</span><b id="rdiff">Normal</b></div>
       <div class="row hot"><span>Longest combo</span><b id="rcombo">0</b></div>
       <div class="row good"><span>Perfect</span><b id="rperf">0</b></div>
       <div class="row"><span>Good</span><b id="rgood">0</b></div>
@@ -406,57 +401,163 @@
 
 <script>
 (function(){
-  /* ---- the grid, measured off track.mp3 ---- */
-  var BPM = 150, BEAT = 0.4, ZERO = 0.048;
+  /* the grid, measured off the file: 150.00 bpm, 4 ms drift end to end */
+  var BEAT = 0.4, ZERO = 0.048;
+  var SONG_END = 158.4;          /* audible content ends here, file runs to 164.7 */
 
-  /* ---- the chart, generated from the kick pattern in the file ---- */
-  var CHART = [
+  var CHART_N = [
     [8,0],[12,1],[16,2],[20,3],[24,0],[28,1],[32,0],[34,2],[36,1],[38,3],[40,0],[42,2],[44,1],
-    [46,3],[48,0],[50,2],[52,1],[54,3],[56,0],[58,2],[60,1],[62,3],[65,0],[66,2],[67,1],[68,3],
-    [69,1],[70,2],[71,0],[72,3],[73,0],[74,2],[75,1],[76,3],[77,1],[78,2],[79,0],[80,3],[81,0],
-    [82,2],[83,1],[84,3],[85,1],[86,2],[87,0],[88,3],[89,0],[90,2],[91,1],[92,3],[100,0],
-    [108,3],[116,1],[124,2],[132,0],[140,3],[148,1],[156,2],[164,0],[172,3],[180,1],[188,2],
-    [192,0],[196,1],[200,2],[204,3],[208,3],[210,2],[212,1],[214,0],[216,3],[218,2],[220,1],
-    [222,0],[224,0],[226,3],[228,1],[230,2],[232,0],[234,3],[236,1],[238,2],[240,0],[241,1],
-    [242,2],[243,3],[244,3],[245,2],[246,1],[247,0],[248,0],[249,1],[250,2],[251,3],[252,3],
-    [253,2],[254,1],[255,0],[256,0],[256,3],[257,2],[258,1],[259,3],[260,2],[261,0],[262,3],
-    [263,1],[265,0],[266,2],[267,1],[268,3],[269,2],[270,0],[271,3],[272,1],[272,2],[273,0],
-    [274,2],[275,1],[276,3],[277,2],[278,0],[279,3],[280,1],[280,2],[281,0],[282,2],[283,1],
-    [284,3],[285,2],[286,0],[287,3],[288,1],[288,2],[289,0],[290,2],[291,1],[292,3],[293,2],
-    [295,0],[297,3],[298,1],[299,0],[300,2],[301,1],[302,3],[303,2],[304,0],[304,3],[305,3],
-    [306,1],[307,0],[308,2],[309,1],[310,3],[311,2],[312,0],[312,3],[313,3],[314,1],[315,0],
-    [316,2],[317,1],[318,3],[319,2],[320,1],[322,2],[324,1],[326,2],[328,1],[330,2],[332,1],
-    [334,2],[336,0],[336,3],[337,3],[338,1],[339,2],[340,0],[340,3],[341,0],[342,2],[343,1],
-    [344,0],[344,3],[345,3],[346,1],[347,2],[347.5,3],[348,0],[348,3],[349,0],[350,2],[351,1],
-    [352,0],[352,3],[353,3],[354,1],[355,2],[355.5,3],[356,0],[356,3],[357,0],[358,2],[359,1],
-    [361,0],[362,3],[363,1],[363.5,3],[364,1],[364,2],[365,3],[366,0],[367,2],[368,1],[368,2],
-    [369,0],[370,3],[371,1],[371.5,3],[372,1],[372,2],[373,3],[374,0],[375,2],[376,1],[376,2],
-    [377,0],[378,3],[379,1],[379.5,3],[380,1],[380,2],[381,3],[382,0],[383,2]
+    [46,3],[48,0],[50,2],[52,1],[54,3],[56,0],[58,2],[60,1],[62,3],[65,0],[66,2],[67,1],
+    [68,3],[69,1],[70,2],[71,0],[72,3],[73,0],[74,2],[75,1],[76,3],[77,1],[78,2],[79,0],
+    [80,3],[81,0],[82,2],[83,1],[84,3],[85,1],[86,2],[87,0],[88,3],[89,0],[90,2],[91,1],
+    [92,3],[100,0],[108,3],[116,1],[124,2],[132,0],[140,3],[148,1],[156,2],[164,0],[172,3],
+    [180,1],[188,2],[192,0],[196,1],[200,2],[204,3],[208,3],[210,2],[212,1],[214,0],[216,3],
+    [218,2],[220,1],[222,0],[224,0],[226,3],[228,1],[230,2],[232,0],[234,3],[236,1],[238,2],
+    [240,0],[241,1],[242,2],[243,3],[244,3],[245,2],[246,1],[247,0],[248,0],[249,1],[250,2],
+    [251,3],[252,3],[253,2],[254,1],[255,0],[256,0],[256,3],[257,2],[258,1],[259,3],[260,2],
+    [261,0],[262,3],[263,1],[265,0],[266,2],[267,1],[268,3],[269,2],[270,0],[271,3],[272,1],
+    [272,2],[273,0],[274,2],[275,1],[276,3],[277,2],[278,0],[279,3],[280,1],[280,2],[281,0],
+    [282,2],[283,1],[284,3],[285,2],[286,0],[287,3],[288,1],[288,2],[289,0],[290,2],[291,1],
+    [292,3],[293,2],[295,0],[297,3],[298,1],[299,0],[300,2],[301,1],[302,3],[303,2],[304,0],
+    [304,3],[305,3],[306,1],[307,0],[308,2],[309,1],[310,3],[311,2],[312,0],[312,3],[313,3],
+    [314,1],[315,0],[316,2],[317,1],[318,3],[319,2],[320,1],[322,2],[324,1],[326,2],[328,1],
+    [330,2],[332,1],[334,2],[336,0],[336,3],[337,3],[338,1],[339,2],[340,0],[340,3],[341,0],
+    [342,2],[343,1],[344,0],[344,3],[345,3],[346,1],[347,2],[347.5,3],[348,0],[348,3],[349,0],
+    [350,2],[351,1],[352,0],[352,3],[353,3],[354,1],[355,2],[355.5,3],[356,0],[356,3],[357,0],
+    [358,2],[359,1],[361,0],[362,3],[363,1],[363.5,3],[364,1],[364,2],[365,3],[366,0],[367,2],
+    [368,1],[368,2],[369,0],[370,3],[371,1],[371.5,3],[372,1],[372,2],[373,3],[374,0],[375,2],
+    [376,1],[376,2],[377,0],[378,3],[379,1],[379.5,3],[380,1],[380,2],[381,3],[382,0],[383,2]
   ];
 
-  var SPELLS = [
-    "Ancient Spark","Void Bolt","Mending Word","Blazing Rune","Terrifying Screech",
-    "Consuming Slam","Death Coil","Wracking Pain","Fixate","Withering Grasp",
-    "Molten Blast","Static Field","Chain Lightning","Necrotic Burst","Shatter"
+  var CHART_H = [
+    [8,0],[10,1],[12,2],[14,3],[16,3],[18,2],[20,1],[22,0],[24,0],[26,1],[28,2],[30,3],[32,0],
+    [33,2],[34,1],[35,3],[36,0],[37,2],[38,1],[39,3],[40,0],[41,2],[42,1],[43,3],[44,0],
+    [45,2],[46,1],[47,3],[48,0],[49,2],[50,1],[51,3],[52,0],[53,2],[54,1],[55,3],[56,0],
+    [57,2],[58,1],[59,3],[60,0],[61,2],[62,1],[63,3],[64,0],[65,2],[66,1],[66.5,0],[67,3],
+    [68,1],[69,2],[70,0],[70.5,0],[71,3],[72,0],[73,2],[74,1],[74.5,0],[75,3],[76,1],[77,2],
+    [78,0],[78.5,0],[79,3],[80,0],[81,2],[82,1],[82.5,0],[83,3],[84,1],[85,2],[86,0],[86.5,0],
+    [87,3],[88,0],[89,2],[90,1],[90.5,0],[91,3],[92,1],[93,2],[94,0],[94.5,0],[95,3],[100,0],
+    [104,3],[108,1],[112,2],[116,2],[120,1],[124,3],[128,0],[132,0],[136,3],[140,1],[144,2],
+    [148,2],[152,1],[156,3],[160,0],[164,0],[168,3],[172,1],[176,2],[180,2],[184,1],[188,3],
+    [192,0],[194,1],[196,2],[198,3],[200,0],[202,1],[204,2],[206,3],[208,3],[209,2],[210,1],
+    [211,0],[212,3],[213,2],[214,1],[215,0],[216,3],[217,2],[218,1],[219,0],[220,3],[221,2],
+    [222,1],[223,0],[224,0],[225,3],[226,1],[227,2],[228,0],[229,3],[230,1],[231,2],[232,0],
+    [233,3],[234,1],[235,2],[236,0],[237,3],[238,1],[239,2],[240,0],[240.5,1],[241,2],
+    [241.5,3],[242,0],[242.5,2],[243,1],[243.5,0],[244,1],[244.5,0],[245,2],[245.5,3],[246,0],
+    [246.5,2],[247,1],[247.5,0],[248,1],[248.5,0],[249,2],[249.5,3],[250,0],[250.5,2],[251,1],
+    [251.5,0],[252,1],[252.5,0],[253,2],[253.5,3],[254,0],[254.5,2],[255,1],[255.5,0],[256,1],
+    [256,3],[256.5,2],[257,1],[257.5,3],[258,2],[258.5,0],[259,3],[259.5,1],[260,0],[260.5,2],
+    [261,1],[261.5,3],[262,2],[262.5,0],[263,3],[263.5,1],[264,0],[264,2],[264.5,1],[265,0],
+    [265.5,3],[266,2],[266.5,0],[267,3],[267.5,1],[268,0],[268.5,2],[269,1],[269.5,3],[270,2],
+    [270.5,0],[271,3],[271.5,1],[272,0],[272,2],[272.5,1],[273,0],[273.5,3],[274,2],[274.5,0],
+    [275,3],[275.5,1],[276,0],[276.5,2],[277,1],[277.5,3],[278,2],[278.5,0],[279,3],[279.5,1],
+    [280,0],[280,2],[280.5,1],[281,0],[281.5,3],[282,2],[282.5,0],[283,3],[283.5,1],[284,0],
+    [284.5,2],[285,1],[285.5,3],[286,2],[286.5,0],[287,3],[287.5,1],[288,0],[288,2],[288.5,1],
+    [289,0],[289.5,3],[290,2],[290.5,0],[291,3],[291.5,1],[292,0],[292.5,2],[293,1],[293.5,3],
+    [294,2],[294.5,0],[295,3],[295.5,1],[296,0],[296,2],[296.5,1],[297,0],[297.5,3],[298,2],
+    [298.5,0],[299,3],[299.5,1],[300,0],[300.5,2],[301,1],[301.5,3],[302,2],[302.5,0],[303,3],
+    [303.5,1],[304,0],[304,2],[304.5,1],[305,0],[305.5,3],[306,2],[306.5,0],[307,3],[307.5,1],
+    [308,0],[308.5,2],[309,1],[309.5,3],[310,2],[310.5,0],[311,3],[311.5,1],[312,0],[312,2],
+    [312.5,1],[313,0],[313.5,3],[314,2],[314.5,0],[315,3],[315.5,1],[316,0],[316.5,2],[317,1],
+    [317.5,3],[318,2],[318.5,0],[319,3],[319.5,1],[320,0],[321,2],[322,0],[323,3],[324,1],
+    [325,2],[326,0],[327,3],[328,1],[329,2],[330,0],[331,3],[332,1],[333,2],[334,0],[335,3],
+    [336,0],[336,2],[336.5,3],[337,1],[337.5,2],[338,3],[338.5,0],[339,2],[339.5,1],[340,0],
+    [340,2],[340.5,3],[341,1],[341.5,2],[342,3],[342.5,0],[343,2],[343.5,1],[344,0],[344,2],
+    [344.5,3],[345,1],[345.5,2],[346,3],[346.5,0],[347,2],[347.5,1],[348,0],[348,2],[348.5,3],
+    [349,1],[349.5,2],[350,3],[350.5,0],[351,2],[351.5,1],[352,0],[352,2],[352.5,3],[353,1],
+    [353.5,2],[354,3],[354.5,0],[355,2],[355.5,1],[356,0],[356,2],[356.5,3],[357,1],[357.5,2],
+    [358,3],[358.5,0],[359,2],[359.5,1],[360,0],[360,2],[360.5,3],[361,1],[361.5,2],[362,3],
+    [362.5,0],[363,2],[363.5,1],[364,0],[364,2],[364.5,3],[365,1],[365.5,2],[366,3],[366.5,0],
+    [367,2],[367.5,1],[368,0],[368,2],[368.5,3],[369,1],[369.5,2],[370,3],[370.5,0],[371,2],
+    [371.5,1],[372,0],[372,2],[372.5,3],[373,1],[373.5,2],[374,3],[374.5,0],[375,2],[375.5,1],
+    [376,0],[376,2],[376.5,3],[377,1],[377.5,2],[378,3],[378.5,0],[379,2],[379.5,1],[380,0],
+    [380,2],[380.5,3],[381,1],[381.5,2],[382,3],[382.5,0],[383,2],[383.5,1],[384,2],[385,1],
+    [386,3],[387,0],[388,2]
   ];
 
-  var SECTIONS = [
-    { b: 0,   n: "Trash pull" },
-    { b: 32,  n: "First drop" },
-    { b: 96,  n: "Who are you" },
-    { b: 192, n: "It is building" },
-    { b: 256, n: "Second drop" },
-    { b: 320, n: "Breathe" },
-    { b: 336, n: "Last drop, good luck" },
-    { b: 384, n: "" }
+  var CHART_M = [
+    [8,0],[9,1],[10,2],[11,3],[12,3],[13,2],[14,1],[15,0],[16,0],[17,1],[18,2],[19,3],[20,3],
+    [21,2],[22,1],[23,0],[24,0],[25,1],[26,2],[27,3],[28,3],[29,2],[30,1],[31,0],[32,0],
+    [32.5,2],[33,1],[33.5,3],[34,2],[34.5,0],[35,3],[35.5,1],[36,0],[36.5,2],[37,1],[37.5,3],
+    [38,2],[38.5,0],[39,3],[39.5,1],[40,0],[40.5,2],[41,1],[41.5,3],[42,2],[42.5,0],[43,3],
+    [43.5,1],[44,0],[44.5,2],[45,1],[45.5,3],[46,2],[46.5,0],[47,3],[47.5,1],[48,0],[48.5,2],
+    [49,1],[49.5,3],[50,2],[50.5,0],[51,3],[51.5,1],[52,0],[52.5,2],[53,1],[53.5,3],[54,2],
+    [54.5,0],[55,3],[55.5,1],[56,0],[56.5,2],[57,1],[57.5,3],[58,2],[58.5,0],[59,3],[59.5,1],
+    [60,0],[60.5,2],[61,1],[61.5,3],[62,2],[62.5,0],[63,3],[63.5,1],[64,0],[64,2],[64.5,1],
+    [65,0],[65.5,3],[66,1],[66.5,2],[67,0],[67.5,3],[68,0],[68.5,2],[69,1],[69.5,3],[70,1],
+    [70.5,2],[71,0],[71.5,3],[72,0],[72,2],[72.5,1],[73,0],[73.5,3],[74,1],[74.5,2],[75,0],
+    [75.5,3],[76,0],[76.5,2],[77,1],[77.5,3],[78,1],[78.5,2],[79,0],[79.5,3],[80,0],[80,2],
+    [80.5,1],[81,0],[81.5,3],[82,1],[82.5,2],[83,0],[83.5,3],[84,0],[84.5,2],[85,1],[85.5,3],
+    [86,1],[86.5,2],[87,0],[87.5,3],[88,0],[88,2],[88.25,2],[88.5,1],[88.75,3],[89,0],
+    [89.5,3],[90,1],[90.5,2],[91,0],[91.5,3],[92,0],[92.25,2],[92.5,1],[92.5,2],[92.75,3],
+    [93,1],[93.5,3],[94,1],[94.5,2],[95,0],[95.5,3],[100,0],[102,3],[104,1],[106,2],[108,2],
+    [110,1],[112,3],[114,0],[116,0],[118,3],[120,1],[122,2],[124,2],[126,1],[128,3],[130,0],
+    [132,0],[134,3],[136,1],[138,2],[140,2],[142,1],[144,3],[146,0],[148,0],[150,3],[152,1],
+    [154,2],[156,2],[158,1],[160,3],[162,0],[164,0],[166,3],[168,1],[170,2],[172,2],[174,1],
+    [176,3],[178,0],[180,0],[182,3],[184,1],[186,2],[188,2],[190,1],[192,0],[193,1],[194,2],
+    [195,3],[196,0],[197,1],[198,2],[199,3],[200,0],[201,1],[202,2],[203,3],[204,0],[205,1],
+    [206,2],[207,3],[208,0],[209,1],[210,2],[211,3],[212,0],[213,1],[214,2],[215,3],[216,0],
+    [217,1],[218,2],[219,3],[220,0],[221,1],[222,2],[223,3],[224,3],[224.5,2],[225,1],
+    [225.5,0],[226,3],[226.5,2],[227,1],[227.5,0],[228,3],[228.5,2],[229,1],[229.5,0],[230,3],
+    [230.5,2],[231,1],[231.5,0],[232,3],[232.5,2],[233,1],[233.5,0],[234,3],[234.5,2],[235,1],
+    [235.5,0],[236,3],[236.5,2],[237,1],[237.5,0],[238,3],[238.5,2],[239,1],[239.5,0],[240,1],
+    [240,3],[240.5,0],[241,2],[241.5,3],[242,0],[242.5,2],[243,1],[243.5,0],[244,1],[244.5,0],
+    [245,2],[245.5,3],[246,0],[246.5,2],[247,1],[247.5,0],[248,1],[248,3],[248.5,0],[249,2],
+    [249.5,3],[250,0],[250.5,2],[251,1],[251.5,0],[252,1],[252.5,0],[253,2],[253.5,3],[254,0],
+    [254.5,2],[255,1],[255.5,0],[256,1],[256,3],[256.5,2],[257,1],[257.5,3],[258,2],[258.5,0],
+    [259,3],[259.5,1],[260,0],[260,2],[260.5,1],[261,0],[261.5,3],[262,2],[262.5,0],[263,3],
+    [263.5,1],[264,0],[264,2],[264.5,1],[265,0],[265.5,3],[266,2],[266.5,0],[267,3],[267.5,1],
+    [268,0],[268,2],[268.5,1],[269,0],[269.5,3],[270,2],[270.5,0],[271,3],[271.5,1],[272,0],
+    [272,2],[272.5,1],[273,0],[273.5,3],[274,2],[274.5,0],[275,3],[275.5,1],[276,0],[276,2],
+    [276.5,1],[277,0],[277.5,3],[278,2],[278.5,0],[279,3],[279.5,1],[280,0],[280,2],[280.5,1],
+    [281,0],[281.5,3],[282,2],[282.5,0],[283,3],[283.5,1],[284,0],[284,2],[284.5,1],[285,0],
+    [285.5,3],[286,2],[286.5,0],[287,3],[287.5,1],[288,0],[288,2],[288.5,1],[289,0],[289.5,3],
+    [290,2],[290.5,0],[291,3],[291.5,1],[292,0],[292,2],[292.5,1],[293,0],[293.5,3],[294,2],
+    [294.5,0],[295,3],[295.5,1],[296,0],[296,2],[296.5,1],[297,0],[297.5,3],[298,2],[298.5,0],
+    [299,3],[299.5,1],[300,0],[300,2],[300.5,1],[301,0],[301.5,3],[302,2],[302.5,0],[303,3],
+    [303.5,1],[304,0],[304,2],[304.5,1],[305,0],[305.5,3],[306,2],[306.5,0],[307,3],[307.5,1],
+    [308,0],[308,2],[308.5,1],[309,0],[309.5,3],[310,2],[310.5,0],[311,3],[311.5,1],[312,0],
+    [312,2],[312.25,2],[312.5,1],[312.75,3],[313,0],[313.5,3],[314,2],[314.5,0],[315,3],
+    [315.5,1],[316,0],[316,2],[316.25,2],[316.5,1],[316.75,3],[317,0],[317.5,3],[318,2],
+    [318.5,0],[319,3],[319.5,1],[320,0],[321,2],[322,0],[323,3],[324,1],[325,2],[326,0],
+    [327,3],[328,1],[329,2],[330,0],[331,3],[332,1],[333,2],[334,0],[335,3],[336,0],[336,2],
+    [336.5,3],[337,1],[337.5,2],[338,1],[338,3],[338.5,0],[339,2],[339.5,1],[340,0],[340,2],
+    [340.5,3],[341,1],[341.5,2],[342,1],[342,3],[342.5,0],[343,2],[343.5,1],[344,0],[344,2],
+    [344.5,3],[345,1],[345.5,2],[346,1],[346,3],[346.5,0],[347,2],[347.5,1],[348,0],[348,2],
+    [348.5,3],[349,1],[349.5,2],[350,1],[350,3],[350.5,0],[351,2],[351.5,1],[352,0],[352,2],
+    [352.5,3],[353,1],[353.5,2],[354,1],[354,3],[354.5,0],[355,2],[355.5,1],[356,0],[356,2],
+    [356.5,3],[357,1],[357.5,2],[358,1],[358,3],[358.5,0],[359,2],[359.5,1],[360,0],[360,2],
+    [360.5,3],[361,1],[361.5,2],[362,1],[362,3],[362.5,0],[363,2],[363.5,1],[364,0],[364,2],
+    [364.5,3],[365,1],[365.5,2],[366,1],[366,3],[366.5,0],[367,2],[367.5,1],[368,0],[368,2],
+    [368.5,3],[369,1],[369.5,2],[370,1],[370,3],[370.5,0],[371,2],[371.5,1],[372,0],[372,2],
+    [372.5,3],[373,1],[373.5,2],[374,1],[374,3],[374.5,0],[375,2],[375.5,1],[376,0],[376,2],
+    [376.25,2],[376.5,1],[376.5,3],[376.75,3],[377,1],[377.5,2],[378,0],[378,1],[378.25,2],
+    [378.5,0],[378.5,1],[378.75,3],[379,2],[379.5,1],[380,0],[380,2],[380.25,2],[380.5,1],
+    [380.5,3],[380.75,3],[381,1],[381.5,2],[382,0],[382,1],[382.25,2],[382.5,0],[382.5,1],
+    [382.75,3],[383,2],[383.5,1],[384,2],[384.5,1],[385,3],[385.5,0],[386,2],[386.5,1],
+    [387,3],[387.5,0],[388,2],[388.5,1]
   ];
 
-  /* windows, in seconds */
-  var W_PERF = 0.055, W_GOOD = 0.11, W_HIT = 0.16;
+  /* Kings' Rest, in route order. every one of these is interruptible. */
+  var PULLS = [
+    { b: 0,   mob: "Risen Hexer",         spell: "Hex Volley" },
+    { b: 32,  mob: "Queen Wasi",          spell: "Bind Soul" },
+    { b: 96,  mob: "Seneschal M'bara",    spell: "Unholy Mending" },
+    { b: 192, mob: "Half-Finished Mummy", spell: "Wretched Discharge" },
+    { b: 256, mob: "Phantom Hex Priest",  spell: "Hex" },
+    { b: 320, mob: "Zanazal the Wise",    spell: "Poison Nova" },
+    { b: 336, mob: "Reban",               spell: "Deathly Roar" }
+  ];
+
+  var DIFF = {
+    normal: { chart: CHART_N, perf: 0.055, good: 0.11, hit: 0.16, hp: 2, approach: 2.0, mult: 1.0, label: "Normal" },
+    heroic: { chart: CHART_H, perf: 0.045, good: 0.09, hit: 0.13, hp: 2, approach: 1.8, mult: 1.5, label: "Heroic" },
+    mythic: { chart: CHART_M, perf: 0.035, good: 0.07, hit: 0.11, hp: 1, approach: 1.6, mult: 2.2, label: "Mythic" }
+  };
+  var DIFFC = { normal: "#2FD8C3", heroic: "#E8C468", mythic: "#FF3FA4" };
+
   var KEYS  = ['d','f','j','k'];
-  var LANEC = ['127,182,232', '255,43,209', '198,255,61', '0,224,255'];
-  var MAXHP = 2;
-  var APPROACH = 2.0;          /* how long a cast is on screen before its beat */
+  var LANEC = ['232,196,104', '255,63,164', '47,216,195', '169,108,255'];
   var REZ_STREAK = 30;
 
   var track  = document.getElementById('track');
@@ -470,37 +571,38 @@
   var scoreEl= document.getElementById('score');
   var gate   = document.getElementById('gate');
   var result = document.getElementById('result');
-  var pauseEl = document.getElementById('pause');
+  var pauseEl= document.getElementById('pause');
   var pauseTxt = document.getElementById('ptxt');
   var pauseSub = document.getElementById('psub');
+  var diffTag  = document.getElementById('diffTag');
   var pfs    = [].slice.call(document.querySelectorAll('.pf'));
   var root   = document.documentElement;
 
+  var diff = 'normal', D = DIFF.normal;
+  try { var sd = localStorage.getItem('beat.diff'); if (sd && DIFF[sd]) diff = sd; } catch(e){}
+
   var notes = [], idx = 0, state = 'idle';
   var combo = 0, best = 0, perf = 0, good = 0, missed = 0, score = 0, streak = 0;
-  var dead = 0, lastBeat = -1, p = 0, pd = 0;
+  var dead = 0, lastBeat = -1, p = 0, pd = 0, hp = [2,2,2,2];
+  var laneFlash = [0,0,0,0];
   var offset = 0, calm = false;
-  try {
-    calm = localStorage.getItem('beat.calm') === '1';
-  } catch(e){}
-  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) calm = true;
+  try { offset = parseFloat(localStorage.getItem('beat.offset') || '0') || 0; } catch(e){}
+
   var calmBtn = document.getElementById('calm');
   function paintCalm(){
     document.body.classList.toggle('calm', calm);
     calmBtn.classList.toggle('on', calm);
     calmBtn.textContent = calm ? 'Flashing off' : 'Reduce flashing';
-    if (calm){
-      root.style.setProperty('--p', '0');
-      root.style.setProperty('--pd', '0');
-    }
+    if (calm){ root.style.setProperty('--p','0'); root.style.setProperty('--pd','0'); }
   }
+  try { calm = localStorage.getItem('beat.calm') === '1'; } catch(e){}
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) calm = true;
   calmBtn.addEventListener('click', function(){
     calm = !calm;
     try { localStorage.setItem('beat.calm', calm ? '1' : '0'); } catch(e){}
     paintCalm();
   });
   paintCalm();
-  try { offset = parseFloat(localStorage.getItem('beat.offset') || '0') || 0; } catch(e){}
 
   /* ---- low latency hit sound ---- */
   var AC = null, HIT = null;
@@ -508,11 +610,12 @@
     try {
       var C = window.AudioContext || window.webkitAudioContext;
       if (!C) return;
-      AC = new C();
-      fetch('hit.mp3').then(function(r){ return r.arrayBuffer(); })
-        .then(function(b){ return AC.decodeAudioData(b); })
-        .then(function(buf){ HIT = buf; })
-        .catch(function(){});
+      if (!AC) AC = new C();
+      if (!HIT){
+        fetch('hit.mp3').then(function(r){ return r.arrayBuffer(); })
+          .then(function(b){ return AC.decodeAudioData(b); })
+          .then(function(buf){ HIT = buf; }).catch(function(){});
+      }
     } catch(e){}
   }
   function ping(rate, vol){
@@ -525,31 +628,55 @@
     } catch(e){}
   }
 
-  var hp = [MAXHP, MAXHP, MAXHP, MAXHP];
+  /* ---- the clock. currentTime updates a few times a second, so
+     interpolate between its steps or everything moves in jerks ---- */
+  var ctLast = -1, ctAt = 0, ctBase = 0, ctReady = false;
+  function now(){
+    var ct = track.currentTime;
+    var pn = performance.now() / 1000;
+    if (track.paused){ ctReady = false; return ct + offset; }
+    if (ct !== ctLast){
+      ctLast = ct;
+      var interp = ctBase + (pn - ctAt);
+      if (ctReady && Math.abs(interp - ct) < 0.08) ctBase = interp + (ct - interp) * 0.25;
+      else ctBase = ct;
+      ctAt = pn; ctReady = true;
+      return ctBase + offset;
+    }
+    if (!ctReady) return ct + offset;
+    return ctBase + (pn - ctAt) + offset;
+  }
+  function clockReset(){ ctLast = -1; ctAt = 0; ctBase = 0; ctReady = false; }
+
+  function spellAt(beat){
+    for (var i = PULLS.length - 1; i >= 0; i--) if (beat >= PULLS[i].b) return PULLS[i];
+    return PULLS[0];
+  }
 
   function build(){
-    notes = CHART.map(function(c, i){
+    D = DIFF[diff];
+    notes = D.chart.map(function(c){
+      var pull = spellAt(c[0]);
       return { b: c[0], lane: c[1], t: ZERO + c[0] * BEAT,
-               hit: false, gone: false, name: SPELLS[i % SPELLS.length] };
+               hit: false, gone: false, name: pull.spell };
     });
     idx = 0; combo = 0; best = 0; perf = 0; good = 0; missed = 0;
     score = 0; streak = 0; dead = 0; lastBeat = -1;
-    hp = [MAXHP, MAXHP, MAXHP, MAXHP];
+    hp = [D.hp, D.hp, D.hp, D.hp];
     pfs.forEach(function(el){ el.classList.remove('dead','rez','hurt'); });
-    paintParty();
-    paintHud();
+    diffTag.textContent = D.label;
+    diffTag.style.color = DIFFC[diff];
+    paintParty(); paintHud();
   }
 
   function paintParty(){
     for (var i = 0; i < 4; i++){
-      var el = pfs[i];
-      el.classList.toggle('dead', hp[i] <= 0);
-      el.classList.toggle('hurt', hp[i] === 1);
-      var bar = el.querySelector('.pf-hp i');
-      if (bar) bar.style.width = Math.max(0, hp[i] / MAXHP * 100) + '%';
+      pfs[i].classList.toggle('dead', hp[i] <= 0);
+      pfs[i].classList.toggle('hurt', hp[i] > 0 && hp[i] < D.hp);
+      var bar = pfs[i].querySelector('.pf-hp i');
+      if (bar) bar.style.width = Math.max(0, hp[i] / D.hp * 100) + '%';
     }
   }
-
   function paintHud(){
     comboEl.textContent = combo;
     comboW.classList.toggle('big', combo >= 25);
@@ -557,103 +684,62 @@
     accEl.textContent = judged ? Math.round((perf + good * 0.6) / judged * 100) + '%' : '100%';
     scoreEl.textContent = score;
   }
-
   function say(txt, col){
-    judge.textContent = txt;
-    judge.style.color = col;
-    judge.classList.remove('on');
-    void judge.offsetWidth;
-    judge.classList.add('on');
+    judge.textContent = txt; judge.style.color = col;
+    judge.classList.remove('on'); void judge.offsetWidth; judge.classList.add('on');
   }
 
   function damage(lane){
-    if (hp[lane] > 0){
-      hp[lane]--;
-      if (hp[lane] <= 0) dead++;
-    }
+    if (hp[lane] > 0){ hp[lane]--; if (hp[lane] <= 0) dead++; }
     paintParty();
     return dead >= 4;
   }
   function rezOne(){
-    /* a dead one first, otherwise patch up whoever is hurt */
     for (var i = 0; i < 4; i++){
       if (hp[i] <= 0){
-        hp[i] = 1; dead--;
-        pfs[i].classList.add('rez');
-        paintParty();
-        say('BATTLE RES', '#C6FF3D'); ping(0.7, 0.6);
-        return;
+        hp[i] = 1; dead--; pfs[i].classList.add('rez'); paintParty();
+        say('BATTLE RES', '#E8C468'); ping(0.7, 0.6); return;
       }
     }
     for (var j = 0; j < 4; j++){
-      if (hp[j] < MAXHP){
-        hp[j]++;
-        pfs[j].classList.add('rez');
-        paintParty();
-        say('HEALED', '#C6FF3D'); ping(0.7, 0.5);
-        return;
+      if (hp[j] < D.hp){
+        hp[j]++; pfs[j].classList.add('rez'); paintParty();
+        say('HEALED', '#E8C468'); ping(0.7, 0.5); return;
       }
     }
   }
-
-  /* currentTime only updates a handful of times a second, so reading it
-     straight gives stepped motion. sample it when it actually changes and
-     run on performance.now() in between, snapping back if we drift. */
-  var ctLast = -1, ctAt = 0, ctBase = 0, ctReady = false;
-  function clock(){
-    var ct = track.currentTime;
-    var pn = performance.now() / 1000;
-    if (track.paused){ ctReady = false; return ct + offset; }
-    if (ct !== ctLast){
-      ctLast = ct;
-      var interp = ctBase + (pn - ctAt);
-      /* small disagreement: ease toward the truth. large: snap */
-      if (ctReady && Math.abs(interp - ct) < 0.08) ctBase = interp + (ct - interp) * 0.25;
-      else ctBase = ct;
-      ctAt = pn;
-      ctReady = true;
-      return ctBase + offset;
-    }
-    if (!ctReady) return ct + offset;
-    return ctBase + (pn - ctAt) + offset;
-  }
-  function clockReset(){ ctLast = -1; ctAt = 0; ctBase = 0; ctReady = false; }
-  function now(){ return clock(); }
-
-  var laneFlash = [0,0,0,0];
 
   function press(lane){
     if (state !== 'play') return;
     laneFlash[lane] = 1;
     var t = now(), bestI = -1, bestD = 9;
-    for (var i = idx; i < notes.length && i < idx + 16; i++){
+    for (var i = idx; i < notes.length && i < idx + 20; i++){
       var n = notes[i];
       if (n.hit || n.gone || n.lane !== lane) continue;
       var d = Math.abs(n.t - t);
       if (d < bestD){ bestD = d; bestI = i; }
     }
-    if (bestI < 0 || bestD > W_HIT){
-      combo = 0; streak = 0;
-      say('EARLY', '#6E5F91');
-      paintHud();
-      return;
+    if (bestI < 0 || bestD > D.hit){
+      combo = 0; streak = 0; say('EARLY', '#7C6E5E'); paintHud(); return;
     }
     var nn = notes[bestI];
     nn.hit = true;
-    if (bestD <= W_PERF){
-      perf++; score += 300 + combo * 2; streak++;
-      say('PERFECT', '#C6FF3D'); ping(1.0, 0.5);
-    } else if (bestD <= W_GOOD){
-      good++; score += 150 + combo; streak = 0;
-      say('GOOD', '#00E0FF'); ping(0.92, 0.42);
+    if (bestD <= D.perf){
+      perf++; score += Math.round((300 + combo * 2) * D.mult); streak++;
+      say('PERFECT', '#E8C468'); ping(1.0, 0.5);
+    } else if (bestD <= D.good){
+      good++; score += Math.round((150 + combo) * D.mult); streak = 0;
+      say('GOOD', '#2FD8C3'); ping(0.92, 0.42);
     } else {
-      good++; score += 60; streak = 0;
-      say(nn.t > t ? 'EARLY' : 'LATE', '#B14BFF'); ping(0.84, 0.38);
+      good++; score += Math.round(60 * D.mult); streak = 0;
+      say(nn.t > t ? 'EARLY' : 'LATE', '#A96CFF'); ping(0.84, 0.38);
     }
     combo++;
     if (combo > best) best = combo;
-    if (streak >= REZ_STREAK && (dead > 0 || hp.some(function(h){ return h < MAXHP; }))){
-      streak = 0; rezOne();
+    if (streak >= REZ_STREAK){
+      var needs = false;
+      for (var q = 0; q < 4; q++) if (hp[q] < D.hp) needs = true;
+      if (needs){ streak = 0; rezOne(); }
     }
     paintHud();
   }
@@ -661,13 +747,11 @@
   function miss(n){
     n.gone = true;
     missed++; combo = 0; streak = 0;
-    say('MISSED', '#FF3B3B');
-    paintHud();
+    say('MISSED', '#FF4B4B'); paintHud();
     if (damage(n.lane)) finish(false);
   }
 
-  /* ---- drawing ---- */
-  /* four lanes, one per party member, falling onto the interrupt line */
+  /* ---- four lanes falling onto the interrupt line ---- */
   var W = 0, H = 0, HITY = 0, LX = 0, LW = 0, COLW = 0, GAP = 8;
   function size(){
     var r = cv.getBoundingClientRect();
@@ -677,45 +761,40 @@
     cv.height = Math.max(1, Math.round(H * dpr));
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     HITY = Math.round(H * 0.82);
-    LW = Math.round(Math.min(430, W * 0.9));
+    LW = Math.round(Math.min(560, W * 0.94));
     LX = Math.round((W - LW) / 2);
     COLW = Math.floor((LW - GAP * 3) / 4);
   }
   window.addEventListener('resize', size);
-  function colX(lane){ return LX + lane * (COLW + GAP); }
+  function colX(l){ return LX + l * (COLW + GAP); }
 
   var flash = 0;
   function draw(){
     ctx.clearRect(0, 0, W, H);
-    var t = now();
-    var travel = HITY;
-    var i, l;
+    var t = now(), travel = HITY, i, l;
 
-    /* lanes */
     for (l = 0; l < 4; l++){
-      var x = colX(l);
+      var lx = colX(l);
       ctx.fillStyle = 'rgba(255,255,255,.022)';
-      ctx.fillRect(x, 0, COLW, HITY);
+      ctx.fillRect(lx, 0, COLW, HITY);
       if (laneFlash[l] > 0.02){
-        ctx.fillStyle = 'rgba(' + LANEC[l] + ',' + (0.16 * laneFlash[l]) + ')';
-        ctx.fillRect(x, 0, COLW, HITY);
+        ctx.fillStyle = 'rgba(' + LANEC[l] + ',' + (0.15 * laneFlash[l]) + ')';
+        ctx.fillRect(lx, 0, COLW, HITY);
       }
       laneFlash[l] *= 0.82;
     }
 
-    /* the beat grid */
     var b0 = Math.floor((t - ZERO) / BEAT);
-    for (var k = b0; k < b0 + Math.ceil(APPROACH / BEAT) + 2; k++){
+    for (var k = b0; k < b0 + Math.ceil(D.approach / BEAT) + 2; k++){
       var dtb = (ZERO + k * BEAT) - t;
-      if (dtb < 0 || dtb > APPROACH) continue;
-      var by = Math.round((1 - dtb / APPROACH) * travel);
+      if (dtb < 0 || dtb > D.approach) continue;
+      var by = Math.round((1 - dtb / D.approach) * travel);
       ctx.fillStyle = (((k % 4) + 4) % 4) === 0 ? 'rgba(255,255,255,.10)' : 'rgba(255,255,255,.035)';
       ctx.fillRect(LX, by, LW, 1);
     }
 
-    /* the interrupt line */
     if (flash > 0.02){
-      ctx.fillStyle = 'rgba(255,43,209,' + (0.12 * flash) + ')';
+      ctx.fillStyle = 'rgba(232,196,104,' + (0.1 * flash) + ')';
       ctx.fillRect(LX - 8, HITY - 22, LW + 16, 44);
     }
     flash *= 0.86;
@@ -724,80 +803,77 @@
       ctx.fillRect(colX(l), HITY - 2, COLW, 4);
     }
 
-    /* the casts */
-    var bh = Math.max(16, Math.min(26, H * 0.05));
+    var bh = Math.max(15, Math.min(24, H * 0.048));
+    ctx.font = '600 8px JetBrains Mono, monospace';
+    ctx.textBaseline = 'middle';
     for (i = idx; i < notes.length; i++){
       var n = notes[i];
       var dt = n.t - t;
-      if (dt > APPROACH) break;
+      if (dt > D.approach) break;
       if (n.hit || n.gone) continue;
-      var y = (1 - dt / APPROACH) * travel;
+      var y = (1 - dt / D.approach) * travel;
       var cx = colX(n.lane);
       var a = dt < 0 ? 0.45 : 1;
       var c = LANEC[n.lane];
 
-      ctx.fillStyle = 'rgba(10,5,20,.9)';
+      ctx.fillStyle = 'rgba(12,7,22,.9)';
       ctx.fillRect(cx, y - bh, COLW, bh);
-      ctx.fillStyle = 'rgba(' + c + ',' + (0.4 * a) + ')';
+      ctx.fillStyle = 'rgba(' + c + ',' + (0.38 * a) + ')';
       ctx.fillRect(cx, y - bh, COLW, bh);
       ctx.strokeStyle = 'rgba(' + c + ',' + (0.9 * a) + ')';
       ctx.lineWidth = 1;
       ctx.strokeRect(cx + .5, y - bh + .5, COLW - 1, bh - 1);
-      /* the leading edge is what you time against */
       ctx.fillStyle = 'rgba(255,255,255,' + a + ')';
       ctx.fillRect(cx, y - 2, COLW, 2);
+
+      if (bh >= 18 && COLW >= 90){
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rgba(255,255,255,' + (0.82 * a) + ')';
+        ctx.fillText(n.name.toUpperCase(), cx + COLW / 2, y - bh / 2);
+      }
     }
 
-    /* the keys, under the line */
     ctx.font = '700 12px JetBrains Mono, monospace';
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
     for (l = 0; l < 4; l++){
-      var kx = colX(l) + COLW / 2;
       ctx.fillStyle = 'rgba(' + LANEC[l] + ',' + (0.5 + laneFlash[l] * 0.5) + ')';
-      ctx.fillText(KEYS[l].toUpperCase(), kx, HITY + 20);
+      ctx.fillText(KEYS[l].toUpperCase(), colX(l) + COLW / 2, HITY + 20);
     }
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic';
   }
 
-  /* ---- the loop ---- */
+  /* ---- loop ---- */
   function frame(){
     if (state === 'play'){
       var t = now();
-
-      while (idx < notes.length && notes[idx].t < t - W_HIT){
+      while (idx < notes.length && notes[idx].t < t - D.hit){
         var n = notes[idx];
         if (!n.hit && !n.gone) miss(n);
         idx++;
       }
-
       var b = Math.floor((t - ZERO) / BEAT);
       if (b !== lastBeat){
         lastBeat = b;
         if (!calm){ p = 1; flash = 1; }
-        for (var s2 = SECTIONS.length - 1; s2 >= 0; s2--){
-          if (b >= SECTIONS[s2].b){ sectEl.textContent = SECTIONS[s2].n; break; }
-        }
+        var pull = spellAt(b);
+        sectEl.innerHTML = pull.mob + ' <b>' + pull.spell + '</b>';
       }
       if (!calm){
         p *= 0.82; pd *= 0.88;
         root.style.setProperty('--p', p.toFixed(3));
         root.style.setProperty('--pd', pd.toFixed(3));
       }
-
       draw();
-
-      if (track.ended || (idx >= notes.length && t > notes[notes.length - 1].t + 1.5)){
-        finish(true);
-      }
+      /* let the song play out. it runs to 164.7s */
+      if (track.ended || t > SONG_END) finish(true);
     } else if (state === 'paused' || state === 'count'){
       draw();
     }
     requestAnimationFrame(frame);
   }
 
-  /* ---- pause and the three count ---- */
+  /* ---- pause ---- */
   function pause(){
     if (state !== 'play') return;
     state = 'paused';
@@ -814,36 +890,25 @@
     pauseSub.textContent = 'Hands on D F J K';
     (function tick(){
       pauseTxt.textContent = k > 0 ? String(k) : 'Go';
-      if (k > 0){
-        k--;
-        countT = setTimeout(tick, 700);
-      } else {
+      if (k > 0){ k--; countT = setTimeout(tick, 700); }
+      else {
         countT = setTimeout(function(){
           pauseEl.classList.add('gone');
           clockReset();
-          try {
-            var pr = track.play();
-            if (pr && pr.catch) pr.catch(function(){});
-          } catch(e){}
+          try { var pr = track.play(); if (pr && pr.catch) pr.catch(function(){}); } catch(e){}
           state = 'play';
         }, 350);
       }
     })();
   }
 
-  /* ---- start and finish ---- */
   function start(){
     if (countT){ clearTimeout(countT); countT = null; }
-    build();
-    size();
-    clockReset();
-    audioInit();
+    build(); size(); clockReset(); audioInit();
     if (AC && AC.state === 'suspended'){ try { AC.resume(); } catch(e){} }
     try {
-      track.currentTime = 0;
-      track.volume = 0.8;
-      var pr = track.play();
-      if (pr && pr.catch) pr.catch(function(){});
+      track.currentTime = 0; track.volume = 0.8;
+      var pr = track.play(); if (pr && pr.catch) pr.catch(function(){});
     } catch(e){}
     state = 'play';
     gate.classList.add('gone');
@@ -860,27 +925,28 @@
     var acc = judged ? (perf + good * 0.6) / judged : 0;
     var g, gc, line;
     if (!survived){
-      g = 'F'; gc = '#FF3B3B';
+      g = 'F'; gc = '#FF4B4B';
       line = 'Everybody died. It was the ' + missed + ' casts you let through.';
     } else if (acc >= 0.97 && missed === 0){
-      g = 'S'; gc = '#C6FF3D';
-      line = 'Nothing got a cast off. Nobody will thank you for it.';
+      g = 'S'; gc = '#E8C468';
+      line = 'Nothing got a cast off in the whole dungeon. Nobody will thank you for it.';
     } else if (acc >= 0.9){
-      g = 'A'; gc = '#00E0FF';
+      g = 'A'; gc = '#2FD8C3';
       line = 'Timed it. You would survive one of my keys.';
     } else if (acc >= 0.78){
-      g = 'B'; gc = '#B14BFF';
+      g = 'B'; gc = '#A96CFF';
       line = 'Passable. You would still get a whisper about it afterwards.';
     } else if (acc >= 0.6){
-      g = 'C'; gc = '#FF2BD1';
+      g = 'C'; gc = '#FF3FA4';
       line = 'This is roughly what my pugs do, and I heal through it.';
     } else {
-      g = 'D'; gc = '#FF3B3B';
+      g = 'D'; gc = '#FF4B4B';
       line = 'You survived on my cooldowns. Both of us know it.';
     }
     document.getElementById('rk').textContent = survived ? 'Key complete' : 'Key depleted';
     var gr = document.getElementById('grade');
     gr.textContent = g; gr.style.color = gc;
+    document.getElementById('rdiff').textContent = D.label;
     document.getElementById('rcombo').textContent = best;
     document.getElementById('rperf').textContent = perf;
     document.getElementById('rgood').textContent = good;
@@ -896,11 +962,9 @@
   /* ---- input ---- */
   window.addEventListener('keydown', function(e){
     var k = (e.key || '').toLowerCase();
-
     if (e.key === 'Escape'){
       e.preventDefault();
-      if (state === 'play') pause();
-      else if (state === 'paused') resume();
+      if (state === 'play') pause(); else if (state === 'paused') resume();
       return;
     }
     if (k === ' ' || e.code === 'Space'){
@@ -915,7 +979,7 @@
       offset += (e.key === 'ArrowLeft' ? -0.01 : 0.01);
       offset = Math.round(offset * 1000) / 1000;
       try { localStorage.setItem('beat.offset', String(offset)); } catch(err){}
-      say((offset > 0 ? '+' : '') + Math.round(offset * 1000) + ' MS', '#00E0FF');
+      say((offset > 0 ? '+' : '') + Math.round(offset * 1000) + ' MS', '#2FD8C3');
       return;
     }
     if (e.repeat) return;
@@ -923,7 +987,6 @@
     if (lane >= 0){ e.preventDefault(); press(lane); }
   });
 
-  /* tapping a lane works too */
   document.querySelector('.field').addEventListener('pointerdown', function(e){
     if (state !== 'play') return;
     e.preventDefault();
@@ -934,7 +997,13 @@
     }
   });
 
-  document.getElementById('start').addEventListener('click', start);
+  [].slice.call(document.querySelectorAll('.diff')).forEach(function(btn){
+    btn.addEventListener('click', function(){
+      diff = btn.getAttribute('data-d');
+      try { localStorage.setItem('beat.diff', diff); } catch(e){}
+      start();
+    });
+  });
   document.getElementById('again').addEventListener('click', start);
   document.getElementById('home').addEventListener('click', function(){ location.href = '/'; });
 
