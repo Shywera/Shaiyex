@@ -149,16 +149,22 @@
     width:12px;height:12px;margin:-6px 0 0 -6px;
     border-radius:50%;border:3px solid var(--iii);opacity:0;
   }
-  .stamp.on{animation:slam 1s cubic-bezier(.12,.92,.18,1) forwards}
-  .stamp.on::before{animation:shock .75s ease-out forwards}
+  .stamp.on{animation:slam .72s linear forwards}
+  .stamp.on::before{animation:shock .55s ease-out forwards}
   @keyframes slam{
-    0%  {opacity:0; filter:blur(16px); transform:translate(-50%,-50%) rotate(var(--sr)) scale(3.4)}
-    13% {opacity:1; filter:blur(0);    transform:translate(-50%,-50%) rotate(var(--sr)) scale(1.14)}
-    21% {                              transform:translate(-50%,-50%) rotate(var(--sr)) scale(.96)}
-    29% {                              transform:translate(-50%,-50%) rotate(var(--sr)) scale(1.03)}
-    38% {                              transform:translate(-50%,-50%) rotate(var(--sr)) scale(1)}
-    72% {opacity:1;                    transform:translate(-50%,-50%) rotate(var(--sr)) scale(1)}
-    100%{opacity:0; filter:blur(7px);  transform:translate(-50%,-50%) rotate(var(--sr)) scale(1.2)}
+    0%  {opacity:0; transform:translate(-50%,-50%) rotate(var(--sr)) scale(3);
+         text-shadow:-52px 0 var(--iii), 52px 0 var(--i)}
+    5%  {opacity:1; transform:translate(-50%,-50%) rotate(var(--sr)) scale(1.8);
+         text-shadow:-30px 0 var(--iii), 30px 0 var(--i)}
+    10% {opacity:1; transform:translate(-50%,-52%) rotate(var(--sr)) scale(.8);
+         text-shadow:16px 0 var(--iii), -16px 0 var(--i)}
+    15% {opacity:1; transform:translate(-50%,-48%) rotate(var(--sr)) scale(1.24);
+         text-shadow:-8px 0 var(--iii), 8px 0 var(--i)}
+    21% {opacity:1; transform:translate(-50%,-50%) rotate(var(--sr)) scale(.96)}
+    27% {opacity:1; transform:translate(-50%,-50%) rotate(var(--sr)) scale(1);
+         text-shadow:0 0 24px var(--iii), 0 0 70px var(--iii), 0 0 150px var(--ii)}
+    78% {opacity:1; transform:translate(-50%,-50%) rotate(var(--sr)) scale(1)}
+    100%{opacity:0; transform:translate(-50%,-50%) rotate(var(--sr)) scale(1.05)}
   }
   @keyframes shock{
     0%  {opacity:.85; transform:scale(1)}
@@ -490,7 +496,7 @@
     transform:translate(-50%,-50%) rotate(var(--pr,-4deg));
     text-align:center;opacity:0;width:92vw;
   }
-  .phase.on{animation:phaseIn 1.2s cubic-bezier(.12,.9,.2,1) forwards}
+  .phase.on{animation:phaseIn .95s linear forwards}
   .phase .pk{
     font-family:var(--mono);font-size:12px;font-weight:700;
     letter-spacing:.42em;text-transform:uppercase;color:var(--iii);
@@ -505,11 +511,13 @@
     letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-top:14px;
   }
   @keyframes phaseIn{
-    0%  {opacity:0; filter:blur(18px); transform:translate(-50%,-50%) rotate(var(--pr)) scale(2.4)}
-    9%  {opacity:1; filter:blur(0);    transform:translate(-50%,-50%) rotate(var(--pr)) scale(1.08)}
-    18% {                              transform:translate(-50%,-50%) rotate(var(--pr)) scale(1)}
-    72% {opacity:1;                    transform:translate(-50%,-50%) rotate(var(--pr)) scale(1)}
-    100%{opacity:0; filter:blur(5px);  transform:translate(-50%,-50%) rotate(var(--pr)) scale(1.1)}
+    0%  {opacity:0; transform:translate(-50%,-50%) rotate(var(--pr)) scale(2.6)}
+    4%  {opacity:1; transform:translate(-50%,-50%) rotate(var(--pr)) scale(1.7)}
+    9%  {opacity:1; transform:translate(-50%,-53%) rotate(var(--pr)) scale(.86)}
+    14% {opacity:1; transform:translate(-50%,-48%) rotate(var(--pr)) scale(1.16)}
+    20% {opacity:1; transform:translate(-50%,-50%) rotate(var(--pr)) scale(1)}
+    80% {opacity:1; transform:translate(-50%,-50%) rotate(var(--pr)) scale(1)}
+    100%{opacity:0; transform:translate(-50%,-50%) rotate(var(--pr)) scale(1.06)}
   }
 
   /* ---------- the finale ---------- */
@@ -536,59 +544,49 @@
   .cursor.on{opacity:1}
   body.stalk, body.stalk *{cursor:none}
 
-  /* ---------- terror mode ---------- */
-  body.terror{
-    --i:#FF2E2E;
-    --ii:#8E0F14;
-    --iii:#FF4A46;
-    --acid:#FF6B67;
-    --line:#3A1113;
-    --line-hot:#6E1A1E;
-    --dim:#C09A9A;
-    --dimmer:#8A6363;
-  }
-  body.terror .rave{
-    background:
-      radial-gradient(58% 46% at 16% 4%,  rgba(200,12,12,.5),  rgba(200,12,12,0) 62%),
-      radial-gradient(56% 44% at 84% 12%, rgba(120,0,0,.6),    rgba(120,0,0,0) 62%),
-      radial-gradient(76% 60% at 50% 98%, rgba(255,24,24,.45), rgba(255,24,24,0) 64%);
-    filter:none;
-  }
-  body.terror .grid{
-    background:
-      repeating-linear-gradient(90deg, rgba(255,40,40,.2) 0 1px, rgba(0,0,0,0) 1px 84px),
-      repeating-linear-gradient( 0deg, rgba(140,0,0,.16) 0 1px, rgba(0,0,0,0) 1px 84px);
-  }
-  body.terror .wall{background:rgba(8,1,2, calc(.955 - var(--pd) * .5))}
-  body.terror .wall .cut{
-    background-image:
-      radial-gradient(48% 40% at var(--lx,50%) var(--ly,42%),
-        rgba(255,220,220,1) 0%,
-        rgba(255,46,46,.95) 20%,
-        rgba(190,0,0,.75) 44%,
-        rgba(90,0,0,.4) 66%,
-        rgba(90,0,0,0) 82%),
-      linear-gradient(180deg, rgba(255,60,60,.16), rgba(120,0,0,.06));
-    filter:brightness(calc(.4 + var(--pd) * 3.6)) saturate(1.6);
-  }
-  body.terror .scan{opacity:.72}
-  body.terror .strobe{background:#FF2E2E;opacity:calc(var(--pd) * .16)}
+  /* ---------- phase five: everything moves ---------- */
+  .page.gl{filter:contrast(1.8) saturate(2.3) hue-rotate(24deg)}
 
-  .blood{
-    position:fixed;inset:0;z-index:7;pointer-events:none;display:none;
-    background:
-      linear-gradient(180deg, rgba(70,0,0,.75) 0%, rgba(70,0,0,0) 26%),
-      linear-gradient(0deg,   rgba(60,0,0,.8) 0%,  rgba(60,0,0,0) 22%),
-      radial-gradient(120% 80% at 50% 50%, rgba(120,0,0,0) 40%, rgba(70,0,0,.55) 100%),
-      repeating-linear-gradient(90deg,
-        rgba(90,0,0,.22) 0 3px, rgba(0,0,0,0) 3px 26px);
-    opacity:calc(.6 + var(--pd) * .4);
+  body.p5 .rave,
+  body.p5 #lasers,
+  body.p5 .wall,
+  body.p5 .pops,
+  body.p5 .tears,
+  body.p5 .frame,
+  body.p5 .scan{
+    transform:translate3d(var(--gx,0px), var(--gy,0px), 0);
   }
-  body.terror .blood{display:block}
+  body.p5 .grid{
+    transform:translate3d(var(--gx,0px), var(--gy,0px), 0)
+              perspective(700px) rotateX(64deg);
+  }
+  body.p5 .page{
+    transform:translate3d(var(--shx,0px), var(--shy,0px), 0)
+              rotate(var(--roll,0deg))
+              scale(calc(1 + var(--pd) * .03));
+  }
+  body.p5 .ticker{animation:tickShake .18s linear infinite}
+  @keyframes tickShake{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-2px)}
+  }
+  body.p5 .hud,
+  body.p5 #mute,
+  body.p5 .readbtn,
+  body.p5 .backlink{
+    transform:translate3d(calc(var(--gx,0px) * .6), calc(var(--gy,0px) * .6), 0);
+  }
+  body.p5 .strobe{opacity:calc(var(--pd) * .2)}
+  body.p5 .frame{
+    box-shadow:
+      inset 0 0 0 3px rgba(255,46,106,calc(.25 + var(--pd) * .75)),
+      inset 0 0 calc(40px + var(--pd) * 200px) rgba(177,75,255,calc(.14 + var(--pd) * .6));
+  }
 
-  .page.gl{
-    filter:contrast(1.9) saturate(2.4) hue-rotate(-14deg) brightness(1.15);
-  }
+  /* second ticker, other direction, only at five */
+  .ticker.top{top:0;bottom:auto;border-top:0;border-bottom:1px solid var(--line-hot);display:none}
+  body.p5 .ticker.top{display:flex}
+  .ticker.top .ticker-in{animation-direction:reverse;animation-duration:13s}
 
   /* ---------- intro gate ---------- */
   .gate{
@@ -664,7 +662,6 @@
 <div class="wall" id="wall" aria-hidden="true"><div class="cut" id="cut"></div></div>
 <div class="pops" id="pops" aria-hidden="true"></div>
 <div class="stamp" id="stamp" aria-hidden="true"></div>
-<div class="blood" aria-hidden="true"></div>
 <div class="toasts" id="toasts" aria-hidden="true"></div>
 <div class="cursor" id="cursor" aria-hidden="true"></div>
 <div class="phase" id="phase" aria-hidden="true">
@@ -700,7 +697,7 @@
 
 <div class="hud phud" id="phud" aria-hidden="true">
   <span class="nm" id="phaseTxt">Phase 0</span>
-  <span class="pips" id="phasePips"><i></i><i></i><i></i><i></i></span>
+  <span class="pips" id="phasePips"><i></i><i></i><i></i><i></i><i></i></span>
 </div>
 
 <button id="mute" type="button" aria-label="Toggle sound">
@@ -712,6 +709,9 @@
 
 <div class="ticker" aria-hidden="true">
   <div class="ticker-in" id="tick"></div>
+</div>
+<div class="ticker top" aria-hidden="true">
+  <div class="ticker-in" id="tick2"></div>
 </div>
 
 <div class="page">
@@ -900,9 +900,9 @@
     "timed it anyway"
   ];
   (function(){
-    var t = document.getElementById('tick');
     var half = LINES.map(function(s){ return '<b>' + s + '</b>'; }).join('');
-    t.innerHTML = half + half;   /* duplicated so the loop seams */
+    document.getElementById('tick').innerHTML  = half + half;   /* duplicated so the loop seams */
+    document.getElementById('tick2').innerHTML = half + half;
   })();
 
   /* ---- lasers ---- */
@@ -970,7 +970,6 @@
     "I SAW THAT","TIMED IT FOR YOU","CRY","SIT DOWN DOG","HEEL"
   ];
   var POPC   = ['#00E5FF','#B14BFF','#FF2E6A','#C6FF3D','#FFFFFF'];
-  var POPC_T = ['#FF2E2E','#FF7A7A','#C40000','#FFD5D5','#FFFFFF'];
   function popOff(){
     var e = document.createElement('span');
     e.className = 'pop';
@@ -978,8 +977,7 @@
                              : POPS[Math.floor(Math.random() * POPS.length)];
     e.style.left = (6 + Math.random() * 88) + 'vw';
     e.style.top  = (14 + Math.random() * 68) + 'vh';
-    var pal = terror ? POPC_T : POPC;
-    e.style.color = pal[Math.floor(Math.random() * pal.length)];
+    e.style.color = POPC[Math.floor(Math.random() * POPC.length)];
     e.style.setProperty('--r', ((Math.random() - 0.5) * 16).toFixed(1) + 'deg');
     popsEl.appendChild(e);
     setTimeout(function(){ if (e.parentNode) e.parentNode.removeChild(e); }, 1300);
@@ -1059,7 +1057,6 @@
 
   /* ---- stencil wall ---- */
   var pageEl = document.querySelector('.page');
-  var terror = false;
 
   function wallSay(w){
     var a = [];
@@ -1109,7 +1106,8 @@
     { b: 8,  k: '', t: '', s: '' },   /* silent, the room just gets louder */
     { b: 20, k: 'Phase two',   t: 'THAT WAS ME',  s: 'and that one, and that one' },
     { b: 40, k: 'Phase three', t: 'ALL ME',       s: 'say it back' },
-    { b: 68, k: 'Phase four',  t: 'SIT DOWN DOG', s: 'no notes' }
+    { b: 68, k: 'Phase four',  t: 'SIT DOWN DOG', s: 'no notes' },
+    { b: 100, k: 'Phase five', t: 'HOLD ON TO SOMETHING', s: 'you asked for the healer' }
   ];
   var phase = 0, ph = 0, calm = false;
   var tickIn = document.getElementById('tick');
@@ -1136,8 +1134,9 @@
       wallEl.style.display = 'none';
       curEl.classList.remove('on');
       document.body.classList.remove('stalk');
-      document.body.classList.remove('terror');
+      document.body.classList.remove('p5');
       pageEl.classList.remove('gl');
+      root.style.setProperty('--roll', '0deg');
       tickIn.style.animationDuration = '46s';
     } else {
       tickIn.style.animationDuration = Math.max(11, 46 - phase * 9) + 's';
@@ -1148,8 +1147,8 @@
       if (phase >= 4){
         curEl.classList.add('on');
         document.body.classList.add('stalk');
-        document.body.classList.add('terror');
       }
+      if (phase >= 5) document.body.classList.add('p5');
     }
     hudPhase();
   });
@@ -1171,13 +1170,10 @@
     swapping = true;
     var w = word || 'YOU ARE SHIT';
 
-    /* the wall goes black, changes what it says, then lights back up.
-       in terror it already says it, so leave it alone */
-    if (!terror){
-      cutSaved = cutEl.innerHTML;
-      var html = wallSay(w);
-      blind(function(){ cutEl.innerHTML = html; });
-    }
+    /* the wall goes black, changes what it says, then lights back up */
+    cutSaved = cutEl.innerHTML;
+    var html = wallSay(w);
+    blind(function(){ cutEl.innerHTML = html; });
 
     var saved = SWAPPABLE.map(function(el){ return el.innerHTML; });
     SWAPPABLE.forEach(function(el, i){
@@ -1193,7 +1189,7 @@
         el.classList.remove('swapped');
         el.innerHTML = saved[i];
       });
-      if (!terror) blind(function(){ cutEl.innerHTML = cutSaved; });
+      blind(function(){ cutEl.innerHTML = cutSaved; });
       swapping = false;
     }, ms);
   }
@@ -1229,13 +1225,9 @@
     if (phase >= 4){
       curEl.classList.add('on');
       document.body.classList.add('stalk');
-      document.body.classList.add('terror');
-      terror = true;
-      root.style.setProperty('--wall', '1');
-      wallEl.style.display = 'block';
-      blind(function(){ cutEl.innerHTML = wallSay('YOU ARE SHIT'); });
       setTimeout(finale, 1100);   /* lands right after the phase call clears */
     }
+    if (phase >= 5) document.body.classList.add('p5');
   }
 
   /* ---- text corruption ---- */
@@ -1283,28 +1275,32 @@
             var ef = calm ? 1 : phase;
 
             if (ef >= 1){
-              var n = ef;
+              var n = ef >= 5 ? 8 : ef;
               while (n--) popOff();
               if (m4 === 0 && ef >= 2) popOff();
-              var tev = ef >= 4 ? 2 : ef >= 3 ? 4 : ef >= 2 ? 8 : 16;
-              if (b % tev === 0) tear(ef + 1);
+              var tev = ef >= 5 ? 1 : ef >= 4 ? 2 : ef >= 3 ? 4 : ef >= 2 ? 8 : 16;
+              if (b % tev === 0) tear(ef >= 5 ? 5 : ef + 1);
             }
             if (ef >= 2){
-              var sev = ef >= 4 ? 8 : ef >= 3 ? 12 : 16;
+              var sev = ef >= 5 ? 4 : ef >= 4 ? 8 : ef >= 3 ? 12 : 16;
               if (b % sev === 0){ slam(); invert(60 + ef * 12); }
               if (b % 8 === 2 && TITLES.length){
                 corrupt(TITLES[Math.floor(Math.random() * TITLES.length)]);
               }
             }
-            if (ef >= 3 && b % 8 === 0) sweep();
+            if (ef >= 3 && b % (ef >= 5 ? 1 : 8) === 0) sweep();
             if (ef >= 4){
-              if (b % 2 === 0) glitch();
+              if (b % (ef >= 5 ? 1 : 2) === 0) glitch();
               /* one achievement every 20 seconds, no more */
               if (m4 === 0 && (track.currentTime < lastAch || track.currentTime - lastAch > 20)){
                 lastAch = track.currentTime;
                 toast();
               }
-              if (b % 16 === 8) meSwap(BEAT * 4000);   /* four beats, long enough to read */
+              if (b % (ef >= 5 ? 8 : 16) === 8) meSwap(BEAT * 4000);
+            }
+            if (ef >= 5){
+              root.style.setProperty('--roll', (m4 % 2 ? 1 : -1) * (0.6 + Math.random() * 1.1) + 'deg');
+              root.style.setProperty('--hue', ((b * 47) % 360) + 'deg');
             }
           }
         }
@@ -1316,8 +1312,16 @@
       }
       root.style.setProperty('--p',  p.toFixed(3));
       root.style.setProperty('--pd', pd.toFixed(3));
-      root.style.setProperty('--shx', ((Math.random() - 0.5) * sh * 7).toFixed(2) + 'px');
-      root.style.setProperty('--shy', ((Math.random() - 0.5) * sh * 5).toFixed(2) + 'px');
+      var big = (!calm && phase >= 5);
+      var amp = big ? 16 : 7;
+      root.style.setProperty('--shx', ((Math.random() - 0.5) * sh * amp).toFixed(2) + 'px');
+      root.style.setProperty('--shy', ((Math.random() - 0.5) * sh * amp * .72).toFixed(2) + 'px');
+      if (big){
+        /* the whole rig rattles, not just the text */
+        var g = 3 + p * 9;
+        root.style.setProperty('--gx', ((Math.random() - 0.5) * g).toFixed(2) + 'px');
+        root.style.setProperty('--gy', ((Math.random() - 0.5) * g).toFixed(2) + 'px');
+      }
       drawLasers(t || 0, phase >= 1 ? p : 0);
     }
     requestAnimationFrame(frame);
