@@ -321,7 +321,7 @@
     color:var(--k);opacity:.92;line-height:1.75;
   }
 
-  /* ---------- summary screen ---------- */
+  /* ---------- pecking order ---------- */
   .sheet{
     background:#0B0814;
     border:1px solid var(--line);
@@ -330,23 +330,29 @@
     overflow:hidden;
   }
   .row{
-    display:flex;align-items:baseline;gap:16px;
-    padding:13px clamp(16px,3vw,24px);
+    display:grid;grid-template-columns:auto 1fr;
+    gap:clamp(14px,3vw,22px);
+    padding:16px clamp(16px,3vw,24px);
     border-bottom:1px solid var(--line);
   }
   .row:last-child{border-bottom:0}
-  .row .lbl{flex:1 1 auto;font-size:15px;line-height:1.4;color:var(--dim)}
-  .row .val{
+  .row .no{
     font-family:var(--display);
-    font-size:clamp(26px,4.4vw,38px);
-    line-height:1;color:var(--text);
-    font-variant-numeric:tabular-nums;
+    font-size:clamp(30px,5.4vw,46px);
+    line-height:.85;color:var(--dimmer);
   }
-  .row.good .val{color:var(--i);text-shadow:0 0 calc(4px + var(--pd) * 18px) var(--i)}
-  .row.bad  .val{color:var(--iii);text-shadow:0 0 calc(4px + var(--pd) * 18px) var(--iii)}
-  .row.fin{background:rgba(198,255,61,.05)}
-  .row.fin .lbl{color:var(--text);font-weight:600}
-  .row.fin .val{color:var(--acid);letter-spacing:.04em;text-shadow:0 0 calc(8px + var(--pd) * 28px) var(--acid)}
+  .row .nm{
+    font-family:var(--display);
+    font-size:clamp(21px,3.6vw,30px);
+    line-height:1;color:var(--text);
+  }
+  .row .ds{margin:.4em 0 0;font-size:15px;line-height:1.5;color:var(--dim)}
+  .row.top{background:rgba(0,229,255,.05)}
+  .row.top .no,.row.top .nm{
+    color:var(--i);
+    text-shadow:0 0 calc(6px + var(--pd) * 26px) var(--i);
+  }
+  .row.last .no,.row.last .nm{color:var(--iii)}
 
   /* ---------- terms ---------- */
   .terms{display:flex;flex-direction:column;border-top:1px solid var(--line)}
@@ -539,19 +545,46 @@
 
   <section>
     <div class="sec-head">
-      <p class="eyebrow">Last run</p>
-      <h2>The summary screen, <span class="hi">rounded up</span>.</h2>
+      <p class="eyebrow">The pecking order</p>
+      <h2>Where you sit in <span class="hi">my</span> key.</h2>
     </div>
 
     <div class="sheet">
-      <div class="row good"><span class="lbl">Deaths in the group</span><span class="val">0</span></div>
-      <div class="row bad"><span class="lbl">Times one of you was at one percent</span><span class="val">Too many</span></div>
-      <div class="row good"><span class="lbl">Times any of you noticed</span><span class="val">0</span></div>
-      <div class="row"><span class="lbl">Interrupts your group had available</span><span class="val">14</span></div>
-      <div class="row bad"><span class="lbl">Interrupts your group actually pressed</span><span class="val">3</span></div>
-      <div class="row bad"><span class="lbl">Of those, on the right target</span><span class="val">1</span></div>
-      <div class="row"><span class="lbl">Cooldowns I pressed so you could keep standing there</span><span class="val">9</span></div>
-      <div class="row fin"><span class="lbl">Key</span><span class="val">Timed</span></div>
+      <div class="row top">
+        <span class="no">1</span>
+        <div>
+          <span class="nm">Me</span>
+          <p class="ds">Not up for discussion. Everything under this line exists to keep me alive and in combat.</p>
+        </div>
+      </div>
+      <div class="row">
+        <span class="no">2</span>
+        <div>
+          <span class="nm">My mana bar</span>
+          <p class="ds">When it is empty all five of us find out what the pull actually does. It has never been empty.</p>
+        </div>
+      </div>
+      <div class="row">
+        <span class="no">3</span>
+        <div>
+          <span class="nm">The tank</span>
+          <p class="ds">Conditional seat. Press a wall once per pack and it stays yours.</p>
+        </div>
+      </div>
+      <div class="row">
+        <span class="no">4</span>
+        <div>
+          <span class="nm">Whoever kicked last</span>
+          <p class="ds">You get promoted the second you press it. That is how little it takes to matter here.</p>
+        </div>
+      </div>
+      <div class="row last">
+        <span class="no">5</span>
+        <div>
+          <span class="nm">You</span>
+          <p class="ds">For now. See position four, it is right there, it costs you one button.</p>
+        </div>
+      </div>
     </div>
   </section>
 
