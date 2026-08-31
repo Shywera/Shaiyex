@@ -399,30 +399,30 @@
   .wall{
     position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden;
     display:none;
-    background:rgba(6,4,10, calc(.93 - var(--pd) * .26));
+    background:rgba(5,3,9, calc(.95 - var(--pd) * .34));
   }
   .wall .cut{
-    position:absolute;inset:-16%;
+    position:absolute;inset:-18%;
     font-family:var(--display);
-    font-size:clamp(38px,5.6vw,76px);
-    line-height:.86;letter-spacing:.07em;
+    font-size:clamp(54px,8.4vw,124px);
+    line-height:.82;letter-spacing:.06em;
     word-break:break-word;
     transform:rotate(-8deg);
     color:transparent;
     -webkit-background-clip:text;
     background-clip:text;
     background-image:
-      radial-gradient(34% 28% at var(--lx,50%) var(--ly,42%),
-        rgba(255,255,255,.98) 0%,
-        rgba(0,229,255,.85) 22%,
-        rgba(177,75,255,.62) 44%,
-        rgba(255,46,106,.28) 62%,
-        rgba(255,255,255,0) 76%),
-      radial-gradient(60% 50% at 82% 88%,
-        rgba(198,255,61,.35), rgba(198,255,61,0) 60%),
-      linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.035));
-    filter:brightness(calc(.5 + var(--pd) * 1.7)) saturate(1.25);
-    opacity:calc((.3 + var(--p) * .7) * var(--wall, .3));
+      radial-gradient(48% 40% at var(--lx,50%) var(--ly,42%),
+        rgba(255,255,255,1) 0%,
+        rgba(0,229,255,.95) 24%,
+        rgba(177,75,255,.8) 46%,
+        rgba(255,46,106,.5) 64%,
+        rgba(255,46,106,0) 82%),
+      radial-gradient(70% 60% at 84% 90%,
+        rgba(198,255,61,.5), rgba(198,255,61,0) 62%),
+      linear-gradient(180deg, rgba(255,255,255,.24), rgba(255,255,255,.1));
+    filter:brightness(calc(.75 + var(--pd) * 2.2)) saturate(1.35);
+    opacity:calc((.55 + var(--p) * .45) * var(--wall, .3));
     transition:background-position .5s ease;
   }
 
@@ -955,7 +955,7 @@
   (function(){
     var W = ['ALL ME','THAT WAS ME','MINE','STILL ME','MY KEY','SHAIYEX','ME','ALSO ME'];
     var s = [];
-    for (var i = 0; i < 340; i++) s.push(W[i % W.length]);
+    for (var i = 0; i < 220; i++) s.push(W[i % W.length]);
     cutEl.textContent = s.join(' ');
   })();
   function sweep(){
@@ -1035,7 +1035,7 @@
     tickIn.style.animationDuration = Math.max(11, 46 - phase * 9) + 's';
     if (phase >= 3){
       wallEl.style.display = 'block';
-      root.style.setProperty('--wall', phase >= 4 ? '1' : '.62');
+      root.style.setProperty('--wall', phase >= 4 ? '1' : '.85');
       sweep();
     }
     if (phase >= 4){
