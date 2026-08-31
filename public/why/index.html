@@ -545,7 +545,7 @@
 
     <div class="sheet">
       <div class="row good"><span class="lbl">Deaths in the group</span><span class="val">0</span></div>
-      <div class="row bad"><span class="lbl">Times one of you was at one percent</span><span class="val">6</span></div>
+      <div class="row bad"><span class="lbl">Times one of you was at one percent</span><span class="val">Too many</span></div>
       <div class="row good"><span class="lbl">Times any of you noticed</span><span class="val">0</span></div>
       <div class="row"><span class="lbl">Interrupts your group had available</span><span class="val">14</span></div>
       <div class="row bad"><span class="lbl">Interrupts your group actually pressed</span><span class="val">3</span></div>
@@ -707,7 +707,7 @@
     "SAY THANK YOU","YOU ARE WELCOME","CARRIED","WHO SAVED YOU",
     "NOBODY ELSE PRESSED IT","COUNT YOUR KICKS","YOUR KICK. YOURS.","LOOK AT THE LOG",
     "SKILL ISSUE","1% AND ALIVE","HEALER DIFF? YES","DIFF? ME","NOT MY FAULT",
-    "I SAW THAT","TIMED IT FOR YOU","CRY","GOOD DOG","SIT DOWN DOG","HEEL"
+    "I SAW THAT","TIMED IT FOR YOU","CRY","SIT DOWN DOG","HEEL"
   ];
   var POPC = ['#00E5FF','#B14BFF','#FF2E6A','#C6FF3D','#FFFFFF'];
   function popOff(){
@@ -743,8 +743,8 @@
 
   /* ---- slam stamp ---- */
   var STAMPS = [
-    "THAT WAS ME","GOOD DOG","GUESS WHO SAVED YOU","SIT DOWN DOG","SAY THANK YOU",
-    "COUNT YOUR KICKS","I CARRIED THAT","GOOD DOG","ALSO ME","NOT MY FAULT","STILL ME"
+    "THAT WAS ME","SIT DOWN DOG","GUESS WHO SAVED YOU","SAY THANK YOU",
+    "COUNT YOUR KICKS","SIT DOWN DOG","I CARRIED THAT","ALSO ME","NOT MY FAULT","STILL ME"
   ];
   var si = 0;
   function slam(){
@@ -804,8 +804,9 @@
             if (b % 16 === 8 && TITLES.length){
               corrupt(TITLES[Math.floor(Math.random() * TITLES.length)]);
             }
-            if (b % 32 === 0){ slam(); invert(70); }
-            if (b % 64 === 32) invert(110);
+            /* first slam lands early, then every four bars */
+            if (b >= 8 && (b - 8) % 16 === 0){ slam(); invert(70); }
+            if (b % 32 === 0 && b > 0) invert(110);
           }
         }
         p  *= 0.80;
