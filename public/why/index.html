@@ -399,7 +399,7 @@
   .wall{
     position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden;
     display:none;
-    background:rgba(5,3,9, calc(.95 - var(--pd) * .34));
+    background:rgba(5,3,9, calc(.965 - var(--pd) * .45));
   }
   .wall .cut{
     position:absolute;inset:-18%;
@@ -420,9 +420,9 @@
         rgba(255,46,106,0) 82%),
       radial-gradient(70% 60% at 84% 90%,
         rgba(198,255,61,.5), rgba(198,255,61,0) 62%),
-      linear-gradient(180deg, rgba(255,255,255,.24), rgba(255,255,255,.1));
-    filter:brightness(calc(.75 + var(--pd) * 2.2)) saturate(1.35);
-    opacity:calc((.55 + var(--p) * .45) * var(--wall, .3));
+      linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,.04));
+    filter:brightness(calc(.34 + var(--pd) * 3.4)) saturate(1.35);
+    opacity:calc((.32 + var(--p) * .68) * var(--wall, .3));
     transition:background-position .5s ease;
   }
 
@@ -880,7 +880,8 @@
   function popOff(){
     var e = document.createElement('span');
     e.className = 'pop';
-    e.textContent = POPS[Math.floor(Math.random() * POPS.length)];
+    e.textContent = swapping ? 'YOU ARE SHIT'
+                             : POPS[Math.floor(Math.random() * POPS.length)];
     e.style.left = (6 + Math.random() * 88) + 'vw';
     e.style.top  = (14 + Math.random() * 68) + 'vh';
     e.style.color = POPC[Math.floor(Math.random() * POPC.length)];
@@ -990,11 +991,18 @@
   var SWAPPABLE = [].slice.call(document.querySelectorAll(
     '.lede, h2, .trait-t, .trait-name, .trait p, .kicker, .nm, .ds, .term-t, .close p, .eyebrow'
   ));
-  var swapping = false;
+  var swapping = false, cutSaved = '';
   function meSwap(ms, word){
     if (swapping) return;
     swapping = true;
     var w = word || 'YOU ARE SHIT';
+
+    /* the wall says it too */
+    cutSaved = cutEl.textContent;
+    var wall = [];
+    for (var k = 0; k < 150; k++) wall.push(w);
+    cutEl.textContent = wall.join(' ');
+
     var saved = SWAPPABLE.map(function(el){ return el.innerHTML; });
     SWAPPABLE.forEach(function(el, i){
       var reps = Math.max(1, Math.min(14, Math.round(el.textContent.length / (w.length + 1))));
@@ -1008,6 +1016,7 @@
         el.classList.remove('swapped');
         el.innerHTML = saved[i];
       });
+      cutEl.textContent = cutSaved;
       swapping = false;
     }, ms);
   }
@@ -1109,7 +1118,7 @@
               }
             }
             if (phase >= 4){
-              curEl.textContent = CURW[(b >> 0) % CURW.length];
+              curEl.textContent = swapping ? 'YOU ARE SHIT' : CURW[b % CURW.length];
               if (b % 16 === 8) meSwap(BEAT * 4000);   /* four beats, long enough to read */
             }
           }
