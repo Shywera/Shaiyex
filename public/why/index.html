@@ -533,12 +533,12 @@
     background:#000;opacity:0;
     transition:opacity .06s linear;   /* out instantly, so the return hits */
   }
-  /* the veil only drops for the break itself, not the whole wind down */
-  body.dark .veil{opacity:.985;transition:opacity .5s cubic-bezier(.3,.85,.45,1)}
+  /* the veil only drops for the break itself, and it drops hard */
+  body.dark .veil{opacity:.985;transition:opacity .22s cubic-bezier(.3,.9,.4,1)}
   body.hush .ticker-in{animation-play-state:paused}
   body.hush .rave,
   body.hush .grid,
-  body.hush .strobe{opacity:0;transition:opacity 1.6s ease-out}
+  body.hush .strobe{opacity:0;transition:opacity .3s ease-out}
 
   /* ---------- phase five: everything moves ---------- */
   .page.gl{transform:translate3d(var(--shx,0px), var(--shy,0px), 0) skewX(-3deg) scale(1.02)}
@@ -1144,11 +1144,11 @@
     { b: 134, k: 'Phase five', t: 'HOLD ON TO SOMETHING', s: 'you asked for the healer' }
   ];
   /* the hush. measured off the file:
-     beat 124 (bar 32) the effects stop and the screen starts going down,
-     beat 129 is where the bass actually drops out and it is fully black,
-     beat 134 is where the bass comes back. */
-  var BREAK_B_IN = 124, DARK_B = 128, BREAK_B_OUT = 134;
-  var LEAD = 0.10;
+     beat 129 is where the bass drops out, beat 134 is where it comes back.
+     freeze and blackout happen together on the drop, so there is no dead
+     frozen page sitting there, and the dark lasts exactly the break. */
+  var BREAK_B_IN = 129, DARK_B = 129, BREAK_B_OUT = 134;
+  var LEAD = 0.13;
   var phase = 0, ph = 0, calm = false;
   var tickIn = document.getElementById('tick');
   var readBtn = document.getElementById('readbtn');
