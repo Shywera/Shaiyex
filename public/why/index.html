@@ -423,8 +423,11 @@
       linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,.04));
     filter:brightness(calc(.34 + var(--pd) * 3.4)) saturate(1.35);
     opacity:calc((.32 + var(--p) * .68) * var(--wall, .3));
-    transition:background-position .5s ease;
+    transition:opacity .4s ease, background-position .5s ease;
   }
+  /* lights out while the wall changes what it says */
+  .wall.blind{background:#050309}
+  .wall.blind .cut{opacity:0 !important;transition:none}
 
   /* ---------- achievement spam ---------- */
   .toasts{
@@ -490,12 +493,17 @@
   /* ---------- cursor stalker ---------- */
   .cursor{
     position:fixed;z-index:59;pointer-events:none;
-    font-family:var(--display);
-    font-size:clamp(22px,3vw,32px);letter-spacing:.05em;
-    color:var(--i);
-    text-shadow:0 0 14px var(--i), 0 0 40px var(--i), 0 2px 10px rgba(0,0,0,.9);
-    opacity:0;transition:opacity .35s ease;white-space:nowrap;
-    transform:translate(-50%,-50%) scale(calc(1 + var(--p) * .16));
+    width:28px;height:28px;border-radius:50%;
+    border:2px solid var(--i);
+    box-shadow:0 0 calc(5px + var(--p) * 26px) var(--i),
+               inset 0 0 calc(3px + var(--p) * 16px) var(--i);
+    opacity:0;transition:opacity .35s ease;
+    transform:translate(-50%,-50%) scale(calc(.78 + var(--p) * .6));
+  }
+  .cursor::after{
+    content:"";position:absolute;left:50%;top:50%;
+    width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;
+    background:var(--i);box-shadow:0 0 10px var(--i);
   }
   .cursor.on{opacity:1}
   body.stalk, body.stalk *{cursor:none}
@@ -575,7 +583,7 @@
 <div class="pops" id="pops" aria-hidden="true"></div>
 <div class="stamp" id="stamp" aria-hidden="true"></div>
 <div class="toasts" id="toasts" aria-hidden="true"></div>
-<div class="cursor" id="cursor" aria-hidden="true">STILL ME</div>
+<div class="cursor" id="cursor" aria-hidden="true"></div>
 <div class="phase" id="phase" aria-hidden="true">
   <div class="pk"></div>
   <div class="pt"></div>
@@ -980,8 +988,7 @@
     cutEl.style.setProperty('--ly', (10 + Math.random() * 78).toFixed(0) + '%');
   }
 
-  /* ---- cursor stalker ---- */
-  var CURW = ["STILL ME","THAT WAS ME","ALSO ME","MINE","ME","SIT DOWN DOG"];
+  /* ---- cursor ring ---- */
   var cx = -999, cy = -999;
   window.addEventListener('mousemove', function(ev){
     cx = ev.clientX; cy = ev.clientY;
@@ -1001,25 +1008,33 @@
 
   /* every readable thing on the page briefly says the same thing */
   var SWAPPABLE = [].slice.call(document.querySelectorAll(
-    '.lede, h2, .trait-t, .trait-name, .trait p, .kicker, .nm, .ds, .term-t, .close p, .eyebrow'
+    'h1, .lede, h2, .trait-t, .trait-name, .trait p, .kicker, .nm, .ds, .term-t, .close p, .eyebrow'
   ));
   var swapping = false, cutSaved = '';
+
+  /* kill the light, change the wall in the dark, bring it back */
+  function blind(change){
+    wallEl.classList.add('blind');
+    setTimeout(change, 60);
+    setTimeout(function(){ wallEl.classList.remove('blind'); }, BEAT * 2000);
+  }
   function meSwap(ms, word){
     if (swapping) return;
     swapping = true;
     var w = word || 'YOU ARE SHIT';
 
-    /* the wall says it too */
+    /* the wall goes black, changes what it says, then lights back up */
     cutSaved = cutEl.innerHTML;
     var wall = [];
     for (var k = 0; k < 150; k++){
       wall.push('<span style="font-size:' + (0.6 + Math.random() * 0.7).toFixed(2) + 'em">' + w + '</span>');
     }
-    cutEl.innerHTML = wall.join(' ');
+    blind(function(){ cutEl.innerHTML = wall.join(' '); });
 
     var saved = SWAPPABLE.map(function(el){ return el.innerHTML; });
     SWAPPABLE.forEach(function(el, i){
-      var reps = Math.max(1, Math.min(14, Math.round(el.textContent.length / (w.length + 1))));
+      var reps = (el.tagName === 'H1') ? 1
+               : Math.max(1, Math.min(14, Math.round(el.textContent.length / (w.length + 1))));
       var out = [];
       while (reps--) out.push(w);
       el.textContent = out.join(' ');
@@ -1030,7 +1045,7 @@
         el.classList.remove('swapped');
         el.innerHTML = saved[i];
       });
-      cutEl.innerHTML = cutSaved;
+      blind(function(){ cutEl.innerHTML = cutSaved; });
       swapping = false;
     }, ms);
   }
@@ -1122,17 +1137,16 @@
             if (phase >= 2){
               var sev = phase >= 4 ? 8 : phase >= 3 ? 12 : 16;
               if (b % sev === 0){ slam(); invert(60 + phase * 12); }
-              /* one achievement every 20 seconds, no more */
-              if (m4 === 0 && (track.currentTime < lastAch || track.currentTime - lastAch > 20)){
-                lastAch = track.currentTime;
-                toast();
-              }
               if (b % 8 === 2 && TITLES.length){
                 corrupt(TITLES[Math.floor(Math.random() * TITLES.length)]);
               }
             }
             if (phase >= 4){
-              curEl.textContent = swapping ? 'YOU ARE SHIT' : CURW[b % CURW.length];
+              /* one achievement every 20 seconds, no more */
+              if (m4 === 0 && (track.currentTime < lastAch || track.currentTime - lastAch > 20)){
+                lastAch = track.currentTime;
+                toast();
+              }
               if (b % 16 === 8) meSwap(BEAT * 4000);   /* four beats, long enough to read */
             }
           }
