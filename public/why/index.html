@@ -90,15 +90,55 @@
   }
   .tear.on{display:block}
 
+  #lasers{
+    position:fixed;inset:0;z-index:1;pointer-events:none;
+    width:100%;height:100%;
+    mix-blend-mode:screen;
+  }
+
+  /* the shake lives on .page only, nothing fixed is inside it */
   .page{
     position:relative;z-index:2;
     max-width:78ch;margin:0 auto;
-    padding:clamp(30px,6vw,60px) clamp(18px,5vw,28px) 110px;
+    padding:clamp(30px,6vw,60px) clamp(18px,5vw,28px) 140px;
     display:flex;flex-direction:column;gap:clamp(46px,7vw,78px);
+    transform:translate3d(var(--shx,0px), var(--shy,0px), 0);
+    will-change:transform;
   }
 
+  /* ---------- led ticker ---------- */
+  .ticker{
+    position:fixed;left:0;right:0;bottom:0;z-index:55;
+    height:30px;display:flex;align-items:center;overflow:hidden;
+    background:#09060F;
+    border-top:1px solid var(--line-hot);
+    box-shadow:0 -12px 34px rgba(0,0,0,.7);
+  }
+  .ticker::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(90deg,#09060F 0%, rgba(9,6,15,0) 6%, rgba(9,6,15,0) 94%, #09060F 100%);
+  }
+  .ticker-in{
+    display:flex;white-space:nowrap;
+    animation:slide 46s linear infinite;
+    will-change:transform;
+  }
+  .ticker b{
+    font-family:var(--mono);font-weight:400;
+    font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--dim);padding:0 14px 0 22px;position:relative;
+    text-shadow:0 0 calc(var(--p) * 16px) var(--i);
+  }
+  .ticker b::after{
+    content:"";position:absolute;right:0;top:50%;
+    width:4px;height:4px;margin-top:-2px;
+    background:var(--iii);
+    box-shadow:0 0 calc(4px + var(--pd) * 14px) var(--iii);
+  }
+  @keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
   .backlink{
-    position:fixed;bottom:16px;left:16px;z-index:60;
+    position:fixed;bottom:44px;left:16px;z-index:60;
     font-family:var(--mono);font-size:10.5px;font-weight:700;
     letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
     background:rgba(15,11,24,.9);border:1px solid var(--line-hot);
@@ -187,7 +227,9 @@
     font-family:var(--display);
     font-size:clamp(26px,4.6vw,40px);line-height:1.02;
     margin:.5em 0 0;color:var(--text);
+    text-shadow:calc(var(--pd) * -3px) 0 var(--k), calc(var(--pd) * 3px) 0 var(--i);
   }
+  h2{text-shadow:calc(var(--pd) * -3px) 0 var(--iii), calc(var(--pd) * 3px) 0 var(--i)}
   .trait p{color:var(--dim);font-size:16px;line-height:1.6;max-width:58ch}
   .trait p b{color:var(--text);font-weight:600}
   .trait .kicker{
@@ -196,6 +238,27 @@
     font-family:var(--mono);font-size:12.5px;letter-spacing:.03em;
     color:var(--k);opacity:.92;line-height:1.75;
   }
+
+  /* ---------- party chat ---------- */
+  .chat{
+    position:relative;
+    padding:clamp(18px,3.6vw,28px);
+    background:#0B0814;
+    border:1px solid var(--line);
+    border-left:3px solid var(--acid);
+    border-radius:2px;
+    font-family:var(--mono);
+    font-size:13px;
+    line-height:2;
+    color:var(--dim);
+    overflow-x:auto;
+  }
+  .chat > div{white-space:nowrap}
+  .chat .t{color:#4E4670}
+  .chat .me{color:var(--i)}
+  .chat .them{color:var(--iii)}
+  .chat .sys{color:var(--acid)}
+  .chat .win{color:#FFF;text-shadow:0 0 calc(6px + var(--pd) * 22px) var(--acid)}
 
   /* ---------- terms ---------- */
   .terms{display:flex;flex-direction:column;border-top:1px solid var(--line)}
@@ -294,6 +357,7 @@
 <body>
 
 <div class="rave" id="rave" aria-hidden="true"></div>
+<canvas id="lasers" aria-hidden="true"></canvas>
 <div class="grid" aria-hidden="true"></div>
 <div class="strobe" aria-hidden="true"></div>
 <div class="scan" aria-hidden="true"></div>
@@ -321,6 +385,10 @@
 </button>
 
 <a class="backlink" href="/">shaiyex.com</a>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-in" id="tick"></div>
+</div>
 
 <div class="page">
 
@@ -368,6 +436,28 @@
         <span class="kicker">You get healed either way. The healing is unconditional. The commentary is not.</span>
       </article>
 
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Exhibit A</p>
+      <h2>Party chat, <span class="hi">verbatim</span>.</h2>
+    </div>
+
+    <div class="chat">
+      <div><span class="t">[21:38:04]</span> <span class="them">[Tank]:</span> pull?</div>
+      <div><span class="t">[21:38:04]</span> <span class="me">[Shaiyex]:</span> i have been healing you for six seconds already</div>
+      <div><span class="t">[21:41:19]</span> <span class="sys">Ancient Spark was not interrupted. Nobody was in range. Everybody was in range.</span></div>
+      <div><span class="t">[21:41:22]</span> <span class="me">[Shaiyex]:</span> interesting group decision</div>
+      <div><span class="t">[21:41:30]</span> <span class="them">[Dps 2]:</span> unlucky</div>
+      <div><span class="t">[21:41:31]</span> <span class="me">[Shaiyex]:</span> no</div>
+      <div><span class="t">[21:47:02]</span> <span class="sys">Shaiyex casts Lay on Hands on Dps 3. Dps 3 was at 2%.</span></div>
+      <div><span class="t">[21:47:05]</span> <span class="me">[Shaiyex]:</span> that one is going in the screenshot</div>
+      <div><span class="t">[21:52:44]</span> <span class="them">[Dps 1]:</span> healer diff</div>
+      <div><span class="t">[21:52:46]</span> <span class="me">[Shaiyex]:</span> correct</div>
+      <div><span class="t">[21:59:58]</span> <span class="win">Key completed in time. +2.</span></div>
+      <div><span class="t">[22:00:01]</span> <span class="me">[Shaiyex]:</span> you are all welcome, individually, in the order you needed it</div>
     </div>
   </section>
 
@@ -435,32 +525,131 @@
     if (muted){ try { track.pause(); } catch (e){} } else { play(); }
   });
 
-  /* every visual hangs off the track's own playhead */
-  var lastBeat = -1, p = 0, pd = 0;
+  /* ---- ticker ---- */
+  var LINES = [
+    "you had your kick off cooldown",
+    "eight percent twice",
+    "i saw the log",
+    "press one button",
+    "that was not the affix",
+    "nobody defensived",
+    "lay on hands, again",
+    "still standing, you are welcome",
+    "the cast bar was on your screen too",
+    "unlucky is not a mechanic",
+    "i healed that, ask me how",
+    "timed it anyway"
+  ];
+  (function(){
+    var t = document.getElementById('tick');
+    var half = LINES.map(function(s){ return '<b>' + s + '</b>'; }).join('');
+    t.innerHTML = half + half;   /* duplicated so the loop seams */
+  })();
 
-  function frame(){
+  /* ---- lasers ---- */
+  var lc = document.getElementById('lasers');
+  var lx = lc.getContext('2d');
+  var W = 0, H = 0, BEAMS = [];
+
+  function sizeL(){
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    lc.width = W * dpr; lc.height = H * dpr;
+    lx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  var HUES = [188, 285, 338, 78];
+  function newBeams(){
+    BEAMS = [];
+    var n = 5 + Math.floor(Math.random() * 4);
+    var base = Math.random() * Math.PI * 2;
+    var hue = HUES[Math.floor(Math.random() * HUES.length)];
+    for (var i = 0; i < n; i++){
+      BEAMS.push({
+        a: base + (i - (n - 1) / 2) * (0.13 + Math.random() * 0.09),
+        w: 0.008 + Math.random() * 0.026,
+        h: Math.random() < 0.25 ? HUES[Math.floor(Math.random() * HUES.length)] : hue
+      });
+    }
+  }
+  sizeL(); newBeams();
+  window.addEventListener('resize', sizeL);
+
+  function drawLasers(t, amt){
+    lx.clearRect(0, 0, W, H);
+    if (amt < 0.02) return;
+    var ox = W * 0.5 + Math.sin(t * 0.00022) * W * 0.34;
+    var oy = -60;
+    var R  = Math.sqrt(W * W + H * H) * 1.25;
+    lx.globalCompositeOperation = 'lighter';
+    for (var i = 0; i < BEAMS.length; i++){
+      var b = BEAMS[i];
+      var a = b.a + t * 0.00007;
+      var x = ox + Math.cos(a) * R, y = oy + Math.sin(a) * R;
+      var g = lx.createLinearGradient(ox, oy, x, y);
+      var al = amt * 0.42;
+      g.addColorStop(0,   'hsla(' + b.h + ',100%,66%,' + al + ')');
+      g.addColorStop(0.55,'hsla(' + b.h + ',100%,58%,' + (al * 0.35) + ')');
+      g.addColorStop(1,   'hsla(' + b.h + ',100%,50%,0)');
+      lx.beginPath();
+      lx.moveTo(ox, oy);
+      lx.lineTo(ox + Math.cos(a - b.w) * R, oy + Math.sin(a - b.w) * R);
+      lx.lineTo(ox + Math.cos(a + b.w) * R, oy + Math.sin(a + b.w) * R);
+      lx.closePath();
+      lx.fillStyle = g;
+      lx.fill();
+    }
+    lx.globalCompositeOperation = 'source-over';
+  }
+
+  /* ---- text corruption ---- */
+  var GLYPH = "!@#$%&*<>/\\|=+~";
+  var TITLES = [].slice.call(document.querySelectorAll('.trait-t'));
+  function corrupt(el){
+    if (!el || el._busy) return;
+    el._busy = 1;
+    var orig = el.textContent, n = 0;
+    var iv = setInterval(function(){
+      n++;
+      el.textContent = orig.replace(/\S/g, function(c){
+        return Math.random() > 0.28 ? c : GLYPH.charAt(Math.floor(Math.random() * GLYPH.length));
+      });
+      if (n > 3){ clearInterval(iv); el.textContent = orig; el._busy = 0; }
+    }, 38);
+  }
+
+  /* every visual hangs off the track's own playhead */
+  var lastBeat = -1, p = 0, pd = 0, sh = 0;
+
+  function frame(t){
     if (!reduce){
       if (!track.paused && !track.ended){
         var b = Math.floor((track.currentTime - OFFSET) / BEAT);
         if (b !== lastBeat){
           lastBeat = b;
           p = 1;
-          if (b % 4 === 0) pd = 1;
+          if (b % 4 === 0){ pd = 1; sh = 1; newBeams(); }
           root.style.setProperty('--hue', ((b >> 4) * 26 % 360) + 'deg');
           if (b % 16 === 0){
-            tearEl.style.top = (Math.random() * 78 + 8) + 'vh';
+            tearEl.style.top = (Math.random() * 70 + 8) + 'vh';
             tearEl.style.height = (3 + Math.random() * 26) + 'px';
             tearEl.classList.add('on');
             setTimeout(function(){ tearEl.classList.remove('on'); }, 80);
           }
+          if (b % 32 === 0 && TITLES.length){
+            corrupt(TITLES[Math.floor(Math.random() * TITLES.length)]);
+          }
         }
         p  *= 0.80;
-        pd *= 0.88;
+        pd *= 0.86;
+        sh *= 0.70;
       } else {
-        p *= 0.9; pd *= 0.9;
+        p *= 0.9; pd *= 0.9; sh *= 0.8;
       }
       root.style.setProperty('--p',  p.toFixed(3));
       root.style.setProperty('--pd', pd.toFixed(3));
+      root.style.setProperty('--shx', ((Math.random() - 0.5) * sh * 7).toFixed(2) + 'px');
+      root.style.setProperty('--shy', ((Math.random() - 0.5) * sh * 5).toFixed(2) + 'px');
+      drawLasers(t || 0, p);
     }
     requestAnimationFrame(frame);
   }
