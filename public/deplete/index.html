@@ -104,17 +104,8 @@
       radial-gradient(90% 55% at 50% 0%, rgba(200,30,30,.16), rgba(200,30,30,0) 62%),
       radial-gradient(70% 45% at 0% 100%, rgba(200,30,30,.12), rgba(200,30,30,0) 60%),
       radial-gradient(70% 45% at 100% 100%, rgba(200,30,30,.12), rgba(200,30,30,0) 60%);
-    animation:bleed 7.5s steps(1) infinite;
-  }
-  @keyframes bleed{
-    0%,11%{opacity:.62}
-    12%{opacity:.12}
-    18%,40%{opacity:.78}
-    41%,52%{opacity:.08}
-    56%{opacity:.3}
-    60%,78%{opacity:.7}
-    79%{opacity:.14}
-    86%,100%{opacity:.62}
+    opacity:.62;
+    transition:opacity .06s linear;
   }
   .page{position:relative;z-index:1}
 
@@ -334,7 +325,7 @@
 
 <div class="bleed" aria-hidden="true"></div>
 
-<audio id="theme" src="theme.mp3" preload="none" loop></audio>
+<audio id="theme" src="theme.mp3" preload="metadata" loop></audio>
 <audio id="buzz" src="neon.mp3" preload="auto" loop></audio>
 <button id="mute" type="button" aria-label="Toggle sound">
   <span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>
@@ -505,17 +496,17 @@
   }
   muteBtn.addEventListener('click', function(){ setMuted(!muted); });
 
-  /* keep trying on every interaction until something is actually audible */
+  /* Chrome does not treat a mouse pointerdown as user activation - it wants
+     mousedown/click - so listen for every gesture that can unlock audio */
+  var GESTURES = ['pointerdown','mousedown','click','touchstart','touchend','keydown'];
   function arm(){
     if (audioOn){
-      document.removeEventListener('pointerdown', arm, true);
-      document.removeEventListener('keydown', arm, true);
+      GESTURES.forEach(function(g){ document.removeEventListener(g, arm, true); });
       return;
     }
     playTheme();
   }
-  document.addEventListener('pointerdown', arm, true);
-  document.addEventListener('keydown', arm, true);
+  GESTURES.forEach(function(g){ document.addEventListener(g, arm, true); });
 
   /* ---- the sign: flicker timings measured from neon.mp3 itself,
          so the light and the recording stay locked together ---- */
@@ -533,11 +524,12 @@
     var bleed = document.querySelector('.bleed');
     var offT  = null;
 
+    var BASE = 0.62;
     function lit(){
       h1.style.opacity = '1';
       h1.style.transform = 'none';
       h1.style.textShadow = FULL;
-      if (bleed) bleed.style.opacity = '';
+      if (bleed) bleed.style.opacity = String(BASE);
     }
     function out(power){
       var p    = (power == null) ? 0.5 : power;
@@ -547,7 +539,8 @@
       h1.style.transform = 'translateX(' + (Math.random()*22-11).toFixed(1) + 'px) skewX(' +
                            (Math.random()*9-4.5).toFixed(1) + 'deg)';
       h1.style.textShadow = deep ? 'none' : DYING;
-      if (bleed) bleed.style.opacity = String(Math.max(lvl*0.5, 0.07));
+      // the room loses its glow exactly as hard as the sign does
+      if (bleed) bleed.style.opacity = String(deep ? 0.05 : BASE * (0.35 + lvl));
       clearTimeout(offT);
       offT = setTimeout(lit, deep ? 90 + p * 240 : 45 + Math.random() * 70);
     }
