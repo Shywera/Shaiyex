@@ -279,31 +279,57 @@
 
   /* ---------- counter ---------- */
   .tally{
+    position:relative;
     display:flex;
     align-items:center;
-    gap:18px;
+    gap:clamp(18px,4vw,40px);
     flex-wrap:wrap;
-    padding:20px 22px;
-    background:linear-gradient(120deg, rgba(214,65,63,.1), rgba(214,65,63,0) 60%), var(--panel);
-    border:1px solid var(--line-hot);
+    padding:clamp(26px,5vw,40px) clamp(22px,4vw,34px);
+    background:
+      radial-gradient(90% 140% at 12% 50%, rgba(200,30,30,.22), rgba(200,30,30,0) 62%),
+      linear-gradient(160deg, rgba(255,255,255,.02), rgba(255,255,255,0) 60%),
+      #0B0709;
+    border:1px solid #5A1E20;
     border-radius:2px;
+    box-shadow:0 0 46px rgba(200,30,30,.18) inset, 0 0 30px rgba(200,30,30,.12);
+    overflow:hidden;
+  }
+  .tally::before{
+    content:"";
+    position:absolute;
+    left:0;top:0;bottom:0;
+    width:3px;
+    background:var(--red-hot);
+    box-shadow:0 0 22px var(--red-hot);
   }
   .tally-n{
     font-family:var(--display);
     font-weight:800;
-    font-size:clamp(44px,9vw,68px);
-    line-height:.9;
+    font-size:clamp(86px,20vw,180px);
+    line-height:.78;
     color:var(--red-hot);
     font-variant-numeric:tabular-nums;
+    text-shadow:0 0 26px rgba(255,74,70,.85), 0 0 80px rgba(200,30,30,.55);
   }
   .tally-l{
-    flex:1 1 180px;
+    flex:1 1 220px;
     font-family:var(--mono);
-    font-size:11px;
-    letter-spacing:.13em;
+    font-size:12px;
+    letter-spacing:.1em;
     text-transform:uppercase;
-    color:var(--dimmer);
-    line-height:1.6;
+    color:var(--dim);
+    line-height:1.75;
+  }
+  .tally-since{
+    display:inline-block;
+    margin-top:12px;
+    padding:5px 10px 6px;
+    font-size:10px;
+    letter-spacing:.16em;
+    color:var(--red-hot);
+    border:1px solid #5A1E20;
+    border-radius:2px;
+    background:rgba(200,30,30,.08);
   }
 
   /* ---------- buttons + inputs ---------- */
@@ -314,32 +340,79 @@
 
   /* ---------- avoid list ---------- */
 
-  .avoid{display:flex;flex-direction:column;margin-top:22px;border-top:1px solid var(--line)}
+  .avoid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+    gap:12px;
+    margin-top:24px;
+  }
   .avoid[hidden]{display:none}
   .av{
-    display:grid;
-    grid-template-columns:1.2fr 1.6fr auto;
-    gap:6px 16px;
-    padding:12px 2px;
-    border-bottom:1px solid var(--line);
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    padding:20px 20px 18px;
+    background:
+      radial-gradient(120% 100% at 100% 0%, rgba(200,30,30,.16), rgba(200,30,30,0) 65%),
+      #0C0809;
+    border:1px solid #3A1E21;
+    border-left:3px solid var(--red);
+    border-radius:2px;
+    transition:border-color .25s ease, box-shadow .25s ease, transform .25s ease;
+  }
+  .av:hover{
+    transform:translateY(-3px);
+    border-color:#8E2B2E;
+    border-left-color:var(--red-hot);
+    box-shadow:0 0 34px rgba(200,30,30,.28);
+  }
+  .av-top{
+    display:flex;
     align-items:center;
-  }
-  .av-n{font-weight:600;font-size:16px;word-break:break-word}
-  .av-n span{display:block;font-family:var(--mono);font-size:11px;color:var(--dimmer);font-weight:400}
-  .av-l{font-family:var(--mono);font-size:12px;word-break:break-all}
-  .av-l a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(233,168,60,.3)}
-  .av-l a:hover{border-bottom-color:var(--amber)}
-  @media (max-width:640px){
-    .av{grid-template-columns:1fr auto}
-    .av-l{grid-column:1/-1}
-  }
-  .empty{
-    padding:22px 2px;
-    color:var(--dimmer);
+    justify-content:space-between;
+    gap:12px;
     font-family:var(--mono);
-    font-size:12px;
-    letter-spacing:.04em;
+    font-size:10px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--dimmer);
   }
+  .av-tag{
+    color:var(--red-hot);
+    border:1px solid #5A1E20;
+    background:rgba(200,30,30,.1);
+    padding:3px 8px 4px;
+    border-radius:2px;
+  }
+  .av-n{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(28px,4.6vw,38px);
+    line-height:1;
+    color:#FFE0DE;
+    text-shadow:0 0 22px rgba(255,74,70,.4);
+    word-break:break-word;
+  }
+  .av-realm{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--dimmer)}
+  .av-note{font-size:14.5px;line-height:1.45;color:var(--dim)}
+  .av-l{margin-top:8px}
+  .av-l a{
+    display:inline-block;
+    font-family:var(--mono);
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--red-hot);
+    text-decoration:none;
+    padding:8px 14px 9px;
+    border:1px solid #5A1E20;
+    border-radius:2px;
+    transition:background .2s ease, color .2s ease;
+  }
+  .av-l a:hover{background:var(--red-hot);color:#0A0405;border-color:var(--red-hot)}
+  .empty{padding:22px 2px;color:var(--dimmer);font-family:var(--mono);font-size:12px;letter-spacing:.04em}
 
   footer{
     border-top:1px solid var(--line);
@@ -404,13 +477,13 @@
 
   <section>
     <div class="sec-head">
-      <p class="eyebrow">Running total</p>
+      <p class="eyebrow">The tally</p>
       <h2>How often this happened since 30.08.2026.</h2>
     </div>
 
     <div class="tally">
       <span class="tally-n" id="tallyN">0</span>
-      <span class="tally-l">Keys fucked up because of<br>dumb DPS</span>
+      <span class="tally-l" id="tallyL">keys binned by DPS who think<br>the cast bar is scenery<span class="tally-since">since 30.08.2026</span></span>
     </div>
   </section>
 
@@ -474,32 +547,50 @@
     listEl.innerHTML = '';
     emptyEl.hidden = BLACKLIST.length > 0;
 
-    BLACKLIST.forEach(function(r){
+    BLACKLIST.forEach(function(r, i){
       var wrap = document.createElement('div');
       wrap.className = 'av';
+
+      var top = document.createElement('div');
+      top.className = 'av-top';
+      var no = document.createElement('span');
+      no.textContent = ('0' + (i + 1)).slice(-2);
+      var tag = document.createElement('span');
+      tag.className = 'av-tag';
+      tag.textContent = 'Do not invite';
+      top.appendChild(no); top.appendChild(tag);
 
       var name = document.createElement('span');
       name.className = 'av-n';
       name.textContent = r.name;
-      var sub = document.createElement('span');
-      sub.textContent = [r.realm, r.note].filter(Boolean).join(' · ');
-      name.appendChild(sub);
 
-      var link = document.createElement('span');
-      link.className = 'av-l';
-      var u = safeUrl(r.link || '');
-      if (u){
-        var a = document.createElement('a');
-        a.href = u; a.target = '_blank'; a.rel = 'noopener noreferrer';
-        a.textContent = u.replace(/^https?:\/\//, '').slice(0, 52);
-        link.appendChild(a);
-      } else {
-        link.textContent = '—';
-        link.style.color = 'var(--dimmer)';
+      wrap.appendChild(top);
+      wrap.appendChild(name);
+
+      if (r.realm){
+        var realm = document.createElement('span');
+        realm.className = 'av-realm';
+        realm.textContent = r.realm;
+        wrap.appendChild(realm);
+      }
+      if (r.note){
+        var note = document.createElement('span');
+        note.className = 'av-note';
+        note.textContent = r.note;
+        wrap.appendChild(note);
       }
 
-      wrap.appendChild(name);
-      wrap.appendChild(link);
+      var u = safeUrl(r.link || '');
+      if (u){
+        var box = document.createElement('span');
+        box.className = 'av-l';
+        var a = document.createElement('a');
+        a.href = u; a.target = '_blank'; a.rel = 'noopener noreferrer';
+        a.textContent = 'Raider.IO →';
+        box.appendChild(a);
+        wrap.appendChild(box);
+      }
+
       listEl.appendChild(wrap);
     });
   }
