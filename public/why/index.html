@@ -490,11 +490,15 @@
   /* ---------- cursor stalker ---------- */
   .cursor{
     position:fixed;z-index:59;pointer-events:none;
-    font-family:var(--display);font-size:19px;letter-spacing:.05em;
-    color:var(--i);text-shadow:0 0 16px var(--i);
+    font-family:var(--display);
+    font-size:clamp(22px,3vw,32px);letter-spacing:.05em;
+    color:var(--i);
+    text-shadow:0 0 14px var(--i), 0 0 40px var(--i), 0 2px 10px rgba(0,0,0,.9);
     opacity:0;transition:opacity .35s ease;white-space:nowrap;
+    transform:translate(-50%,-50%) scale(calc(1 + var(--p) * .16));
   }
   .cursor.on{opacity:1}
+  body.stalk, body.stalk *{cursor:none}
 
   /* ---------- intro gate ---------- */
   .gate{
@@ -968,8 +972,8 @@
   var cx = -999, cy = -999;
   window.addEventListener('mousemove', function(ev){
     cx = ev.clientX; cy = ev.clientY;
-    curEl.style.left = (cx + 18) + 'px';
-    curEl.style.top  = (cy + 16) + 'px';
+    curEl.style.left = cx + 'px';
+    curEl.style.top  = cy + 'px';
   });
 
   /* ---- phases ---- */
@@ -1009,7 +1013,7 @@
   }
 
   function finale(){
-    meSwap(2100);
+    meSwap(BEAT * 6000);   /* six beats on the big one */
     invert(220);
     tear(16);
   }
@@ -1040,6 +1044,7 @@
     }
     if (phase >= 4){
       curEl.classList.add('on');
+      document.body.classList.add('stalk');
       setTimeout(finale, 1100);   /* lands right after the phase call clears */
     }
   }
@@ -1103,7 +1108,10 @@
                 corrupt(TITLES[Math.floor(Math.random() * TITLES.length)]);
               }
             }
-            if (phase >= 4 && b % 16 === 8) meSwap(520);
+            if (phase >= 4){
+              curEl.textContent = CURW[(b >> 0) % CURW.length];
+              if (b % 16 === 8) meSwap(BEAT * 4000);   /* four beats, long enough to read */
+            }
           }
         }
         p  *= 0.80;
@@ -1116,9 +1124,6 @@
       root.style.setProperty('--pd', pd.toFixed(3));
       root.style.setProperty('--shx', ((Math.random() - 0.5) * sh * 7).toFixed(2) + 'px');
       root.style.setProperty('--shy', ((Math.random() - 0.5) * sh * 5).toFixed(2) + 'px');
-      if (phase >= 4 && curEl.className.indexOf('on') > -1 && Math.random() < 0.02){
-        curEl.textContent = CURW[Math.floor(Math.random() * CURW.length)];
-      }
       drawLasers(t || 0, phase >= 1 ? p : 0);
     }
     requestAnimationFrame(frame);
