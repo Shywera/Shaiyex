@@ -59,39 +59,6 @@
 
   a{color:inherit;text-decoration:none}
 
-  /* ---------- blacklist button ---------- */
-  .bl-btn{
-    position:fixed;
-    top:0;left:50%;
-    transform:translateX(-50%);
-    z-index:65;
-    display:flex;
-    align-items:center;
-    gap:9px;
-    padding:11px 22px 12px;
-    font-family:"JetBrains Mono","IBM Plex Mono",Consolas,monospace;
-    font-size:11px;
-    font-weight:700;
-    letter-spacing:.2em;
-    text-transform:uppercase;
-    color:#FFD9D7;
-    text-decoration:none;
-    background:linear-gradient(180deg,#2A0A0C,#140406);
-    border:1px solid #6E2224;
-    border-top:none;
-    border-radius:0 0 3px 3px;
-    box-shadow:0 0 26px rgba(200,30,30,.45), 0 0 60px rgba(200,30,30,.22);
-    animation:blPulse 3.4s ease-in-out infinite;
-    transition:color .2s ease, border-color .2s ease;
-  }
-  .bl-btn::before{content:"";width:7px;height:7px;border-radius:50%;background:#FF4A46;box-shadow:0 0 10px #FF4A46}
-  .bl-btn:hover{color:#fff;border-color:#C81E1E;box-shadow:0 0 40px rgba(200,30,30,.75)}
-  .bl-btn:focus-visible{outline:2px solid #FF4A46;outline-offset:3px}
-  @keyframes blPulse{
-    0%,100%{box-shadow:0 0 20px rgba(200,30,30,.35), 0 0 50px rgba(200,30,30,.16)}
-    50%{box-shadow:0 0 34px rgba(200,30,30,.6), 0 0 78px rgba(200,30,30,.3)}
-  }
-  @media (max-width:520px){.bl-btn{font-size:10px;padding:9px 14px 10px;letter-spacing:.14em}}
 
   /* ---------- hero ---------- */
   .hero{
@@ -252,6 +219,30 @@
   .door:hover .door-go{color:var(--text)}
 
   .door-2{--c:var(--amber)}
+  .door-3{
+    --c:#FF4A46;
+    border-color:#5A1E20;
+    background:
+      radial-gradient(120% 100% at 50% 120%, rgba(200,30,30,.2), rgba(200,30,30,0) 70%),
+      linear-gradient(165deg, rgba(255,255,255,.03), rgba(255,255,255,0) 60%),
+      #0B0709;
+    animation:doorNeon 6.5s steps(1) infinite;
+  }
+  .door-3 .door-t{color:#FFD9D7;text-shadow:0 0 22px rgba(255,74,70,.7)}
+  .door-3::after{opacity:1}
+  @keyframes doorNeon{
+    0%,38%   {box-shadow:0 0 26px rgba(200,30,30,.35)}
+    39%      {box-shadow:none}
+    40%      {box-shadow:0 0 26px rgba(200,30,30,.35)}
+    41%      {box-shadow:none}
+    43%,66%  {box-shadow:0 0 30px rgba(200,30,30,.45)}
+    67%,70%  {box-shadow:none}
+    71%      {box-shadow:0 0 12px rgba(200,30,30,.2)}
+    72%      {box-shadow:none}
+    74%,90%  {box-shadow:0 0 30px rgba(200,30,30,.45)}
+    91%      {box-shadow:none}
+    93%,100% {box-shadow:0 0 26px rgba(200,30,30,.35)}
+  }
 
   footer{
     flex:0 0 auto;
@@ -277,7 +268,6 @@
 </head>
 <body>
 
-<a class="bl-btn" href="/deplete/#blacklist">Blacklist</a>
 <header class="hero">
   <canvas id="rays" aria-hidden="true"></canvas>
   <div class="inner">
@@ -295,6 +285,13 @@
         <span class="door-t">About me</span>
         <span class="door-d">Mythic+ score, this season’s keys, raid progression, every tier played and the logs for each class.</span>
         <span class="door-go">Read it →</span>
+      </a>
+
+      <a class="door door-3" href="/deplete/">
+        <span class="door-k">When it goes wrong</span>
+        <span class="door-t">Blacklist</span>
+        <span class="door-d">The post-mortem I send after a depleted key, and the list of people I will not group with again.</span>
+        <span class="door-go">Open it →</span>
       </a>
 
       <a class="door door-2" href="/kick/">
