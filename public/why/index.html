@@ -136,23 +136,49 @@
   .stamp{
     position:fixed;left:50%;top:44%;z-index:52;pointer-events:none;
     font-family:var(--display);
-    font-size:clamp(46px,12vw,142px);
-    line-height:.9;letter-spacing:.03em;white-space:nowrap;
+    font-size:clamp(52px,13.5vw,168px);
+    line-height:.88;letter-spacing:.03em;white-space:nowrap;
     color:#fff;opacity:0;
-    transform:translate(-50%,-50%) scale(.4);
-    text-shadow:0 0 30px var(--iii), 0 0 90px var(--iii), 0 0 160px var(--ii);
+    transform:translate(-50%,-50%) rotate(var(--sr,-8deg)) scale(.4);
+    text-shadow:
+      0 0 24px var(--iii), 0 0 70px var(--iii),
+      0 0 150px var(--ii), 0 6px 0 rgba(0,0,0,.55);
   }
-  .stamp.on{animation:slam .8s cubic-bezier(.1,.9,.2,1) forwards}
+  .stamp::before{
+    content:"";position:absolute;left:50%;top:50%;
+    width:12px;height:12px;margin:-6px 0 0 -6px;
+    border-radius:50%;border:3px solid var(--iii);opacity:0;
+  }
+  .stamp.on{animation:slam 1s cubic-bezier(.12,.92,.18,1) forwards}
+  .stamp.on::before{animation:shock .75s ease-out forwards}
   @keyframes slam{
-    0%  {opacity:0; transform:translate(-50%,-50%) scale(2.6) rotate(-7deg)}
-    16% {opacity:1; transform:translate(-50%,-50%) scale(1)   rotate(-7deg)}
-    62% {opacity:1; transform:translate(-50%,-50%) scale(1)   rotate(-7deg)}
-    100%{opacity:0; transform:translate(-50%,-50%) scale(1.08) rotate(-7deg)}
+    0%  {opacity:0; filter:blur(16px); transform:translate(-50%,-50%) rotate(var(--sr)) scale(3.4)}
+    13% {opacity:1; filter:blur(0);    transform:translate(-50%,-50%) rotate(var(--sr)) scale(1.14)}
+    21% {                              transform:translate(-50%,-50%) rotate(var(--sr)) scale(.96)}
+    29% {                              transform:translate(-50%,-50%) rotate(var(--sr)) scale(1.03)}
+    38% {                              transform:translate(-50%,-50%) rotate(var(--sr)) scale(1)}
+    72% {opacity:1;                    transform:translate(-50%,-50%) rotate(var(--sr)) scale(1)}
+    100%{opacity:0; filter:blur(7px);  transform:translate(-50%,-50%) rotate(var(--sr)) scale(1.2)}
+  }
+  @keyframes shock{
+    0%  {opacity:.85; transform:scale(1)}
+    100%{opacity:0;   transform:scale(52)}
   }
 
   /* ---------- club hud ---------- */
+  .readbtn{
+    position:fixed;top:16px;left:16px;z-index:61;
+    padding:8px 13px 9px;
+    font-family:var(--mono);font-size:10.5px;font-weight:700;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+    background:rgba(15,11,24,.92);
+    border:1px solid var(--line-hot);border-radius:2px;cursor:pointer;
+  }
+  .readbtn:hover{color:var(--text);border-color:var(--acid)}
+  .readbtn.on{color:#06040A;background:var(--acid);border-color:#E4FF8A}
+
   .hud{
-    position:fixed;top:16px;left:16px;z-index:60;
+    position:fixed;top:53px;left:16px;z-index:60;
     display:flex;align-items:center;gap:10px;
     padding:7px 11px 8px;
     font-family:var(--mono);font-size:10px;font-weight:700;
@@ -168,7 +194,7 @@
   .hud .bl{display:flex;gap:3px}
   .hud .bl i{display:block;width:5px;height:11px;background:#2A2046}
   .hud .bl i.on{background:var(--i);box-shadow:0 0 9px var(--i)}
-  .phud{top:53px}
+  .phud{top:90px}
   .phud .pips{display:flex;gap:4px}
   .phud .pips i{
     display:block;width:12px;height:4px;background:#2A2046;
@@ -461,7 +487,8 @@
   /* ---------- phase call ---------- */
   .phase{
     position:fixed;left:50%;top:50%;z-index:70;pointer-events:none;
-    transform:translate(-50%,-50%);text-align:center;opacity:0;width:92vw;
+    transform:translate(-50%,-50%) rotate(var(--pr,-4deg));
+    text-align:center;opacity:0;width:92vw;
   }
   .phase.on{animation:phaseIn 1.2s cubic-bezier(.12,.9,.2,1) forwards}
   .phase .pk{
@@ -478,10 +505,11 @@
     letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-top:14px;
   }
   @keyframes phaseIn{
-    0%  {opacity:0;transform:translate(-50%,-50%) scale(2.1)}
-    8%  {opacity:1;transform:translate(-50%,-50%) scale(1)}
-    72% {opacity:1}
-    100%{opacity:0;transform:translate(-50%,-50%) scale(1.06)}
+    0%  {opacity:0; filter:blur(18px); transform:translate(-50%,-50%) rotate(var(--pr)) scale(2.4)}
+    9%  {opacity:1; filter:blur(0);    transform:translate(-50%,-50%) rotate(var(--pr)) scale(1.08)}
+    18% {                              transform:translate(-50%,-50%) rotate(var(--pr)) scale(1)}
+    72% {opacity:1;                    transform:translate(-50%,-50%) rotate(var(--pr)) scale(1)}
+    100%{opacity:0; filter:blur(5px);  transform:translate(-50%,-50%) rotate(var(--pr)) scale(1.1)}
   }
 
   /* ---------- the finale ---------- */
@@ -507,6 +535,60 @@
   }
   .cursor.on{opacity:1}
   body.stalk, body.stalk *{cursor:none}
+
+  /* ---------- terror mode ---------- */
+  body.terror{
+    --i:#FF2E2E;
+    --ii:#8E0F14;
+    --iii:#FF4A46;
+    --acid:#FF6B67;
+    --line:#3A1113;
+    --line-hot:#6E1A1E;
+    --dim:#C09A9A;
+    --dimmer:#8A6363;
+  }
+  body.terror .rave{
+    background:
+      radial-gradient(58% 46% at 16% 4%,  rgba(200,12,12,.5),  rgba(200,12,12,0) 62%),
+      radial-gradient(56% 44% at 84% 12%, rgba(120,0,0,.6),    rgba(120,0,0,0) 62%),
+      radial-gradient(76% 60% at 50% 98%, rgba(255,24,24,.45), rgba(255,24,24,0) 64%);
+    filter:none;
+  }
+  body.terror .grid{
+    background:
+      repeating-linear-gradient(90deg, rgba(255,40,40,.2) 0 1px, rgba(0,0,0,0) 1px 84px),
+      repeating-linear-gradient( 0deg, rgba(140,0,0,.16) 0 1px, rgba(0,0,0,0) 1px 84px);
+  }
+  body.terror .wall{background:rgba(8,1,2, calc(.955 - var(--pd) * .5))}
+  body.terror .wall .cut{
+    background-image:
+      radial-gradient(48% 40% at var(--lx,50%) var(--ly,42%),
+        rgba(255,220,220,1) 0%,
+        rgba(255,46,46,.95) 20%,
+        rgba(190,0,0,.75) 44%,
+        rgba(90,0,0,.4) 66%,
+        rgba(90,0,0,0) 82%),
+      linear-gradient(180deg, rgba(255,60,60,.16), rgba(120,0,0,.06));
+    filter:brightness(calc(.4 + var(--pd) * 3.6)) saturate(1.6);
+  }
+  body.terror .scan{opacity:.72}
+  body.terror .strobe{background:#FF2E2E;opacity:calc(var(--pd) * .16)}
+
+  .blood{
+    position:fixed;inset:0;z-index:7;pointer-events:none;display:none;
+    background:
+      linear-gradient(180deg, rgba(70,0,0,.75) 0%, rgba(70,0,0,0) 26%),
+      linear-gradient(0deg,   rgba(60,0,0,.8) 0%,  rgba(60,0,0,0) 22%),
+      radial-gradient(120% 80% at 50% 50%, rgba(120,0,0,0) 40%, rgba(70,0,0,.55) 100%),
+      repeating-linear-gradient(90deg,
+        rgba(90,0,0,.22) 0 3px, rgba(0,0,0,0) 3px 26px);
+    opacity:calc(.6 + var(--pd) * .4);
+  }
+  body.terror .blood{display:block}
+
+  .page.gl{
+    filter:contrast(1.9) saturate(2.4) hue-rotate(-14deg) brightness(1.15);
+  }
 
   /* ---------- intro gate ---------- */
   .gate{
@@ -582,6 +664,7 @@
 <div class="wall" id="wall" aria-hidden="true"><div class="cut" id="cut"></div></div>
 <div class="pops" id="pops" aria-hidden="true"></div>
 <div class="stamp" id="stamp" aria-hidden="true"></div>
+<div class="blood" aria-hidden="true"></div>
 <div class="toasts" id="toasts" aria-hidden="true"></div>
 <div class="cursor" id="cursor" aria-hidden="true"></div>
 <div class="phase" id="phase" aria-hidden="true">
@@ -606,6 +689,8 @@
     <button class="gate-btn" id="enter" type="button">Hear me out</button>
   </div>
 </div>
+
+<button class="readbtn" id="readbtn" type="button">I want to read</button>
 
 <div class="hud" id="hud" aria-hidden="true">
   <span class="rec"></span>
@@ -884,7 +969,8 @@
     "SKILL ISSUE","1% AND ALIVE","HEALER DIFF? YES","DIFF? ME","NOT MY FAULT",
     "I SAW THAT","TIMED IT FOR YOU","CRY","SIT DOWN DOG","HEEL"
   ];
-  var POPC = ['#00E5FF','#B14BFF','#FF2E6A','#C6FF3D','#FFFFFF'];
+  var POPC   = ['#00E5FF','#B14BFF','#FF2E6A','#C6FF3D','#FFFFFF'];
+  var POPC_T = ['#FF2E2E','#FF7A7A','#C40000','#FFD5D5','#FFFFFF'];
   function popOff(){
     var e = document.createElement('span');
     e.className = 'pop';
@@ -892,7 +978,8 @@
                              : POPS[Math.floor(Math.random() * POPS.length)];
     e.style.left = (6 + Math.random() * 88) + 'vw';
     e.style.top  = (14 + Math.random() * 68) + 'vh';
-    e.style.color = POPC[Math.floor(Math.random() * POPC.length)];
+    var pal = terror ? POPC_T : POPC;
+    e.style.color = pal[Math.floor(Math.random() * pal.length)];
     e.style.setProperty('--r', ((Math.random() - 0.5) * 16).toFixed(1) + 'deg');
     popsEl.appendChild(e);
     setTimeout(function(){ if (e.parentNode) e.parentNode.removeChild(e); }, 1300);
@@ -923,8 +1010,14 @@
     "COUNT YOUR KICKS","SIT DOWN DOG","I CARRIED THAT","ALSO ME","NOT MY FAULT","STILL ME"
   ];
   var si = 0;
+  function tilt(){
+    var deg = 5 + Math.random() * 10;
+    return (Math.random() < 0.5 ? -deg : deg).toFixed(1) + 'deg';
+  }
   function slam(){
     stampEl.textContent = STAMPS[si++ % STAMPS.length];
+    stampEl.style.setProperty('--sr', tilt());
+    stampEl.style.top = (38 + Math.random() * 16) + '%';
     stampEl.classList.remove('on');
     void stampEl.offsetWidth;
     stampEl.classList.add('on');
@@ -965,6 +1058,21 @@
   }
 
   /* ---- stencil wall ---- */
+  var pageEl = document.querySelector('.page');
+  var terror = false;
+
+  function wallSay(w){
+    var a = [];
+    for (var k = 0; k < 150; k++){
+      a.push('<span style="font-size:' + (0.6 + Math.random() * 0.7).toFixed(2) + 'em">' + w + '</span>');
+    }
+    return a.join(' ');
+  }
+  function glitch(){
+    pageEl.classList.add('gl');
+    setTimeout(function(){ pageEl.classList.remove('gl'); }, 70 + Math.random() * 90);
+  }
+
   (function(){
     var W = [
       'ALL ME','THAT WAS ME','I DID THAT','MINE','STILL ME','MY KEY',
@@ -1003,8 +1111,48 @@
     { b: 40, k: 'Phase three', t: 'ALL ME',       s: 'say it back' },
     { b: 68, k: 'Phase four',  t: 'SIT DOWN DOG', s: 'no notes' }
   ];
-  var phase = 0, ph = 0;
+  var phase = 0, ph = 0, calm = false;
   var tickIn = document.getElementById('tick');
+  var readBtn = document.getElementById('readbtn');
+
+  function hudPhase(){
+    phTxt.textContent = calm ? 'Reading mode' : 'Phase ' + phase;
+    for (var i = 0; i < phPips.length; i++){
+      phPips[i].className = (!calm && i < phase) ? 'lit' : '';
+    }
+  }
+
+  readBtn.addEventListener('click', function(){
+    calm = !calm;
+    readBtn.classList.toggle('on', calm);
+    readBtn.textContent = calm ? 'Turn it back up' : 'I want to read';
+    if (calm){
+      while (popsEl.firstChild)  popsEl.removeChild(popsEl.firstChild);
+      while (toastEl.firstChild) toastEl.removeChild(toastEl.firstChild);
+      while (tearsEl.firstChild) tearsEl.removeChild(tearsEl.firstChild);
+      stampEl.classList.remove('on');
+      phEl.classList.remove('on');
+      invEl.classList.remove('on');
+      wallEl.style.display = 'none';
+      curEl.classList.remove('on');
+      document.body.classList.remove('stalk');
+      document.body.classList.remove('terror');
+      pageEl.classList.remove('gl');
+      tickIn.style.animationDuration = '46s';
+    } else {
+      tickIn.style.animationDuration = Math.max(11, 46 - phase * 9) + 's';
+      if (phase >= 3){
+        wallEl.style.display = 'block';
+        root.style.setProperty('--wall', phase >= 4 ? '1' : '.85');
+      }
+      if (phase >= 4){
+        curEl.classList.add('on');
+        document.body.classList.add('stalk');
+        document.body.classList.add('terror');
+      }
+    }
+    hudPhase();
+  });
 
   /* every readable thing on the page briefly says the same thing */
   var SWAPPABLE = [].slice.call(document.querySelectorAll(
@@ -1023,13 +1171,13 @@
     swapping = true;
     var w = word || 'YOU ARE SHIT';
 
-    /* the wall goes black, changes what it says, then lights back up */
-    cutSaved = cutEl.innerHTML;
-    var wall = [];
-    for (var k = 0; k < 150; k++){
-      wall.push('<span style="font-size:' + (0.6 + Math.random() * 0.7).toFixed(2) + 'em">' + w + '</span>');
+    /* the wall goes black, changes what it says, then lights back up.
+       in terror it already says it, so leave it alone */
+    if (!terror){
+      cutSaved = cutEl.innerHTML;
+      var html = wallSay(w);
+      blind(function(){ cutEl.innerHTML = html; });
     }
-    blind(function(){ cutEl.innerHTML = wall.join(' '); });
 
     var saved = SWAPPABLE.map(function(el){ return el.innerHTML; });
     SWAPPABLE.forEach(function(el, i){
@@ -1045,7 +1193,7 @@
         el.classList.remove('swapped');
         el.innerHTML = saved[i];
       });
-      blind(function(){ cutEl.innerHTML = cutSaved; });
+      if (!terror) blind(function(){ cutEl.innerHTML = cutSaved; });
       swapping = false;
     }, ms);
   }
@@ -1059,15 +1207,13 @@
   function enterPhase(d){
     phase++;
 
-    phTxt.textContent = 'Phase ' + phase;
-    for (var i = 0; i < phPips.length; i++){
-      phPips[i].className = (i < phase) ? 'lit' : '';
-    }
+    hudPhase();
 
     if (d.t){
       phEl.children[0].textContent = d.k;
       phEl.children[1].textContent = d.t;
       phEl.children[2].textContent = d.s;
+      phEl.style.setProperty('--pr', tilt());
       phEl.classList.remove('on');
       void phEl.offsetWidth;
       phEl.classList.add('on');
@@ -1083,6 +1229,11 @@
     if (phase >= 4){
       curEl.classList.add('on');
       document.body.classList.add('stalk');
+      document.body.classList.add('terror');
+      terror = true;
+      root.style.setProperty('--wall', '1');
+      wallEl.style.display = 'block';
+      blind(function(){ cutEl.innerHTML = wallSay('YOU ARE SHIT'); });
       setTimeout(finale, 1100);   /* lands right after the phase call clears */
     }
   }
@@ -1122,26 +1273,32 @@
             /* hud */
             for (var q = 0; q < 4; q++){ hudBl[q].className = (q === m4) ? 'on' : ''; }
             hudTxt.textContent = '145 BPM  BAR ' + (Math.floor(b / 4) + 1);
-            if (phase >= 3 && b % 8 === 0) sweep();
 
-            /* the ramp */
-            while (ph < PHASES.length && b >= PHASES[ph].b){ enterPhase(PHASES[ph]); ph++; }
-
-            if (phase >= 1){
-              var n = phase;
-              while (n--) popOff();
-              if (m4 === 0 && phase >= 2) popOff();
-              var tev = phase >= 4 ? 2 : phase >= 3 ? 4 : phase >= 2 ? 8 : 16;
-              if (b % tev === 0) tear(phase + 1);
+            /* the ramp. reading mode keeps counting but stays quiet */
+            while (ph < PHASES.length && b >= PHASES[ph].b){
+              if (calm){ phase++; ph++; hudPhase(); }
+              else { enterPhase(PHASES[ph]); ph++; }
             }
-            if (phase >= 2){
-              var sev = phase >= 4 ? 8 : phase >= 3 ? 12 : 16;
-              if (b % sev === 0){ slam(); invert(60 + phase * 12); }
+
+            var ef = calm ? 1 : phase;
+
+            if (ef >= 1){
+              var n = ef;
+              while (n--) popOff();
+              if (m4 === 0 && ef >= 2) popOff();
+              var tev = ef >= 4 ? 2 : ef >= 3 ? 4 : ef >= 2 ? 8 : 16;
+              if (b % tev === 0) tear(ef + 1);
+            }
+            if (ef >= 2){
+              var sev = ef >= 4 ? 8 : ef >= 3 ? 12 : 16;
+              if (b % sev === 0){ slam(); invert(60 + ef * 12); }
               if (b % 8 === 2 && TITLES.length){
                 corrupt(TITLES[Math.floor(Math.random() * TITLES.length)]);
               }
             }
-            if (phase >= 4){
+            if (ef >= 3 && b % 8 === 0) sweep();
+            if (ef >= 4){
+              if (b % 2 === 0) glitch();
               /* one achievement every 20 seconds, no more */
               if (m4 === 0 && (track.currentTime < lastAch || track.currentTime - lastAch > 20)){
                 lastAch = track.currentTime;
