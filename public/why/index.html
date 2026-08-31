@@ -563,7 +563,8 @@
   body.p5 .page{
     transform:translate3d(var(--shx,0px), var(--shy,0px), 0)
               rotate(var(--roll,0deg))
-              scale(calc(1 + var(--pd) * .03));
+              skewX(var(--skw,0deg))
+              scale(calc(1 + var(--pd) * .07));
   }
   body.p5 .ticker{animation:tickShake .18s linear infinite}
   @keyframes tickShake{
@@ -973,7 +974,7 @@
   function popOff(){
     var e = document.createElement('span');
     e.className = 'pop';
-    e.textContent = swapping ? 'YOU ARE SHIT'
+    e.textContent = swapping ? swapWord
                              : POPS[Math.floor(Math.random() * POPS.length)];
     e.style.left = (6 + Math.random() * 88) + 'vw';
     e.style.top  = (14 + Math.random() * 68) + 'vh';
@@ -1013,7 +1014,7 @@
     return (Math.random() < 0.5 ? -deg : deg).toFixed(1) + 'deg';
   }
   function slam(){
-    stampEl.textContent = STAMPS[si++ % STAMPS.length];
+    stampEl.textContent = swapping ? swapWord : STAMPS[si++ % STAMPS.length];
     stampEl.style.setProperty('--sr', tilt());
     stampEl.style.top = (38 + Math.random() * 16) + '%';
     stampEl.classList.remove('on');
@@ -1157,7 +1158,12 @@
   var SWAPPABLE = [].slice.call(document.querySelectorAll(
     'h1, .lede, h2, .trait-t, .trait-name, .trait p, .kicker, .nm, .ds, .term-t, .close p, .eyebrow'
   ));
-  var swapping = false, cutSaved = '';
+  var SWAPW = [
+    'YOU ARE SHIT','YOU ARE TRASH','PRESS YOUR KICK','YOU DID NOTHING',
+    'SIT DOWN DOG','LEARN TO PLAY','YOU ARE THE PROBLEM','GET BOOSTED',
+    'IT WAS YOUR CAST','ZERO INTERRUPTS','YOU ARE SHIT'
+  ];
+  var swapping = false, cutSaved = '', swapWord = 'YOU ARE SHIT', sw = 0;
 
   /* kill the light, change the wall in the dark, bring it back */
   function blind(change){
@@ -1168,7 +1174,10 @@
   function meSwap(ms, word){
     if (swapping) return;
     swapping = true;
-    var w = word || 'YOU ARE SHIT';
+    var w = word || SWAPW[sw++ % SWAPW.length];
+    swapWord = w;
+    slam();          /* the takeover announces itself */
+    tear(6);
 
     /* the wall goes black, changes what it says, then lights back up */
     cutSaved = cutEl.innerHTML;
@@ -1247,7 +1256,7 @@
   }
 
   /* every visual hangs off the track's own playhead */
-  var lastBeat = -1, p = 0, pd = 0, sh = 0;
+  var lastBeat = -1, p = 0, pd = 0, sh = 0, joltA = 16;
 
   function frame(t){
     if (!reduce){
@@ -1296,10 +1305,15 @@
                 lastAch = track.currentTime;
                 toast();
               }
-              if (b % (ef >= 5 ? 8 : 16) === 8) meSwap(BEAT * 4000);
+              if (b % (ef >= 5 ? 8 : 16) === (ef >= 5 ? 4 : 8)) meSwap(BEAT * 4000);
             }
             if (ef >= 5){
-              root.style.setProperty('--roll', (m4 % 2 ? 1 : -1) * (0.6 + Math.random() * 1.1) + 'deg');
+              /* never the same jolt twice, and every fourth one is a lurch */
+              var heavy = (m4 === 0) || (Math.random() < 0.18);
+              joltA = heavy ? 26 + Math.random() * 26 : 8 + Math.random() * 16;
+              var rmax = heavy ? 5.5 : 1.8;
+              root.style.setProperty('--roll', ((Math.random() - 0.5) * 2 * rmax).toFixed(2) + 'deg');
+              root.style.setProperty('--skw', ((Math.random() - 0.5) * (heavy ? 7 : 2.4)).toFixed(2) + 'deg');
               root.style.setProperty('--hue', ((b * 47) % 360) + 'deg');
             }
           }
@@ -1313,12 +1327,12 @@
       root.style.setProperty('--p',  p.toFixed(3));
       root.style.setProperty('--pd', pd.toFixed(3));
       var big = (!calm && phase >= 5);
-      var amp = big ? 16 : 7;
+      var amp = big ? joltA : 7;
       root.style.setProperty('--shx', ((Math.random() - 0.5) * sh * amp).toFixed(2) + 'px');
       root.style.setProperty('--shy', ((Math.random() - 0.5) * sh * amp * .72).toFixed(2) + 'px');
       if (big){
         /* the whole rig rattles, not just the text */
-        var g = 3 + p * 9;
+        var g = 3 + p * (joltA * 0.55);
         root.style.setProperty('--gx', ((Math.random() - 0.5) * g).toFixed(2) + 'px');
         root.style.setProperty('--gy', ((Math.random() - 0.5) * g).toFixed(2) + 'px');
       }
