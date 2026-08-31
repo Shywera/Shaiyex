@@ -250,8 +250,87 @@
     92%,100% {box-shadow:0 0 46px rgba(200,30,30,.75), 0 0 110px rgba(200,30,30,.4), inset 0 0 42px rgba(200,30,30,.2);  border-color:#8E2B2E; filter:none}
   }
 
+  .door-4{--c:#B14BFF}
+
+  /* ---------- blacklist strip ---------- */
+  .blbar{
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:clamp(14px,3vw,28px);
+    margin-top:14px;
+    padding:14px clamp(16px,3vw,24px);
+    text-align:left;
+    border:1px solid #8E2B2E;
+    border-radius:2px;
+    background:
+      radial-gradient(140% 260% at 50% 130%, rgba(200,30,30,.30), rgba(200,30,30,0) 70%),
+      #0B0709;
+    box-shadow:0 0 40px rgba(200,30,30,.6), 0 0 96px rgba(200,30,30,.3), inset 0 0 34px rgba(200,30,30,.18);
+    overflow:hidden;
+    animation:blNeon 13s steps(1) infinite;
+    transition:transform .28s cubic-bezier(.2,.8,.25,1);
+  }
+  .blbar::after{
+    content:"";
+    position:absolute;left:0;right:0;bottom:0;height:2px;
+    background:#FF4A46;
+    box-shadow:0 0 18px #FF4A46;
+  }
+  .blbar:hover{
+    animation-play-state:paused;
+    filter:none;
+    transform:translateY(-3px);
+    box-shadow:0 0 52px rgba(200,30,30,.85), 0 0 130px rgba(200,30,30,.45), inset 0 0 42px rgba(200,30,30,.22);
+  }
+  .bl-t{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(20px,3.4vw,30px);
+    line-height:1;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:#FFD9D7;
+    text-shadow:0 0 26px rgba(255,74,70,.95), 0 0 66px rgba(200,30,30,.6);
+    white-space:nowrap;
+  }
+  .bl-d{
+    flex:1 1 auto;
+    font-size:13.5px;
+    line-height:1.45;
+    color:#C9A9AB;
+  }
+  .bl-go{
+    font-family:var(--mono);
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:#FF6B67;
+    white-space:nowrap;
+  }
+  .blbar:hover .bl-go{color:#FFD9D7}
+  @keyframes blNeon{
+    0%,30%   {filter:none}
+    31%      {filter:brightness(.32)}
+    32%      {filter:none}
+    33%      {filter:brightness(.22)}
+    35%,58%  {filter:none}
+    59%,66%  {filter:brightness(.18)}
+    67%      {filter:brightness(.6)}
+    68%      {filter:brightness(.2)}
+    70%,86%  {filter:none}
+    87%      {filter:brightness(.28)}
+    89%      {filter:brightness(.7)}
+    90%      {filter:brightness(.25)}
+    92%,100% {filter:none}
+  }
+
   @media (max-width:880px){
     .doors{grid-template-columns:1fr}
+  }
+  @media (max-width:620px){
+    .blbar{flex-direction:column;align-items:flex-start;gap:8px;padding:18px}
   }
 
   footer{
@@ -297,11 +376,11 @@
         <span class="door-go">Read it →</span>
       </a>
 
-      <a class="door door-3" href="/deplete/">
-        <span class="door-k">When it goes wrong</span>
-        <span class="door-t">Blacklist</span>
-        <span class="door-d">The post-mortem for a depleted key, and the list of names to avoid in the group finder.</span>
-        <span class="door-go">Open it →</span>
+      <a class="door door-4" href="/why/">
+        <span class="door-k">The pitch</span>
+        <span class="door-t">Why invite me</span>
+        <span class="door-d">Narcissism, Machiavellianism, psychopathy, and a Lay on Hands. Nobody dies and nobody hears the end of it.</span>
+        <span class="door-go">Hear it →</span>
       </a>
 
       <a class="door door-2" href="/kick/">
@@ -311,12 +390,18 @@
         <span class="door-go">Prove it →</span>
       </a>
     </div>
+
+    <a class="blbar" href="/deplete/">
+      <span class="bl-t">Blacklist</span>
+      <span class="bl-d">The post-mortem for a depleted key, and the names to avoid in the group finder.</span>
+      <span class="bl-go">Open it →</span>
+    </a>
   </div>
 </header>
 
 <footer>
   <div>SHAIYEX · LIGHTFORGED DRAENEI · HOLY PALADIN</div>
-  <div>Raid spot: About me. Running a key together: the other two.</div>
+  <div>Raid spot: About me. Running a key together: everything else.</div>
 </footer>
 
 <script>

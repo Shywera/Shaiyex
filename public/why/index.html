@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Narcissism, Machiavellianism, psychopathy. Also nobody dies. Why you invite me.">
+<meta name="theme-color" content="#06040A">
+<meta property="og:type" content="website">
+<meta property="og:title" content="The Dark Triad">
+<meta property="og:description" content="Three traits. One healer. Your key gets timed.">
+<meta property="og:url" content="https://shaiyex.com/why/">
+<meta name="twitter:card" content="summary">
+<title>The Dark Triad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap">
+
+<style>
+  :root{
+    --ink:#06040A;
+    --panel:#0F0B18;
+    --line:#241A3C;
+    --line-hot:#3E2C6E;
+    --text:#F3EEFF;
+    --dim:#A79BC4;
+    --dimmer:#6C6190;
+
+    --i:#00E5FF;
+    --ii:#B14BFF;
+    --iii:#FF2E6A;
+    --acid:#C6FF3D;
+
+    --display:"Bebas Neue","Arial Narrow",sans-serif;
+    --body:"Archivo","Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:"JetBrains Mono",Consolas,ui-monospace,monospace;
+
+    --p:0;      /* beat pulse, 0..1 */
+    --pd:0;     /* downbeat pulse, 0..1 */
+    --hue:0deg;
+  }
+  *{box-sizing:border-box}
+
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--text);
+    font-family:var(--body);
+    font-size:17px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  /* ---------- room ---------- */
+  .rave{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(58% 46% at 16% 4%,  rgba(0,229,255,.30),  rgba(0,229,255,0) 62%),
+      radial-gradient(56% 44% at 84% 12%, rgba(255,46,106,.28), rgba(255,46,106,0) 62%),
+      radial-gradient(74% 58% at 50% 98%, rgba(177,75,255,.34), rgba(177,75,255,0) 64%);
+    filter:hue-rotate(var(--hue));
+    opacity:calc(.26 + var(--p) * .62 + var(--pd) * .12);
+  }
+  .strobe{
+    position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:#fff;
+    opacity:calc(var(--pd) * .05);
+    mix-blend-mode:overlay;
+  }
+  .grid{
+    position:fixed;inset:-20% -20% -40%;z-index:0;pointer-events:none;
+    background:
+      repeating-linear-gradient(90deg, rgba(177,75,255,.16) 0 1px, rgba(0,0,0,0) 1px 84px),
+      repeating-linear-gradient( 0deg, rgba(0,229,255,.10) 0 1px, rgba(0,0,0,0) 1px 84px);
+    transform:perspective(700px) rotateX(64deg) translateY(calc(var(--p) * 6px));
+    opacity:calc(.16 + var(--p) * .3);
+    -webkit-mask-image:linear-gradient(180deg, rgba(0,0,0,0) 40%, #000 100%);
+    mask-image:linear-gradient(180deg, rgba(0,0,0,0) 40%, #000 100%);
+  }
+  .scan{
+    position:fixed;inset:0;z-index:3;pointer-events:none;
+    background:repeating-linear-gradient(180deg, rgba(0,0,0,.30) 0 1px, rgba(0,0,0,0) 1px 3px);
+    opacity:.5;mix-blend-mode:multiply;
+  }
+  .tear{
+    position:fixed;left:0;right:0;height:0;z-index:4;pointer-events:none;display:none;
+    background:linear-gradient(90deg, rgba(0,229,255,.55), rgba(177,75,255,.5) 48%, rgba(255,46,106,.5));
+    mix-blend-mode:screen;
+  }
+  .tear.on{display:block}
+
+  .page{
+    position:relative;z-index:2;
+    max-width:78ch;margin:0 auto;
+    padding:clamp(30px,6vw,60px) clamp(18px,5vw,28px) 110px;
+    display:flex;flex-direction:column;gap:clamp(46px,7vw,78px);
+  }
+
+  .backlink{
+    position:fixed;bottom:16px;left:16px;z-index:60;
+    font-family:var(--mono);font-size:10.5px;font-weight:700;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+    background:rgba(15,11,24,.9);border:1px solid var(--line-hot);
+    border-radius:2px;padding:7px 12px 8px;text-decoration:none;
+  }
+  .backlink:hover{color:var(--text);border-color:var(--ii)}
+
+  #mute{
+    position:fixed;top:16px;right:16px;z-index:60;
+    display:flex;align-items:center;gap:8px;padding:8px 12px 9px;
+    font-family:var(--mono);font-size:10.5px;font-weight:700;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+    background:rgba(15,11,24,.92);border:1px solid var(--line-hot);
+    border-radius:2px;cursor:pointer;
+  }
+  #mute:hover{color:var(--text);border-color:var(--i)}
+  #mute .eq{display:flex;align-items:flex-end;gap:2px;height:13px}
+  #mute .eq i{display:block;width:2px;background:var(--i);height:calc(3px + var(--p) * 10px)}
+  #mute.off .eq i{height:3px;background:var(--dimmer)}
+
+  /* ---------- type ---------- */
+  .eyebrow{
+    font-family:var(--mono);font-size:11px;font-weight:700;
+    letter-spacing:.24em;text-transform:uppercase;color:var(--i);margin:0;
+  }
+  h1{
+    font-family:var(--display);
+    font-size:clamp(66px,17vw,168px);
+    line-height:.82;letter-spacing:.01em;margin:.1em 0 0;color:var(--text);
+    transform:scale(calc(1 + var(--pd) * .03));
+    text-shadow:
+      calc(var(--p) * -6px) 0 var(--iii),
+      calc(var(--p) *  6px) 0 var(--i),
+      0 0 calc(26px + var(--pd) * 60px) rgba(177,75,255,.6);
+  }
+  h1 span{display:block}
+  h1 .sm{
+    font-family:var(--body);font-weight:400;
+    font-size:clamp(15px,2.2vw,18px);line-height:1.5;
+    color:var(--dim);letter-spacing:0;text-shadow:none;margin-top:.9em;
+  }
+  h2{
+    font-family:var(--display);
+    font-size:clamp(32px,6.4vw,54px);
+    line-height:.98;margin:0;color:var(--text);
+  }
+  h2 .hi{color:var(--iii)}
+  .lede{font-size:clamp(17px,2.5vw,20px);color:var(--dim);max-width:54ch;margin:1.2em 0 0}
+  .lede b{color:var(--text);font-weight:600}
+  p{margin:1em 0 0}
+  .prose{color:var(--dim);max-width:60ch}
+  .prose b{color:var(--text);font-weight:600}
+  .sec-head{display:flex;flex-direction:column;gap:.5em;margin-bottom:1.4em}
+
+  /* ---------- the three ---------- */
+  .traits{display:flex;flex-direction:column;gap:16px}
+  .trait{
+    position:relative;
+    padding:clamp(22px,4vw,32px);
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:3px solid var(--k);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .trait::before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(110% 150% at 0% 0%, var(--kf), transparent 62%);
+  }
+  .trait::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(100deg, transparent 42%, var(--kf) 50%, transparent 58%);
+    opacity:calc(var(--pd) * .9);
+  }
+  .trait > *{position:relative;z-index:1}
+  .trait-top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .trait-n{
+    font-family:var(--display);font-size:clamp(40px,9vw,68px);line-height:.8;
+    color:var(--k);text-shadow:0 0 calc(14px + var(--pd) * 26px) var(--k);
+  }
+  .trait-name{
+    font-family:var(--mono);font-size:11px;font-weight:700;
+    letter-spacing:.24em;text-transform:uppercase;color:var(--k);
+  }
+  .trait-t{
+    font-family:var(--display);
+    font-size:clamp(26px,4.6vw,40px);line-height:1.02;
+    margin:.5em 0 0;color:var(--text);
+  }
+  .trait p{color:var(--dim);font-size:16px;line-height:1.6;max-width:58ch}
+  .trait p b{color:var(--text);font-weight:600}
+  .trait .kicker{
+    display:block;margin-top:1.2em;padding-top:1.2em;
+    border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.03em;
+    color:var(--k);opacity:.92;line-height:1.75;
+  }
+
+  /* ---------- terms ---------- */
+  .terms{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+  .term{
+    display:grid;grid-template-columns:auto 1fr;gap:18px;
+    padding:15px 2px;border-bottom:1px solid var(--line);align-items:baseline;
+  }
+  .term-n{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--acid)}
+  .term-t{color:var(--dim);font-size:16px;line-height:1.5}
+  .term-t b{color:var(--text);font-weight:600}
+
+  .close{
+    padding:clamp(26px,5vw,40px);text-align:center;
+    background:
+      radial-gradient(90% 150% at 50% 0%, rgba(177,75,255,.24), rgba(177,75,255,0) 66%),
+      var(--panel);
+    border:1px solid var(--line-hot);border-radius:2px;
+  }
+  .close p{
+    font-family:var(--display);
+    font-size:clamp(28px,5.6vw,48px);line-height:1.02;color:var(--text);margin:0;
+  }
+  .close small{
+    display:block;margin-top:16px;
+    font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--dimmer);
+  }
+
+  footer{
+    border-top:1px solid var(--line);padding-top:20px;
+    font-family:var(--mono);font-size:11px;line-height:1.9;
+    letter-spacing:.04em;color:var(--dimmer);
+  }
+
+  /* ---------- intro gate ---------- */
+  .gate{
+    position:fixed;inset:0;z-index:80;
+    display:grid;place-items:center;text-align:center;padding:24px;
+    background:
+      radial-gradient(80% 62% at 50% 44%, rgba(177,75,255,.30) 0%, rgba(6,4,10,.99) 74%),
+      var(--ink);
+    transition:opacity .5s ease;
+  }
+  .gate.gone{opacity:0;pointer-events:none}
+  .gate-in{max-width:640px}
+  .gate-k{
+    font-family:var(--mono);font-size:11px;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--i);margin:0;
+    animation:fadein .8s .1s both;
+  }
+  .gate-t{
+    font-family:var(--display);
+    font-size:clamp(52px,14vw,132px);line-height:.84;margin:.12em 0 0;color:var(--text);
+    text-shadow:-4px 0 var(--iii), 4px 0 var(--i), 0 0 70px rgba(177,75,255,.6);
+    animation:fadein .9s .35s both;
+  }
+  .gate-tri{
+    display:flex;justify-content:center;gap:0;
+    margin:26px 0 0;list-style:none;padding:0;flex-wrap:wrap;
+  }
+  .gate-tri li{
+    font-family:var(--mono);font-size:11px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--dim);
+    padding:2px 16px;border-left:1px solid var(--line-hot);
+    animation:fadein .7s both;
+  }
+  .gate-tri li:first-child{border-left:0}
+  .gate-tri li:nth-child(1){animation-delay:.9s}
+  .gate-tri li:nth-child(2){animation-delay:1.15s}
+  .gate-tri li:nth-child(3){animation-delay:1.4s}
+  .gate-sub{
+    margin:26px auto 0;max-width:48ch;color:var(--dimmer);
+    font-size:15px;line-height:1.6;
+    animation:fadein .8s 1.7s both;
+  }
+  .gate-btn{
+    margin-top:34px;font-family:var(--display);
+    font-size:clamp(24px,5vw,38px);letter-spacing:.06em;
+    padding:12px 46px 14px;color:#06040A;background:var(--acid);
+    border:1px solid #E4FF8A;border-radius:2px;cursor:pointer;
+    animation:fadein .6s 2.05s both, breathe 2.6s 2.65s ease-in-out infinite;
+  }
+  .gate-btn:hover{background:#D9FF6E}
+  .gate-btn:active{transform:translateY(2px)}
+  .gate-btn:focus-visible{outline:2px solid var(--i);outline-offset:4px}
+  @keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes breathe{0%,100%{box-shadow:0 0 38px rgba(198,255,61,.35)}50%{box-shadow:0 0 76px rgba(198,255,61,.65)}}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important}
+    h1{transform:none;text-shadow:0 0 30px rgba(177,75,255,.5)}
+    .rave{opacity:.5}
+  }
+</style>
+</head>
+<body>
+
+<div class="rave" id="rave" aria-hidden="true"></div>
+<div class="grid" aria-hidden="true"></div>
+<div class="strobe" aria-hidden="true"></div>
+<div class="scan" aria-hidden="true"></div>
+<div class="tear" id="tear" aria-hidden="true"></div>
+
+<audio id="track" src="track.mp3" preload="auto" loop></audio>
+
+<div class="gate" id="gate">
+  <div class="gate-in">
+    <p class="gate-k">Unsolicited application</p>
+    <p class="gate-t">The Dark Triad</p>
+    <ul class="gate-tri">
+      <li>Narcissism</li>
+      <li>Machiavellianism</li>
+      <li>Psychopathy</li>
+    </ul>
+    <p class="gate-sub">Three traits psychologists put on a warning list. I have all of them and a Lay on Hands. Volume up.</p>
+    <button class="gate-btn" id="enter" type="button">Hear me out</button>
+  </div>
+</div>
+
+<button id="mute" type="button" aria-label="Toggle sound">
+  <span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>
+  <span id="muteTxt">Sound on</span>
+</button>
+
+<a class="backlink" href="/">shaiyex.com</a>
+
+<div class="page">
+
+  <header>
+    <p class="eyebrow">Holy paladin, available, insufferable</p>
+    <h1><span>Why</span><span>Invite Me</span><span class="sm">Three reasons. They turn out to be the same reason.</span></h1>
+    <p class="lede">You have a healer slot and a key that dies on the first pull. <b>I fix one of those.</b> The other one is a personality and I am keeping it.</p>
+  </header>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Diagnosis</p>
+      <h2>Psychologists call it the <span class="hi">dark triad</span>.</h2>
+      <p class="prose">Narcissism, Machiavellianism, psychopathy. In an office it is a problem. In a timed key it is a healer who will not let you die and will not let you forget it.</p>
+    </div>
+
+    <div class="traits">
+
+      <article class="trait" style="--k:#00E5FF;--kf:rgba(0,229,255,.16)">
+        <div class="trait-top">
+          <span class="trait-n">I</span>
+          <span class="trait-name">Narcissism</span>
+        </div>
+        <p class="trait-t">Nobody dies, and I need you to know that was me.</p>
+        <p>You will finish the pull convinced it was an easy pull. It was not an easy pull. You were at eight percent twice and you noticed neither time, because noticing is <b>my</b> job and bringing it up afterwards is my hobby.</p>
+        <span class="kicker">I do not link meters. I just leave the healing tab open in case somebody asks. Somebody always asks. I make sure of it.</span>
+      </article>
+
+      <article class="trait" style="--k:#B14BFF;--kf:rgba(177,75,255,.16)">
+        <div class="trait-top">
+          <span class="trait-n">II</span>
+          <span class="trait-name">Machiavellianism</span>
+        </div>
+        <p class="trait-t">The save is mine before you knew you needed one.</p>
+        <p>Lay on Hands is not an emergency button, it is a sniping rifle. If the other healer is mid cast on your save, <b>I take it from across the room</b>, I say nothing in chat, and the two of us quietly live with that for the rest of the dungeon.</p>
+        <span class="kicker">Repentance, Blinding Light, Hammer of Justice on things you did not know were crowd controllable. Then I mention it. Casually. Twice.</span>
+      </article>
+
+      <article class="trait" style="--k:#FF2E6A;--kf:rgba(255,46,106,.16)">
+        <div class="trait-top">
+          <span class="trait-n">III</span>
+          <span class="trait-name">Psychopathy</span>
+        </div>
+        <p class="trait-t">I will blame you for the kick and feel nothing at all.</p>
+        <p>I do not believe in unlucky. When the key bricks I already know whose cast it was, the log is open on the other monitor, and <b>I will describe your mistake in the same calm voice</b> I was using while healing you through it.</p>
+        <span class="kicker">You get healed either way. The healing is unconditional. The commentary is not.</span>
+      </article>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Terms</p>
+      <h2>The entire contract.</h2>
+    </div>
+
+    <div class="terms">
+      <div class="term"><span class="term-n">I</span><span class="term-t">You press <b>one button</b> when a cast bar appears. That is the whole ask.</span></div>
+      <div class="term"><span class="term-n">II</span><span class="term-t">I keep all five of us alive, including whoever is standing in it right now.</span></div>
+      <div class="term"><span class="term-n">III</span><span class="term-t">Nobody opens damage meters in a timed key. We are all adults, allegedly.</span></div>
+      <div class="term"><span class="term-n">IV</span><span class="term-t">When I am wrong I say so. It has happened. I remember the date.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="close">
+      <p>Invite me. Worst case you get a healer who cares about your key more than you do.</p>
+      <small>Best case is that same sentence and you time it</small>
+    </div>
+  </section>
+
+  <footer>
+    <div>Why invite me. Unsolicited, unedited, unrepentant.</div>
+    <div>Holy paladin. Sound: The Dark Triad 2.</div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  /* measured off track.mp3 after the intro was cut: 145 bpm */
+  var BEAT = 0.41394, OFFSET = 0.365;
+
+  var track   = document.getElementById('track');
+  var gateEl  = document.getElementById('gate');
+  var tearEl  = document.getElementById('tear');
+  var muteBtn = document.getElementById('mute');
+  var muteTxt = document.getElementById('muteTxt');
+  var root    = document.documentElement;
+  var reduce  = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var muted   = false;
+
+  function play(){
+    if (muted) return;
+    try {
+      track.volume = 0.72;
+      var pr = track.play();
+      if (pr && pr.catch) pr.catch(function(){});
+    } catch (e){}
+  }
+
+  document.getElementById('enter').addEventListener('click', function(){
+    play();
+    gateEl.classList.add('gone');
+    setTimeout(function(){ gateEl.style.display = 'none'; }, 550);
+  });
+
+  muteBtn.addEventListener('click', function(){
+    muted = !muted;
+    muteBtn.classList.toggle('off', muted);
+    muteTxt.textContent = muted ? 'Sound off' : 'Sound on';
+    if (muted){ try { track.pause(); } catch (e){} } else { play(); }
+  });
+
+  /* every visual hangs off the track's own playhead */
+  var lastBeat = -1, p = 0, pd = 0;
+
+  function frame(){
+    if (!reduce){
+      if (!track.paused && !track.ended){
+        var b = Math.floor((track.currentTime - OFFSET) / BEAT);
+        if (b !== lastBeat){
+          lastBeat = b;
+          p = 1;
+          if (b % 4 === 0) pd = 1;
+          root.style.setProperty('--hue', ((b >> 4) * 26 % 360) + 'deg');
+          if (b % 16 === 0){
+            tearEl.style.top = (Math.random() * 78 + 8) + 'vh';
+            tearEl.style.height = (3 + Math.random() * 26) + 'px';
+            tearEl.classList.add('on');
+            setTimeout(function(){ tearEl.classList.remove('on'); }, 80);
+          }
+        }
+        p  *= 0.80;
+        pd *= 0.88;
+      } else {
+        p *= 0.9; pd *= 0.9;
+      }
+      root.style.setProperty('--p',  p.toFixed(3));
+      root.style.setProperty('--pd', pd.toFixed(3));
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
