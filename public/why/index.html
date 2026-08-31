@@ -35,8 +35,10 @@
     --body:"Archivo","Segoe UI",Helvetica,Arial,sans-serif;
     --mono:"JetBrains Mono",Consolas,ui-monospace,monospace;
 
-    --p:0;      /* beat pulse, 0..1 */
-    --pd:0;     /* downbeat pulse, 0..1 */
+    --p:0;      /* beat pulse, 0..1, smooth. only for opacity and transform */
+    --pd:0;     /* downbeat pulse, 0..1, smooth */
+    --pq:0;     /* same pulse, stepped. for anything that forces a repaint */
+    --pdq:0;
     --hue:0deg;
   }
   *{box-sizing:border-box}
@@ -61,12 +63,14 @@
       radial-gradient(74% 58% at 50% 98%, rgba(177,75,255,.34), rgba(177,75,255,0) 64%);
     filter:hue-rotate(var(--hue));
     opacity:calc(.26 + var(--p) * .62 + var(--pd) * .12);
+    will-change:opacity;
   }
   .strobe{
     position:fixed;inset:0;z-index:1;pointer-events:none;
     background:#fff;
     opacity:calc(var(--pd) * .10);
     mix-blend-mode:overlay;
+    will-change:opacity;
   }
   .grid{
     position:fixed;inset:-20% -20% -40%;z-index:0;pointer-events:none;
@@ -75,6 +79,7 @@
       repeating-linear-gradient( 0deg, rgba(0,229,255,.10) 0 1px, rgba(0,0,0,0) 1px 84px);
     transform:perspective(700px) rotateX(64deg) translateY(calc(var(--p) * 6px));
     opacity:calc(.16 + var(--p) * .3);
+    will-change:opacity, transform;
     -webkit-mask-image:linear-gradient(180deg, rgba(0,0,0,0) 40%, #000 100%);
     mask-image:linear-gradient(180deg, rgba(0,0,0,0) 40%, #000 100%);
   }
@@ -103,8 +108,8 @@
   .frame{
     position:fixed;inset:0;z-index:5;pointer-events:none;
     box-shadow:
-      inset 0 0 0 2px rgba(255,46,106,calc(var(--pd) * .8)),
-      inset 0 0 calc(20px + var(--pd) * 150px) rgba(177,75,255,calc(.05 + var(--pd) * .45));
+      inset 0 0 0 2px rgba(255,46,106,calc(var(--pdq) * .8)),
+      inset 0 0 calc(20px + var(--pdq) * 150px) rgba(177,75,255,calc(.05 + var(--pdq) * .45));
   }
 
   /* ---------- invert kick ---------- */
@@ -197,7 +202,7 @@
   }
   .hud .rec{
     width:7px;height:7px;border-radius:50%;background:var(--iii);
-    box-shadow:0 0 calc(3px + var(--p) * 16px) var(--iii);
+    box-shadow:0 0 calc(3px + var(--pq) * 16px) var(--iii);
     opacity:calc(.3 + var(--p) * .7);
   }
   .hud .bl{display:flex;gap:3px}
@@ -235,6 +240,7 @@
     background:#09060F;
     border-top:1px solid var(--line-hot);
     box-shadow:0 -12px 34px rgba(0,0,0,.7);
+    contain:paint;
   }
   .ticker::after{
     content:"";position:absolute;inset:0;pointer-events:none;
@@ -249,13 +255,13 @@
     font-family:var(--mono);font-weight:400;
     font-size:11px;letter-spacing:.2em;text-transform:uppercase;
     color:var(--dim);padding:0 14px 0 22px;position:relative;
-    text-shadow:0 0 calc(var(--p) * 16px) var(--i);
+    text-shadow:0 0 calc(var(--pq) * 16px) var(--i);
   }
   .ticker b::after{
     content:"";position:absolute;right:0;top:50%;
     width:4px;height:4px;margin-top:-2px;
     background:var(--iii);
-    box-shadow:0 0 calc(4px + var(--pd) * 14px) var(--iii);
+    box-shadow:0 0 calc(4px + var(--pdq) * 14px) var(--iii);
   }
   @keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
@@ -278,7 +284,7 @@
   }
   #mute:hover{color:var(--text);border-color:var(--i)}
   #mute .eq{display:flex;align-items:flex-end;gap:2px;height:13px}
-  #mute .eq i{display:block;width:2px;background:var(--i);height:calc(3px + var(--p) * 10px)}
+  #mute .eq i{display:block;width:2px;background:var(--i);height:calc(3px + var(--pq) * 10px)}
   #mute.off .eq i{height:3px;background:var(--dimmer)}
 
   /* ---------- type ---------- */
@@ -292,9 +298,9 @@
     line-height:.82;letter-spacing:.01em;margin:.1em 0 0;color:var(--text);
     transform:scale(calc(1 + var(--pd) * .03));
     text-shadow:
-      calc(var(--p) * -6px) 0 var(--iii),
-      calc(var(--p) *  6px) 0 var(--i),
-      0 0 calc(26px + var(--pd) * 60px) rgba(177,75,255,.6);
+      calc(var(--pq) * -6px) 0 var(--iii),
+      calc(var(--pq) *  6px) 0 var(--i),
+      0 0 calc(26px + var(--pdq) * 60px) rgba(177,75,255,.6);
   }
   h1 span{display:block}
   h1 .sm{
@@ -339,22 +345,22 @@
   .trait-top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
   .trait-n{
     font-family:var(--display);font-size:clamp(40px,9vw,68px);line-height:.8;
-    color:var(--k);text-shadow:0 0 calc(14px + var(--pd) * 26px) var(--k);
+    color:var(--k);text-shadow:0 0 calc(14px + var(--pdq) * 26px) var(--k);
   }
   .trait-name{
     font-family:var(--display);
     font-size:clamp(22px,4.2vw,36px);
     line-height:.9;letter-spacing:.05em;text-transform:uppercase;
     color:var(--k);
-    text-shadow:0 0 calc(8px + var(--pd) * 30px) var(--k);
+    text-shadow:0 0 calc(8px + var(--pdq) * 30px) var(--k);
   }
   .trait-t{
     font-family:var(--display);
     font-size:clamp(26px,4.6vw,40px);line-height:1.02;
     margin:.5em 0 0;color:var(--text);
-    text-shadow:calc(var(--pd) * -3px) 0 var(--k), calc(var(--pd) * 3px) 0 var(--i);
+    text-shadow:calc(var(--pdq) * -3px) 0 var(--k), calc(var(--pdq) * 3px) 0 var(--i);
   }
-  h2{text-shadow:calc(var(--pd) * -3px) 0 var(--iii), calc(var(--pd) * 3px) 0 var(--i)}
+  h2{text-shadow:calc(var(--pdq) * -3px) 0 var(--iii), calc(var(--pdq) * 3px) 0 var(--i)}
   .trait p{color:var(--dim);font-size:16px;line-height:1.6;max-width:58ch}
   .trait p b{color:var(--text);font-weight:600}
   .trait .kicker{
@@ -393,7 +399,7 @@
   .row.top{background:rgba(0,229,255,.05)}
   .row.top .no,.row.top .nm{
     color:var(--i);
-    text-shadow:0 0 calc(6px + var(--pd) * 26px) var(--i);
+    text-shadow:0 0 calc(6px + var(--pdq) * 26px) var(--i);
   }
   .row.last .no,.row.last .nm{color:var(--iii)}
 
@@ -434,7 +440,7 @@
   .wall{
     position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden;
     display:none;
-    background:rgba(5,3,9, calc(.965 - var(--pd) * .45));
+    background:rgba(5,3,9, calc(.965 - var(--pdq) * .45));
   }
   .wall .cut{
     position:absolute;inset:-18%;
@@ -456,8 +462,9 @@
       radial-gradient(70% 60% at 84% 90%,
         rgba(198,255,61,.5), rgba(198,255,61,0) 62%),
       linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,.04));
-    filter:brightness(calc(.34 + var(--pd) * 3.4)) saturate(1.35);
+    filter:brightness(calc(.34 + var(--pdq) * 3.4)) saturate(1.35);
     opacity:calc((.32 + var(--p) * .68) * var(--wall, .3));
+    will-change:opacity;
     transition:opacity .4s ease, background-position .5s ease;
   }
   /* lights out while the wall changes what it says */
@@ -520,7 +527,7 @@
   /* ---------- the finale ---------- */
   .swapped{
     color:var(--iii) !important;
-    text-shadow:0 0 calc(8px + var(--pd) * 26px) var(--iii);
+    text-shadow:0 0 calc(8px + var(--pdq) * 26px) var(--iii);
   }
 
 
@@ -560,8 +567,8 @@
   body.p5 .strobe{opacity:calc(var(--pd) * .2)}
   body.p5 .frame{
     box-shadow:
-      inset 0 0 0 3px rgba(255,46,106,calc(.25 + var(--pd) * .75)),
-      inset 0 0 calc(40px + var(--pd) * 200px) rgba(177,75,255,calc(.14 + var(--pd) * .6));
+      inset 0 0 0 3px rgba(255,46,106,calc(.25 + var(--pdq) * .75)),
+      inset 0 0 calc(40px + var(--pdq) * 200px) rgba(177,75,255,calc(.14 + var(--pdq) * .6));
   }
 
   /* second ticker, other direction, only at five */
@@ -890,7 +897,9 @@
   var W = 0, H = 0, BEAMS = [];
 
   function sizeL(){
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    /* soft glow, so a lower backing store is invisible and costs a
+       quarter of the fill work on a hidpi screen */
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.25);
     W = window.innerWidth; H = window.innerHeight;
     lc.width = W * dpr; lc.height = H * dpr;
     lx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -910,11 +919,32 @@
     }
   }
   sizeL(); newBeams();
-  window.addEventListener('resize', sizeL);
+  window.addEventListener('resize', function(){ sizeL(); gradCache = {}; gradAmt = -1; });
 
+  var gradCache = {}, gradAmt = -1, lastDrew = false;
+  function gradFor(hue, amt){
+    var key = hue + '|' + amt;
+    var g = gradCache[key];
+    if (g) return g;
+    var R = Math.sqrt(W * W + H * H) * 1.25;
+    g = lx.createLinearGradient(0, 0, R, 0);
+    var al = amt * 0.42;
+    g.addColorStop(0,    'hsla(' + hue + ',100%,66%,' + al + ')');
+    g.addColorStop(0.55, 'hsla(' + hue + ',100%,58%,' + (al * 0.35) + ')');
+    g.addColorStop(1,    'hsla(' + hue + ',100%,50%,0)');
+    gradCache[key] = g;
+    return g;
+  }
   function drawLasers(t, amt){
+    if (amt < 0.02){
+      /* nothing to draw. only pay for the clear once */
+      if (lastDrew){ lx.clearRect(0, 0, W, H); lastDrew = false; }
+      return;
+    }
+    lastDrew = true;
     lx.clearRect(0, 0, W, H);
-    if (amt < 0.02) return;
+    var qa = Math.round(amt * 12) / 12;      /* 12 alpha steps, reuses gradients */
+    if (qa !== gradAmt){ gradCache = {}; gradAmt = qa; }
     var ox = W * 0.5 + Math.sin(t * 0.00022) * W * 0.34;
     var oy = -60;
     var R  = Math.sqrt(W * W + H * H) * 1.25;
@@ -922,19 +952,17 @@
     for (var i = 0; i < BEAMS.length; i++){
       var b = BEAMS[i];
       var a = b.a + t * 0.00007;
-      var x = ox + Math.cos(a) * R, y = oy + Math.sin(a) * R;
-      var g = lx.createLinearGradient(ox, oy, x, y);
-      var al = amt * 0.42;
-      g.addColorStop(0,   'hsla(' + b.h + ',100%,66%,' + al + ')');
-      g.addColorStop(0.55,'hsla(' + b.h + ',100%,58%,' + (al * 0.35) + ')');
-      g.addColorStop(1,   'hsla(' + b.h + ',100%,50%,0)');
+      lx.save();
+      lx.translate(ox, oy);
+      lx.rotate(a);
+      lx.fillStyle = gradFor(b.h, qa);
       lx.beginPath();
-      lx.moveTo(ox, oy);
-      lx.lineTo(ox + Math.cos(a - b.w) * R, oy + Math.sin(a - b.w) * R);
-      lx.lineTo(ox + Math.cos(a + b.w) * R, oy + Math.sin(a + b.w) * R);
+      lx.moveTo(0, 0);
+      lx.lineTo(Math.cos(-b.w) * R, Math.sin(-b.w) * R);
+      lx.lineTo(Math.cos(b.w) * R,  Math.sin(b.w) * R);
       lx.closePath();
-      lx.fillStyle = g;
       lx.fill();
+      lx.restore();
     }
     lx.globalCompositeOperation = 'source-over';
   }
@@ -1276,6 +1304,7 @@
 
   /* every visual hangs off the track's own playhead */
   var lastBeat = -1, p = 0, pd = 0, sh = 0, joltA = 16;
+  var lastPS = -1, lastPdS = -1, lastPQ = -1, lastPdQ = -1, lastShx = null;
 
   function frame(t){
     if (!reduce){
@@ -1348,12 +1377,30 @@
       } else {
         p *= 0.9; pd *= 0.9; sh *= 0.8;
       }
-      root.style.setProperty('--p',  p.toFixed(3));
-      root.style.setProperty('--pd', pd.toFixed(3));
+      /* smooth ones drive opacity and transform, which composite.
+         stepped ones drive shadows and filters, which repaint, so they
+         only move a handful of times per beat instead of sixty. */
+      var pS  = Math.round(p  * 50) / 50;
+      var pdS = Math.round(pd * 50) / 50;
+      var pQ  = Math.round(p  * 12) / 12;
+      var pdQ = Math.round(pd * 12) / 12;
+      if (pS  !== lastPS ){ lastPS  = pS;  root.style.setProperty('--p',  pS ); }
+      if (pdS !== lastPdS){ lastPdS = pdS; root.style.setProperty('--pd', pdS); }
+      if (pQ  !== lastPQ ){ lastPQ  = pQ;  root.style.setProperty('--pq',  pQ ); }
+      if (pdQ !== lastPdQ){ lastPdQ = pdQ; root.style.setProperty('--pdq', pdQ); }
       var big = (!calm && phase >= 5);
       var amp = big ? joltA : 7;
-      root.style.setProperty('--shx', ((Math.random() - 0.5) * sh * amp).toFixed(2) + 'px');
-      root.style.setProperty('--shy', ((Math.random() - 0.5) * sh * amp * .72).toFixed(2) + 'px');
+      /* once the shake has decayed there is nothing to say. writing zero
+         every frame still costs a style pass on the whole page. */
+      if (sh > 0.004){
+        root.style.setProperty('--shx', ((Math.random() - 0.5) * sh * amp).toFixed(2) + 'px');
+        root.style.setProperty('--shy', ((Math.random() - 0.5) * sh * amp * .72).toFixed(2) + 'px');
+        lastShx = 1;
+      } else if (lastShx !== null){
+        root.style.setProperty('--shx', '0px');
+        root.style.setProperty('--shy', '0px');
+        lastShx = null;
+      }
       if (big){
         /* the whole rig rattles, not just the text */
         var g = 3 + p * (joltA * 0.55);
