@@ -58,7 +58,7 @@
       radial-gradient(60% 50% at 15% 0%,   rgba(255,43,209,.26), rgba(255,43,209,0) 62%),
       radial-gradient(58% 46% at 85% 6%,   rgba(0,224,255,.22),  rgba(0,224,255,0) 62%),
       radial-gradient(80% 60% at 50% 104%, rgba(177,75,255,.30), rgba(177,75,255,0) 64%);
-    opacity:calc(.3 + var(--p) * .5 + var(--pd) * .2);
+    opacity:calc(.26 + var(--p) * .12);
   }
   .floor{
     position:fixed;inset:-20% -20% -45%;z-index:0;pointer-events:none;
@@ -66,20 +66,16 @@
       repeating-linear-gradient(90deg, rgba(177,75,255,.18) 0 1px, rgba(0,0,0,0) 1px 76px),
       repeating-linear-gradient( 0deg, rgba(0,224,255,.10) 0 1px, rgba(0,0,0,0) 1px 76px);
     transform:perspective(680px) rotateX(66deg);
-    opacity:calc(.14 + var(--p) * .26);
+    opacity:.12;
     -webkit-mask-image:linear-gradient(180deg, rgba(0,0,0,0) 42%, #000 100%);
     mask-image:linear-gradient(180deg, rgba(0,0,0,0) 42%, #000 100%);
   }
+  /* no blend modes and no animated full screen shadows.
+     both of those repaint the entire viewport on every single frame. */
   .scan{
     position:fixed;inset:0;z-index:6;pointer-events:none;
-    background:repeating-linear-gradient(180deg, rgba(0,0,0,.26) 0 1px, rgba(0,0,0,0) 1px 3px);
-    opacity:.45;mix-blend-mode:multiply;
-  }
-  .frame{
-    position:fixed;inset:0;z-index:7;pointer-events:none;
-    box-shadow:
-      inset 0 0 0 2px rgba(255,43,209,calc(var(--pd) * .55)),
-      inset 0 0 calc(18px + var(--pd) * 130px) rgba(177,75,255,calc(.04 + var(--pd) * .3));
+    background:repeating-linear-gradient(180deg, rgba(0,0,0,.18) 0 1px, rgba(0,0,0,0) 1px 4px);
+    opacity:.3;
   }
 
   /* ---------- stage ---------- */
@@ -116,7 +112,7 @@
     font-family:var(--mono);font-size:9px;font-weight:700;
     letter-spacing:.16em;text-transform:uppercase;color:var(--dimmer);
   }
-  #combo b{color:var(--acid);text-shadow:0 0 calc(4px + var(--pd) * 20px) var(--acid)}
+  #combo b{color:var(--acid)}
   #combo.big b{font-size:clamp(30px,5vw,50px)}
 
   /* ---------- party ---------- */
@@ -179,7 +175,7 @@
     position:absolute;left:0;right:0;top:16%;
     text-align:center;pointer-events:none;
     font-family:var(--display);
-    font-size:clamp(30px,6vw,58px);
+    font-size:clamp(24px,4.4vw,44px);
     line-height:1;opacity:0;
   }
   .judge.on{animation:judge .5s ease-out forwards}
@@ -209,6 +205,18 @@
     display:inline-block;padding:2px 7px 3px;margin:0 3px;
     border:1px solid var(--line-hot);border-radius:2px;color:var(--dim);
   }
+  #calm{
+    font:inherit;cursor:pointer;
+    padding:4px 10px 5px;
+    color:var(--dim);background:rgba(18,11,31,.9);
+    border:1px solid var(--line-hot);border-radius:2px;
+  }
+  #calm:hover{color:var(--text);border-color:var(--cool)}
+  #calm.on{color:#07030F;background:var(--acid);border-color:#E4FF8A}
+  /* easy on the eyes: the room stops moving, the lane still reads */
+  body.calm .lights{opacity:.16}
+  body.calm .floor{opacity:.06}
+  body.calm .judge.on{animation-duration:.32s}
 
   /* ---------- overlays ---------- */
   .over{
@@ -295,7 +303,6 @@
 <div class="lights" aria-hidden="true"></div>
 <div class="floor" aria-hidden="true"></div>
 <div class="scan" aria-hidden="true"></div>
-<div class="frame" aria-hidden="true"></div>
 
 <audio id="track" src="track.mp3" preload="auto"></audio>
 
@@ -340,7 +347,10 @@
 
   <div class="bottom">
     <div><span class="key">Space</span> interrupt <span class="key">R</span> restart <span class="key">&larr;</span><span class="key">&rarr;</span> offset</div>
-    <div><a href="/">shaiyex.com</a></div>
+    <div>
+      <button id="calm" type="button">Reduce flashing</button>
+      <a href="/" style="margin-left:12px">shaiyex.com</a>
+    </div>
   </div>
 
 </div>
@@ -377,21 +387,21 @@
 <script>
 (function(){
   /* ---- the grid, measured off track.mp3 ---- */
-  var BPM = 150, BEAT = 0.4, ZERO = 0.040;
+  var BPM = 150, BEAT = 0.4, ZERO = 0.048;
 
   /* ---- the chart, generated from the kick pattern in the file ---- */
   var CHART = [
     8,12,16,20,24,28,34,36,38,40,42,44,46,48,50,52,54,56,58,60,65,66,67,68,69,70,71,72,73,74,75,
-    76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,104,120,128,132,136,140,144,146,148,150,
-    152,154,156,158,169,170,171,172,173,174,175,176,177,178,179,180,180.5,181,182,183,184,185,
-    186,187,188,188.5,189,190,191,192,193,194,195,196,196.5,197,198,199,201,202,203,204,204.5,
-    205,206,207,208,209,210,211,212,212.5,213,214,215,216,217,218,219,220,220.5,221,222,223,224,
-    225,226,227,228,228.5,229,231,233,234,235,236,236.5,237,238,239,240,241,242,243,244,244.5,
-    245,246,247,248,249,250,251,252,252.5,253,254,255,256,258,260,262,264,266,268,270,272,273,
-    274,274.5,275,276,277,278,278.5,279,280,281,282,282.5,283,283.5,284,285,286,286.5,287,288,
-    289,290,290.5,291,291.5,292,293,294,294.5,295,297,298,298.5,299,299.5,300,301,302,302.5,303,
-    304,305,306,306.5,307,307.5,308,309,310,310.5,311,312,313,314,314.5,315,315.5,316,317,318,
-    318.5,319
+    76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,100,108,116,124,132,140,148,156,164,172,
+    180,188,192,196,200,204,208,210,212,214,216,218,220,222,224,226,228,230,232,234,236,238,240,
+    241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,260.5,261,
+    262,263,265,266,267,268,268.5,269,270,271,272,273,274,275,276,276.5,277,278,279,280,281,282,
+    283,284,284.5,285,286,287,288,289,290,291,292,292.5,293,295,297,298,299,300,300.5,301,302,
+    303,304,305,306,307,308,308.5,309,310,311,312,313,314,315,316,316.5,317,318,319,320,322,324,
+    326,328,330,332,334,336,337,338,338.5,339,340,341,342,342.5,343,344,345,346,346.5,347,347.5,
+    348,349,350,350.5,351,352,353,354,354.5,355,355.5,356,357,358,358.5,359,361,362,362.5,363,
+    363.5,364,365,366,366.5,367,368,369,370,370.5,371,371.5,372,373,374,374.5,375,376,377,378,
+    378.5,379,379.5,380,381,382,382.5,383
   ];
 
   var SPELLS = [
@@ -404,11 +414,11 @@
     { b: 0,   n: "Trash pull" },
     { b: 32,  n: "First drop" },
     { b: 96,  n: "Who are you" },
-    { b: 128, n: "It is building" },
-    { b: 176, n: "Second drop" },
-    { b: 256, n: "Breathe" },
-    { b: 272, n: "Last drop, good luck" },
-    { b: 320, n: "" }
+    { b: 192, n: "It is building" },
+    { b: 256, n: "Second drop" },
+    { b: 320, n: "Breathe" },
+    { b: 336, n: "Last drop, good luck" },
+    { b: 384, n: "" }
   ];
 
   /* windows, in seconds */
@@ -433,7 +443,27 @@
   var notes = [], idx = 0, running = false;
   var combo = 0, best = 0, perf = 0, good = 0, missed = 0, score = 0, streak = 0;
   var dead = 0, lastBeat = -1, p = 0, pd = 0;
-  var offset = 0;
+  var offset = 0, calm = false;
+  try {
+    calm = localStorage.getItem('beat.calm') === '1';
+  } catch(e){}
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) calm = true;
+  var calmBtn = document.getElementById('calm');
+  function paintCalm(){
+    document.body.classList.toggle('calm', calm);
+    calmBtn.classList.toggle('on', calm);
+    calmBtn.textContent = calm ? 'Flashing off' : 'Reduce flashing';
+    if (calm){
+      root.style.setProperty('--p', '0');
+      root.style.setProperty('--pd', '0');
+    }
+  }
+  calmBtn.addEventListener('click', function(){
+    calm = !calm;
+    try { localStorage.setItem('beat.calm', calm ? '1' : '0'); } catch(e){}
+    paintCalm();
+  });
+  paintCalm();
   try { offset = parseFloat(localStorage.getItem('beat.offset') || '0') || 0; } catch(e){}
 
   /* ---- low latency hit sound ---- */
@@ -598,17 +628,16 @@
     ctx.fillRect(HITX - 2, laneY - laneH / 2 - 8, 4, laneH + 16);
     ctx.fillStyle = 'rgba(255,255,255,' + (0.15 + flash * 0.85) + ')';
     ctx.fillRect(HITX - 1, laneY - laneH / 2 - 8, 2, laneH + 16);
-    if (flash > 0.01){
-      var g = ctx.createRadialGradient(HITX, laneY, 0, HITX, laneY, 150 * flash);
-      g.addColorStop(0, 'rgba(255,43,209,' + (0.35 * flash) + ')');
-      g.addColorStop(1, 'rgba(255,43,209,0)');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, W, H);
+    if (flash > 0.02){
+      ctx.fillStyle = 'rgba(255,43,209,' + (0.16 * flash) + ')';
+      ctx.fillRect(HITX - 40, laneY - laneH / 2 - 8, 80, laneH + 16);
     }
     flash *= 0.86;
 
     /* the casts */
     var bh = Math.min(40, laneH * 0.44);
+    ctx.font = '600 9px JetBrains Mono, monospace';
+    ctx.textAlign = 'right';
     for (var i = idx; i < notes.length; i++){
       var n = notes[i];
       var dt = n.t - t;
@@ -637,8 +666,6 @@
 
       if (wpx > 78){
         ctx.fillStyle = 'rgba(255,255,255,' + (0.75 * a) + ')';
-        ctx.font = '600 9px JetBrains Mono, monospace';
-        ctx.textAlign = 'right';
         ctx.fillText(n.name.toUpperCase().slice(0, 14), x - 7, laneY + 3);
       }
     }
@@ -661,15 +688,17 @@
       var b = Math.floor((t - ZERO) / BEAT);
       if (b !== lastBeat){
         lastBeat = b;
-        p = 1;
+        if (!calm){ p = 1; flash = 1; }
         if ((((b % 4) + 4) % 4) === 0) pd = 1;
         for (var s = SECTIONS.length - 1; s >= 0; s--){
           if (b >= SECTIONS[s].b){ sectEl.textContent = SECTIONS[s].n; break; }
         }
       }
-      p *= 0.82; pd *= 0.88;
-      root.style.setProperty('--p', p.toFixed(3));
-      root.style.setProperty('--pd', pd.toFixed(3));
+      if (!calm){
+        p *= 0.82; pd *= 0.88;
+        root.style.setProperty('--p', p.toFixed(3));
+        root.style.setProperty('--pd', pd.toFixed(3));
+      }
 
       draw();
 
@@ -764,16 +793,6 @@
   document.getElementById('start').addEventListener('click', start);
   document.getElementById('again').addEventListener('click', start);
   document.getElementById('home').addEventListener('click', function(){ location.href = '/'; });
-
-  /* flash the hit line on every kick so the timing is readable without sound */
-  var flashBeat = -1;
-  (function pulse(){
-    if (running){
-      var b = Math.floor((now() - ZERO) / BEAT);
-      if (b !== flashBeat){ flashBeat = b; flash = 1; }
-    }
-    requestAnimationFrame(pulse);
-  })();
 
   size();
   build();
