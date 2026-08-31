@@ -95,6 +95,74 @@
   }
   @media (max-width:520px){.bl-btn{font-size:10px;padding:9px 14px 10px;letter-spacing:.14em}}
 
+  .gate{
+    position:fixed;
+    inset:0;
+    z-index:80;
+    display:grid;
+    place-items:center;
+    text-align:center;
+    padding:24px;
+    background:
+      radial-gradient(85% 60% at 50% 45%, rgba(150,10,10,.5) 0%, rgba(5,4,6,.985) 72%),
+      #050406;
+    transition:opacity .5s ease;
+  }
+  .gate.gone{opacity:0;pointer-events:none}
+  .gate-k{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    color:var(--red);
+    margin:0;
+  }
+  .gate-t{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(46px,12vw,104px);
+    line-height:.9;
+    margin:.14em 0 0;
+    color:var(--red-hot);
+    text-shadow:0 0 24px rgba(255,74,70,.8), 0 0 90px rgba(200,30,30,.45);
+  }
+  .gate-btn{
+    margin-top:34px;
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(22px,4.4vw,34px);
+    letter-spacing:.03em;
+    padding:14px 40px 16px;
+    color:#0A0405;
+    background:var(--red-hot);
+    border:1px solid #FF8A86;
+    border-radius:2px;
+    cursor:pointer;
+    box-shadow:0 0 44px rgba(255,74,70,.5);
+    transition:transform .1s ease, box-shadow .25s ease, background .25s ease;
+  }
+  .gate-btn:hover{background:#FF6B67;box-shadow:0 0 70px rgba(255,74,70,.8)}
+  .gate-btn:active{transform:translateY(2px)}
+  .gate-btn:focus-visible{outline:2px solid var(--amber);outline-offset:4px}
+  .gate-s{
+    margin-top:20px;
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--dimmer);
+  }
+
+  .veil{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background:#000;
+    opacity:0;
+    transition:opacity .05s linear;
+  }
+
   .bleed{
     position:fixed;
     inset:0;
@@ -324,6 +392,16 @@
 <body>
 
 <div class="bleed" aria-hidden="true"></div>
+<div class="veil" id="veil" aria-hidden="true"></div>
+
+<div class="gate" id="gate">
+  <div class="gate-in">
+    <p class="gate-k">The key is gone</p>
+    <p class="gate-t">Key Depleted.</p>
+    <button class="gate-btn" id="enter" type="button">Open the post-mortem</button>
+    <p class="gate-s">Sound on. There is a mute button once you are in.</p>
+  </div>
+</div>
 
 <audio id="theme" src="theme.mp3" preload="metadata" loop></audio>
 <audio id="buzz" src="neon.mp3" preload="auto" loop></audio>
@@ -495,12 +573,13 @@
   }
   muteBtn.addEventListener('click', function(){ setMuted(!muted); });
 
-  /* try on every click and key until it is genuinely playing; the listeners
-     are cheap and calling play() on a playing element is a no-op */
-  function arm(){ playTheme(); }
-  document.addEventListener('click', arm);
-  document.addEventListener('keydown', arm);
-  document.addEventListener('touchend', arm);
+  /* one real button, one click handler - the only reliable way across browsers */
+  var gateEl = document.getElementById('gate');
+  document.getElementById('enter').addEventListener('click', function(){
+    playTheme();
+    gateEl.classList.add('gone');
+    setTimeout(function(){ gateEl.style.display = 'none'; }, 550);
+  });
 
   /* ---- the sign: flicker timings measured from neon.mp3 itself,
          so the light and the recording stay locked together ---- */
@@ -518,12 +597,14 @@
     var bleed = document.querySelector('.bleed');
     var offT  = null;
 
-    var BASE = 0.62;
+    var BASE = 0.9;
+    var veil = document.getElementById('veil');
     function lit(){
       h1.style.opacity = '1';
       h1.style.transform = 'none';
       h1.style.textShadow = FULL;
       if (bleed) bleed.style.opacity = String(BASE);
+      if (veil) veil.style.opacity = '0';
     }
     function out(power){
       var p    = (power == null) ? 0.5 : power;
@@ -534,7 +615,8 @@
                            (Math.random()*9-4.5).toFixed(1) + 'deg)';
       h1.style.textShadow = deep ? 'none' : DYING;
       // the room loses its glow exactly as hard as the sign does
-      if (bleed) bleed.style.opacity = String(deep ? 0.05 : BASE * (0.35 + lvl));
+      if (bleed) bleed.style.opacity = String(deep ? 0 : BASE * (0.3 + lvl));
+      if (veil)  veil.style.opacity  = String(deep ? 0.94 : 0.4 * (1 - p));
       clearTimeout(offT);
       offT = setTimeout(lit, deep ? 90 + p * 240 : 45 + Math.random() * 70);
     }
