@@ -90,8 +90,9 @@
   }
   .tearb{
     position:absolute;left:-10%;right:-10%;
-    animation:tearb .2s steps(3) forwards;
+    opacity:0;will-change:transform, opacity;
   }
+  .tearb.run{animation:tearb .2s steps(3) forwards}
   @keyframes tearb{
     0%{opacity:1;transform:translateX(var(--tx))}
     60%{opacity:.9;transform:translateX(calc(var(--tx) * -.6))}
@@ -122,9 +123,11 @@
     font-family:var(--display);
     font-size:clamp(20px,3.6vw,42px);
     line-height:1;white-space:nowrap;
+    opacity:0;
     text-shadow:0 0 20px currentColor, 0 0 46px currentColor;
-    animation:pop 1.2s cubic-bezier(.15,.85,.3,1) forwards;
+    will-change:transform, opacity;
   }
+  .pop.run{animation:pop 1.2s cubic-bezier(.15,.85,.3,1) forwards}
   @keyframes pop{
     0%  {opacity:0; transform:translate(-50%,0)      scale(.55) rotate(var(--r))}
     12% {opacity:1; transform:translate(-50%,-16px)  scale(1.14) rotate(var(--r))}
@@ -497,10 +500,7 @@
     text-align:center;opacity:0;width:92vw;
   }
   .phase.on{animation:phaseIn .95s linear forwards}
-  .phase .pk{
-    font-family:var(--mono);font-size:12px;font-weight:700;
-    letter-spacing:.42em;text-transform:uppercase;color:var(--iii);
-  }
+  .phase .pk{display:none}
   .phase .pt{
     font-family:var(--display);
     font-size:clamp(46px,12vw,150px);line-height:.88;margin-top:8px;color:#fff;
@@ -526,26 +526,9 @@
     text-shadow:0 0 calc(8px + var(--pd) * 26px) var(--iii);
   }
 
-  /* ---------- cursor stalker ---------- */
-  .cursor{
-    position:fixed;z-index:59;pointer-events:none;
-    width:28px;height:28px;border-radius:50%;
-    border:2px solid var(--i);
-    box-shadow:0 0 calc(5px + var(--p) * 26px) var(--i),
-               inset 0 0 calc(3px + var(--p) * 16px) var(--i);
-    opacity:0;transition:opacity .35s ease;
-    transform:translate(-50%,-50%) scale(calc(.78 + var(--p) * .6));
-  }
-  .cursor::after{
-    content:"";position:absolute;left:50%;top:50%;
-    width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;
-    background:var(--i);box-shadow:0 0 10px var(--i);
-  }
-  .cursor.on{opacity:1}
-  body.stalk, body.stalk *{cursor:none}
 
   /* ---------- phase five: everything moves ---------- */
-  .page.gl{filter:contrast(1.8) saturate(2.3) hue-rotate(24deg)}
+  .page.gl{transform:translate3d(var(--shx,0px), var(--shy,0px), 0) skewX(-3deg) scale(1.02)}
 
   body.p5 .rave,
   body.p5 #lasers,
@@ -664,7 +647,6 @@
 <div class="pops" id="pops" aria-hidden="true"></div>
 <div class="stamp" id="stamp" aria-hidden="true"></div>
 <div class="toasts" id="toasts" aria-hidden="true"></div>
-<div class="cursor" id="cursor" aria-hidden="true"></div>
 <div class="phase" id="phase" aria-hidden="true">
   <div class="pk"></div>
   <div class="pt"></div>
@@ -855,7 +837,6 @@
   var phTxt   = document.getElementById('phaseTxt');
   var phPips  = document.getElementById('phasePips').children;
   var toastEl = document.getElementById('toasts');
-  var curEl   = document.getElementById('cursor');
   var phEl    = document.getElementById('phase');
   var muteBtn = document.getElementById('mute');
   var muteTxt = document.getElementById('muteTxt');
@@ -971,17 +952,31 @@
     "I SAW THAT","TIMED IT FOR YOU","CRY","SIT DOWN DOG","HEEL"
   ];
   var POPC   = ['#00E5FF','#B14BFF','#FF2E6A','#C6FF3D','#FFFFFF'];
+  /* pooled: creating and binning elements every beat was costing frames,
+     and dropped frames are what makes the whole thing feel off the beat */
+  var PPOOL = [], pi = 0;
+  (function(){
+    for (var i = 0; i < 26; i++){
+      var e = document.createElement('span');
+      e.className = 'pop';
+      popsEl.appendChild(e);
+      PPOOL.push(e);
+    }
+  })();
   function popOff(){
-    var e = document.createElement('span');
-    e.className = 'pop';
+    var e = PPOOL[pi++ % PPOOL.length];
+    e.classList.remove('run');
+    void e.offsetWidth;
     e.textContent = swapping ? swapWord
                              : POPS[Math.floor(Math.random() * POPS.length)];
     e.style.left = (6 + Math.random() * 88) + 'vw';
     e.style.top  = (14 + Math.random() * 68) + 'vh';
     e.style.color = POPC[Math.floor(Math.random() * POPC.length)];
     e.style.setProperty('--r', ((Math.random() - 0.5) * 16).toFixed(1) + 'deg');
-    popsEl.appendChild(e);
-    setTimeout(function(){ if (e.parentNode) e.parentNode.removeChild(e); }, 1300);
+    e.classList.add('run');
+  }
+  function popsClear(){
+    for (var i = 0; i < PPOOL.length; i++) PPOOL[i].classList.remove('run');
   }
 
   /* ---- slice tears ---- */
@@ -990,17 +985,29 @@
     'linear-gradient(90deg, rgba(255,46,106,.6), rgba(198,255,61,.45) 55%, rgba(0,229,255,.5))',
     'linear-gradient(90deg, rgba(198,255,61,.5), rgba(255,255,255,.45) 50%, rgba(177,75,255,.5))'
   ];
-  function tear(n){
-    for (var i = 0; i < n; i++){
+  var TPOOL = [], ti = 0;
+  (function(){
+    for (var i = 0; i < 16; i++){
       var e = document.createElement('div');
       e.className = 'tearb';
+      tearsEl.appendChild(e);
+      TPOOL.push(e);
+    }
+  })();
+  function tear(n){
+    for (var i = 0; i < n; i++){
+      var e = TPOOL[ti++ % TPOOL.length];
+      e.classList.remove('run');
+      void e.offsetWidth;
       e.style.top = (Math.random() * 92) + 'vh';
       e.style.height = (2 + Math.random() * 34) + 'px';
       e.style.background = TCOL[Math.floor(Math.random() * TCOL.length)];
       e.style.setProperty('--tx', ((Math.random() - 0.5) * 90).toFixed(0) + 'px');
-      tearsEl.appendChild(e);
-      setTimeout(function(el){ return function(){ if (el.parentNode) el.parentNode.removeChild(el); }; }(e), 260);
+      e.classList.add('run');
     }
+  }
+  function tearsClear(){
+    for (var i = 0; i < TPOOL.length; i++) TPOOL[i].classList.remove('run');
   }
 
   /* ---- slam stamp ---- */
@@ -1113,13 +1120,6 @@
     cutEl.style.setProperty('--ly', (10 + Math.random() * 78).toFixed(0) + '%');
   }
 
-  /* ---- cursor ring ---- */
-  var cx = -999, cy = -999;
-  window.addEventListener('mousemove', function(ev){
-    cx = ev.clientX; cy = ev.clientY;
-    curEl.style.left = cx + 'px';
-    curEl.style.top  = cy + 'px';
-  });
 
   /* ---- phases ---- */
   var PHASES = [
@@ -1127,8 +1127,10 @@
     { b: 20, k: 'Phase two',   t: 'THAT WAS ME',  s: 'and that one, and that one' },
     { b: 40, k: 'Phase three', t: 'ALL ME',       s: 'say it back' },
     { b: 68, k: 'Phase four',  t: 'SIT DOWN DOG', s: 'no notes' },
-    { b: 100, k: 'Phase five', t: 'HOLD ON TO SOMETHING', s: 'you asked for the healer' }
+    { b: 135, k: 'Phase five', t: 'HOLD ON TO SOMETHING', s: 'you asked for the healer' }
   ];
+  /* the track drops out here. measured off the file, not guessed */
+  var BREAK_IN = 55.85, BREAK_OUT = 58.00;
   var phase = 0, ph = 0, calm = false;
   var tickIn = document.getElementById('tick');
   var readBtn = document.getElementById('readbtn');
@@ -1145,15 +1147,13 @@
     readBtn.classList.toggle('on', calm);
     readBtn.textContent = calm ? 'Turn it back up' : 'I want to read';
     if (calm){
-      while (popsEl.firstChild)  popsEl.removeChild(popsEl.firstChild);
+      popsClear();
+      tearsClear();
       while (toastEl.firstChild) toastEl.removeChild(toastEl.firstChild);
-      while (tearsEl.firstChild) tearsEl.removeChild(tearsEl.firstChild);
       stampEl.classList.remove('on');
       phEl.classList.remove('on');
       invEl.classList.remove('on');
       wallEl.style.display = 'none';
-      curEl.classList.remove('on');
-      document.body.classList.remove('stalk');
       document.body.classList.remove('p5');
       pageEl.classList.remove('gl');
       root.style.setProperty('--roll', '0deg');
@@ -1165,8 +1165,6 @@
         root.style.setProperty('--wall', phase >= 4 ? '1' : '.85');
       }
       if (phase >= 4){
-        curEl.classList.add('on');
-        document.body.classList.add('stalk');
       }
       if (phase >= 5) document.body.classList.add('p5');
     }
@@ -1251,8 +1249,6 @@
       sweep();
     }
     if (phase >= 4){
-      curEl.classList.add('on');
-      document.body.classList.add('stalk');
       setTimeout(finale, 1100);   /* lands right after the phase call clears */
     }
     if (phase >= 5) document.body.classList.add('p5');
@@ -1275,16 +1271,36 @@
   }
 
   /* every visual hangs off the track's own playhead */
-  var lastBeat = -1, p = 0, pd = 0, sh = 0, joltA = 16;
+  var lastBeat = -1, p = 0, pd = 0, sh = 0, joltA = 16, inBreak = false;
 
   function frame(t){
     if (!reduce){
       if (!track.paused && !track.ended){
-        var b = Math.floor((track.currentTime - OFFSET) / BEAT);
+        var now = track.currentTime;
+
+        /* the track goes quiet mid way. so does everything else */
+        var hush = (now >= BREAK_IN && now < BREAK_OUT);
+        if (hush !== inBreak){
+          inBreak = hush;
+          if (hush){
+            popsClear(); tearsClear();
+            stampEl.classList.remove('on');
+            invEl.classList.remove('on');
+            pageEl.classList.remove('gl');
+            document.body.classList.remove('p5');
+            wallEl.style.display = 'none';
+            root.style.setProperty('--roll', '0deg');
+            root.style.setProperty('--skw', '0deg');
+            root.style.setProperty('--gx', '0px');
+            root.style.setProperty('--gy', '0px');
+          }
+        }
+
+        var b = Math.floor((now - OFFSET) / BEAT);
         if (b !== lastBeat){
           lastBeat = b;
-          p = 1;
-          if (b >= 0){
+          if (!inBreak) p = 1;
+          if (b >= 0 && !inBreak){
             var m4 = ((b % 4) + 4) % 4;
             if (m4 === 0){ pd = 1; sh = 1; if (phase >= 1) newBeams(); }
 
@@ -1345,7 +1361,7 @@
       }
       root.style.setProperty('--p',  p.toFixed(3));
       root.style.setProperty('--pd', pd.toFixed(3));
-      var big = (!calm && phase >= 5);
+      var big = (!calm && !inBreak && phase >= 5);
       var amp = big ? joltA : 7;
       root.style.setProperty('--shx', ((Math.random() - 0.5) * sh * amp).toFixed(2) + 'px');
       root.style.setProperty('--shy', ((Math.random() - 0.5) * sh * amp * .72).toFixed(2) + 'px');
@@ -1355,7 +1371,7 @@
         root.style.setProperty('--gx', ((Math.random() - 0.5) * g).toFixed(2) + 'px');
         root.style.setProperty('--gy', ((Math.random() - 0.5) * g).toFixed(2) + 'px');
       }
-      drawLasers(t || 0, phase >= 1 ? p : 0);
+      drawLasers(t || 0, (phase >= 1 && !inBreak) ? p : 0);
     }
     requestAnimationFrame(frame);
   }
