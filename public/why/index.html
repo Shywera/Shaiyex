@@ -506,10 +506,7 @@
     font-size:clamp(46px,12vw,150px);line-height:.88;margin-top:8px;color:#fff;
     text-shadow:0 0 40px var(--iii), 0 0 120px var(--ii);
   }
-  .phase .ps{
-    font-family:var(--mono);font-size:11.5px;
-    letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-top:14px;
-  }
+  .phase .ps{display:none}
   @keyframes phaseIn{
     0%  {opacity:0; transform:translate(-50%,-50%) rotate(var(--pr)) scale(2.6)}
     4%  {opacity:1; transform:translate(-50%,-50%) rotate(var(--pr)) scale(1.7)}
@@ -526,19 +523,6 @@
     text-shadow:0 0 calc(8px + var(--pd) * 26px) var(--iii);
   }
 
-
-  /* ---------- the hush: lights out, everything stops ---------- */
-  .veil{
-    position:fixed;inset:0;z-index:65;pointer-events:none;
-    background:#000;opacity:0;
-    transition:opacity .06s linear;   /* out instantly, so the return hits */
-  }
-  /* the veil only drops for the break itself, and it drops hard */
-  body.dark .veil{opacity:.985;transition:opacity .22s cubic-bezier(.3,.9,.4,1)}
-  body.hush .ticker-in{animation-play-state:paused}
-  body.hush .rave,
-  body.hush .grid,
-  body.hush .strobe{opacity:0;transition:opacity .3s ease-out}
 
   /* ---------- phase five: everything moves ---------- */
   .page.gl{transform:translate3d(var(--shx,0px), var(--shy,0px), 0) skewX(-3deg) scale(1.02)}
@@ -656,7 +640,6 @@
 <div class="tears" id="tears" aria-hidden="true"></div>
 <div class="frame" aria-hidden="true"></div>
 <div class="inv" id="inv" aria-hidden="true"></div>
-<div class="veil" aria-hidden="true"></div>
 <div class="wall" id="wall" aria-hidden="true"><div class="cut" id="cut"></div></div>
 <div class="pops" id="pops" aria-hidden="true"></div>
 <div class="stamp" id="stamp" aria-hidden="true"></div>
@@ -1026,13 +1009,12 @@
 
   /* ---- slam stamp ---- */
   var STAMPS = [
-    "THAT WAS ME","SIT DOWN DOG","GUESS WHO SAVED YOU","SAY THANK YOU",
-    "COUNT YOUR KICKS","I CARRIED THAT","ALSO ME","NOT MY FAULT","STILL ME",
-    "WHO PRESSED THAT","YOUR CAST, MY PROBLEM","I WAS THE KEY","SAY IT LOUDER",
-    "NOBODY ELSE DID THAT","ZERO DEATHS","I SAW YOU STANDING THERE","YOU HAD ONE JOB",
-    "MY COOLDOWNS, YOUR LIFE","YOU DID NOT NOTICE","EIGHT PERCENT","ASK ME HOW",
-    "STILL CARRYING","ONE BUTTON","I NEVER MISS","THAT WAS ME AGAIN","HEEL",
-    "YOU WERE DEAD","I DECIDED OTHERWISE","NO, IT WAS ME","TIMED IT ANYWAY"
+    "THAT WAS ME","SIT DOWN DOG","SAY THANK YOU","COUNT YOUR KICKS",
+    "I CARRIED THAT","ALSO ME","NOT MY FAULT","STILL ME","ZERO DEATHS",
+    "ONE BUTTON","I NEVER MISS","ASK ME HOW","MY COOLDOWNS","EIGHT PERCENT",
+    "GUESS WHO","MINE","ME AGAIN","I FIXED IT","YOU WERE DEAD",
+    "IT WAS ME","TIMED IT ANYWAY","WHO PRESSED THAT","STILL CARRYING",
+    "SAY IT LOUDER","HEEL","ONE JOB"
   ];
   /* shuffle once so the order is never the same twice, then walk it in
      sequence, which is what actually stops the same word coming back */
@@ -1138,17 +1120,12 @@
   /* ---- phases ---- */
   var PHASES = [
     { b: 8,  k: '', t: '', s: '' },   /* silent, the room just gets louder */
-    { b: 20, k: 'Phase two',   t: 'THAT WAS ME',  s: 'and that one, and that one' },
-    { b: 40, k: 'Phase three', t: 'ALL ME',       s: 'say it back' },
-    { b: 68, k: 'Phase four',  t: 'SIT DOWN DOG', s: 'no notes' },
-    { b: 134, k: 'Phase five', t: 'HOLD ON TO SOMETHING', s: 'you asked for the healer' }
+    { b: 20, k: '', t: 'THAT WAS ME',  s: '' },
+    { b: 40, k: '', t: 'ALL ME',       s: '' },
+    { b: 68, k: '', t: 'SIT DOWN DOG', s: '' },
+    { b: 134, k: '', t: 'HOLD ON',     s: '' }
   ];
-  /* the hush. measured off the file:
-     beat 129 is where the bass drops out, beat 134 is where it comes back.
-     freeze and blackout happen together on the drop, so there is no dead
-     frozen page sitting there, and the dark lasts exactly the break. */
-  var BREAK_B_IN = 129, DARK_B = 129, BREAK_B_OUT = 134;
-  var LEAD = 0.13;
+  var LEAD = 0;
   var phase = 0, ph = 0, calm = false;
   var tickIn = document.getElementById('tick');
   var readBtn = document.getElementById('readbtn');
@@ -1298,7 +1275,7 @@
   }
 
   /* every visual hangs off the track's own playhead */
-  var lastBeat = -1, p = 0, pd = 0, sh = 0, joltA = 16, inBreak = false, inDark = false;
+  var lastBeat = -1, p = 0, pd = 0, sh = 0, joltA = 16;
 
   function frame(t){
     if (!reduce){
@@ -1308,35 +1285,11 @@
         var now = track.currentTime + LEAD;
         var bNow = Math.floor((now - OFFSET) / BEAT);
 
-        /* the track goes quiet mid way. so does everything else */
-        var hush = (bNow >= BREAK_B_IN && bNow < BREAK_B_OUT);
-        var dark = (bNow >= DARK_B && bNow < BREAK_B_OUT);
-        if (dark !== inDark){
-          inDark = dark;
-          document.body.classList.toggle('dark', dark);
-        }
-        if (hush !== inBreak){
-          inBreak = hush;
-          document.body.classList.toggle('hush', hush);
-          if (hush){
-            popsClear(); tearsClear();
-            stampEl.classList.remove('on');
-            invEl.classList.remove('on');
-            pageEl.classList.remove('gl');
-            document.body.classList.remove('p5');
-            wallEl.style.display = 'none';
-            root.style.setProperty('--roll', '0deg');
-            root.style.setProperty('--skw', '0deg');
-            root.style.setProperty('--gx', '0px');
-            root.style.setProperty('--gy', '0px');
-          }
-        }
-
         var b = bNow;
         if (b !== lastBeat){
           lastBeat = b;
-          if (!inBreak) p = 1;
-          if (b >= 0 && !inBreak){
+          p = 1;
+          if (b >= 0){
             var m4 = ((b % 4) + 4) % 4;
             if (m4 === 0){ pd = 1; sh = 1; if (phase >= 1) newBeams(); }
 
@@ -1397,7 +1350,7 @@
       }
       root.style.setProperty('--p',  p.toFixed(3));
       root.style.setProperty('--pd', pd.toFixed(3));
-      var big = (!calm && !inBreak && phase >= 5);
+      var big = (!calm && phase >= 5);
       var amp = big ? joltA : 7;
       root.style.setProperty('--shx', ((Math.random() - 0.5) * sh * amp).toFixed(2) + 'px');
       root.style.setProperty('--shy', ((Math.random() - 0.5) * sh * amp * .72).toFixed(2) + 'px');
@@ -1407,7 +1360,7 @@
         root.style.setProperty('--gx', ((Math.random() - 0.5) * g).toFixed(2) + 'px');
         root.style.setProperty('--gy', ((Math.random() - 0.5) * g).toFixed(2) + 'px');
       }
-      drawLasers(t || 0, (phase >= 1 && !inBreak) ? p : 0);
+      drawLasers(t || 0, phase >= 1 ? p : 0);
     }
     requestAnimationFrame(frame);
   }
