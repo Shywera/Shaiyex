@@ -533,11 +533,12 @@
     background:#000;opacity:0;
     transition:opacity .1s ease;   /* out fast, so the return hits */
   }
-  body.hush .veil{opacity:.985;transition:opacity .5s ease}
+  /* 3.7s to fall, so it is fully black on the beat the bass leaves */
+  body.hush .veil{opacity:.985;transition:opacity 3.7s cubic-bezier(.7,0,.9,.4)}
   body.hush .ticker-in{animation-play-state:paused}
   body.hush .rave,
   body.hush .grid,
-  body.hush .strobe{opacity:0;transition:opacity .5s ease}
+  body.hush .strobe{opacity:0;transition:opacity 3.2s ease-in}
 
   /* ---------- phase five: everything moves ---------- */
   .page.gl{transform:translate3d(var(--shx,0px), var(--shy,0px), 0) skewX(-3deg) scale(1.02)}
@@ -1140,11 +1141,13 @@
     { b: 20, k: 'Phase two',   t: 'THAT WAS ME',  s: 'and that one, and that one' },
     { b: 40, k: 'Phase three', t: 'ALL ME',       s: 'say it back' },
     { b: 68, k: 'Phase four',  t: 'SIT DOWN DOG', s: 'no notes' },
-    { b: 135, k: 'Phase five', t: 'HOLD ON TO SOMETHING', s: 'you asked for the healer' }
+    { b: 134, k: 'Phase five', t: 'HOLD ON TO SOMETHING', s: 'you asked for the healer' }
   ];
-  /* the hush. held on bar lines so it cuts clean:
-     beat 120 is the top of bar 31, beat 135 is where the track comes back */
-  var BREAK_B_IN = 120, BREAK_B_OUT = 135;
+  /* the hush. measured off the file:
+     beat 120 (bar 31) the effects stop and the screen starts going down,
+     beat 129 is where the bass actually drops out and it is fully black,
+     beat 134 is where the bass comes back. */
+  var BREAK_B_IN = 120, BREAK_B_OUT = 134;
   var phase = 0, ph = 0, calm = false;
   var tickIn = document.getElementById('tick');
   var readBtn = document.getElementById('readbtn');
