@@ -469,44 +469,38 @@
   var muteTxt = document.getElementById('muteTxt');
   var muted   = false;
 
-  var audioOn = false;
-  [theme, buzz].forEach(function(el){
-    el.addEventListener('playing', function(){ audioOn = true; });
-  });
-
-  /* never guard on .paused: play() flips it to false synchronously and only
-     rejects later, so a blocked attempt would make every retry a no-op */
-  function start(el, vol){
-    if (muted) return;
+  /* Play from a plain bubble-phase click, which is the one path that is
+     reliable in both Firefox and Chrome - the same way the kick page does it.
+     Capture-phase pointerdown is not treated as activation everywhere. */
+  function kick(el, vol){
     try {
       el.volume = vol;
       var pr = el.play();
       if (pr && pr.catch) pr.catch(function(){});
     } catch (e){}
   }
+
   function playTheme(){
-    start(theme, 0.75);
-    start(buzz, 1.0);
+    if (muted) return;
+    kick(theme, 0.75);
+    kick(buzz, 1.0);
   }
+
   function setMuted(v){
     muted = v;
     muteBtn.classList.toggle('off', muted);
     muteTxt.textContent = muted ? 'Sound off' : 'Sound on';
-    if (muted){ try { theme.pause(); buzz.pause(); } catch (e){} } else { playTheme(); }
+    if (muted){ try { theme.pause(); buzz.pause(); } catch (e){} }
+    else { playTheme(); }
   }
   muteBtn.addEventListener('click', function(){ setMuted(!muted); });
 
-  /* Chrome does not treat a mouse pointerdown as user activation - it wants
-     mousedown/click - so listen for every gesture that can unlock audio */
-  var GESTURES = ['pointerdown','mousedown','click','touchstart','touchend','keydown'];
-  function arm(){
-    if (audioOn){
-      GESTURES.forEach(function(g){ document.removeEventListener(g, arm, true); });
-      return;
-    }
-    playTheme();
-  }
-  GESTURES.forEach(function(g){ document.addEventListener(g, arm, true); });
+  /* try on every click and key until it is genuinely playing; the listeners
+     are cheap and calling play() on a playing element is a no-op */
+  function arm(){ playTheme(); }
+  document.addEventListener('click', arm);
+  document.addEventListener('keydown', arm);
+  document.addEventListener('touchend', arm);
 
   /* ---- the sign: flicker timings measured from neon.mp3 itself,
          so the light and the recording stay locked together ---- */
