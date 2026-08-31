@@ -434,7 +434,7 @@
     position:fixed;left:50%;top:50%;z-index:70;pointer-events:none;
     transform:translate(-50%,-50%);text-align:center;opacity:0;width:92vw;
   }
-  .phase.on{animation:phaseIn 1.7s cubic-bezier(.12,.9,.2,1) forwards}
+  .phase.on{animation:phaseIn 1.2s cubic-bezier(.12,.9,.2,1) forwards}
   .phase .pk{
     font-family:var(--mono);font-size:12px;font-weight:700;
     letter-spacing:.42em;text-transform:uppercase;color:var(--iii);
@@ -449,20 +449,16 @@
     letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-top:14px;
   }
   @keyframes phaseIn{
-    0%  {opacity:0;transform:translate(-50%,-50%) scale(2)}
-    10% {opacity:1;transform:translate(-50%,-50%) scale(1)}
-    70% {opacity:1}
+    0%  {opacity:0;transform:translate(-50%,-50%) scale(2.1)}
+    8%  {opacity:1;transform:translate(-50%,-50%) scale(1)}
+    72% {opacity:1}
     100%{opacity:0;transform:translate(-50%,-50%) scale(1.06)}
   }
 
   /* ---------- the finale ---------- */
-  body.flip .page{animation:flipover 2.6s cubic-bezier(.3,.9,.2,1)}
-  @keyframes flipover{
-    0%  {transform:none}
-    10% {transform:rotate(190deg) scale(.92)}
-    52% {transform:rotate(180deg) scale(.92)}
-    76% {transform:rotate(180deg) scale(.92)}
-    100%{transform:none}
+  .swapped{
+    color:var(--iii) !important;
+    text-shadow:0 0 calc(8px + var(--pd) * 26px) var(--iii);
   }
 
   /* ---------- cursor stalker ---------- */
@@ -914,7 +910,7 @@
   /* ---- wall of me ---- */
   (function(){
     var s = [];
-    for (var i = 0; i < 700; i++) s.push(i % 7 === 6 ? 'SHAIYEX' : 'ME');
+    for (var i = 0; i < 500; i++) s.push(i % 7 === 6 ? 'SHAIYEX' : 'ALL ME');
     meEl.textContent = s.join(' ');
   })();
 
@@ -929,36 +925,44 @@
 
   /* ---- phases ---- */
   var PHASES = [
-    { b: 8,   k: 'Phase one',   t: 'WARM UP',      s: 'you are already behind' },
-    { b: 20,  k: 'Phase two',   t: 'THAT WAS ME',  s: 'and that one, and that one' },
-    { b: 44,  k: 'Phase three', t: 'ALL ME',       s: 'say it back' },
-    { b: 84,  k: 'Phase four',  t: 'SIT DOWN DOG', s: 'no notes' }
+    { b: 8,  k: 'Phase one',   t: 'WARM UP',      s: 'you are already behind' },
+    { b: 20, k: 'Phase two',   t: 'THAT WAS ME',  s: 'and that one, and that one' },
+    { b: 40, k: 'Phase three', t: 'ALL ME',       s: 'say it back' },
+    { b: 68, k: 'Phase four',  t: 'SIT DOWN DOG', s: 'no notes' }
   ];
   var phase = 0, ph = 0;
   var tickIn = document.getElementById('tick');
 
-  /* every readable thing on the page briefly becomes ME */
+  /* every readable thing on the page briefly says the same thing */
   var SWAPPABLE = [].slice.call(document.querySelectorAll(
     '.lede, h2, .trait-t, .trait-name, .trait p, .kicker, .nm, .ds, .term-t, .close p, .eyebrow'
   ));
   var swapping = false;
-  function meSwap(ms){
+  function meSwap(ms, word){
     if (swapping) return;
     swapping = true;
+    var w = word || 'YOU ARE SHIT';
     var saved = SWAPPABLE.map(function(el){ return el.innerHTML; });
-    SWAPPABLE.forEach(function(el){ el.textContent = 'ME'; });
+    SWAPPABLE.forEach(function(el, i){
+      var reps = Math.max(1, Math.min(14, Math.round(el.textContent.length / (w.length + 1))));
+      var out = [];
+      while (reps--) out.push(w);
+      el.textContent = out.join(' ');
+      el.classList.add('swapped');
+    });
     setTimeout(function(){
-      SWAPPABLE.forEach(function(el, i){ el.innerHTML = saved[i]; });
+      SWAPPABLE.forEach(function(el, i){
+        el.classList.remove('swapped');
+        el.innerHTML = saved[i];
+      });
       swapping = false;
     }, ms);
   }
 
   function finale(){
-    document.body.classList.add('flip');
-    meSwap(1900);
+    meSwap(2100);
     invert(220);
     tear(16);
-    setTimeout(function(){ document.body.classList.remove('flip'); }, 2700);
   }
 
   function enterPhase(d){
@@ -975,7 +979,7 @@
     if (phase >= 3) meEl.style.display = 'block';
     if (phase >= 4){
       curEl.classList.add('on');
-      setTimeout(finale, 1500);   /* lands right after the phase call clears */
+      setTimeout(finale, 1100);   /* lands right after the phase call clears */
     }
   }
 
@@ -1034,7 +1038,7 @@
                 corrupt(TITLES[Math.floor(Math.random() * TITLES.length)]);
               }
             }
-            if (phase >= 4 && b % 16 === 8) meSwap(430);
+            if (phase >= 4 && b % 16 === 8) meSwap(520);
           }
         }
         p  *= 0.80;
