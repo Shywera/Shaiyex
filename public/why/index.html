@@ -533,12 +533,12 @@
     background:#000;opacity:0;
     transition:opacity .1s ease;   /* out fast, so the return hits */
   }
-  /* 3.7s to fall, so it is fully black on the beat the bass leaves */
-  body.hush .veil{opacity:.985;transition:opacity 3.7s cubic-bezier(.7,0,.9,.4)}
+  /* 2s to fall, so it is fully black on the beat the bass leaves */
+  body.hush .veil{opacity:.985;transition:opacity 2s cubic-bezier(.6,0,.9,.45)}
   body.hush .ticker-in{animation-play-state:paused}
   body.hush .rave,
   body.hush .grid,
-  body.hush .strobe{opacity:0;transition:opacity 3.2s ease-in}
+  body.hush .strobe{opacity:0;transition:opacity 1.7s ease-in}
 
   /* ---------- phase five: everything moves ---------- */
   .page.gl{transform:translate3d(var(--shx,0px), var(--shy,0px), 0) skewX(-3deg) scale(1.02)}
@@ -1144,10 +1144,10 @@
     { b: 134, k: 'Phase five', t: 'HOLD ON TO SOMETHING', s: 'you asked for the healer' }
   ];
   /* the hush. measured off the file:
-     beat 120 (bar 31) the effects stop and the screen starts going down,
+     beat 124 (bar 32) the effects stop and the screen starts going down,
      beat 129 is where the bass actually drops out and it is fully black,
      beat 134 is where the bass comes back. */
-  var BREAK_B_IN = 120, BREAK_B_OUT = 134;
+  var BREAK_B_IN = 124, BREAK_B_OUT = 134;
   var phase = 0, ph = 0, calm = false;
   var tickIn = document.getElementById('tick');
   var readBtn = document.getElementById('readbtn');
