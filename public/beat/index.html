@@ -596,6 +596,28 @@
     }
   }
 
+  /* currentTime only updates a handful of times a second, so reading it
+     straight gives stepped motion. sample it when it actually changes and
+     run on performance.now() in between, snapping back if we drift. */
+  var ctLast = -1, ctAt = 0, ctBase = 0, ctReady = false;
+  function clock(){
+    var ct = track.currentTime;
+    var pn = performance.now() / 1000;
+    if (track.paused){ ctReady = false; return ct + offset; }
+    if (ct !== ctLast){
+      ctLast = ct;
+      var interp = ctBase + (pn - ctAt);
+      /* small disagreement: ease toward the truth. large: snap */
+      if (ctReady && Math.abs(interp - ct) < 0.08) ctBase = interp + (ct - interp) * 0.25;
+      else ctBase = ct;
+      ctAt = pn;
+      ctReady = true;
+      return ctBase + offset;
+    }
+    if (!ctReady) return ct + offset;
+    return ctBase + (pn - ctAt) + offset;
+  }
+  function clockReset(){ ctLast = -1; ctAt = 0; ctBase = 0; ctReady = false; }
   function now(){ return clock(); }
 
   var laneFlash = [0,0,0,0];
