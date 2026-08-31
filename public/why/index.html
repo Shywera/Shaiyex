@@ -958,10 +958,22 @@
 
   /* ---- stencil wall ---- */
   (function(){
-    var W = ['ALL ME','THAT WAS ME','MINE','STILL ME','MY KEY','SHAIYEX','ME','ALSO ME'];
-    var s = [];
-    for (var i = 0; i < 220; i++) s.push(W[i % W.length]);
-    cutEl.textContent = s.join(' ');
+    var W = [
+      'ALL ME','THAT WAS ME','I DID THAT','MINE','STILL ME','MY KEY',
+      'WHO SAVED YOU','SAY IT BACK','SAY THANK YOU','I CARRIED THIS',
+      'NOBODY ELSE PRESSED IT','COUNT YOUR KICKS','THAT SAVE WAS MINE',
+      'YOU ARE ALIVE BECAUSE OF ME','GUESS WHO','ALSO ME','ME AGAIN',
+      'I FIXED IT','MY COOLDOWNS','LOOK AT THE LOG','IT WAS ME',
+      'EVERY SINGLE ONE','NOT LUCK','ME','AGAIN, ME','ASK THE LOG'
+    ];
+    var s = [], prev = -1, n;
+    for (var i = 0; i < 190; i++){
+      do { n = Math.floor(Math.random() * W.length); } while (n === prev);
+      prev = n;
+      var sz = (0.55 + Math.random() * 0.85).toFixed(2);
+      s.push('<span style="font-size:' + sz + 'em">' + W[n] + '</span>');
+    }
+    cutEl.innerHTML = s.join(' ');
   })();
   function sweep(){
     cutEl.style.setProperty('--lx', (8 + Math.random() * 84).toFixed(0) + '%');
@@ -998,10 +1010,12 @@
     var w = word || 'YOU ARE SHIT';
 
     /* the wall says it too */
-    cutSaved = cutEl.textContent;
+    cutSaved = cutEl.innerHTML;
     var wall = [];
-    for (var k = 0; k < 150; k++) wall.push(w);
-    cutEl.textContent = wall.join(' ');
+    for (var k = 0; k < 150; k++){
+      wall.push('<span style="font-size:' + (0.6 + Math.random() * 0.7).toFixed(2) + 'em">' + w + '</span>');
+    }
+    cutEl.innerHTML = wall.join(' ');
 
     var saved = SWAPPABLE.map(function(el){ return el.innerHTML; });
     SWAPPABLE.forEach(function(el, i){
@@ -1016,7 +1030,7 @@
         el.classList.remove('swapped');
         el.innerHTML = saved[i];
       });
-      cutEl.textContent = cutSaved;
+      cutEl.innerHTML = cutSaved;
       swapping = false;
     }, ms);
   }
