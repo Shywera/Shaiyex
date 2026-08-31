@@ -65,7 +65,7 @@
   .strobe{
     position:fixed;inset:0;z-index:1;pointer-events:none;
     background:#fff;
-    opacity:calc(var(--pd) * .05);
+    opacity:calc(var(--pd) * .10);
     mix-blend-mode:overlay;
   }
   .grid{
@@ -83,12 +83,91 @@
     background:repeating-linear-gradient(180deg, rgba(0,0,0,.30) 0 1px, rgba(0,0,0,0) 1px 3px);
     opacity:.5;mix-blend-mode:multiply;
   }
-  .tear{
-    position:fixed;left:0;right:0;height:0;z-index:4;pointer-events:none;display:none;
-    background:linear-gradient(90deg, rgba(0,229,255,.55), rgba(177,75,255,.5) 48%, rgba(255,46,106,.5));
-    mix-blend-mode:screen;
+  /* ---------- slice tears ---------- */
+  .tears{
+    position:fixed;inset:0;z-index:4;pointer-events:none;
+    overflow:hidden;mix-blend-mode:screen;
   }
-  .tear.on{display:block}
+  .tearb{
+    position:absolute;left:-10%;right:-10%;
+    animation:tearb .2s steps(3) forwards;
+  }
+  @keyframes tearb{
+    0%{opacity:1;transform:translateX(var(--tx))}
+    60%{opacity:.9;transform:translateX(calc(var(--tx) * -.6))}
+    100%{opacity:0;transform:translateX(0)}
+  }
+
+  /* ---------- viewport frame ---------- */
+  .frame{
+    position:fixed;inset:0;z-index:5;pointer-events:none;
+    box-shadow:
+      inset 0 0 0 2px rgba(255,46,106,calc(var(--pd) * .8)),
+      inset 0 0 calc(20px + var(--pd) * 150px) rgba(177,75,255,calc(.05 + var(--pd) * .45));
+  }
+
+  /* ---------- invert kick ---------- */
+  .inv{
+    position:fixed;inset:0;z-index:6;pointer-events:none;
+    -webkit-backdrop-filter:invert(1) hue-rotate(120deg);
+    backdrop-filter:invert(1) hue-rotate(120deg);
+    opacity:0;
+  }
+  .inv.on{opacity:1}
+
+  /* ---------- floating abuse ---------- */
+  .pops{position:fixed;inset:0;z-index:50;pointer-events:none;overflow:hidden}
+  .pop{
+    position:absolute;
+    font-family:var(--display);
+    font-size:clamp(20px,3.6vw,42px);
+    line-height:1;white-space:nowrap;
+    text-shadow:0 0 20px currentColor, 0 0 46px currentColor;
+    animation:pop 1.2s cubic-bezier(.15,.85,.3,1) forwards;
+  }
+  @keyframes pop{
+    0%  {opacity:0; transform:translate(-50%,0)      scale(.55) rotate(var(--r))}
+    12% {opacity:1; transform:translate(-50%,-16px)  scale(1.14) rotate(var(--r))}
+    22% {           transform:translate(-50%,-26px)  scale(1)   rotate(var(--r))}
+    100%{opacity:0; transform:translate(-50%,-150px) scale(.9)  rotate(var(--r))}
+  }
+
+  /* ---------- slam stamp ---------- */
+  .stamp{
+    position:fixed;left:50%;top:44%;z-index:52;pointer-events:none;
+    font-family:var(--display);
+    font-size:clamp(46px,12vw,142px);
+    line-height:.9;letter-spacing:.03em;white-space:nowrap;
+    color:#fff;opacity:0;
+    transform:translate(-50%,-50%) scale(.4);
+    text-shadow:0 0 30px var(--iii), 0 0 90px var(--iii), 0 0 160px var(--ii);
+  }
+  .stamp.on{animation:slam .8s cubic-bezier(.1,.9,.2,1) forwards}
+  @keyframes slam{
+    0%  {opacity:0; transform:translate(-50%,-50%) scale(2.6) rotate(-7deg)}
+    16% {opacity:1; transform:translate(-50%,-50%) scale(1)   rotate(-7deg)}
+    62% {opacity:1; transform:translate(-50%,-50%) scale(1)   rotate(-7deg)}
+    100%{opacity:0; transform:translate(-50%,-50%) scale(1.08) rotate(-7deg)}
+  }
+
+  /* ---------- club hud ---------- */
+  .hud{
+    position:fixed;top:16px;left:16px;z-index:60;
+    display:flex;align-items:center;gap:10px;
+    padding:7px 11px 8px;
+    font-family:var(--mono);font-size:10px;font-weight:700;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
+    background:rgba(15,11,24,.9);
+    border:1px solid var(--line-hot);border-radius:2px;
+  }
+  .hud .rec{
+    width:7px;height:7px;border-radius:50%;background:var(--iii);
+    box-shadow:0 0 calc(3px + var(--p) * 16px) var(--iii);
+    opacity:calc(.3 + var(--p) * .7);
+  }
+  .hud .bl{display:flex;gap:3px}
+  .hud .bl i{display:block;width:5px;height:11px;background:#2A2046}
+  .hud .bl i.on{background:var(--i);box-shadow:0 0 9px var(--i)}
 
   #lasers{
     position:fixed;inset:0;z-index:1;pointer-events:none;
@@ -102,7 +181,7 @@
     max-width:78ch;margin:0 auto;
     padding:clamp(30px,6vw,60px) clamp(18px,5vw,28px) 140px;
     display:flex;flex-direction:column;gap:clamp(46px,7vw,78px);
-    transform:translate3d(var(--shx,0px), var(--shy,0px), 0);
+    transform:translate3d(var(--shx,0px), var(--shy,0px), 0) scale(calc(1 + var(--pd) * .014));
     will-change:transform;
   }
 
@@ -220,8 +299,11 @@
     color:var(--k);text-shadow:0 0 calc(14px + var(--pd) * 26px) var(--k);
   }
   .trait-name{
-    font-family:var(--mono);font-size:11px;font-weight:700;
-    letter-spacing:.24em;text-transform:uppercase;color:var(--k);
+    font-family:var(--display);
+    font-size:clamp(22px,4.2vw,36px);
+    line-height:.9;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--k);
+    text-shadow:0 0 calc(8px + var(--pd) * 30px) var(--k);
   }
   .trait-t{
     font-family:var(--display);
@@ -367,7 +449,11 @@
 <div class="grid" aria-hidden="true"></div>
 <div class="strobe" aria-hidden="true"></div>
 <div class="scan" aria-hidden="true"></div>
-<div class="tear" id="tear" aria-hidden="true"></div>
+<div class="tears" id="tears" aria-hidden="true"></div>
+<div class="frame" aria-hidden="true"></div>
+<div class="inv" id="inv" aria-hidden="true"></div>
+<div class="pops" id="pops" aria-hidden="true"></div>
+<div class="stamp" id="stamp" aria-hidden="true"></div>
 
 <audio id="track" src="track.mp3" preload="auto" loop></audio>
 
@@ -383,6 +469,12 @@
     <p class="gate-sub">Three reasons to bring me. Two of them are red flags. Volume up.</p>
     <button class="gate-btn" id="enter" type="button">Hear me out</button>
   </div>
+</div>
+
+<div class="hud" id="hud" aria-hidden="true">
+  <span class="rec"></span>
+  <span id="hudTxt">145 BPM</span>
+  <span class="bl" id="hudBl"><i></i><i></i><i></i><i></i></span>
 </div>
 
 <button id="mute" type="button" aria-label="Toggle sound">
@@ -425,7 +517,7 @@
       <article class="trait" style="--k:#B14BFF;--kf:rgba(177,75,255,.16)">
         <div class="trait-top">
           <span class="trait-n">II</span>
-          <span class="trait-name">Mine now</span>
+          <span class="trait-name">I press everything</span>
         </div>
         <p class="trait-t">Every save in the key is mine, there is nobody else.</p>
         <p>Four of you, zero personal defensives pressed between you, and one Lay on Hands deciding which of you has earned it this pull. Your bar drops, it is already in the air. Tank presses a wall two seconds late, I cover the gap and nobody sees it happen. That is the point. <b>You do not get to watch the saves, you only get to notice you are still standing.</b></p>
@@ -493,12 +585,17 @@
 
 <script>
 (function(){
-  /* measured off track.mp3 after the intro was cut: 145 bpm */
-  var BEAT = 0.41394, OFFSET = 0.365;
+  /* measured off track.mp3: 145 bpm, drop lands 2s after the cut */
+  var BEAT = 0.41394, OFFSET = 2.365;
 
   var track   = document.getElementById('track');
   var gateEl  = document.getElementById('gate');
-  var tearEl  = document.getElementById('tear');
+  var tearsEl = document.getElementById('tears');
+  var popsEl  = document.getElementById('pops');
+  var stampEl = document.getElementById('stamp');
+  var invEl   = document.getElementById('inv');
+  var hudTxt  = document.getElementById('hudTxt');
+  var hudBl   = document.getElementById('hudBl').children;
   var muteBtn = document.getElementById('mute');
   var muteTxt = document.getElementById('muteTxt');
   var root    = document.documentElement;
@@ -562,7 +659,7 @@
   var HUES = [188, 285, 338, 78];
   function newBeams(){
     BEAMS = [];
-    var n = 5 + Math.floor(Math.random() * 4);
+    var n = 7 + Math.floor(Math.random() * 5);
     var base = Math.random() * Math.PI * 2;
     var hue = HUES[Math.floor(Math.random() * HUES.length)];
     for (var i = 0; i < n; i++){
@@ -603,6 +700,60 @@
     lx.globalCompositeOperation = 'source-over';
   }
 
+  /* ---- floating abuse ---- */
+  var POPS = [
+    "SKILL ISSUE","KICK IT","PRESS IT","1%","THAT WAS ME","STILL ALIVE",
+    "-1 KEY","LOL","MINE","OFF COOLDOWN","WHO KICKED? NOBODY","YOU ARE WELCOME",
+    "HEALER DIFF? YES","GG GO NEXT","I SAW THAT","DPS DIFF? NO","AGAIN","+2"
+  ];
+  var POPC = ['#00E5FF','#B14BFF','#FF2E6A','#C6FF3D','#FFFFFF'];
+  function popOff(){
+    var e = document.createElement('span');
+    e.className = 'pop';
+    e.textContent = POPS[Math.floor(Math.random() * POPS.length)];
+    e.style.left = (6 + Math.random() * 88) + 'vw';
+    e.style.top  = (14 + Math.random() * 68) + 'vh';
+    e.style.color = POPC[Math.floor(Math.random() * POPC.length)];
+    e.style.setProperty('--r', ((Math.random() - 0.5) * 16).toFixed(1) + 'deg');
+    popsEl.appendChild(e);
+    setTimeout(function(){ if (e.parentNode) e.parentNode.removeChild(e); }, 1300);
+  }
+
+  /* ---- slice tears ---- */
+  var TCOL = [
+    'linear-gradient(90deg, rgba(0,229,255,.6), rgba(177,75,255,.5) 48%, rgba(255,46,106,.55))',
+    'linear-gradient(90deg, rgba(255,46,106,.6), rgba(198,255,61,.45) 55%, rgba(0,229,255,.5))',
+    'linear-gradient(90deg, rgba(198,255,61,.5), rgba(255,255,255,.45) 50%, rgba(177,75,255,.5))'
+  ];
+  function tear(n){
+    for (var i = 0; i < n; i++){
+      var e = document.createElement('div');
+      e.className = 'tearb';
+      e.style.top = (Math.random() * 92) + 'vh';
+      e.style.height = (2 + Math.random() * 34) + 'px';
+      e.style.background = TCOL[Math.floor(Math.random() * TCOL.length)];
+      e.style.setProperty('--tx', ((Math.random() - 0.5) * 90).toFixed(0) + 'px');
+      tearsEl.appendChild(e);
+      setTimeout(function(el){ return function(){ if (el.parentNode) el.parentNode.removeChild(el); }; }(e), 260);
+    }
+  }
+
+  /* ---- slam stamp ---- */
+  var STAMPS = ["SKILL ISSUE","THAT WAS ME","PRESS YOUR KICK","STILL ALIVE","YOU ARE WELCOME","NOT MY FAULT"];
+  var si = 0;
+  function slam(){
+    stampEl.textContent = STAMPS[si++ % STAMPS.length];
+    stampEl.classList.remove('on');
+    void stampEl.offsetWidth;
+    stampEl.classList.add('on');
+  }
+
+  /* ---- invert kick ---- */
+  function invert(ms){
+    invEl.classList.add('on');
+    setTimeout(function(){ invEl.classList.remove('on'); }, ms);
+  }
+
   /* ---- text corruption ---- */
   var GLYPH = "!@#$%&*<>/\\|=+~";
   var TITLES = [].slice.call(document.querySelectorAll('.trait-t'));
@@ -629,16 +780,26 @@
         if (b !== lastBeat){
           lastBeat = b;
           p = 1;
-          if (b % 4 === 0){ pd = 1; sh = 1; newBeams(); }
-          root.style.setProperty('--hue', ((b >> 4) * 26 % 360) + 'deg');
-          if (b % 16 === 0){
-            tearEl.style.top = (Math.random() * 70 + 8) + 'vh';
-            tearEl.style.height = (3 + Math.random() * 26) + 'px';
-            tearEl.classList.add('on');
-            setTimeout(function(){ tearEl.classList.remove('on'); }, 80);
-          }
-          if (b % 32 === 0 && TITLES.length){
-            corrupt(TITLES[Math.floor(Math.random() * TITLES.length)]);
+          if (b >= 0){
+            var m4 = ((b % 4) + 4) % 4;
+            if (m4 === 0){ pd = 1; sh = 1; newBeams(); }
+
+            root.style.setProperty('--hue', ((b >> 4) * 26 % 360) + 'deg');
+
+            /* hud */
+            for (var q = 0; q < 4; q++){ hudBl[q].className = (q === m4) ? 'on' : ''; }
+            hudTxt.textContent = '145 BPM  BAR ' + (Math.floor(b / 4) + 1);
+
+            /* abuse, constantly */
+            popOff();
+            if (m4 === 0) popOff();
+            if (b % 8 === 0) tear(2 + Math.floor(Math.random() * 3));
+            if (b % 16 === 0) tear(4);
+            if (b % 16 === 8 && TITLES.length){
+              corrupt(TITLES[Math.floor(Math.random() * TITLES.length)]);
+            }
+            if (b % 32 === 0){ slam(); invert(70); }
+            if (b % 64 === 32) invert(110);
           }
         }
         p  *= 0.80;
