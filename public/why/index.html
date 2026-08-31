@@ -533,13 +533,12 @@
     background:#000;opacity:0;
     transition:opacity .06s linear;   /* out instantly, so the return hits */
   }
-  /* falls fast, so it is already black well before the bass leaves.
-     the old ease-in curve was still 87% transparent a second in. */
-  body.hush .veil{opacity:.985;transition:opacity 1.5s cubic-bezier(.3,.85,.45,1)}
+  /* the veil only drops for the break itself, not the whole wind down */
+  body.dark .veil{opacity:.985;transition:opacity .5s cubic-bezier(.3,.85,.45,1)}
   body.hush .ticker-in{animation-play-state:paused}
   body.hush .rave,
   body.hush .grid,
-  body.hush .strobe{opacity:0;transition:opacity 1.1s cubic-bezier(.3,.85,.45,1)}
+  body.hush .strobe{opacity:0;transition:opacity 1.6s ease-out}
 
   /* ---------- phase five: everything moves ---------- */
   .page.gl{transform:translate3d(var(--shx,0px), var(--shy,0px), 0) skewX(-3deg) scale(1.02)}
@@ -1148,7 +1147,7 @@
      beat 124 (bar 32) the effects stop and the screen starts going down,
      beat 129 is where the bass actually drops out and it is fully black,
      beat 134 is where the bass comes back. */
-  var BREAK_B_IN = 124, BREAK_B_OUT = 134;
+  var BREAK_B_IN = 124, DARK_B = 128, BREAK_B_OUT = 134;
   var LEAD = 0.10;
   var phase = 0, ph = 0, calm = false;
   var tickIn = document.getElementById('tick');
@@ -1311,6 +1310,11 @@
 
         /* the track goes quiet mid way. so does everything else */
         var hush = (bNow >= BREAK_B_IN && bNow < BREAK_B_OUT);
+        var dark = (bNow >= DARK_B && bNow < BREAK_B_OUT);
+        if (dark !== inDark){
+          inDark = dark;
+          document.body.classList.toggle('dark', dark);
+        }
         if (hush !== inBreak){
           inBreak = hush;
           document.body.classList.toggle('hush', hush);
