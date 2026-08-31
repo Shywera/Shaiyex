@@ -553,6 +553,7 @@
 </div>
 
 <audio id="track" src="track.mp3" preload="auto" loop></audio>
+<audio id="achSfx" src="ach.mp3" preload="auto"></audio>
 
 <div class="gate" id="gate">
   <div class="gate-in">
@@ -895,8 +896,17 @@
     "Lay on Hands: Sniper","Healer Diff Confirmed","Timed It Despite You",
     "Kicked It While Casting","Still The Best Player Here","Heel"
   ];
-  var ai = 0;
+  var ai = 0, lastAch = -99;
+  var achSfx = document.getElementById('achSfx');
   function toast(){
+    if (!muted){
+      try {
+        achSfx.currentTime = 0;
+        achSfx.volume = 0.85;
+        var pr = achSfx.play();
+        if (pr && pr.catch) pr.catch(function(){});
+      } catch (e2){}
+    }
     var e = document.createElement('div');
     e.className = 'toast';
     e.innerHTML = '<span class="ico">&#9733;</span><span><span class="tt">Achievement earned</span><br>' +
@@ -1033,7 +1043,11 @@
             if (phase >= 2){
               var sev = phase >= 4 ? 8 : phase >= 3 ? 12 : 16;
               if (b % sev === 0){ slam(); invert(60 + phase * 12); }
-              if (b % 8 === 4) toast();
+              /* one achievement every 20 seconds, no more */
+              if (m4 === 0 && (track.currentTime < lastAch || track.currentTime - lastAch > 20)){
+                lastAch = track.currentTime;
+                toast();
+              }
               if (b % 8 === 2 && TITLES.length){
                 corrupt(TITLES[Math.floor(Math.random() * TITLES.length)]);
               }
