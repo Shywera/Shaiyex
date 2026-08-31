@@ -1006,12 +1006,31 @@
   /* ---- slam stamp ---- */
   var STAMPS = [
     "THAT WAS ME","SIT DOWN DOG","GUESS WHO SAVED YOU","SAY THANK YOU",
-    "COUNT YOUR KICKS","SIT DOWN DOG","I CARRIED THAT","ALSO ME","NOT MY FAULT","STILL ME"
+    "COUNT YOUR KICKS","I CARRIED THAT","ALSO ME","NOT MY FAULT","STILL ME",
+    "WHO PRESSED THAT","YOUR CAST, MY PROBLEM","I WAS THE KEY","SAY IT LOUDER",
+    "NOBODY ELSE DID THAT","ZERO DEATHS","LOOK AT THE LOG","YOU HAD ONE JOB",
+    "MY COOLDOWNS, YOUR LIFE","YOU DID NOT NOTICE","EIGHT PERCENT","ASK ME HOW",
+    "STILL CARRYING","ONE BUTTON","I NEVER MISS","THAT WAS ME AGAIN","HEEL",
+    "YOU WERE DEAD","I DECIDED OTHERWISE","NO, IT WAS ME","TIMED IT ANYWAY"
   ];
+  /* shuffle once so the order is never the same twice, then walk it in
+     sequence, which is what actually stops the same word coming back */
+  for (var q = STAMPS.length - 1; q > 0; q--){
+    var r = Math.floor(Math.random() * (q + 1));
+    var tmp = STAMPS[q]; STAMPS[q] = STAMPS[r]; STAMPS[r] = tmp;
+  }
   var si = 0;
   function tilt(){
     var deg = 5 + Math.random() * 10;
     return (Math.random() < 0.5 ? -deg : deg).toFixed(1) + 'deg';
+  }
+  /* the stamp is one element, so never let two beats fight over it,
+     and give it a few ms so it lands on the hit instead of just before it */
+  var lastSlamB = -99, SLAM_LEAD = 55;
+  function slamSoon(b){
+    if (b === lastSlamB) return;
+    lastSlamB = b;
+    setTimeout(slam, SLAM_LEAD);
   }
   function slam(){
     stampEl.textContent = swapping ? swapWord : STAMPS[si++ % STAMPS.length];
@@ -1176,7 +1195,7 @@
     swapping = true;
     var w = word || SWAPW[sw++ % SWAPW.length];
     swapWord = w;
-    slam();          /* the takeover announces itself */
+    slamSoon(lastBeat);   /* the takeover announces itself, once */
     tear(6);
 
     /* the wall goes black, changes what it says, then lights back up */
@@ -1292,7 +1311,7 @@
             }
             if (ef >= 2){
               var sev = ef >= 5 ? 4 : ef >= 4 ? 8 : ef >= 3 ? 12 : 16;
-              if (b % sev === 0){ slam(); invert(60 + ef * 12); }
+              if (b % sev === 0){ slamSoon(b); invert(60 + ef * 12); }
               if (b % 8 === 2 && TITLES.length){
                 corrupt(TITLES[Math.floor(Math.random() * TITLES.length)]);
               }
