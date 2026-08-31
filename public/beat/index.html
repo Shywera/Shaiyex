@@ -162,7 +162,7 @@
 
   /* ---------- playfield ---------- */
   .field{
-    position:relative;flex:1 1 auto;min-height:180px;
+    position:relative;flex:1 1 auto;min-height:300px;
     border:1px solid var(--line);
     border-radius:3px;
     background:
@@ -172,7 +172,7 @@
   }
   #pf{display:block;width:100%;height:100%}
   .judge{
-    position:absolute;left:0;right:0;top:16%;
+    position:absolute;left:0;right:0;top:50%;
     text-align:center;pointer-events:none;
     font-family:var(--display);
     font-size:clamp(24px,4.4vw,44px);
@@ -423,7 +423,7 @@
 
   /* windows, in seconds */
   var W_PERF = 0.055, W_GOOD = 0.11, W_HIT = 0.16;
-  var APPROACH = 1.7;          /* how long a cast is on screen before its beat */
+  var APPROACH = 2.0;          /* how long a cast is on screen before its beat */
   var REZ_STREAK = 30;
 
   var track  = document.getElementById('track');
@@ -542,7 +542,28 @@
     }
   }
 
-  function now(){ return track.currentTime + offset; }
+  /* currentTime only updates a handful of times a second, so reading it
+     straight gives stepped motion. sample it when it actually changes and
+     run on performance.now() in between, snapping back if we drift. */
+  var ctLast = -1, ctAt = 0, ctBase = 0, ctReady = false;
+  function clock(){
+    var ct = track.currentTime;
+    var pn = performance.now() / 1000;
+    if (ct !== ctLast){
+      ctLast = ct;
+      var interp = ctBase + (pn - ctAt);
+      /* small disagreement: ease toward the truth. large: snap */
+      if (ctReady && Math.abs(interp - ct) < 0.08) ctBase = interp + (ct - interp) * 0.25;
+      else ctBase = ct;
+      ctAt = pn;
+      ctReady = true;
+      return ctBase + offset;
+    }
+    if (!ctReady) return ct + offset;
+    return ctBase + (pn - ctAt) + offset;
+  }
+  function clockReset(){ ctLast = -1; ctAt = 0; ctBase = 0; ctReady = false; }
+  function now(){ return clock(); }
 
   function press(){
     if (!running) return;
@@ -590,15 +611,18 @@
   }
 
   /* ---- drawing ---- */
-  var W = 0, H = 0, HITX = 0;
+  /* boss timeline: casts fall from the top onto the interrupt line */
+  var W = 0, H = 0, HITY = 0, LANE_X = 0, LANE_W = 0;
   function size(){
     var r = cv.getBoundingClientRect();
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     W = r.width; H = r.height;
-    cv.width = Math.max(1, W * dpr);
-    cv.height = Math.max(1, H * dpr);
+    cv.width = Math.max(1, Math.round(W * dpr));
+    cv.height = Math.max(1, Math.round(H * dpr));
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    HITX = Math.round(W * 0.17);
+    HITY = Math.round(H * 0.80);
+    LANE_W = Math.round(Math.min(460, W * 0.86));
+    LANE_X = Math.round((W - LANE_W) / 2);
   }
   window.addEventListener('resize', size);
 
@@ -606,70 +630,77 @@
   function draw(){
     ctx.clearRect(0, 0, W, H);
     var t = now();
+    var travel = HITY;
 
     /* the lane */
-    var laneY = H * 0.5, laneH = Math.min(96, H * 0.44);
-    ctx.fillStyle = 'rgba(255,255,255,.025)';
-    ctx.fillRect(0, laneY - laneH / 2, W, laneH);
+    ctx.fillStyle = 'rgba(255,255,255,.022)';
+    ctx.fillRect(LANE_X, 0, LANE_W, HITY);
 
-    /* beat ticks sliding by, so you can see the grid */
-    var b0 = Math.floor((t - ZERO) / BEAT) - 1;
-    for (var k = b0; k < b0 + 14; k++){
-      var bt = ZERO + k * BEAT;
-      var bx = HITX + (bt - t) / APPROACH * (W - HITX);
-      if (bx < -20 || bx > W + 20) continue;
+    /* the beat grid, so you can read the tempo without sound */
+    var b0 = Math.floor((t - ZERO) / BEAT);
+    for (var k = b0; k < b0 + Math.ceil(APPROACH / BEAT) + 2; k++){
+      var dtb = (ZERO + k * BEAT) - t;
+      if (dtb < 0 || dtb > APPROACH) continue;
+      var by = Math.round((1 - dtb / APPROACH) * travel);
       var strong = (((k % 4) + 4) % 4) === 0;
-      ctx.fillStyle = strong ? 'rgba(255,255,255,.13)' : 'rgba(255,255,255,.05)';
-      ctx.fillRect(bx, laneY - laneH / 2, 1, laneH);
+      ctx.fillStyle = strong ? 'rgba(255,255,255,.11)' : 'rgba(255,255,255,.04)';
+      ctx.fillRect(LANE_X, by, LANE_W, 1);
     }
 
-    /* the hit line */
-    ctx.fillStyle = 'rgba(255,43,209,' + (0.5 + flash * 0.5) + ')';
-    ctx.fillRect(HITX - 2, laneY - laneH / 2 - 8, 4, laneH + 16);
-    ctx.fillStyle = 'rgba(255,255,255,' + (0.15 + flash * 0.85) + ')';
-    ctx.fillRect(HITX - 1, laneY - laneH / 2 - 8, 2, laneH + 16);
+    /* the interrupt line */
     if (flash > 0.02){
-      ctx.fillStyle = 'rgba(255,43,209,' + (0.16 * flash) + ')';
-      ctx.fillRect(HITX - 40, laneY - laneH / 2 - 8, 80, laneH + 16);
+      ctx.fillStyle = 'rgba(255,43,209,' + (0.14 * flash) + ')';
+      ctx.fillRect(LANE_X - 10, HITY - 26, LANE_W + 20, 52);
     }
     flash *= 0.86;
+    ctx.fillStyle = 'rgba(255,43,209,.75)';
+    ctx.fillRect(LANE_X - 10, HITY - 2, LANE_W + 20, 4);
+    ctx.fillStyle = 'rgba(255,255,255,' + (0.35 + flash * 0.65) + ')';
+    ctx.fillRect(LANE_X - 10, HITY - 1, LANE_W + 20, 2);
 
     /* the casts */
-    var bh = Math.min(40, laneH * 0.44);
-    ctx.font = '600 9px JetBrains Mono, monospace';
-    ctx.textAlign = 'right';
+    var bh = Math.max(20, Math.min(30, H * 0.055));
+    ctx.textBaseline = 'middle';
     for (var i = idx; i < notes.length; i++){
       var n = notes[i];
       var dt = n.t - t;
       if (dt > APPROACH) break;
       if (n.hit || n.gone) continue;
-      var x = HITX + dt / APPROACH * (W - HITX);
-      var wpx = Math.max(64, Math.min(120, W * 0.11));
+
+      var y = (1 - dt / APPROACH) * travel;
       var half = n.b % 1 !== 0;
       var col = half ? '0,224,255' : '255,43,209';
-      var a = dt < 0 ? 0.5 : 1;
+      var a = dt < 0 ? 0.45 : 1;
+      var top = y - bh;
 
-      ctx.fillStyle = 'rgba(10,5,20,.9)';
-      ctx.fillRect(x - wpx, laneY - bh / 2, wpx, bh);
-      ctx.strokeStyle = 'rgba(' + col + ',' + (0.85 * a) + ')';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(x - wpx + .5, laneY - bh / 2 + .5, wpx - 1, bh - 1);
+      ctx.fillStyle = 'rgba(10,5,20,.92)';
+      ctx.fillRect(LANE_X, top, LANE_W, bh);
 
-      /* fill shows how much of the cast is left */
+      /* the bar drains as the cast completes, like a real cast bar */
       var fill = Math.max(0, Math.min(1, 1 - dt / APPROACH));
-      ctx.fillStyle = 'rgba(' + col + ',' + (0.4 * a) + ')';
-      ctx.fillRect(x - wpx, laneY - bh / 2, wpx * fill, bh);
+      ctx.fillStyle = 'rgba(' + col + ',' + (0.34 * a) + ')';
+      ctx.fillRect(LANE_X, top, LANE_W * fill, bh);
 
-      /* the leading edge, the thing you actually time against */
+      ctx.strokeStyle = 'rgba(' + col + ',' + (0.8 * a) + ')';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(LANE_X + .5, top + .5, LANE_W - 1, bh - 1);
+
+      /* the leading edge is what you time against */
       ctx.fillStyle = 'rgba(255,255,255,' + a + ')';
-      ctx.fillRect(x - 2, laneY - bh / 2 - 3, 2, bh + 6);
+      ctx.fillRect(LANE_X, y - 2, LANE_W, 2);
 
-      if (wpx > 78){
-        ctx.fillStyle = 'rgba(255,255,255,' + (0.75 * a) + ')';
-        ctx.fillText(n.name.toUpperCase().slice(0, 14), x - 7, laneY + 3);
+      if (bh >= 22){
+        ctx.font = '600 10px JetBrains Mono, monospace';
+        ctx.textAlign = 'left';
+        ctx.fillStyle = 'rgba(255,255,255,' + (0.8 * a) + ')';
+        ctx.fillText(n.name.toUpperCase(), LANE_X + 10, top + bh / 2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = 'rgba(255,255,255,' + (0.4 * a) + ')';
+        ctx.fillText(dt > 0 ? dt.toFixed(1) : '0.0', LANE_X + LANE_W - 10, top + bh / 2);
       }
     }
     ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
   }
 
   /* ---- the loop ---- */
@@ -713,6 +744,7 @@
   function start(){
     build();
     size();
+    clockReset();
     audioInit();
     if (AC && AC.state === 'suspended') { try { AC.resume(); } catch(e){} }
     try {
