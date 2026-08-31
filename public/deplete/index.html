@@ -478,18 +478,24 @@
   var muteTxt = document.getElementById('muteTxt');
   var muted   = false;
 
+  var audioOn = false;
+  [theme, buzz].forEach(function(el){
+    el.addEventListener('playing', function(){ audioOn = true; });
+  });
+
+  /* never guard on .paused: play() flips it to false synchronously and only
+     rejects later, so a blocked attempt would make every retry a no-op */
   function start(el, vol){
     if (muted) return;
     try {
       el.volume = vol;
-      if (!el.paused) return;
       var pr = el.play();
       if (pr && pr.catch) pr.catch(function(){});
     } catch (e){}
   }
   function playTheme(){
     start(theme, 0.45);
-    start(buzz, 0.22);
+    start(buzz, 0.55);
   }
   function setMuted(v){
     muted = v;
@@ -499,14 +505,17 @@
   }
   muteBtn.addEventListener('click', function(){ setMuted(!muted); });
 
-  function armOnce(){
+  /* keep trying on every interaction until something is actually audible */
+  function arm(){
+    if (audioOn){
+      document.removeEventListener('pointerdown', arm, true);
+      document.removeEventListener('keydown', arm, true);
+      return;
+    }
     playTheme();
-    document.removeEventListener('pointerdown', armOnce, true);
-    document.removeEventListener('keydown', armOnce, true);
   }
-  document.addEventListener('pointerdown', armOnce, true);
-  document.addEventListener('keydown', armOnce, true);
-  playTheme();   // works if the browser already trusts this origin
+  document.addEventListener('pointerdown', arm, true);
+  document.addEventListener('keydown', arm, true);
 
   /* ---- the sign: flicker timings measured from neon.mp3 itself,
          so the light and the recording stay locked together ---- */
@@ -516,9 +525,8 @@
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     // seconds into the clip where the sign actually stutters
-    var EVENTS = [0.445,1.074,1.191,1.283,3.074,3.085,3.577,4.133,4.234,4.921,
-                  5.551,6.593,7.048,7.585,7.955,8.106,9.089,9.552,9.702,10.273,
-                  11.844,12.071,13.415,13.583,14.105,14.532,14.709];
+    var EVENTS = [1.025,1.115,1.665,4.12,4.25,4.725,5.15,5.25,5.675,7.625,7.75,8.105,8.32,8.83,8.99,10.135,10.45,11.055,12.885,13.015,13.345,13.695,14.405,14.51,15.195,15.35];
+    var POWER  = [0.713,0.893,0.594,0.451,0.517,0.366,0.264,0.096,0.056,0.989,0.521,0.404,0.068,0.322,0.061,0.528,0.1,0.05,0.696,0.377,0.665,0.061,0.38,0.442,0.309,0.1];
 
     var FULL  = '0 0 24px rgba(255,74,70,.85), 0 0 70px rgba(200,30,30,.6), 0 0 160px rgba(200,30,30,.35)';
     var DYING = '0 0 6px rgba(255,74,70,.2)';
@@ -531,16 +539,17 @@
       h1.style.textShadow = FULL;
       if (bleed) bleed.style.opacity = '';
     }
-    function out(){
-      var deep = Math.random() < .72;
-      var lvl  = deep ? 0.04 : 0.45;
+    function out(power){
+      var p    = (power == null) ? 0.5 : power;
+      var deep = p > 0.3;
+      var lvl  = deep ? 0.04 : 0.5 - p * 0.4;
       h1.style.opacity = String(lvl);
       h1.style.transform = 'translateX(' + (Math.random()*22-11).toFixed(1) + 'px) skewX(' +
                            (Math.random()*9-4.5).toFixed(1) + 'deg)';
       h1.style.textShadow = deep ? 'none' : DYING;
       if (bleed) bleed.style.opacity = String(Math.max(lvl*0.5, 0.07));
       clearTimeout(offT);
-      offT = setTimeout(lit, deep ? 70 + Math.random()*160 : 50 + Math.random()*90);
+      offT = setTimeout(lit, deep ? 90 + p * 240 : 45 + Math.random() * 70);
     }
 
     /* while the recording plays, follow its playhead */
@@ -550,7 +559,7 @@
         var t = buzz.currentTime;
         if (t < prev - 0.2){ idx = 0; }          // looped
         prev = t;
-        while (idx < EVENTS.length && t >= EVENTS[idx]){ out(); idx++; }
+        while (idx < EVENTS.length && t >= EVENTS[idx]){ out(POWER[idx]); idx++; }
       }
       requestAnimationFrame(follow);
     }
@@ -559,7 +568,7 @@
     /* muted or blocked: keep the sign alive on its own */
     (function solo(){
       setTimeout(function(){
-        if (buzz.paused) out();
+        if (buzz.paused) out(Math.random());
         solo();
       }, 900 + Math.random()*2600);
     })();
