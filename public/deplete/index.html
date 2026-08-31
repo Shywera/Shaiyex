@@ -104,17 +104,49 @@
       radial-gradient(90% 55% at 50% 0%, rgba(200,30,30,.16), rgba(200,30,30,0) 62%),
       radial-gradient(70% 45% at 0% 100%, rgba(200,30,30,.12), rgba(200,30,30,0) 60%),
       radial-gradient(70% 45% at 100% 100%, rgba(200,30,30,.12), rgba(200,30,30,0) 60%);
-    animation:bleed 7s ease-in-out infinite;
+    animation:bleed 7.5s steps(1) infinite;
   }
   @keyframes bleed{
-    0%,100%{opacity:.62}
-    46%{opacity:.9}
-    49%{opacity:.28}
-    56%{opacity:.34}
-    60%{opacity:.85}
-    84%{opacity:.5}
+    0%,11%{opacity:.62}
+    12%{opacity:.12}
+    18%,40%{opacity:.78}
+    41%,52%{opacity:.08}
+    56%{opacity:.3}
+    60%,78%{opacity:.7}
+    79%{opacity:.14}
+    86%,100%{opacity:.62}
   }
   .page{position:relative;z-index:1}
+
+  #mute{
+    position:fixed;
+    top:16px;right:16px;
+    z-index:66;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 12px 9px;
+    font-family:var(--mono);
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--dim);
+    background:rgba(14,9,11,.9);
+    border:1px solid var(--line-hot);
+    border-radius:2px;
+    cursor:pointer;
+    transition:color .2s ease, border-color .2s ease;
+  }
+  #mute:hover{color:var(--text);border-color:var(--red)}
+  #mute:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+  #mute .eq{display:flex;align-items:flex-end;gap:2px;height:12px}
+  #mute .eq i{display:block;width:2px;background:var(--red-hot);animation:eq .9s ease-in-out infinite}
+  #mute .eq i:nth-child(1){height:5px;animation-delay:0s}
+  #mute .eq i:nth-child(2){height:11px;animation-delay:.15s}
+  #mute .eq i:nth-child(3){height:7px;animation-delay:.3s}
+  @keyframes eq{0%,100%{transform:scaleY(.45)}50%{transform:scaleY(1)}}
+  #mute.off .eq i{animation:none;transform:scaleY(.3);background:var(--dimmer)}
 
   .backlink{
     position:fixed;
@@ -153,25 +185,9 @@
     margin:.2em 0 0;
     color:var(--red-hot);
     text-shadow:0 0 24px rgba(255,74,70,.85), 0 0 70px rgba(200,30,30,.6), 0 0 160px rgba(200,30,30,.35);
-    animation:neon 7.5s steps(1) infinite;
     will-change:opacity,transform;
   }
   /* a tube on its way out: snaps off, leans, buzzes back */
-  @keyframes neon{
-    0%,16%   {opacity:1;   transform:none;                           text-shadow:0 0 24px rgba(255,74,70,.85), 0 0 70px rgba(200,30,30,.6), 0 0 160px rgba(200,30,30,.35)}
-    17%      {opacity:.18; transform:translateX(-4px) skewX(-2.5deg);text-shadow:0 0 8px rgba(255,74,70,.25)}
-    18%      {opacity:1;   transform:none;                           text-shadow:0 0 24px rgba(255,74,70,.85), 0 0 70px rgba(200,30,30,.6), 0 0 160px rgba(200,30,30,.35)}
-    19%      {opacity:.10; transform:translateX(3px) skewX(1.5deg);  text-shadow:none}
-    21%,48%  {opacity:1;   transform:none;                           text-shadow:0 0 24px rgba(255,74,70,.85), 0 0 70px rgba(200,30,30,.6), 0 0 160px rgba(200,30,30,.35)}
-    49%,55%  {opacity:.08; transform:translateX(-6px) skewX(2deg);   text-shadow:none}
-    56%      {opacity:.75; transform:translateX(-2px);               text-shadow:0 0 8px rgba(255,74,70,.25)}
-    57%      {opacity:.12; transform:translateX(2px);                text-shadow:none}
-    59%,83%  {opacity:1;   transform:none;                           text-shadow:0 0 24px rgba(255,74,70,.85), 0 0 70px rgba(200,30,30,.6), 0 0 160px rgba(200,30,30,.35)}
-    84%      {opacity:.22; transform:translateX(5px) skewX(-1.5deg); text-shadow:0 0 8px rgba(255,74,70,.25)}
-    85%      {opacity:1;   transform:translateX(1px);                text-shadow:0 0 24px rgba(255,74,70,.85), 0 0 70px rgba(200,30,30,.6), 0 0 160px rgba(200,30,30,.35)}
-    86%      {opacity:.3;  transform:translateX(-1px);               text-shadow:none}
-    88%,100% {opacity:1;   transform:none;                           text-shadow:0 0 24px rgba(255,74,70,.85), 0 0 70px rgba(200,30,30,.6), 0 0 160px rgba(200,30,30,.35)}
-  }
 
   h2{
     font-family:var(--display);
@@ -318,6 +334,13 @@
 
 <div class="bleed" aria-hidden="true"></div>
 
+<audio id="theme" src="theme.mp3" preload="none" loop></audio>
+<audio id="buzz" src="neon.mp3" preload="auto" loop></audio>
+<button id="mute" type="button" aria-label="Toggle sound">
+  <span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>
+  <span id="muteTxt">Sound on</span>
+</button>
+
 <a class="bl-btn" href="#blacklist">Blacklist</a>
 
 <a class="backlink" href="/">← shaiyex.com</a>
@@ -447,6 +470,102 @@
       listEl.appendChild(wrap);
     });
   }
+
+  /* ---- theme: browsers will not autoplay, so it starts on the first input ---- */
+  var theme   = document.getElementById('theme');
+  var buzz    = document.getElementById('buzz');
+  var muteBtn = document.getElementById('mute');
+  var muteTxt = document.getElementById('muteTxt');
+  var muted   = false;
+
+  function start(el, vol){
+    if (muted) return;
+    try {
+      el.volume = vol;
+      if (!el.paused) return;
+      var pr = el.play();
+      if (pr && pr.catch) pr.catch(function(){});
+    } catch (e){}
+  }
+  function playTheme(){
+    start(theme, 0.45);
+    start(buzz, 0.22);
+  }
+  function setMuted(v){
+    muted = v;
+    muteBtn.classList.toggle('off', muted);
+    muteTxt.textContent = muted ? 'Sound off' : 'Sound on';
+    if (muted){ try { theme.pause(); buzz.pause(); } catch (e){} } else { playTheme(); }
+  }
+  muteBtn.addEventListener('click', function(){ setMuted(!muted); });
+
+  function armOnce(){
+    playTheme();
+    document.removeEventListener('pointerdown', armOnce, true);
+    document.removeEventListener('keydown', armOnce, true);
+  }
+  document.addEventListener('pointerdown', armOnce, true);
+  document.addEventListener('keydown', armOnce, true);
+  playTheme();   // works if the browser already trusts this origin
+
+  /* ---- the sign: flicker timings measured from neon.mp3 itself,
+         so the light and the recording stay locked together ---- */
+  (function(){
+    var h1 = document.querySelector('h1');
+    if (!h1) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // seconds into the clip where the sign actually stutters
+    var EVENTS = [0.445,1.074,1.191,1.283,3.074,3.085,3.577,4.133,4.234,4.921,
+                  5.551,6.593,7.048,7.585,7.955,8.106,9.089,9.552,9.702,10.273,
+                  11.844,12.071,13.415,13.583,14.105,14.532,14.709];
+
+    var FULL  = '0 0 24px rgba(255,74,70,.85), 0 0 70px rgba(200,30,30,.6), 0 0 160px rgba(200,30,30,.35)';
+    var DYING = '0 0 6px rgba(255,74,70,.2)';
+    var bleed = document.querySelector('.bleed');
+    var offT  = null;
+
+    function lit(){
+      h1.style.opacity = '1';
+      h1.style.transform = 'none';
+      h1.style.textShadow = FULL;
+      if (bleed) bleed.style.opacity = '';
+    }
+    function out(){
+      var deep = Math.random() < .72;
+      var lvl  = deep ? 0.04 : 0.45;
+      h1.style.opacity = String(lvl);
+      h1.style.transform = 'translateX(' + (Math.random()*22-11).toFixed(1) + 'px) skewX(' +
+                           (Math.random()*9-4.5).toFixed(1) + 'deg)';
+      h1.style.textShadow = deep ? 'none' : DYING;
+      if (bleed) bleed.style.opacity = String(Math.max(lvl*0.5, 0.07));
+      clearTimeout(offT);
+      offT = setTimeout(lit, deep ? 70 + Math.random()*160 : 50 + Math.random()*90);
+    }
+
+    /* while the recording plays, follow its playhead */
+    var idx = 0, prev = 0;
+    function follow(){
+      if (!buzz.paused && !buzz.ended){
+        var t = buzz.currentTime;
+        if (t < prev - 0.2){ idx = 0; }          // looped
+        prev = t;
+        while (idx < EVENTS.length && t >= EVENTS[idx]){ out(); idx++; }
+      }
+      requestAnimationFrame(follow);
+    }
+    requestAnimationFrame(follow);
+
+    /* muted or blocked: keep the sign alive on its own */
+    (function solo(){
+      setTimeout(function(){
+        if (buzz.paused) out();
+        solo();
+      }, 900 + Math.random()*2600);
+    })();
+
+    lit();
+  })();
 
   render();
 

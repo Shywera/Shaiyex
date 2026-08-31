@@ -218,6 +218,16 @@
     background:linear-gradient(180deg,#E3625F,#A82A28);
     box-shadow:0 0 22px rgba(214,65,63,.45);
   }
+  .sim[data-state="ready"] .bar{opacity:.45}
+  .sim[data-state="ready"] .bar-label{color:var(--dimmer)}
+  .sim[data-state="ready"] .glyph{opacity:.35}
+  .sim[data-state="ready"] kbd{display:none}
+  .sim[data-state="ready"] .kick-btn{animation:readyPulse 2.6s ease-in-out infinite}
+  @keyframes readyPulse{
+    0%,100%{box-shadow:0 0 0 rgba(233,168,60,0)}
+    50%{box-shadow:0 0 26px rgba(233,168,60,.55)}
+  }
+
   .sim[data-state="done"] .bar{opacity:.5}
   .sim[data-state="done"] .bar-label{color:var(--dimmer)}
   .sim[data-state="done"] .glyph{opacity:.4}
@@ -1148,40 +1158,6 @@
   /* out of the way while a run is live, like the mute button */
   body.locked .backlink{opacity:0;pointer-events:none}
 
-  /* ---------- blacklist button ---------- */
-  .bl-btn{
-    position:fixed;
-    top:0;left:50%;
-    transform:translateX(-50%);
-    z-index:65;
-    display:flex;
-    align-items:center;
-    gap:9px;
-    padding:11px 22px 12px;
-    font-family:"JetBrains Mono","IBM Plex Mono",Consolas,monospace;
-    font-size:11px;
-    font-weight:700;
-    letter-spacing:.2em;
-    text-transform:uppercase;
-    color:#FFD9D7;
-    text-decoration:none;
-    background:linear-gradient(180deg,#2A0A0C,#140406);
-    border:1px solid #6E2224;
-    border-top:none;
-    border-radius:0 0 3px 3px;
-    box-shadow:0 0 26px rgba(200,30,30,.45), 0 0 60px rgba(200,30,30,.22);
-    animation:blPulse 3.4s ease-in-out infinite;
-    transition:color .2s ease, border-color .2s ease;
-  }
-  .bl-btn::before{content:"";width:7px;height:7px;border-radius:50%;background:#FF4A46;box-shadow:0 0 10px #FF4A46}
-  .bl-btn:hover{color:#fff;border-color:#C81E1E;box-shadow:0 0 40px rgba(200,30,30,.75)}
-  .bl-btn:focus-visible{outline:2px solid #FF4A46;outline-offset:3px}
-  @keyframes blPulse{
-    0%,100%{box-shadow:0 0 20px rgba(200,30,30,.35), 0 0 50px rgba(200,30,30,.16)}
-    50%{box-shadow:0 0 34px rgba(200,30,30,.6), 0 0 78px rgba(200,30,30,.3)}
-  }
-  @media (max-width:520px){.bl-btn{font-size:10px;padding:9px 14px 10px;letter-spacing:.14em}}
-
   /* ---------- master mute ---------- */
   #mute{
     position:fixed;
@@ -1207,7 +1183,6 @@
   #mute:hover{color:var(--text);border-color:var(--amber)}
   /* out of the way mid-run — a stray click here would kill the music */
   body.locked #mute{opacity:0;pointer-events:none}
-  body.locked .bl-btn{opacity:0;pointer-events:none}
   #mute:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
   #mute .eq{display:flex;align-items:flex-end;gap:2px;height:12px}
   #mute .eq i{
@@ -1758,7 +1733,6 @@
 <body>
 
 
-<a class="bl-btn" href="/deplete/#blacklist">Blacklist</a>
 <a class="backlink" href="/">← shaiyex.com</a>
 
 <div class="page">
@@ -1772,10 +1746,10 @@
       <button type="button" id="povJoined" aria-pressed="false">I just joined</button>
     </div>
 
-    <div class="sim panel" id="sim" data-state="idle">
+    <div class="sim panel" id="sim" data-state="ready">
       <div class="caster">
         <span><b>Trash Pack</b> · elite · not marked, because nobody ever marks</span>
-        <span id="simTag">casting</span>
+        <span id="simTag">not started</span>
       </div>
 
       <div class="bar-row">
@@ -1783,14 +1757,14 @@
         <div class="bar" role="progressbar" aria-label="Enemy cast bar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="bar">
           <div class="fill" id="fill"></div>
           <div class="bar-label">
-            <span class="n" id="spellName">Shadow Bolt Volley</span>
-            <span class="t" id="timer">2.2</span>
+            <span class="n" id="spellName">Nothing casting yet</span>
+            <span class="t" id="timer">—</span>
           </div>
         </div>
       </div>
 
       <div class="sim-foot">
-        <button class="kick-btn" id="kickBtn" type="button">KICK</button>
+        <button class="kick-btn" id="kickBtn" type="button">START</button>
         <kbd>SPACE</kbd>
         <span class="verdict" id="verdict">Press it before the bar fills. Five in a row and you're invited. Miss two and we're done.</span>
       </div>
@@ -3923,7 +3897,7 @@
     if (fn) fn(); else stopSim('Run over. Press RUN IT AGAIN for normal casts.');
   }
 
-  var state = 'idle', start = 0, dur = 2.2, cur = SPELLS[0], raf = null;
+  var state = 'ready', start = 0, dur = 2.2, cur = SPELLS[0], raf = null;
   var hits = 0, miss = 0, streak = 0, missStreak = 0;
 
   function setTally(){
@@ -4028,6 +4002,7 @@
   }
 
   function kick(){
+    if (state === 'ready'){ startGate(); return; }
     if (mode === 'challenge' || mode === 'ultra'){
       var now = performance.now();
 
@@ -4115,6 +4090,14 @@
     verdict.className = 'verdict';
     verdict.textContent = msg;
     kickBtn.textContent = 'RUN IT AGAIN';
+  }
+
+  function startGate(){
+    kickBtn.textContent = 'KICK';
+    verdict.className = 'verdict';
+    verdict.textContent = 'Press it before the bar fills. Five in a row and you’re invited. Miss two and we’re done.';
+    loop = true;
+    reset();
   }
 
   function restart(){
@@ -4361,7 +4344,6 @@
   })();
 
   setTally();
-  beginCast();
 
   // ---- ready check ----
   var boxes    = Array.prototype.slice.call(document.querySelectorAll('.ox')),
