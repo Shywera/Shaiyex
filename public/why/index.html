@@ -527,6 +527,18 @@
   }
 
 
+  /* ---------- the hush: lights out, everything stops ---------- */
+  .veil{
+    position:fixed;inset:0;z-index:65;pointer-events:none;
+    background:#000;opacity:0;
+    transition:opacity .1s ease;   /* out fast, so the return hits */
+  }
+  body.hush .veil{opacity:.985;transition:opacity .5s ease}
+  body.hush .ticker-in{animation-play-state:paused}
+  body.hush .rave,
+  body.hush .grid,
+  body.hush .strobe{opacity:0;transition:opacity .5s ease}
+
   /* ---------- phase five: everything moves ---------- */
   .page.gl{transform:translate3d(var(--shx,0px), var(--shy,0px), 0) skewX(-3deg) scale(1.02)}
 
@@ -643,6 +655,7 @@
 <div class="tears" id="tears" aria-hidden="true"></div>
 <div class="frame" aria-hidden="true"></div>
 <div class="inv" id="inv" aria-hidden="true"></div>
+<div class="veil" aria-hidden="true"></div>
 <div class="wall" id="wall" aria-hidden="true"><div class="cut" id="cut"></div></div>
 <div class="pops" id="pops" aria-hidden="true"></div>
 <div class="stamp" id="stamp" aria-hidden="true"></div>
@@ -1129,8 +1142,9 @@
     { b: 68, k: 'Phase four',  t: 'SIT DOWN DOG', s: 'no notes' },
     { b: 135, k: 'Phase five', t: 'HOLD ON TO SOMETHING', s: 'you asked for the healer' }
   ];
-  /* the track drops out here. measured off the file, not guessed */
-  var BREAK_IN = 55.85, BREAK_OUT = 58.00;
+  /* the hush. held on bar lines so it cuts clean:
+     beat 120 is the top of bar 31, beat 135 is where the track comes back */
+  var BREAK_B_IN = 120, BREAK_B_OUT = 135;
   var phase = 0, ph = 0, calm = false;
   var tickIn = document.getElementById('tick');
   var readBtn = document.getElementById('readbtn');
@@ -1251,7 +1265,16 @@
     if (phase >= 4){
       setTimeout(finale, 1100);   /* lands right after the phase call clears */
     }
-    if (phase >= 5) document.body.classList.add('p5');
+    if (phase >= 5){
+      document.body.classList.add('p5');
+      /* boom */
+      p = 1; pd = 1; sh = 1;
+      joltA = 46;
+      tear(14);
+      invert(220);
+      slamSoon(lastBeat);
+      newBeams();
+    }
   }
 
   /* ---- text corruption ---- */
@@ -1277,11 +1300,13 @@
     if (!reduce){
       if (!track.paused && !track.ended){
         var now = track.currentTime;
+        var bNow = Math.floor((now - OFFSET) / BEAT);
 
         /* the track goes quiet mid way. so does everything else */
-        var hush = (now >= BREAK_IN && now < BREAK_OUT);
+        var hush = (bNow >= BREAK_B_IN && bNow < BREAK_B_OUT);
         if (hush !== inBreak){
           inBreak = hush;
+          document.body.classList.toggle('hush', hush);
           if (hush){
             popsClear(); tearsClear();
             stampEl.classList.remove('on');
