@@ -168,6 +168,14 @@
   .hud .bl{display:flex;gap:3px}
   .hud .bl i{display:block;width:5px;height:11px;background:#2A2046}
   .hud .bl i.on{background:var(--i);box-shadow:0 0 9px var(--i)}
+  .phud{top:53px}
+  .phud .pips{display:flex;gap:4px}
+  .phud .pips i{
+    display:block;width:12px;height:4px;background:#2A2046;
+    transition:background .3s ease, box-shadow .3s ease;
+  }
+  .phud .pips i.lit{background:var(--iii);box-shadow:0 0 10px var(--iii)}
+  .phud .nm{color:var(--text)}
 
   #lasers{
     position:fixed;inset:0;z-index:1;pointer-events:none;
@@ -387,17 +395,35 @@
     letter-spacing:.04em;color:var(--dimmer);
   }
 
-  /* ---------- wall of me ---------- */
-  .mewall{
-    position:fixed;inset:-25%;z-index:1;pointer-events:none;
+  /* ---------- stencil wall, light behind it ---------- */
+  .wall{
+    position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden;
     display:none;
+    background:rgba(6,4,10, calc(.93 - var(--pd) * .26));
+  }
+  .wall .cut{
+    position:absolute;inset:-16%;
     font-family:var(--display);
-    font-size:clamp(44px,6.6vw,84px);
-    line-height:.9;letter-spacing:.08em;
-    color:#fff;opacity:0;
-    transform:rotate(-11deg);
-    overflow:hidden;word-break:break-word;
-    mix-blend-mode:overlay;
+    font-size:clamp(38px,5.6vw,76px);
+    line-height:.86;letter-spacing:.07em;
+    word-break:break-word;
+    transform:rotate(-8deg);
+    color:transparent;
+    -webkit-background-clip:text;
+    background-clip:text;
+    background-image:
+      radial-gradient(34% 28% at var(--lx,50%) var(--ly,42%),
+        rgba(255,255,255,.98) 0%,
+        rgba(0,229,255,.85) 22%,
+        rgba(177,75,255,.62) 44%,
+        rgba(255,46,106,.28) 62%,
+        rgba(255,255,255,0) 76%),
+      radial-gradient(60% 50% at 82% 88%,
+        rgba(198,255,61,.35), rgba(198,255,61,0) 60%),
+      linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.035));
+    filter:brightness(calc(.5 + var(--pd) * 1.7)) saturate(1.25);
+    opacity:calc((.3 + var(--p) * .7) * var(--wall, .3));
+    transition:background-position .5s ease;
   }
 
   /* ---------- achievement spam ---------- */
@@ -541,7 +567,7 @@
 <div class="tears" id="tears" aria-hidden="true"></div>
 <div class="frame" aria-hidden="true"></div>
 <div class="inv" id="inv" aria-hidden="true"></div>
-<div class="mewall" id="mewall" aria-hidden="true"></div>
+<div class="wall" id="wall" aria-hidden="true"><div class="cut" id="cut"></div></div>
 <div class="pops" id="pops" aria-hidden="true"></div>
 <div class="stamp" id="stamp" aria-hidden="true"></div>
 <div class="toasts" id="toasts" aria-hidden="true"></div>
@@ -573,6 +599,11 @@
   <span class="rec"></span>
   <span id="hudTxt">145 BPM</span>
   <span class="bl" id="hudBl"><i></i><i></i><i></i><i></i></span>
+</div>
+
+<div class="hud phud" id="phud" aria-hidden="true">
+  <span class="nm" id="phaseTxt">Phase 0</span>
+  <span class="pips" id="phasePips"><i></i><i></i><i></i><i></i></span>
 </div>
 
 <button id="mute" type="button" aria-label="Toggle sound">
@@ -721,7 +752,10 @@
   var invEl   = document.getElementById('inv');
   var hudTxt  = document.getElementById('hudTxt');
   var hudBl   = document.getElementById('hudBl').children;
-  var meEl    = document.getElementById('mewall');
+  var wallEl  = document.getElementById('wall');
+  var cutEl   = document.getElementById('cut');
+  var phTxt   = document.getElementById('phaseTxt');
+  var phPips  = document.getElementById('phasePips').children;
   var toastEl = document.getElementById('toasts');
   var curEl   = document.getElementById('cursor');
   var phEl    = document.getElementById('phase');
@@ -891,10 +925,10 @@
 
   /* ---- achievement spam ---- */
   var ACH = [
-    "Carried Again","Nobody Noticed","Saved Someone Who Did Not Deserve It",
-    "Pressed Everything Myself","Zero Deaths, Zero Thanks","Interrupted It For You",
-    "Lay on Hands: Sniper","Healer Diff Confirmed","Timed It Despite You",
-    "Kicked It While Casting","Still The Best Player Here","Heel"
+    "Got Boosted","Pressed Nothing For 28 Minutes","Watched Someone Else Play",
+    "Kick Still On Cooldown","Blamed The Healer","Stood In It Twice",
+    "Said Unlucky","Took A Free +2","Typed More Than You Kicked",
+    "Never Pressed A Defensive","Died To The Avoidable One","Carried Again"
   ];
   var ai = 0, lastAch = -99;
   var achSfx = document.getElementById('achSfx');
@@ -917,12 +951,17 @@
     setTimeout(function(){ if (e.parentNode) e.parentNode.removeChild(e); }, 3900);
   }
 
-  /* ---- wall of me ---- */
+  /* ---- stencil wall ---- */
   (function(){
+    var W = ['ALL ME','THAT WAS ME','MINE','STILL ME','MY KEY','SHAIYEX','ME','ALSO ME'];
     var s = [];
-    for (var i = 0; i < 500; i++) s.push(i % 7 === 6 ? 'SHAIYEX' : 'ALL ME');
-    meEl.textContent = s.join(' ');
+    for (var i = 0; i < 340; i++) s.push(W[i % W.length]);
+    cutEl.textContent = s.join(' ');
   })();
+  function sweep(){
+    cutEl.style.setProperty('--lx', (8 + Math.random() * 84).toFixed(0) + '%');
+    cutEl.style.setProperty('--ly', (10 + Math.random() * 78).toFixed(0) + '%');
+  }
 
   /* ---- cursor stalker ---- */
   var CURW = ["STILL ME","THAT WAS ME","ALSO ME","MINE","ME","SIT DOWN DOG"];
@@ -935,7 +974,7 @@
 
   /* ---- phases ---- */
   var PHASES = [
-    { b: 8,  k: 'Phase one',   t: 'WARM UP',      s: 'you are already behind' },
+    { b: 8,  k: '', t: '', s: '' },   /* silent, the room just gets louder */
     { b: 20, k: 'Phase two',   t: 'THAT WAS ME',  s: 'and that one, and that one' },
     { b: 40, k: 'Phase three', t: 'ALL ME',       s: 'say it back' },
     { b: 68, k: 'Phase four',  t: 'SIT DOWN DOG', s: 'no notes' }
@@ -977,16 +1016,28 @@
 
   function enterPhase(d){
     phase++;
-    phEl.children[0].textContent = d.k;
-    phEl.children[1].textContent = d.t;
-    phEl.children[2].textContent = d.s;
-    phEl.classList.remove('on');
-    void phEl.offsetWidth;
-    phEl.classList.add('on');
+
+    phTxt.textContent = 'Phase ' + phase;
+    for (var i = 0; i < phPips.length; i++){
+      phPips[i].className = (i < phase) ? 'lit' : '';
+    }
+
+    if (d.t){
+      phEl.children[0].textContent = d.k;
+      phEl.children[1].textContent = d.t;
+      phEl.children[2].textContent = d.s;
+      phEl.classList.remove('on');
+      void phEl.offsetWidth;
+      phEl.classList.add('on');
+    }
     invert(150);
     tear(10);
     tickIn.style.animationDuration = Math.max(11, 46 - phase * 9) + 's';
-    if (phase >= 3) meEl.style.display = 'block';
+    if (phase >= 3){
+      wallEl.style.display = 'block';
+      root.style.setProperty('--wall', phase >= 4 ? '1' : '.62');
+      sweep();
+    }
     if (phase >= 4){
       curEl.classList.add('on');
       setTimeout(finale, 1100);   /* lands right after the phase call clears */
@@ -1027,8 +1078,8 @@
 
             /* hud */
             for (var q = 0; q < 4; q++){ hudBl[q].className = (q === m4) ? 'on' : ''; }
-            hudTxt.textContent = '145 BPM  BAR ' + (Math.floor(b / 4) + 1) +
-                                 (phase ? '  P' + phase : '');
+            hudTxt.textContent = '145 BPM  BAR ' + (Math.floor(b / 4) + 1);
+            if (phase >= 3 && b % 8 === 0) sweep();
 
             /* the ramp */
             while (ph < PHASES.length && b >= PHASES[ph].b){ enterPhase(PHASES[ph]); ph++; }
@@ -1065,7 +1116,6 @@
       root.style.setProperty('--pd', pd.toFixed(3));
       root.style.setProperty('--shx', ((Math.random() - 0.5) * sh * 7).toFixed(2) + 'px');
       root.style.setProperty('--shy', ((Math.random() - 0.5) * sh * 5).toFixed(2) + 'px');
-      if (phase >= 3) meEl.style.opacity = (0.05 + p * 0.16).toFixed(3);
       if (phase >= 4 && curEl.className.indexOf('on') > -1 && Math.random() < 0.02){
         curEl.textContent = CURW[Math.floor(Math.random() * CURW.length)];
       }
