@@ -310,6 +310,7 @@
     font-variant-numeric:tabular-nums;
   }
   .tier-wr{color:var(--gold)}
+  .tier.hc .tier-wr{color:var(--dimmer)}
   .tier-cls{font-size:14px;color:var(--dim)}
   .tier.peak{
     background:linear-gradient(90deg, rgba(240,200,104,.13), rgba(240,200,104,0) 78%);
@@ -620,11 +621,11 @@
     color:var(--gold-hot);
     filter:drop-shadow(0 0 26px rgba(240,200,104,.4));
   }
+  .ms-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
   .ms-sub{color:var(--dim);font-size:15.5px;margin:.7em 0 0;line-height:1.5}
   .ms-sub b{color:var(--text);font-weight:600}
   .ms-link{
     display:inline-block;
-    margin-top:16px;
     font-family:var(--mono);
     font-size:11px;
     letter-spacing:.15em;
@@ -811,19 +812,20 @@
   <section>
     <div class="mainstage">
       <div class="ms-left">
-        <p class="eyebrow">Current main</p>
         <h2 class="ms-name">Shaiyex</h2>
-        <p class="ms-sub"><b>Lightforged Draenei · Holy Paladin</b><br>&lt;Deception&gt;<br>Holy Paladin main. Staying Holy Paladin.</p>
-        <a class="ms-link" href="https://raider.io/characters/eu/argent-dawn/Shaiyex" target="_blank" rel="noopener">Raider.IO profile</a>
+        <div class="ms-links">
+          <a class="ms-link" href="https://raider.io/characters/eu/argent-dawn/Shaiyex" target="_blank" rel="noopener">Raider.IO</a>
+          <a class="ms-link" href="https://www.warcraftlogs.com/character/eu/ravencrest/shyabel" target="_blank" rel="noopener">Warcraft Logs</a>
+        </div>
       </div>
       <div class="ms-right">
         <div class="ms-stat">
           <span class="ms-n" data-count="3212.4" data-dec="1">3,212.4</span>
-          <span class="ms-l">Mythic+ score<br>current season, healer</span>
+          <span class="ms-l">Mythic+ score<br>current season</span>
         </div>
         <div class="ms-stat">
-          <span class="ms-n" data-count="20530">20,530</span>
-          <span class="ms-l">Achievement<br>points</span>
+          <span class="ms-n">6/8 H</span>
+          <span class="ms-l">The Venomous Abyss<br>1/1 H Tidebound Grotto</span>
         </div>
         <span class="ms-live">Raider.IO · 30 Aug 2026</span>
       </div>
@@ -865,39 +867,39 @@
 
     <div class="xpac">
       <div class="xpac-name">Legion</div>
-      <div class="tier">
+      <div class="tier hc">
         <span class="tier-raid">Antorus</span>
         <span class="tier-prog">8/11 HC</span>
-        <span class="tier-wr">1,189 rio</span>
+        <span class="tier-wr">—</span>
         <span class="tier-cls">Prot paladin</span>
       </div>
     </div>
 
     <div class="xpac">
       <div class="xpac-name">Battle for Azeroth</div>
-      <div class="tier">
+      <div class="tier hc">
         <span class="tier-raid">Uldir</span>
         <span class="tier-prog">7/8 HC</span>
-        <span class="tier-wr">981 rio</span>
+        <span class="tier-wr">—</span>
         <span class="tier-cls">Holy paladin</span>
       </div>
       <div class="tier">
         <span class="tier-raid">Battle of Dazar'alor</span>
         <span class="tier-prog">3/9 M</span>
-        <span class="tier-wr">1,446 rio</span>
+        <span class="tier-wr">—</span>
         <span class="tier-cls">Holy paladin</span>
       </div>
       <div class="tier">
         <span class="tier-raid">Eternal Palace</span>
         <span class="tier-prog">5/8 M</span>
-        <span class="tier-wr">2,018 rio</span>
+        <span class="tier-wr">—</span>
         <span class="tier-cls">Holy paladin</span>
       </div>
       <div class="tier">
         <span class="tier-raid">Ny'alotha</span>
         <span class="tier-prog">12/12 M</span>
-        <span class="tier-wr">~700 WR</span>
-        <span class="tier-cls">Ret 5,065 rio · Holy 3,495 rio</span>
+        <span class="tier-wr">700 WR</span>
+        <span class="tier-cls">Ret and holy paladin</span>
       </div>
     </div>
 
@@ -906,25 +908,25 @@
       <div class="tier">
         <span class="tier-raid">Castle Nathria</span>
         <span class="tier-prog">9/10 M</span>
-        <span class="tier-wr">1,400 rio</span>
+        <span class="tier-wr">—</span>
         <span class="tier-cls">Windwalker monk</span>
       </div>
       <div class="tier">
         <span class="tier-raid">Sanctum of Domination</span>
         <span class="tier-prog">10/10 M</span>
-        <span class="tier-wr">~1300 WR</span>
+        <span class="tier-wr">1300 WR</span>
         <span class="tier-cls">Arms warrior</span>
       </div>
       <div class="tier">
         <span class="tier-raid">Sepulcher</span>
         <span class="tier-prog">11/11 M</span>
-        <span class="tier-wr">~900 WR</span>
+        <span class="tier-wr">900 WR</span>
         <span class="tier-cls">Fury warrior</span>
       </div>
-      <div class="tier">
+      <div class="tier hc">
         <span class="tier-raid">Fated</span>
         <span class="tier-prog">3/3 "CE"</span>
-        <span class="tier-wr">~300 WR</span>
+        <span class="tier-wr">300 WR</span>
         <span class="tier-cls">Resto shaman</span>
       </div>
     </div>
@@ -962,7 +964,7 @@
       <div class="tier">
         <span class="tier-raid">Manaforge Omega</span>
         <span class="tier-prog">8/8 M</span>
-        <span class="tier-wr">—</span>
+        <span class="tier-wr">400 WR</span>
         <span class="tier-cls">Paladin · &lt;Badkarma&gt;, Draenor</span>
       </div>
     </div>
@@ -1026,31 +1028,6 @@
 
   </section>
 
-  <section>
-    <div class="sec-head">
-      <p class="eyebrow">Video</p>
-      <h2>Video</h2>
-    </div>
-
-    <div class="links">
-      <div class="link-row">
-        <span class="link-what">Queen on mage <span>Newest</span></span>
-        <span class="link-a" style="color:var(--dimmer)">The Raid® Defense System uses a combination of products to help you when fighting bugs in your home.</span>
-      </div>
-      <div class="link-row">
-        <span class="link-what">Sark <span>Holy priest</span></span>
-        <span class="link-a"><a href="https://youtu.be/b5ZwZzXJtQU" target="_blank" rel="noopener">youtu.be/b5ZwZzXJtQU</a></span>
-      </div>
-      <div class="link-row">
-        <span class="link-what">Raz <span>Arms warrior</span></span>
-        <span class="link-a"><a href="https://youtu.be/F2l2yII6GVo" target="_blank" rel="noopener">youtu.be/F2l2yII6GVo</a></span>
-      </div>
-      <div class="link-row">
-        <span class="link-what">N'Zoth healing <span>Oldest — awesome tunes</span></span>
-        <span class="link-a"><a href="https://youtu.be/RL-fQSPNplg" target="_blank" rel="noopener">youtu.be/RL-fQSPNplg</a></span>
-      </div>
-    </div>
-  </section>
 
 
 

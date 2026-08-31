@@ -441,12 +441,6 @@
       </div>
     </div>
 
-    <div class="maker" id="maker" hidden>
-      <select id="mkDgn" aria-label="Dungeon"><option value="">Dungeon…</option></select>
-      <input id="mkLvl" type="number" min="2" max="40" value="15" aria-label="Key level">
-      <button class="btn ghost" id="mkCopy" type="button">Copy link</button>
-    </div>
-
     <p class="prose">Most of them do not survive the first pull. Nobody kicks, the healer dies, and it is gg go next before a single boss has gone down. Twenty-eight minutes some nights, ninety seconds on the rest.</p>
   </header>
 
@@ -461,9 +455,6 @@
     <div class="tally">
       <span class="tally-n" id="tallyN">0</span>
       <span class="tally-l">Keys bricked<br>and counting</span>
-      <button class="btn" id="addOne" type="button" hidden>Log another</button>
-      <button class="btn ghost" id="resetTally" type="button" hidden>Reset</button>
-      <span class="tally-hint" id="tallyHint" hidden></span>
     </div>
   </section>
 
@@ -473,23 +464,10 @@
       <h2>Blacklist.</h2>
     </div>
 
-    <p class="prose">Do not invite. This list is maintained by me — you cannot add to it.</p>
-
-    <div class="form" id="ownerForm" hidden>
-      <input id="avName" type="text" placeholder="Name-Realm" maxlength="60" autocomplete="off">
-      <input id="avLink" type="url" placeholder="raider.io link (optional)" maxlength="300" autocomplete="off">
-      <input id="avNote" type="text" placeholder="What they did" maxlength="120" autocomplete="off">
-      <button class="btn" id="avAdd" type="button">Add</button>
-    </div>
-    <div class="form" id="ownerTools" hidden style="grid-template-columns:auto auto;justify-content:start;margin-top:9px">
-      <button class="btn ghost" id="avExport" type="button">Copy for publishing</button>
-      <button class="btn ghost" id="avLock" type="button">Lock</button>
-    </div>
-
-    <p class="note" id="ownerNote" hidden><b>Owner mode.</b> Anything you add here is staged in this browser only. Hit <b>Copy for publishing</b> and send me the result to put it on the live list that everyone sees.</p>
+    <p class="prose">Do not invite. Maintained by me.</p>
 
     <div class="avoid" id="avList"></div>
-    <p class="empty" id="avEmpty">Nobody listed yet. Optimistic.</p>
+    <p class="empty" id="avEmpty">Nobody listed yet.</p>
   </section>
 
   <footer>
@@ -501,293 +479,85 @@
 </div>
 
 <script>
-  /* ---- the shared list: edit these entries to publish them for everyone ---- */
-  var DUNGEONS = [
-    {k:'KR',  n:"Kings' Rest"},
-    {k:'MR',  n:"Murder Row"},
-    {k:'TOS', n:"Temple of Sethraliss"},
-    {k:'RLP', n:"Ruby Life Pools"},
-    {k:'BV',  n:"The Blinding Vale"},
-    {k:'AOF', n:"Altar of Fangs"},
-    {k:'DON', n:"Den of Nalorakk"},
-    {k:'VSA', n:"Voidscar Arena"}
-  ];
-
-  /* ---- published values: overwritten by /blacklist.json when it loads ---- */
-  var DEPLETED = 1;
-
-  var BLACKLIST = [
-    {
-      name:  'Wannatotem',
-      realm: 'Twisting Nether (EU)',
-      link:  'https://raider.io/characters/eu/twisting-nether/Wannatotem',
-      note:  'Added after a depleted key.'
-    }
-  ];
-
 (function(){
-  /* ---- the key level drop, from ?lvl=12 if you want it accurate ---- */
-  var curLvl = 15, curDgn = '';
-  try {
-    var q = new URLSearchParams(location.search);
-    var lvl = parseInt(q.get('lvl'), 10);
-    if (!isNaN(lvl) && lvl > 1 && lvl < 40) curLvl = lvl;
-    var d = (q.get('d') || '').toUpperCase();
-    if (d) curDgn = d;
-  } catch (e){}
+  var DEPLETED  = 0;
+  var BLACKLIST = [];
 
-  function dgnName(k){
-    for (var i = 0; i < DUNGEONS.length; i++) if (DUNGEONS[i].k === k) return DUNGEONS[i].n;
-    return '';
-  }
-
-  function paintDrop(){
-    document.getElementById('wasLvl').textContent = '+' + curLvl;
-    document.getElementById('nowLvl').textContent = '+' + (curLvl - 1);
-    var el = document.getElementById('dgnName');
-    var nm = dgnName(curDgn);
-    el.textContent = nm;
-    el.hidden = !nm;
-  }
-  paintDrop();
-
-  /* ---- owner builds the link they send ---- */
-  var mkDgn = document.getElementById('mkDgn');
-  DUNGEONS.forEach(function(d){
-    var o = document.createElement('option');
-    o.value = d.k; o.textContent = d.n;
-    mkDgn.appendChild(o);
-  });
-  mkDgn.value = curDgn;
-  document.getElementById('mkLvl').value = String(curLvl);
-
-  function syncFromMaker(){
-    var v = parseInt(document.getElementById('mkLvl').value, 10);
-    if (!isNaN(v) && v > 1 && v < 40) curLvl = v;
-    curDgn = mkDgn.value;
-    paintDrop();
-  }
-  mkDgn.addEventListener('change', syncFromMaker);
-  document.getElementById('mkLvl').addEventListener('input', syncFromMaker);
-
-  document.getElementById('mkCopy').addEventListener('click', function(){
-    syncFromMaker();
-    var url = location.origin + location.pathname + '?lvl=' + curLvl + (curDgn ? '&d=' + curDgn : '');
-    var b = document.getElementById('mkCopy');
-    try { navigator.clipboard.writeText(url); b.textContent = 'Copied'; }
-    catch (e){ b.textContent = 'Copy failed'; }
-    setTimeout(function(){ b.textContent = 'Copy link'; }, 1600);
-  });
-
-  /* ---- running total of bricked keys ---- */
-  var nEl = document.getElementById('tallyN');
-  var hintEl = document.getElementById('tallyHint');
-
-  function readBump(){
-    try { return parseInt(localStorage.getItem('deplete.bump') || '0', 10) || 0; }
-    catch (e){ return 0; }
-  }
-  function writeBump(v){
-    try { localStorage.setItem('deplete.bump', String(v)); } catch (e){}
-    paintTally();
-  }
-  function paintTally(){
-    var bump = ownerOn() ? readBump() : 0;
-    nEl.textContent = String(DEPLETED + bump);
-    if (hintEl){
-      hintEl.hidden = !(ownerOn() && bump > 0);
-      hintEl.textContent = bump > 0
-        ? ('Published number is ' + DEPLETED + '. Tell me to set it to ' + (DEPLETED + bump) + '.')
-        : '';
-    }
-  }
-  document.getElementById('addOne').addEventListener('click', function(){ writeBump(readBump() + 1); });
-  document.getElementById('resetTally').addEventListener('click', function(){ writeBump(0); });
-
-  /* ---- avoid list: this browser only, never sent anywhere ---- */
   var listEl  = document.getElementById('avList');
   var emptyEl = document.getElementById('avEmpty');
-  var nameEl  = document.getElementById('avName');
-  var linkEl  = document.getElementById('avLink');
-  var noteEl  = document.getElementById('avNote');
+  var nEl     = document.getElementById('tallyN');
 
-  function load(){
-    try { return JSON.parse(localStorage.getItem('deplete.avoid') || '[]'); }
-    catch (e){ return []; }
-  }
-  function save(rows){
-    try { localStorage.setItem('deplete.avoid', JSON.stringify(rows)); } catch (e){}
-  }
+  var DUNGEONS = {
+    KR:"Kings' Rest", MR:"Murder Row", TOS:"Temple of Sethraliss",
+    RLP:"Ruby Life Pools", BV:"The Blinding Vale", AOF:"Altar of Fangs",
+    DON:"Den of Nalorakk", VSA:"Voidscar Arena"
+  };
+
+  /* the level and dungeon come from the link, e.g. ?lvl=15&d=KR */
+  var lvl = 15, dgn = '';
+  try {
+    var q = new URLSearchParams(location.search);
+    var n = parseInt(q.get('lvl'), 10);
+    if (!isNaN(n) && n > 1 && n < 40) lvl = n;
+    dgn = (q.get('d') || '').toUpperCase();
+  } catch (e){}
+
+  document.getElementById('wasLvl').textContent = '+' + lvl;
+  document.getElementById('nowLvl').textContent = '+' + (lvl - 1);
+  var dEl = document.getElementById('dgnName');
+  dEl.textContent = DUNGEONS[dgn] || '';
+  dEl.hidden = !DUNGEONS[dgn];
 
   function safeUrl(u){
-    if (!u) return '';
     try {
-      var p = new URL(u);
-      return (p.protocol === 'http:' || p.protocol === 'https:') ? p.href : '';
+      var x = new URL(u);
+      return (x.protocol === 'http:' || x.protocol === 'https:') ? x.href : '';
     } catch (e){ return ''; }
   }
 
   function render(){
-    var local = load();
+    nEl.textContent = String(DEPLETED);
     listEl.innerHTML = '';
-    emptyEl.hidden = (BLACKLIST.length + (ownerOn() ? local.length : 0)) > 0;
+    emptyEl.hidden = BLACKLIST.length > 0;
 
-    // published entries first — everyone who opens the page sees these
     BLACKLIST.forEach(function(r){
       var wrap = document.createElement('div');
       wrap.className = 'av';
 
-      var n = document.createElement('span');
-      n.className = 'av-n';
-      n.textContent = r.name;
+      var name = document.createElement('span');
+      name.className = 'av-n';
+      name.textContent = r.name;
       var sub = document.createElement('span');
       sub.textContent = [r.realm, r.note].filter(Boolean).join(' · ');
-      n.appendChild(sub);
+      name.appendChild(sub);
 
-      var l = document.createElement('span');
-      l.className = 'av-l';
-      var u = safeUrl(r.link);
+      var link = document.createElement('span');
+      link.className = 'av-l';
+      var u = safeUrl(r.link || '');
       if (u){
         var a = document.createElement('a');
         a.href = u; a.target = '_blank'; a.rel = 'noopener noreferrer';
         a.textContent = u.replace(/^https?:\/\//, '').slice(0, 52);
-        l.appendChild(a);
-      } else { l.textContent = '—'; l.style.color = 'var(--dimmer)'; }
-
-      var tag = document.createElement('span');
-      tag.className = 'av-tag';
-      tag.textContent = 'Listed';
-
-      wrap.appendChild(n); wrap.appendChild(l); wrap.appendChild(tag);
-      listEl.appendChild(wrap);
-    });
-
-    var rows = ownerOn() ? local : [];
-    rows.forEach(function(r, i){
-      var wrap = document.createElement('div');
-      wrap.className = 'av';
-
-      var n = document.createElement('span');
-      n.className = 'av-n';
-      n.textContent = r.name;                       // textContent: never parsed as markup
-      var when = document.createElement('span');
-      when.textContent = [r.note, r.when].filter(Boolean).join(' · ');
-      n.appendChild(when);
-
-      var l = document.createElement('span');
-      l.className = 'av-l';
-      var url = safeUrl(r.link);
-      if (url){
-        var a = document.createElement('a');
-        a.href = url;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        a.textContent = url.replace(/^https?:\/\//, '').slice(0, 52);
-        l.appendChild(a);
+        link.appendChild(a);
       } else {
-        l.textContent = '—';
-        l.style.color = 'var(--dimmer)';
+        link.textContent = '—';
+        link.style.color = 'var(--dimmer)';
       }
 
-      var mine = document.createElement('span');
-      mine.className = 'av-tag local';
-      mine.textContent = 'Yours only';
-      n.appendChild(mine);
-
-      var x = document.createElement('button');
-      x.className = 'av-x';
-      x.type = 'button';
-      x.textContent = 'Remove';
-      x.addEventListener('click', function(){
-        var cur = load();
-        cur.splice(i, 1);
-        save(cur);
-        render();
-      });
-
-      wrap.appendChild(n); wrap.appendChild(l); wrap.appendChild(x);
+      wrap.appendChild(name);
+      wrap.appendChild(link);
       listEl.appendChild(wrap);
     });
   }
 
-  function add(){
-    var name = (nameEl.value || '').trim();
-    if (!name) { nameEl.focus(); return; }
-    var rows = load();
-    rows.unshift({
-      name: name.slice(0, 60),
-      link: safeUrl((linkEl.value || '').trim()),
-      note: ((noteEl.value || '').trim()).slice(0, 120),
-      when: new Date().toLocaleDateString()
-    });
-    save(rows.slice(0, 200));
-    nameEl.value = ''; linkEl.value = ''; noteEl.value = '';
-    render();
-    nameEl.focus();
-  }
+  render();
 
-  /* ---- only the owner gets the add form ---- */
-  var OWNER_KEY = 'deplete.owner';
-  function ownerOn(){
-    try { return localStorage.getItem(OWNER_KEY) === '1'; } catch (e){ return false; }
-  }
-  function setOwner(v){
-    try { v ? localStorage.setItem(OWNER_KEY,'1') : localStorage.removeItem(OWNER_KEY); } catch (e){}
-    applyOwner();
-  }
-  function applyOwner(){
-    var on = ownerOn();
-    ['ownerForm','ownerNote','ownerTools','addOne','resetTally','maker'].forEach(function(id){
-      var el = document.getElementById(id);
-      if (el) el.hidden = !on;
-    });
-    paintTally();
-    render();
-  }
-  try {
-    var qs = new URLSearchParams(location.search);
-    if (qs.get('owner') === '1') setOwner(true);
-    if (qs.get('owner') === '0') setOwner(false);
-  } catch (e){}
-
-  document.getElementById('avLock').addEventListener('click', function(){ setOwner(false); });
-  document.getElementById('avExport').addEventListener('click', function(){
-    var rows = load();
-    if (!rows.length) return;
-    var NL = String.fromCharCode(10);
-    var out = rows.map(function(r){
-      return '    {' + NL +
-             '      name:  ' + JSON.stringify(r.name) + ',' + NL +
-             '      realm: "",' + NL +
-             '      link:  ' + JSON.stringify(r.link || '') + ',' + NL +
-             '      note:  ' + JSON.stringify(r.note || '') + NL +
-             '    }';
-    }).join(',' + NL);
-    var btn = document.getElementById('avExport');
-    try {
-      navigator.clipboard.writeText(out);
-      btn.textContent = 'Copied';
-    } catch (e){
-      btn.textContent = 'Copy failed';
-    }
-    setTimeout(function(){ btn.textContent = 'Copy for publishing'; }, 1800);
-  });
-
-  document.getElementById('avAdd').addEventListener('click', add);
-  [nameEl, linkEl, noteEl].forEach(function(el){
-    el.addEventListener('keydown', function(e){ if (e.key === 'Enter') add(); });
-  });
-
-  applyOwner();
-
-  /* ---- the published list and tally come from the spreadsheet ---- */
-  fetch('/blacklist.json', {cache: 'no-cache'})
+  fetch('/blacklist.json', {cache:'no-cache'})
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(d){
       if (!d) return;
       if (typeof d.depleted === 'number') DEPLETED = d.depleted;
       if (Array.isArray(d.entries)) BLACKLIST = d.entries;
-      paintTally();
       render();
     })
     .catch(function(){});
