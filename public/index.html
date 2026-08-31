@@ -252,6 +252,74 @@
 
   .door-4{--c:#B14BFF}
 
+  /* ---------- side tab, work in progress ---------- */
+  .wip{
+    position:fixed;
+    right:0;
+    top:50%;
+    transform:translateY(-50%);
+    z-index:40;
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:11px 14px 12px 15px;
+    background:linear-gradient(120deg, rgba(255,255,255,.05), rgba(255,255,255,0) 60%), #120A1E;
+    border:1px solid #4B2A7A;
+    border-right:0;
+    border-radius:3px 0 0 3px;
+    box-shadow:-6px 0 26px rgba(0,0,0,.5), 0 0 30px rgba(150,60,255,.22);
+    transition:transform .25s cubic-bezier(.2,.8,.25,1), box-shadow .25s ease, border-color .25s ease;
+  }
+  .wip:hover{
+    transform:translateY(-50%) translateX(-4px);
+    border-color:#8A4BFF;
+    box-shadow:-8px 0 34px rgba(0,0,0,.6), 0 0 44px rgba(150,60,255,.4);
+  }
+  .wip-t{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:15px;
+    line-height:1.1;
+    letter-spacing:-.01em;
+    color:var(--text);
+  }
+  .wip-s{
+    display:block;
+    font-family:var(--mono);
+    font-size:9.5px;
+    font-weight:600;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:#B98CFF;
+    margin-top:3px;
+  }
+  .wip-tag{
+    font-family:var(--mono);
+    font-size:9px;
+    font-weight:600;
+    letter-spacing:.14em;
+    padding:3px 6px 4px;
+    color:#0B0714;
+    background:#C08BFF;
+    border-radius:2px;
+    animation:wipPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes wipPulse{
+    0%,100%{opacity:1}
+    50%{opacity:.5}
+  }
+  @media (max-width:880px){
+    .wip{
+      position:static;
+      transform:none;
+      margin:18px auto 0;
+      width:fit-content;
+      border-right:1px solid #4B2A7A;
+      border-radius:3px;
+    }
+    .wip:hover{transform:none}
+  }
+
   /* ---------- blacklist strip ---------- */
   .blbar{
     position:relative;
@@ -366,7 +434,7 @@
 
     <p class="kicker">Holy Paladin</p>
     <h1>Shaiyex</h1>
-    <p class="sub">Mythic+ score, current keys and raid progression - and the two pages that exist because of pugs.</p>
+    <p class="sub">Holy Paladin. Twisting Nether.</p>
 
     <div class="doors">
       <a class="door door-1" href="/about/">
@@ -390,6 +458,14 @@
         <span class="door-go">Prove it →</span>
       </a>
     </div>
+
+    <a class="wip" href="/beat/">
+      <span>
+        <span class="wip-t">Interrupt on the beat</span>
+        <span class="wip-s">Rhythm mode</span>
+      </span>
+      <span class="wip-tag">WIP</span>
+    </a>
 
     <a class="blbar" href="/deplete/">
       <span class="bl-t">Blacklist</span>

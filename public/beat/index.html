@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Every kick is a cast bar. Interrupt it or someone dies.">
+<meta name="theme-color" content="#07030F">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Interrupt On The Beat">
+<meta property="og:description" content="150 BPM. 228 casts. Four people who die if you miss.">
+<meta property="og:url" content="https://shaiyex.com/beat/">
+<meta name="twitter:card" content="summary">
+<title>Interrupt On The Beat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap">
+
+<style>
+  :root{
+    --ink:#07030F;
+    --panel:#120B1F;
+    --line:#2C1B4A;
+    --line-hot:#4A2C82;
+    --text:#F5EEFF;
+    --dim:#A897C8;
+    --dimmer:#6E5F91;
+
+    --hot:#FF2BD1;      /* hardstyle magenta */
+    --cool:#00E0FF;
+    --volt:#B14BFF;
+    --acid:#C6FF3D;
+    --bad:#FF3B3B;
+
+    --display:"Bebas Neue","Arial Narrow",sans-serif;
+    --body:"Archivo","Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:"JetBrains Mono",Consolas,ui-monospace,monospace;
+
+    --p:0;
+    --pd:0;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--text);
+    font-family:var(--body);
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+    touch-action:manipulation;
+  }
+
+  /* ---------- room ---------- */
+  .lights{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(60% 50% at 15% 0%,   rgba(255,43,209,.26), rgba(255,43,209,0) 62%),
+      radial-gradient(58% 46% at 85% 6%,   rgba(0,224,255,.22),  rgba(0,224,255,0) 62%),
+      radial-gradient(80% 60% at 50% 104%, rgba(177,75,255,.30), rgba(177,75,255,0) 64%);
+    opacity:calc(.3 + var(--p) * .5 + var(--pd) * .2);
+  }
+  .floor{
+    position:fixed;inset:-20% -20% -45%;z-index:0;pointer-events:none;
+    background:
+      repeating-linear-gradient(90deg, rgba(177,75,255,.18) 0 1px, rgba(0,0,0,0) 1px 76px),
+      repeating-linear-gradient( 0deg, rgba(0,224,255,.10) 0 1px, rgba(0,0,0,0) 1px 76px);
+    transform:perspective(680px) rotateX(66deg);
+    opacity:calc(.14 + var(--p) * .26);
+    -webkit-mask-image:linear-gradient(180deg, rgba(0,0,0,0) 42%, #000 100%);
+    mask-image:linear-gradient(180deg, rgba(0,0,0,0) 42%, #000 100%);
+  }
+  .scan{
+    position:fixed;inset:0;z-index:6;pointer-events:none;
+    background:repeating-linear-gradient(180deg, rgba(0,0,0,.26) 0 1px, rgba(0,0,0,0) 1px 3px);
+    opacity:.45;mix-blend-mode:multiply;
+  }
+  .frame{
+    position:fixed;inset:0;z-index:7;pointer-events:none;
+    box-shadow:
+      inset 0 0 0 2px rgba(255,43,209,calc(var(--pd) * .55)),
+      inset 0 0 calc(18px + var(--pd) * 130px) rgba(177,75,255,calc(.04 + var(--pd) * .3));
+  }
+
+  /* ---------- stage ---------- */
+  .stage{
+    position:relative;z-index:2;
+    height:100%;
+    display:flex;flex-direction:column;
+    padding:clamp(10px,2vw,18px);
+    gap:clamp(8px,1.4vw,14px);
+  }
+
+  /* ---------- top bar ---------- */
+  .top{
+    display:flex;align-items:flex-start;justify-content:space-between;
+    gap:14px;flex-wrap:wrap;
+  }
+  .brand{display:flex;align-items:baseline;gap:10px}
+  .brand-t{
+    font-family:var(--display);font-size:clamp(20px,3vw,30px);
+    line-height:1;letter-spacing:.02em;color:var(--text);
+  }
+  .brand-s{
+    font-family:var(--mono);font-size:9.5px;font-weight:700;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--hot);
+  }
+  .stats{display:flex;gap:clamp(10px,2vw,22px);align-items:flex-end}
+  .stat{text-align:right;line-height:1}
+  .stat b{
+    display:block;font-family:var(--display);
+    font-size:clamp(22px,3.4vw,34px);line-height:1;
+    color:var(--text);font-variant-numeric:tabular-nums;
+  }
+  .stat span{
+    font-family:var(--mono);font-size:9px;font-weight:700;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--dimmer);
+  }
+  #combo b{color:var(--acid);text-shadow:0 0 calc(4px + var(--pd) * 20px) var(--acid)}
+  #combo.big b{font-size:clamp(30px,5vw,50px)}
+
+  /* ---------- party ---------- */
+  .party{display:flex;gap:8px;flex-wrap:wrap}
+  .pf{
+    flex:1 1 0;min-width:96px;
+    padding:8px 10px 9px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:3px solid var(--k);
+    border-radius:2px;
+    position:relative;overflow:hidden;
+    transition:opacity .3s ease, filter .3s ease;
+  }
+  .pf-n{
+    font-family:var(--mono);font-size:10px;font-weight:700;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--text);
+  }
+  .pf-r{
+    font-family:var(--mono);font-size:8.5px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--dimmer);
+    margin-top:2px;
+  }
+  .pf-hp{
+    margin-top:7px;height:5px;border-radius:2px;
+    background:#241634;overflow:hidden;
+  }
+  .pf-hp i{
+    display:block;height:100%;width:100%;
+    background:linear-gradient(90deg, var(--k), #fff);
+    transition:width .25s ease;
+  }
+  .pf.dead{opacity:.35;filter:grayscale(1)}
+  .pf.dead .pf-hp i{width:0}
+  .pf.dead::after{
+    content:"DEAD";
+    position:absolute;right:8px;top:7px;
+    font-family:var(--mono);font-size:9px;font-weight:700;
+    letter-spacing:.14em;color:var(--bad);
+  }
+  .pf.rez{animation:rez .7s ease}
+  @keyframes rez{
+    0%{box-shadow:0 0 0 rgba(198,255,61,0)}
+    35%{box-shadow:0 0 34px rgba(198,255,61,.85)}
+    100%{box-shadow:0 0 0 rgba(198,255,61,0)}
+  }
+
+  /* ---------- playfield ---------- */
+  .field{
+    position:relative;flex:1 1 auto;min-height:180px;
+    border:1px solid var(--line);
+    border-radius:3px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0) 40%),
+      #0C0618;
+    overflow:hidden;
+  }
+  #pf{display:block;width:100%;height:100%}
+  .judge{
+    position:absolute;left:0;right:0;top:16%;
+    text-align:center;pointer-events:none;
+    font-family:var(--display);
+    font-size:clamp(30px,6vw,58px);
+    line-height:1;opacity:0;
+  }
+  .judge.on{animation:judge .5s ease-out forwards}
+  @keyframes judge{
+    0%{opacity:0;transform:scale(1.5)}
+    14%{opacity:1;transform:scale(1)}
+    70%{opacity:1}
+    100%{opacity:0;transform:scale(1.04)}
+  }
+  .sect{
+    position:absolute;left:0;right:0;bottom:10px;
+    text-align:center;pointer-events:none;
+    font-family:var(--mono);font-size:10px;font-weight:700;
+    letter-spacing:.3em;text-transform:uppercase;color:var(--dimmer);
+  }
+
+  /* ---------- bottom ---------- */
+  .bottom{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:12px;flex-wrap:wrap;
+    font-family:var(--mono);font-size:10px;font-weight:700;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--dimmer);
+  }
+  .bottom a{color:var(--dim);text-decoration:none}
+  .bottom a:hover{color:var(--text)}
+  .key{
+    display:inline-block;padding:2px 7px 3px;margin:0 3px;
+    border:1px solid var(--line-hot);border-radius:2px;color:var(--dim);
+  }
+
+  /* ---------- overlays ---------- */
+  .over{
+    position:fixed;inset:0;z-index:40;
+    display:grid;place-items:center;text-align:center;padding:24px;
+    background:
+      radial-gradient(78% 60% at 50% 45%, rgba(177,75,255,.26) 0%, rgba(7,3,15,.985) 74%),
+      var(--ink);
+    transition:opacity .4s ease;
+  }
+  .over.gone{opacity:0;pointer-events:none}
+  .over-in{max-width:660px;width:100%}
+  .ov-k{
+    font-family:var(--mono);font-size:11px;font-weight:700;
+    letter-spacing:.26em;text-transform:uppercase;color:var(--cool);margin:0;
+  }
+  .ov-t{
+    font-family:var(--display);
+    font-size:clamp(46px,12vw,120px);line-height:.84;margin:.1em 0 0;
+    color:var(--text);
+    text-shadow:-4px 0 var(--hot), 4px 0 var(--cool), 0 0 70px rgba(177,75,255,.6);
+  }
+  .ov-s{margin:18px auto 0;max-width:46ch;color:var(--dim);font-size:15px;line-height:1.6}
+  .ov-s b{color:var(--text);font-weight:600}
+  .btn{
+    margin-top:26px;font-family:var(--display);
+    font-size:clamp(22px,4.6vw,36px);letter-spacing:.06em;
+    padding:11px 42px 13px;color:#07030F;background:var(--acid);
+    border:1px solid #E4FF8A;border-radius:2px;cursor:pointer;
+    box-shadow:0 0 46px rgba(198,255,61,.42);
+  }
+  .btn:hover{background:#D9FF6E}
+  .btn:active{transform:translateY(2px)}
+  .btn:focus-visible{outline:2px solid var(--cool);outline-offset:4px}
+  .btn.alt{
+    background:transparent;color:var(--dim);
+    border-color:var(--line-hot);box-shadow:none;
+    font-size:clamp(16px,3vw,22px);padding:9px 24px 11px;margin-left:10px;
+  }
+  .btn.alt:hover{color:var(--text);border-color:var(--cool)}
+
+  /* result card */
+  .grade{
+    font-family:var(--display);
+    font-size:clamp(80px,20vw,190px);line-height:.8;
+    margin:.06em 0 0;
+    text-shadow:0 0 60px currentColor;
+  }
+  .rows{
+    margin:22px auto 0;max-width:420px;
+    border-top:1px solid var(--line);
+  }
+  .row{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding:9px 2px;border-bottom:1px solid var(--line);
+    font-family:var(--mono);font-size:11px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--dim);
+  }
+  .row b{
+    font-family:var(--display);font-size:22px;line-height:1;
+    color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:.02em;
+  }
+  .row.hot b{color:var(--hot)}
+  .row.good b{color:var(--acid)}
+  .row.bad b{color:var(--bad)}
+
+  .cal{
+    margin-top:16px;font-family:var(--mono);font-size:10px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--dimmer);
+  }
+  .cal b{color:var(--cool)}
+
+  @media (max-width:640px){
+    .pf-r{display:none}
+    .stats{gap:12px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.01ms !important}
+  }
+</style>
+</head>
+<body>
+
+<div class="lights" aria-hidden="true"></div>
+<div class="floor" aria-hidden="true"></div>
+<div class="scan" aria-hidden="true"></div>
+<div class="frame" aria-hidden="true"></div>
+
+<audio id="track" src="track.mp3" preload="auto"></audio>
+
+<div class="stage">
+
+  <div class="top">
+    <div class="brand">
+      <span class="brand-t">Interrupt on the beat</span>
+      <span class="brand-s">150 BPM</span>
+    </div>
+    <div class="stats">
+      <div class="stat" id="combo"><b>0</b><span>Combo</span></div>
+      <div class="stat"><b id="acc">100%</b><span>Accuracy</span></div>
+      <div class="stat"><b id="score">0</b><span>Score</span></div>
+    </div>
+  </div>
+
+  <div class="party" id="party">
+    <div class="pf" style="--k:#7FB6E8" data-i="0">
+      <div class="pf-n">Tank</div><div class="pf-r">Holds it together</div>
+      <div class="pf-hp"><i></i></div>
+    </div>
+    <div class="pf" style="--k:#FF2BD1" data-i="1">
+      <div class="pf-n">Dps 1</div><div class="pf-r">Says unlucky</div>
+      <div class="pf-hp"><i></i></div>
+    </div>
+    <div class="pf" style="--k:#C6FF3D" data-i="2">
+      <div class="pf-n">Dps 2</div><div class="pf-r">Never kicks</div>
+      <div class="pf-hp"><i></i></div>
+    </div>
+    <div class="pf" style="--k:#00E0FF" data-i="3">
+      <div class="pf-n">Dps 3</div><div class="pf-r">Typing</div>
+      <div class="pf-hp"><i></i></div>
+    </div>
+  </div>
+
+  <div class="field">
+    <canvas id="pf"></canvas>
+    <div class="judge" id="judge"></div>
+    <div class="sect" id="sect"></div>
+  </div>
+
+  <div class="bottom">
+    <div><span class="key">Space</span> interrupt <span class="key">R</span> restart <span class="key">&larr;</span><span class="key">&rarr;</span> offset</div>
+    <div><a href="/">shaiyex.com</a></div>
+  </div>
+
+</div>
+
+<div class="over" id="gate">
+  <div class="over-in">
+    <p class="ov-k">Rhythm mode</p>
+    <p class="ov-t">Who Are You</p>
+    <p class="ov-s">Every kick drum is a cast bar. <b>Hit space when it reaches the line.</b> Miss one and somebody in your group dies. Four deaths and the key is over. Thirty in a row and you get a battle res.</p>
+    <p class="ov-s" style="margin-top:10px"><b>228 casts. 150 BPM.</b> The last drop is not survivable by reacting, you have to feel it.</p>
+    <button class="btn" id="start" type="button">Pull</button>
+    <p class="cal">Sound on. If your hits feel off, nudge the offset with the arrow keys</p>
+  </div>
+</div>
+
+<div class="over gone" id="result">
+  <div class="over-in">
+    <p class="ov-k" id="rk">Key complete</p>
+    <p class="grade" id="grade">S</p>
+    <div class="rows">
+      <div class="row hot"><span>Longest combo</span><b id="rcombo">0</b></div>
+      <div class="row good"><span>Perfect</span><b id="rperf">0</b></div>
+      <div class="row"><span>Good</span><b id="rgood">0</b></div>
+      <div class="row bad"><span>Missed</span><b id="rmiss">0</b></div>
+      <div class="row"><span>Accuracy</span><b id="racc">0%</b></div>
+      <div class="row"><span>Score</span><b id="rscore">0</b></div>
+    </div>
+    <p class="ov-s" id="rline"></p>
+    <button class="btn" id="again" type="button">Run it back</button>
+    <button class="btn alt" id="home" type="button">Leave group</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  /* ---- the grid, measured off track.mp3 ---- */
+  var BPM = 150, BEAT = 0.4, ZERO = 0.040;
+
+  /* ---- the chart, generated from the kick pattern in the file ---- */
+  var CHART = [
+    8,12,16,20,24,28,34,36,38,40,42,44,46,48,50,52,54,56,58,60,65,66,67,68,69,70,71,72,73,74,75,
+    76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,104,120,128,132,136,140,144,146,148,150,
+    152,154,156,158,169,170,171,172,173,174,175,176,177,178,179,180,180.5,181,182,183,184,185,
+    186,187,188,188.5,189,190,191,192,193,194,195,196,196.5,197,198,199,201,202,203,204,204.5,
+    205,206,207,208,209,210,211,212,212.5,213,214,215,216,217,218,219,220,220.5,221,222,223,224,
+    225,226,227,228,228.5,229,231,233,234,235,236,236.5,237,238,239,240,241,242,243,244,244.5,
+    245,246,247,248,249,250,251,252,252.5,253,254,255,256,258,260,262,264,266,268,270,272,273,
+    274,274.5,275,276,277,278,278.5,279,280,281,282,282.5,283,283.5,284,285,286,286.5,287,288,
+    289,290,290.5,291,291.5,292,293,294,294.5,295,297,298,298.5,299,299.5,300,301,302,302.5,303,
+    304,305,306,306.5,307,307.5,308,309,310,310.5,311,312,313,314,314.5,315,315.5,316,317,318,
+    318.5,319
+  ];
+
+  var SPELLS = [
+    "Ancient Spark","Void Bolt","Mending Word","Blazing Rune","Terrifying Screech",
+    "Consuming Slam","Death Coil","Wracking Pain","Fixate","Withering Grasp",
+    "Molten Blast","Static Field","Chain Lightning","Necrotic Burst","Shatter"
+  ];
+
+  var SECTIONS = [
+    { b: 0,   n: "Trash pull" },
+    { b: 32,  n: "First drop" },
+    { b: 96,  n: "Who are you" },
+    { b: 128, n: "It is building" },
+    { b: 176, n: "Second drop" },
+    { b: 256, n: "Breathe" },
+    { b: 272, n: "Last drop, good luck" },
+    { b: 320, n: "" }
+  ];
+
+  /* windows, in seconds */
+  var W_PERF = 0.055, W_GOOD = 0.11, W_HIT = 0.16;
+  var APPROACH = 1.7;          /* how long a cast is on screen before its beat */
+  var REZ_STREAK = 30;
+
+  var track  = document.getElementById('track');
+  var cv     = document.getElementById('pf');
+  var ctx    = cv.getContext('2d');
+  var judge  = document.getElementById('judge');
+  var sectEl = document.getElementById('sect');
+  var comboW = document.getElementById('combo');
+  var comboEl= comboW.querySelector('b');
+  var accEl  = document.getElementById('acc');
+  var scoreEl= document.getElementById('score');
+  var gate   = document.getElementById('gate');
+  var result = document.getElementById('result');
+  var pfs    = [].slice.call(document.querySelectorAll('.pf'));
+  var root   = document.documentElement;
+
+  var notes = [], idx = 0, running = false;
+  var combo = 0, best = 0, perf = 0, good = 0, missed = 0, score = 0, streak = 0;
+  var dead = 0, lastBeat = -1, p = 0, pd = 0;
+  var offset = 0;
+  try { offset = parseFloat(localStorage.getItem('beat.offset') || '0') || 0; } catch(e){}
+
+  /* ---- low latency hit sound ---- */
+  var AC = null, HIT = null;
+  function audioInit(){
+    try {
+      var C = window.AudioContext || window.webkitAudioContext;
+      if (!C) return;
+      AC = new C();
+      fetch('hit.mp3').then(function(r){ return r.arrayBuffer(); })
+        .then(function(b){ return AC.decodeAudioData(b); })
+        .then(function(buf){ HIT = buf; })
+        .catch(function(){});
+    } catch(e){}
+  }
+  function ping(rate, vol){
+    if (!AC || !HIT) return;
+    try {
+      var s = AC.createBufferSource(), g = AC.createGain();
+      s.buffer = HIT; s.playbackRate.value = rate || 1;
+      g.gain.value = vol == null ? 0.5 : vol;
+      s.connect(g); g.connect(AC.destination); s.start(0);
+    } catch(e){}
+  }
+
+  function build(){
+    notes = CHART.map(function(b, i){
+      return { b: b, t: ZERO + b * BEAT, hit: false, gone: false,
+               name: SPELLS[i % SPELLS.length] };
+    });
+    idx = 0; combo = 0; best = 0; perf = 0; good = 0; missed = 0;
+    score = 0; streak = 0; dead = 0; lastBeat = -1;
+    pfs.forEach(function(el){ el.classList.remove('dead','rez'); });
+    paintHud();
+  }
+
+  function paintHud(){
+    comboEl.textContent = combo;
+    comboW.classList.toggle('big', combo >= 25);
+    var judged = perf + good + missed;
+    accEl.textContent = judged ? Math.round((perf + good * 0.6) / judged * 100) + '%' : '100%';
+    scoreEl.textContent = score;
+  }
+
+  function say(txt, col){
+    judge.textContent = txt;
+    judge.style.color = col;
+    judge.classList.remove('on');
+    void judge.offsetWidth;
+    judge.classList.add('on');
+  }
+
+  function killOne(){
+    /* dps die first, the tank goes last, then it is over */
+    var order = [3, 2, 1, 0];
+    for (var i = 0; i < order.length; i++){
+      var el = pfs[order[i]];
+      if (!el.classList.contains('dead')){
+        el.classList.add('dead');
+        dead++;
+        return dead >= 4;
+      }
+    }
+    return true;
+  }
+  function rezOne(){
+    for (var i = 0; i < pfs.length; i++){
+      if (pfs[i].classList.contains('dead')){
+        pfs[i].classList.remove('dead');
+        pfs[i].classList.add('rez');
+        dead--;
+        say('BATTLE RES', '#C6FF3D');
+        ping(0.7, 0.6);
+        return;
+      }
+    }
+  }
+
+  function now(){ return track.currentTime + offset; }
+
+  function press(){
+    if (!running) return;
+    var t = now(), bestI = -1, bestD = 9;
+    for (var i = idx; i < notes.length && i < idx + 8; i++){
+      var n = notes[i];
+      if (n.hit || n.gone) continue;
+      var d = Math.abs(n.t - t);
+      if (d < bestD){ bestD = d; bestI = i; }
+    }
+    if (bestI < 0 || bestD > W_HIT){
+      /* a kick on nothing. the group notices */
+      combo = 0; streak = 0;
+      say('EARLY', '#6E5F91');
+      paintHud();
+      return;
+    }
+    var n = notes[bestI];
+    n.hit = true;
+    if (bestD <= W_PERF){
+      perf++; score += 300 + combo * 2; streak++;
+      say('PERFECT', '#C6FF3D');
+      ping(1.0, 0.55);
+    } else if (bestD <= W_GOOD){
+      good++; score += 150 + combo; streak = 0;
+      say('GOOD', '#00E0FF');
+      ping(0.92, 0.45);
+    } else {
+      good++; score += 60; streak = 0;
+      say(n.t > t ? 'EARLY' : 'LATE', '#B14BFF');
+      ping(0.84, 0.4);
+    }
+    combo++;
+    if (combo > best) best = combo;
+    if (streak >= REZ_STREAK && dead > 0){ streak = 0; rezOne(); }
+    paintHud();
+  }
+
+  function miss(n){
+    n.gone = true;
+    missed++; combo = 0; streak = 0;
+    say('MISSED', '#FF3B3B');
+    paintHud();
+    if (killOne()) finish(false);
+  }
+
+  /* ---- drawing ---- */
+  var W = 0, H = 0, HITX = 0;
+  function size(){
+    var r = cv.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = r.width; H = r.height;
+    cv.width = Math.max(1, W * dpr);
+    cv.height = Math.max(1, H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    HITX = Math.round(W * 0.17);
+  }
+  window.addEventListener('resize', size);
+
+  var flash = 0;
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+    var t = now();
+
+    /* the lane */
+    var laneY = H * 0.5, laneH = Math.min(96, H * 0.44);
+    ctx.fillStyle = 'rgba(255,255,255,.025)';
+    ctx.fillRect(0, laneY - laneH / 2, W, laneH);
+
+    /* beat ticks sliding by, so you can see the grid */
+    var b0 = Math.floor((t - ZERO) / BEAT) - 1;
+    for (var k = b0; k < b0 + 14; k++){
+      var bt = ZERO + k * BEAT;
+      var bx = HITX + (bt - t) / APPROACH * (W - HITX);
+      if (bx < -20 || bx > W + 20) continue;
+      var strong = (((k % 4) + 4) % 4) === 0;
+      ctx.fillStyle = strong ? 'rgba(255,255,255,.13)' : 'rgba(255,255,255,.05)';
+      ctx.fillRect(bx, laneY - laneH / 2, 1, laneH);
+    }
+
+    /* the hit line */
+    ctx.fillStyle = 'rgba(255,43,209,' + (0.5 + flash * 0.5) + ')';
+    ctx.fillRect(HITX - 2, laneY - laneH / 2 - 8, 4, laneH + 16);
+    ctx.fillStyle = 'rgba(255,255,255,' + (0.15 + flash * 0.85) + ')';
+    ctx.fillRect(HITX - 1, laneY - laneH / 2 - 8, 2, laneH + 16);
+    if (flash > 0.01){
+      var g = ctx.createRadialGradient(HITX, laneY, 0, HITX, laneY, 150 * flash);
+      g.addColorStop(0, 'rgba(255,43,209,' + (0.35 * flash) + ')');
+      g.addColorStop(1, 'rgba(255,43,209,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+    }
+    flash *= 0.86;
+
+    /* the casts */
+    var bh = Math.min(40, laneH * 0.44);
+    for (var i = idx; i < notes.length; i++){
+      var n = notes[i];
+      var dt = n.t - t;
+      if (dt > APPROACH) break;
+      if (n.hit || n.gone) continue;
+      var x = HITX + dt / APPROACH * (W - HITX);
+      var wpx = Math.max(64, Math.min(120, W * 0.11));
+      var half = n.b % 1 !== 0;
+      var col = half ? '0,224,255' : '255,43,209';
+      var a = dt < 0 ? 0.5 : 1;
+
+      ctx.fillStyle = 'rgba(10,5,20,.9)';
+      ctx.fillRect(x - wpx, laneY - bh / 2, wpx, bh);
+      ctx.strokeStyle = 'rgba(' + col + ',' + (0.85 * a) + ')';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x - wpx + .5, laneY - bh / 2 + .5, wpx - 1, bh - 1);
+
+      /* fill shows how much of the cast is left */
+      var fill = Math.max(0, Math.min(1, 1 - dt / APPROACH));
+      ctx.fillStyle = 'rgba(' + col + ',' + (0.4 * a) + ')';
+      ctx.fillRect(x - wpx, laneY - bh / 2, wpx * fill, bh);
+
+      /* the leading edge, the thing you actually time against */
+      ctx.fillStyle = 'rgba(255,255,255,' + a + ')';
+      ctx.fillRect(x - 2, laneY - bh / 2 - 3, 2, bh + 6);
+
+      if (wpx > 78){
+        ctx.fillStyle = 'rgba(255,255,255,' + (0.75 * a) + ')';
+        ctx.font = '600 9px JetBrains Mono, monospace';
+        ctx.textAlign = 'right';
+        ctx.fillText(n.name.toUpperCase().slice(0, 14), x - 7, laneY + 3);
+      }
+    }
+    ctx.textAlign = 'left';
+  }
+
+  /* ---- the loop ---- */
+  function frame(){
+    if (running){
+      var t = now();
+
+      /* retire notes that are past saving */
+      while (idx < notes.length && notes[idx].t < t - W_HIT){
+        var n = notes[idx];
+        if (!n.hit && !n.gone) miss(n);
+        idx++;
+      }
+
+      /* pulse on the kick */
+      var b = Math.floor((t - ZERO) / BEAT);
+      if (b !== lastBeat){
+        lastBeat = b;
+        p = 1;
+        if ((((b % 4) + 4) % 4) === 0) pd = 1;
+        for (var s = SECTIONS.length - 1; s >= 0; s--){
+          if (b >= SECTIONS[s].b){ sectEl.textContent = SECTIONS[s].n; break; }
+        }
+      }
+      p *= 0.82; pd *= 0.88;
+      root.style.setProperty('--p', p.toFixed(3));
+      root.style.setProperty('--pd', pd.toFixed(3));
+
+      draw();
+
+      if (track.ended || (idx >= notes.length && t > notes[notes.length - 1].t + 1.2)){
+        finish(true);
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ---- start and finish ---- */
+  function start(){
+    build();
+    size();
+    audioInit();
+    if (AC && AC.state === 'suspended') { try { AC.resume(); } catch(e){} }
+    try {
+      track.currentTime = 0;
+      track.volume = 0.8;
+      var pr = track.play();
+      if (pr && pr.catch) pr.catch(function(){});
+    } catch(e){}
+    running = true;
+    gate.classList.add('gone');
+    result.classList.add('gone');
+    setTimeout(function(){ gate.style.display = 'none'; }, 450);
+  }
+
+  function finish(survived){
+    if (!running) return;
+    running = false;
+    try { track.pause(); } catch(e){}
+    var judged = perf + good + missed;
+    var acc = judged ? (perf + good * 0.6) / judged : 0;
+    var g, gc, line;
+    if (!survived){
+      g = 'F'; gc = '#FF3B3B';
+      line = 'Everybody died. It was the ' + (missed === 1 ? 'one cast' : missed + ' casts') + ' you let through.';
+    } else if (acc >= 0.97 && missed === 0){
+      g = 'S'; gc = '#C6FF3D';
+      line = 'Nothing got a cast off. Nobody will thank you for it.';
+    } else if (acc >= 0.9){
+      g = 'A'; gc = '#00E0FF';
+      line = 'Timed it. You would survive one of my keys.';
+    } else if (acc >= 0.78){
+      g = 'B'; gc = '#B14BFF';
+      line = 'Passable. You would still get a whisper about it afterwards.';
+    } else if (acc >= 0.6){
+      g = 'C'; gc = '#FF2BD1';
+      line = 'This is roughly what my pugs do, and I heal through it.';
+    } else {
+      g = 'D'; gc = '#FF3B3B';
+      line = 'You survived on my cooldowns. Both of us know it.';
+    }
+    document.getElementById('rk').textContent = survived ? 'Key complete' : 'Key depleted';
+    var gr = document.getElementById('grade');
+    gr.textContent = g; gr.style.color = gc;
+    document.getElementById('rcombo').textContent = best;
+    document.getElementById('rperf').textContent = perf;
+    document.getElementById('rgood').textContent = good;
+    document.getElementById('rmiss').textContent = missed;
+    document.getElementById('racc').textContent = Math.round(acc * 100) + '%';
+    document.getElementById('rscore').textContent = score;
+    document.getElementById('rline').textContent = line;
+    result.style.display = '';
+    result.classList.remove('gone');
+  }
+
+  /* ---- input ---- */
+  function onKey(e){
+    if (e.code === 'Space' || e.key === ' '){
+      e.preventDefault();
+      if (running) press();
+      else if (gate.style.display !== 'none') start();
+      return;
+    }
+    if (e.key === 'r' || e.key === 'R'){ e.preventDefault(); start(); return; }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight'){
+      e.preventDefault();
+      offset += (e.key === 'ArrowLeft' ? -0.01 : 0.01);
+      offset = Math.round(offset * 1000) / 1000;
+      try { localStorage.setItem('beat.offset', String(offset)); } catch(err){}
+      say((offset > 0 ? '+' : '') + Math.round(offset * 1000) + ' MS', '#00E0FF');
+    }
+  }
+  window.addEventListener('keydown', onKey);
+  document.querySelector('.field').addEventListener('pointerdown', function(e){
+    e.preventDefault();
+    if (running) press();
+  });
+
+  document.getElementById('start').addEventListener('click', start);
+  document.getElementById('again').addEventListener('click', start);
+  document.getElementById('home').addEventListener('click', function(){ location.href = '/'; });
+
+  /* flash the hit line on every kick so the timing is readable without sound */
+  var flashBeat = -1;
+  (function pulse(){
+    if (running){
+      var b = Math.floor((now() - ZERO) / BEAT);
+      if (b !== flashBeat){ flashBeat = b; flash = 1; }
+    }
+    requestAnimationFrame(pulse);
+  })();
+
+  size();
+  build();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
