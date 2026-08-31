@@ -239,26 +239,32 @@
     color:var(--k);opacity:.92;line-height:1.75;
   }
 
-  /* ---------- party chat ---------- */
-  .chat{
-    position:relative;
-    padding:clamp(18px,3.6vw,28px);
+  /* ---------- summary screen ---------- */
+  .sheet{
     background:#0B0814;
     border:1px solid var(--line);
     border-left:3px solid var(--acid);
     border-radius:2px;
-    font-family:var(--mono);
-    font-size:13px;
-    line-height:2;
-    color:var(--dim);
-    overflow-x:auto;
+    overflow:hidden;
   }
-  .chat > div{white-space:nowrap}
-  .chat .t{color:#4E4670}
-  .chat .me{color:var(--i)}
-  .chat .them{color:var(--iii)}
-  .chat .sys{color:var(--acid)}
-  .chat .win{color:#FFF;text-shadow:0 0 calc(6px + var(--pd) * 22px) var(--acid)}
+  .row{
+    display:flex;align-items:baseline;gap:16px;
+    padding:13px clamp(16px,3vw,24px);
+    border-bottom:1px solid var(--line);
+  }
+  .row:last-child{border-bottom:0}
+  .row .lbl{flex:1 1 auto;font-size:15px;line-height:1.4;color:var(--dim)}
+  .row .val{
+    font-family:var(--display);
+    font-size:clamp(26px,4.4vw,38px);
+    line-height:1;color:var(--text);
+    font-variant-numeric:tabular-nums;
+  }
+  .row.good .val{color:var(--i);text-shadow:0 0 calc(4px + var(--pd) * 18px) var(--i)}
+  .row.bad  .val{color:var(--iii);text-shadow:0 0 calc(4px + var(--pd) * 18px) var(--iii)}
+  .row.fin{background:rgba(198,255,61,.05)}
+  .row.fin .lbl{color:var(--text);font-weight:600}
+  .row.fin .val{color:var(--acid);letter-spacing:.04em;text-shadow:0 0 calc(8px + var(--pd) * 28px) var(--acid)}
 
   /* ---------- terms ---------- */
   .terms{display:flex;flex-direction:column;border-top:1px solid var(--line)}
@@ -441,23 +447,19 @@
 
   <section>
     <div class="sec-head">
-      <p class="eyebrow">Exhibit A</p>
-      <h2>Party chat, <span class="hi">verbatim</span>.</h2>
+      <p class="eyebrow">Last run</p>
+      <h2>The summary screen, <span class="hi">rounded up</span>.</h2>
     </div>
 
-    <div class="chat">
-      <div><span class="t">[21:38:04]</span> <span class="them">[Tank]:</span> pull?</div>
-      <div><span class="t">[21:38:04]</span> <span class="me">[Shaiyex]:</span> i have been healing you for six seconds already</div>
-      <div><span class="t">[21:41:19]</span> <span class="sys">Ancient Spark was not interrupted. Nobody was in range. Everybody was in range.</span></div>
-      <div><span class="t">[21:41:22]</span> <span class="me">[Shaiyex]:</span> interesting group decision</div>
-      <div><span class="t">[21:41:30]</span> <span class="them">[Dps 2]:</span> unlucky</div>
-      <div><span class="t">[21:41:31]</span> <span class="me">[Shaiyex]:</span> no</div>
-      <div><span class="t">[21:47:02]</span> <span class="sys">Shaiyex casts Lay on Hands on Dps 3. Dps 3 was at 2%.</span></div>
-      <div><span class="t">[21:47:05]</span> <span class="me">[Shaiyex]:</span> that one is going in the screenshot</div>
-      <div><span class="t">[21:52:44]</span> <span class="them">[Dps 1]:</span> healer diff</div>
-      <div><span class="t">[21:52:46]</span> <span class="me">[Shaiyex]:</span> correct</div>
-      <div><span class="t">[21:59:58]</span> <span class="win">Key completed in time. +2.</span></div>
-      <div><span class="t">[22:00:01]</span> <span class="me">[Shaiyex]:</span> you are all welcome, individually, in the order you needed it</div>
+    <div class="sheet">
+      <div class="row good"><span class="lbl">Deaths in the group</span><span class="val">0</span></div>
+      <div class="row bad"><span class="lbl">Times one of you was under ten percent</span><span class="val">6</span></div>
+      <div class="row good"><span class="lbl">Times any of you noticed</span><span class="val">0</span></div>
+      <div class="row"><span class="lbl">Interrupts your group had available</span><span class="val">14</span></div>
+      <div class="row bad"><span class="lbl">Interrupts your group actually pressed</span><span class="val">3</span></div>
+      <div class="row bad"><span class="lbl">Of those, on the right target</span><span class="val">1</span></div>
+      <div class="row"><span class="lbl">Cooldowns I pressed so you could keep standing there</span><span class="val">9</span></div>
+      <div class="row fin"><span class="lbl">Key</span><span class="val">Timed</span></div>
     </div>
   </section>
 
