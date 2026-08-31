@@ -1029,7 +1029,7 @@
   }
   /* the stamp is one element, so never let two beats fight over it,
      and give it a few ms so it lands on the hit instead of just before it */
-  var lastSlamB = -99, SLAM_LEAD = 155;   /* 55 of its own, plus the 100 the global LEAD moved everything */
+  var lastSlamB = -99, SLAM_LEAD = 55;   /* lands on the hit, not just before it */
   function slamSoon(b){
     if (b === lastSlamB) return;
     lastSlamB = b;
