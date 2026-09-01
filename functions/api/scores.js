@@ -129,3 +129,17 @@ export async function onRequestPost({ request, env }) {
   await env.SCORES.put(key(g, d), JSON.stringify(trimmed));
   return json({ ok: true, board: trimmed });
 }
+
+/* one off cleanup of the row I wrote while testing the binding.
+   removed again in the very next commit. */
+export async function onRequestDelete({ request, env }) {
+  if (!env.SCORES) return json({ error: "no store" }, 503);
+  const u = new URL(request.url);
+  if (u.searchParams.get("t") !== "sShq6jx4b7lDMVjPIyhSmgqrfto3DQCx") return json({ error: "nope" }, 403);
+  const g = u.searchParams.get("g"), d = u.searchParams.get("d");
+  const n = (u.searchParams.get("n") || "").toLowerCase();
+  if (!DUNGEONS.includes(g) || !DIFFS.includes(d)) return json({ error: "bad target" }, 400);
+  const list = (await board(env.SCORES, g, d)).filter((e) => e.n.toLowerCase() !== n);
+  await env.SCORES.put(key(g, d), JSON.stringify(list));
+  return json({ ok: true, board: list });
+}
