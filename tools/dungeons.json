@@ -1,0 +1,169 @@
+[
+  {
+    "key": "kr",
+    "name": "Kings' Rest",
+    "short": "KR",
+    "track": "whoareyou-v2.mp3",
+    "song": "NovaZ - Who Are You",
+    "bpm": 150.0,
+    "beat": 0.4,
+    "zero": 0.048,
+    "end": 158.4,
+    "charts": {
+      "normal": "KR_N",
+      "heroic": "KR_H",
+      "mythic": "KR_M"
+    },
+    "pulls": [
+      {
+        "b": 0,
+        "mob": "Risen Hexer",
+        "spell": "Hex Volley"
+      },
+      {
+        "b": 32,
+        "mob": "Queen Wasi",
+        "spell": "Bind Soul"
+      },
+      {
+        "b": 96,
+        "mob": "Seneschal M'bara",
+        "spell": "Unholy Mending"
+      },
+      {
+        "b": 192,
+        "mob": "Half-Finished Mummy",
+        "spell": "Wretched Discharge"
+      },
+      {
+        "b": 256,
+        "mob": "Phantom Hex Priest",
+        "spell": "Hex"
+      },
+      {
+        "b": 320,
+        "mob": "Zanazal the Wise",
+        "spell": "Poison Nova"
+      },
+      {
+        "b": 336,
+        "mob": "Reban",
+        "spell": "Deathly Roar"
+      }
+    ],
+    "len": 164.68
+  },
+  {
+    "key": "rlp",
+    "name": "Ruby Life Pools",
+    "short": "RLP",
+    "track": "goodolddays.mp3",
+    "song": "D-Sturb - Good Old Days",
+    "bpm": 160.0,
+    "beat": 0.375,
+    "zero": 0.149,
+    "end": 194.0,
+    "charts": {
+      "normal": "RLP_N",
+      "heroic": "RLP_H",
+      "mythic": "RLP_M"
+    },
+    "pulls": [
+      {
+        "b": 0,
+        "mob": "Flashfrost Chillweaver",
+        "spell": "Ice Shield"
+      },
+      {
+        "b": 80,
+        "mob": "Infused Whelp",
+        "spell": "Cold Claws"
+      },
+      {
+        "b": 144,
+        "mob": "Melidrussa Chillworn",
+        "spell": "Frigid Shard"
+      },
+      {
+        "b": 208,
+        "mob": "Blazebound Destroyer",
+        "spell": "Fiery Blast"
+      },
+      {
+        "b": 304,
+        "mob": "Thunderhead",
+        "spell": "Rolling Thunder"
+      },
+      {
+        "b": 368,
+        "mob": "Kokia Blazehoof",
+        "spell": "Blaze Volley"
+      },
+      {
+        "b": 448,
+        "mob": "Erkhart Stormvein",
+        "spell": "Stormslam"
+      }
+    ],
+    "len": 199.02
+  },
+  {
+    "key": "vsa",
+    "name": "Voidscar Arena",
+    "short": "VSA",
+    "track": "makeitfast.mp3",
+    "song": "Make It Fast",
+    "bpm": 160.0,
+    "beat": 0.375,
+    "zero": 0.008,
+    "end": 106.5,
+    "charts": {
+      "normal": "VSA_N",
+      "heroic": "VSA_H",
+      "mythic": "VSA_M"
+    },
+    "pulls": [
+      {
+        "b": 0,
+        "mob": "Dominated Brawler",
+        "spell": "Demoralizing Shout"
+      },
+      {
+        "b": 32,
+        "mob": "Voidtouched Magi",
+        "spell": "Shadowbolt Volley"
+      },
+      {
+        "b": 64,
+        "mob": "Angry Krolusk",
+        "spell": "Violent Sand"
+      },
+      {
+        "b": 96,
+        "mob": "Sycophantic Tarasek",
+        "spell": "Melt Armor"
+      },
+      {
+        "b": 128,
+        "mob": "Killvore Screamer",
+        "spell": "Mad Shriek"
+      },
+      {
+        "b": 176,
+        "mob": "Agitated Voidscythe",
+        "spell": "Corrosive Essence"
+      },
+      {
+        "b": 208,
+        "mob": "Voidminder",
+        "spell": "Mending Void"
+      },
+      {
+        "b": 240,
+        "mob": "Atroxus",
+        "spell": "Mind-Numbing Poison"
+      }
+    ],
+    "len": 107.65
+  }
+]
