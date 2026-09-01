@@ -834,7 +834,7 @@
   body.corrupting .doors,
   body.corrupting .blbar{filter:contrast(1.5) saturate(.4) brightness(.7)}
 
-  #tekkAudio{display:none}
+  #tekkAudio, #holyAudio{display:none}
 
   @media (prefers-reduced-motion:reduce){
     *{animation:none !important;transition:none !important}
@@ -904,16 +904,17 @@
   <div class="bar"></div><div class="bar"></div>
 </div>
 
-<span id="themeHint">what is he hiding &rarr;</span>
-<button id="themeSw" type="button" aria-pressed="false" title="Dispel">
+<span id="themeHint">what is he without it &rarr;</span>
+<button id="themeSw" type="button" aria-pressed="false" title="Renounce">
   <span class="rune" aria-hidden="true"></span>
   <span class="txt">
-    <span class="t1" id="themeLbl">Dispel</span>
-    <span class="t2" id="themeSub">see the real one</span>
+    <span class="t1" id="themeLbl">Renounce</span>
+    <span class="t2" id="themeSub">give up the Light</span>
   </span>
 </button>
 
 <audio id="tekkAudio" src="/mercy.mp3" loop preload="none"></audio>
+<audio id="holyAudio" src="/tirion.mp3" loop preload="none"></audio>
 
 <header class="hero">
   <canvas id="rays" aria-hidden="true"></canvas>
@@ -976,6 +977,7 @@
   var btn    = document.getElementById('themeSw');
   var lbl    = document.getElementById('themeLbl');
   var audio  = document.getElementById('tekkAudio');
+  var holy   = document.getElementById('holyAudio');
   var grain  = document.getElementById('grain');
   var on     = false;
   try { on = localStorage.getItem('shy.tekk') === '1'; } catch(e){}
@@ -1023,21 +1025,31 @@
   function paint(){
     body.classList.toggle('tekk', on);
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-    lbl.textContent = on ? 'Cleanse' : 'Dispel';
-    if (sub2) sub2.textContent = on ? 'put the Light back' : 'see the real one';
-    btn.title = on ? 'Cleanse' : 'Dispel';
+    lbl.textContent = on ? 'Redeem' : 'Renounce';
+    if (sub2) sub2.textContent = on ? 'take the Light back' : 'give up the Light';
+    btn.title = on ? 'Redeem' : 'Renounce';
     copy();
     document.documentElement.style.setProperty('color-scheme', 'dark');
     var m = document.querySelector('meta[name="theme-color"]');
     if (m) m.setAttribute('content', on ? '#06070C' : '#080A14');
   }
 
-  function play(){
+  /* one side plays, the other stops. a track always starts from the top,
+     so the fade in at the head of each file does the work. */
+  function start(el, vol){
     try {
-      audio.volume = 0.55;
-      var p = audio.play();
+      el.currentTime = 0;
+      el.volume = vol;
+      var p = el.play();
       if (p && p.catch) p.catch(function(){});
     } catch(e){}
+  }
+  function stop(el){
+    try { el.pause(); } catch(e){}
+  }
+  function play(){
+    if (on){ stop(holy); start(audio, 0.55); }
+    else   { stop(audio); start(holy, 0.34); }
   }
 
   /* letters coming apart, then knitting back together */
@@ -1085,17 +1097,20 @@
     }, 1100);
     /* this click is the gesture the browser wants, so the track is
        allowed to start here and nowhere else */
-    if (on){
-      play(); listen();
-      setTimeout(startCycle, 360);
-      if (AC && AC.state === 'suspended'){ try { AC.resume(); } catch(e){} }
-    } else {
-      try { audio.pause(); } catch(e){}
-      stopCycle();
-      body.classList.remove('live');
-      document.documentElement.style.setProperty('--pulse', '0');
-      lastQ = -1;
-    }
+    /* swap the music under the wipe, not before it */
+    setTimeout(function(){
+      play();
+      if (on){
+        listen();
+        if (AC && AC.state === 'suspended'){ try { AC.resume(); } catch(e){} }
+      } else {
+        stopCycle();
+        body.classList.remove('live');
+        document.documentElement.style.setProperty('--pulse', '0');
+        lastQ = -1;
+      }
+    }, 300);
+    if (on) setTimeout(startCycle, 360);
   });
 
   paint();
@@ -1114,6 +1129,16 @@
     };
     window.addEventListener('pointerdown', once);
     window.addEventListener('keydown', once);
+  } else {
+    /* the light side waits for a gesture too, browsers do not care which
+       theme you are in */
+    var onceH = function(){
+      if (!on) play();
+      window.removeEventListener('pointerdown', onceH);
+      window.removeEventListener('keydown', onceH);
+    };
+    window.addEventListener('pointerdown', onceH);
+    window.addEventListener('keydown', onceH);
   }
 
   /* ---- the line under the name ---- */
