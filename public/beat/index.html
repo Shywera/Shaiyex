@@ -427,6 +427,70 @@
   .row.hot b{color:var(--gold)}
   .row.good b{color:var(--jade)}
   .row.bad b{color:var(--bad)}
+  /* ---------- scores ---------- */
+  .pb{
+    margin:16px auto 0;max-width:420px;
+    border:1px solid var(--line);border-left:3px solid var(--gold);
+    border-radius:2px;padding:12px 14px 13px;background:var(--panel);
+    text-align:left;
+  }
+  .pb-k{
+    font-family:var(--mono);font-size:9px;font-weight:700;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--gold);
+  }
+  .pb-row{
+    display:flex;justify-content:space-between;align-items:baseline;
+    gap:10px;margin-top:6px;
+    font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--dim);
+  }
+  .pb-row b{
+    font-family:var(--display);font-size:20px;line-height:1;color:var(--text);
+    font-variant-numeric:tabular-nums;letter-spacing:.02em;
+  }
+  .pb-new{
+    display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;
+  }
+  #pbName{
+    flex:1 1 150px;min-width:120px;
+    font-family:var(--mono);font-size:12px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--text);
+    background:#0C0716;border:1px solid var(--line-hot);border-radius:2px;
+    padding:8px 10px 9px;
+  }
+  #pbName:focus{outline:none;border-color:var(--gold)}
+  #pbSave{
+    font:inherit;cursor:pointer;
+    font-family:var(--mono);font-size:10px;font-weight:700;
+    letter-spacing:.14em;text-transform:uppercase;
+    padding:8px 14px 9px;color:#0A0710;background:var(--gold);
+    border:1px solid #FFE39A;border-radius:2px;
+  }
+  #pbSave:hover{background:#F5D689}
+  .pb-best{
+    margin:18px auto 0;max-width:620px;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+  }
+  .pb-cell{
+    border:1px solid var(--line);border-top:2px solid var(--c);
+    border-radius:2px;padding:9px 10px 10px;background:var(--panel);
+    text-align:left;
+  }
+  .pb-cell span{
+    display:block;font-family:var(--mono);font-size:9px;font-weight:700;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--c);
+  }
+  .pb-cell b{
+    display:block;margin-top:4px;
+    font-family:var(--display);font-size:19px;line-height:1;color:var(--text);
+    font-variant-numeric:tabular-nums;
+  }
+  .pb-cell i{
+    display:block;margin-top:2px;font-style:normal;
+    font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--dimmer);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  @media (max-width:620px){ .pb-best{grid-template-columns:1fr} }
+
   .cal{
     margin-top:14px;font-family:var(--mono);font-size:10px;
     letter-spacing:.12em;text-transform:uppercase;color:var(--dimmer);
@@ -549,6 +613,7 @@
       <button class="kb" id="rtBtn" type="button">Retard mode</button>
       <span class="keys-note" id="keysNote"></span>
     </div>
+    <div class="pb-best" id="pbBest"></div>
     <p class="cal">Sound on. If your hits feel off, nudge the offset with the arrow keys</p>
   </div>
 </div>
@@ -594,6 +659,14 @@
       <div class="row"><span>Score</span><b id="rscore">0</b></div>
     </div>
     <p class="ov-s" id="rline"></p>
+    <div class="pb" id="pbBox">
+      <span class="pb-k" id="pbTitle">Personal best</span>
+      <div class="pb-row"><span id="pbWho">nobody yet</span><b id="pbScore">0</b></div>
+      <div class="pb-new" id="pbNew" style="display:none">
+        <input id="pbName" maxlength="14" placeholder="Your name" autocomplete="off" spellcheck="false">
+        <button id="pbSave" type="button">Save it</button>
+      </div>
+    </div>
     <button class="btn" id="again" type="button">Run it back</button>
     <button class="btn alt" id="home" type="button">Pick another</button>
   </div>
@@ -2134,6 +2207,24 @@
     document.getElementById('racc').textContent = Math.round(acc * 100) + '%';
     document.getElementById('rscore').textContent = score;
     document.getElementById('rline').textContent = line;
+
+    /* did that beat the record for this dungeon and difficulty */
+    var prev = bestFor(dung, diff);
+    var accPct = Math.round(acc * 100);
+    if (survived && (!prev || score > prev.score)){
+      pending = { g: dung, d: diff, score: score, acc: accPct, combo: best };
+      pbTitle.textContent = prev ? 'New best, beat ' + prev.score.toLocaleString() : 'First run on this one';
+      pbWho.textContent = 'Put your name on it';
+      pbScore.textContent = score.toLocaleString();
+      pbName.value = playerName;
+      pbNew.style.display = '';
+    } else {
+      pending = null;
+      pbNew.style.display = 'none';
+      pbTitle.textContent = 'Personal best';
+      pbWho.textContent = prev ? prev.name + '  ' + prev.acc + '%' : 'nobody yet';
+      pbScore.textContent = prev ? prev.score.toLocaleString() : '0';
+    }
     pauseEl.classList.add('gone');
     result.style.display = '';
     result.classList.remove('gone');
@@ -2141,6 +2232,12 @@
 
   /* ---- input ---- */
   window.addEventListener('keydown', function(e){
+    /* while a name is being typed, the keyboard belongs to the input */
+    var tag = e.target && e.target.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA'){
+      if (e.key === 'Enter') document.getElementById('pbSave').click();
+      return;
+    }
     var k = (e.key || '').toLowerCase();
 
     if (binding >= 0){
@@ -2202,6 +2299,66 @@
     for (var l = 0; l < 4; l++){
       if (x >= colX(l) && x <= colX(l) + COLW){ press(l); return; }
     }
+  });
+
+  /* ---- scores, kept per dungeon and difficulty ---- */
+  var scores = {}, playerName = "";
+  try {
+    scores = JSON.parse(localStorage.getItem('beat.scores') || '{}') || {};
+    playerName = localStorage.getItem('beat.name') || "";
+  } catch(e){ scores = {}; }
+
+  function scoreKey(g, d){ return g + '|' + d; }
+  function saveScores(){
+    try {
+      localStorage.setItem('beat.scores', JSON.stringify(scores));
+      localStorage.setItem('beat.name', playerName);
+    } catch(e){}
+  }
+  function bestFor(g, d){ return scores[scoreKey(g, d)] || null; }
+
+  var pbBox   = document.getElementById('pbBox');
+  var pbTitle = document.getElementById('pbTitle');
+  var pbWho   = document.getElementById('pbWho');
+  var pbScore = document.getElementById('pbScore');
+  var pbNew   = document.getElementById('pbNew');
+  var pbName  = document.getElementById('pbName');
+  var pbBest  = document.getElementById('pbBest');
+  var pending = null;
+
+  function paintBest(){
+    var g = dung;
+    var cols = { normal: '#2FD8C3', heroic: '#E8C468', mythic: '#FF3FA4' };
+    pbBest.innerHTML = ['normal','heroic','mythic'].map(function(d){
+      var b = bestFor(g, d);
+      return '<div class="pb-cell" style="--c:' + cols[d] + '">' +
+             '<span>' + d + '</span>' +
+             '<b>' + (b ? b.score.toLocaleString() : '&mdash;') + '</b>' +
+             '<i>' + (b ? esc(b.name) + ' &middot; ' + b.acc + '%' : 'no run yet') + '</i>' +
+             '</div>';
+    }).join('');
+  }
+  function esc(s){
+    return String(s).replace(/[<>&"]/g, function(c){
+      return { '<':'&lt;', '>':'&gt;', '&':'&amp;', '"':'&quot;' }[c];
+    });
+  }
+
+  document.getElementById('pbSave').addEventListener('click', function(){
+    if (!pending) return;
+    var nm = (pbName.value || '').trim().slice(0, 14) || 'Anonymous';
+    playerName = nm;
+    pending.name = nm;
+    scores[scoreKey(pending.g, pending.d)] = {
+      name: nm, score: pending.score, acc: pending.acc,
+      combo: pending.combo, when: new Date().toISOString().slice(0, 10)
+    };
+    saveScores();
+    pending = null;
+    pbNew.style.display = 'none';
+    pbTitle.textContent = 'Personal best';
+    pbWho.textContent = nm;
+    paintBest();
   });
 
   /* ---- retard mode: everything from the why page, on top of the run ---- */
@@ -2443,6 +2600,7 @@
   var dungBtns = [].slice.call(document.querySelectorAll('.dung'));
   function paintDung(){
     var g = DUNGEONS[dung];
+    if (typeof paintBest === 'function') paintBest();
     dungBtns.forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-g') === dung); });
     ['normal','heroic','mythic'].forEach(function(k){
       var el = document.getElementById('cnt-' + k);
@@ -2458,6 +2616,7 @@
   });
   paintDung();
   paintKeys();
+  paintBest();
   if (offset){
     keysNote.textContent = 'Offset ' + (offset > 0 ? '+' : '') + Math.round(offset * 1000) + ' ms';
   }
