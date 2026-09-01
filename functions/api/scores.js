@@ -16,6 +16,7 @@
 const DUNGEONS = ["kr", "rlp", "vsa", "sd", "disc", "sd2", "nok", "fd", "iffa", "chea"];
 const DIFFS = ["normal", "heroic", "mythic"];
 const KEEP = 25;
+const BUILD = "2026-09-01a";   // bumped to force a deployment that sees the binding
 const MAX_SCORE = 5000000;
 
 const json = (data, status = 200) =>
