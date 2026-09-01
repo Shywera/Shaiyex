@@ -167,9 +167,9 @@
     "len": 107.65
   },
   {
-    "key": "fh",
-    "name": "Freehold",
-    "short": "FH",
+    "key": "sd",
+    "name": "Sanguine Depths",
+    "short": "SD",
     "track": "furioso.mp3",
     "song": "gmtn. - furioso melodia",
     "bpm": 155.0,
@@ -178,9 +178,9 @@
     "end": 315.0,
     "len": 318.0,
     "charts": {
-      "normal": "FH_N",
-      "heroic": "FH_H",
-      "mythic": "FH_M"
+      "normal": "SD_N",
+      "heroic": "SD_H",
+      "mythic": "SD_M"
     },
     "pulls": [
       {
