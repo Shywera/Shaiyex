@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Shaiyex - Holy Paladin. Mythic+ score, current keys, raid progression and logs.">
-<meta name="theme-color" content="#E4D8BE">
+<meta name="theme-color" content="#F2F1EC">
 <meta property="og:type" content="profile">
 <meta property="og:title" content="Shaiyex">
 <meta property="og:description" content="Holy Paladin. Mythic+ score, keys, progression and logs.">
@@ -20,18 +20,18 @@
 
 <style>
   :root{
-    --ink:#E4D8BE;
-    --ink-2:#F6EEDC;
-    --panel:#FAF3E3;
-    --panel-2:#F3E9D2;
-    --line:#CFBE9B;
-    --line-hot:#B8A275;
-    --text:#241E14;
-    --dim:#5C5340;
-    --dimmer:#8C7F66;
-    --gold:#B5842F;
-    --gold-hot:#8A6116;
-    --gold-deep:#D9C289;
+    --ink:#F2F1EC;
+    --ink-2:#FFFFFF;
+    --panel:#FFFFFF;
+    --panel-2:#F7F6F2;
+    --line:#E2E0D9;
+    --line-hot:#D2CFC5;
+    --text:#23231F;
+    --dim:#5E5D56;
+    --dimmer:#8B8A81;
+    --gold:#A07A2E;
+    --gold-hot:#7E5D18;
+    --gold-deep:#CFC4A6;
     --amber:#E9A83C;
     --pink:#F48CBA;
     --blue:#7FB6E8;
@@ -46,9 +46,7 @@
   body{
     margin:0;
     background:
-      radial-gradient(56% 38% at 50% -14%, rgba(255,250,236,.9) 0%, rgba(255,250,236,0) 68%),
-      radial-gradient(96% 62% at 50% 2%, #F3E9D2 0%, rgba(243,233,210,0) 64%),
-      linear-gradient(180deg,#EDE3CC 0%, #E4D8BE 56%, #D9CCAF 100%),
+      linear-gradient(180deg,#FAFAF8 0%, #F2F1EC 100%),
       var(--ink);
     background-attachment:fixed;
     color:var(--text);
@@ -80,51 +78,6 @@
   }
   body.tekk #rays{display:block}
 
-  /* daylight: a shaft from above, and the air moving in it */
-  .heaven{
-    position:fixed;inset:0;z-index:0;pointer-events:none;
-    transition:opacity .6s ease;
-    background:
-      conic-gradient(from 200deg at 50% -10%,
-        rgba(255,255,255,0) 0deg, rgba(255,251,236,.5) 14deg, rgba(255,255,255,0) 26deg,
-        rgba(255,255,255,0) 40deg, rgba(255,249,230,.38) 52deg, rgba(255,255,255,0) 66deg,
-        rgba(255,255,255,0) 96deg, rgba(255,251,238,.3) 108deg, rgba(255,255,255,0) 122deg,
-        rgba(255,255,255,0) 360deg);
-    -webkit-mask-image:linear-gradient(180deg,#000 0%, rgba(0,0,0,.5) 46%, rgba(0,0,0,0) 82%);
-    mask-image:linear-gradient(180deg,#000 0%, rgba(0,0,0,.5) 46%, rgba(0,0,0,0) 82%);
-    animation:shafts 26s ease-in-out infinite alternate;
-  }
-  body.tekk .heaven{opacity:0}
-  @keyframes shafts{
-    0%{transform:rotate(-1.6deg) scale(1.02)}
-    100%{transform:rotate(1.6deg) scale(1.06)}
-  }
-  .halo{
-    position:fixed;left:50%;top:-24vh;width:130vw;height:80vh;
-    margin-left:-65vw;z-index:0;pointer-events:none;
-    background:radial-gradient(closest-side, rgba(255,252,240,.62) 0%, rgba(255,244,214,.26) 44%, rgba(255,238,196,0) 74%);
-    animation:halo2 7s ease-in-out infinite;
-  }
-  body.tekk .halo{opacity:0}
-  @keyframes halo2{
-    0%,100%{opacity:.6;transform:scale(1)}
-    50%{opacity:.85;transform:scale(1.04)}
-  }
-  /* feathers of light drifting down */
-  .plumes{position:fixed;inset:0;z-index:1;pointer-events:none}
-  body.tekk .plumes{opacity:0}
-  .plumes i{
-    position:absolute;top:-6vh;width:3px;height:12px;border-radius:60% 60% 40% 40%;
-    background:linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,236,190,.12));
-    box-shadow:0 0 8px rgba(255,240,200,.55);
-    animation:fall linear infinite;
-  }
-  @keyframes fall{
-    0%{transform:translateY(0) translateX(0) rotate(0deg);opacity:0}
-    10%{opacity:.9}
-    80%{opacity:.5}
-    100%{transform:translateY(112vh) translateX(var(--dx,20px)) rotate(140deg);opacity:0}
-  }
   .hero > .inner, footer{position:relative;z-index:1}
   .inner{
     position:relative;
@@ -139,7 +92,7 @@
     content:"";
     position:absolute;inset:-16px;
     border-radius:50%;
-    background:radial-gradient(circle, rgba(255,255,255,.9) 0%, rgba(255,238,196,0) 68%);
+    background:none;
     animation:halo 5.5s ease-in-out infinite;
   }
   @keyframes halo{
@@ -152,7 +105,7 @@
     border-radius:50%;
     object-fit:cover;
     border:2px solid var(--gold);
-    box-shadow:0 0 0 6px rgba(255,252,242,.7), 0 0 0 8px rgba(170,132,60,.35), 0 0 46px rgba(255,232,170,.7);
+    box-shadow:none;
     display:block;
   }
 
@@ -174,16 +127,8 @@
     text-transform:uppercase;
     letter-spacing:.02em;
     margin:.12em 0 0;
-    background:linear-gradient(100deg,
-      #A9781F 0%, #C79A3C 30%,
-      #FFF3D0 46%, #E8C579 54%,
-      #C79A3C 70%, #A9781F 100%);
-    background-size:260% 100%;
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-    filter:drop-shadow(0 2px 1px rgba(255,252,240,.7)) drop-shadow(0 0 24px rgba(214,170,90,.45));
-    animation:shimmer 7s linear infinite;
+    color:#23231F;
+    background:none;
   }
   @keyframes shimmer{
     0%{background-position:180% 0}
@@ -214,9 +159,8 @@
     flex-direction:column;
     gap:9px;
     padding:22px 20px 20px;
-    background:linear-gradient(165deg, rgba(255,255,255,.75), rgba(255,255,255,0) 62%), var(--panel);
-    border:1px solid var(--line-hot);
-    box-shadow:0 10px 26px rgba(92,72,34,.14);
+    background:var(--panel);
+    border:1px solid var(--line);
     border-radius:2px;
     overflow:hidden;
     transition:transform .28s cubic-bezier(.2,.8,.25,1), border-color .28s ease, box-shadow .28s ease;
@@ -226,16 +170,18 @@
     position:absolute;left:0;right:0;bottom:0;
     height:3px;
     background:var(--c);
-    opacity:.6;
+    opacity:0;
     transition:opacity .28s ease, box-shadow .28s ease;
   }
   .door:hover,.door:focus-visible{
-    transform:translateY(-5px);
-    border-color:var(--c);
-    box-shadow:0 18px 40px rgba(120,96,48,.22);
+    border-color:var(--line-hot);
     outline:none;
   }
-  .door:hover::after,.door:focus-visible::after{opacity:1;box-shadow:0 0 24px var(--c)}
+  body.tekk .door:hover,
+  body.tekk .door:focus-visible{border-color:var(--c)}
+  body.tekk .door::after{opacity:.6}
+  body.tekk .door:hover::after,
+  body.tekk .door:focus-visible::after{opacity:1;box-shadow:0 0 24px var(--c)}
   .door-3:hover{animation-play-state:paused;filter:none;box-shadow:0 0 46px rgba(200,30,30,.75), 0 0 110px rgba(200,30,30,.4), inset 0 0 42px rgba(200,30,30,.2)}
 
   .door-k{
@@ -310,7 +256,7 @@
     align-items:center;
     gap:9px;
     padding:11px 14px 12px 15px;
-    background:linear-gradient(120deg, #FCF6E7, #F1E5CB 70%);
+    background:#FFFFFF;
     border:1px solid var(--line-hot);
     border-right:0;
     border-radius:3px 0 0 3px;
@@ -477,32 +423,40 @@
     position:fixed;top:16px;right:16px;z-index:70;
     display:flex;align-items:center;gap:11px;
     padding:11px 17px 12px;cursor:pointer;text-align:left;
-    color:var(--text);
-    background:linear-gradient(150deg, #FCF6E7, #F1E5CB 70%);
-    border:1px solid var(--line-hot);border-radius:3px;
-    box-shadow:0 0 0 0 rgba(140,100,30,.4), 0 8px 22px rgba(92,72,34,.22);
+    color:#F0342A;
+    background:linear-gradient(150deg, #1B0B0B, #0A0607 70%);
+    border:1px solid #7E1512;border-radius:3px;
+    box-shadow:0 0 0 0 rgba(194,26,18,.5), 0 0 26px rgba(194,26,18,.35), 0 8px 22px rgba(20,0,0,.25);
     transition:transform .18s cubic-bezier(.2,.8,.25,1), border-color .2s ease, box-shadow .2s ease;
-    animation:lure 3.6s ease-out infinite;
+    animation:lure 3.2s ease-out infinite, sicken 5.5s steps(1) infinite;
   }
-  #themeSw:hover{transform:translateY(-2px) scale(1.03);border-color:var(--gold);animation-play-state:paused}
+  #themeSw:hover{transform:translateY(-2px) scale(1.03);border-color:#F0342A;animation-play-state:paused}
+  /* it does not sit still, the way nothing on the other side does */
+  @keyframes sicken{
+    0%,86%,100%{filter:none}
+    87%{filter:brightness(1.7) saturate(1.5)}
+    88%{filter:brightness(.55)}
+    90%{filter:brightness(1.4)}
+    91%{filter:none}
+  }
   #themeSw:active{transform:translateY(0) scale(.99)}
   /* a ring going out, the way a dispel reads in game */
   @keyframes lure{
-    0%   {box-shadow:0 0 0 0 rgba(181,132,47,.42), 0 8px 22px rgba(120,96,48,.18)}
-    55%  {box-shadow:0 0 0 14px rgba(181,132,47,0), 0 8px 22px rgba(120,96,48,.18)}
-    100% {box-shadow:0 0 0 0 rgba(181,132,47,0), 0 8px 22px rgba(120,96,48,.18)}
+    0%   {box-shadow:0 0 0 0 rgba(194,26,18,.55), 0 0 26px rgba(194,26,18,.35), 0 8px 22px rgba(20,0,0,.25)}
+    55%  {box-shadow:0 0 0 16px rgba(194,26,18,0), 0 0 34px rgba(194,26,18,.45), 0 8px 22px rgba(20,0,0,.25)}
+    100% {box-shadow:0 0 0 0 rgba(194,26,18,0), 0 0 26px rgba(194,26,18,.35), 0 8px 22px rgba(20,0,0,.25)}
   }
   #themeSw .rune{
     position:relative;width:26px;height:26px;flex:0 0 26px;
     display:grid;place-items:center;
-    border:1px solid var(--gold-deep);border-radius:50%;
-    color:var(--gold);font-size:14px;line-height:1;
+    border:1px solid #7E1512;border-radius:50%;
+    color:#F0342A;font-size:14px;line-height:1;
     transition:color .3s ease, border-color .3s ease, transform .5s ease;
   }
   #themeSw .rune::before{content:"\271D"}
   #themeSw .t1{
     font-family:var(--display);font-weight:700;font-size:16px;line-height:1;
-    letter-spacing:.02em;color:var(--text);
+    letter-spacing:.02em;color:#E8D8D6;
   }
   /* the nudge, shown once until it is pressed */
   #themeHint{
@@ -510,7 +464,7 @@
     transform:translateX(-100%);
     padding-right:12px;
     font-family:var(--mono);font-size:10px;font-weight:700;
-    letter-spacing:.14em;text-transform:uppercase;color:var(--gold);
+    letter-spacing:.14em;text-transform:uppercase;color:#C21A12;
     white-space:nowrap;pointer-events:none;
     animation:nudge 1.9s ease-in-out infinite;
   }
@@ -908,6 +862,53 @@
 
   #tekkAudio, #holyAudio{display:none}
 
+  /* the door. a browser will not start a track on its own, so the site asks
+     you to open something first and takes that click as permission. */
+  #gate{
+    position:fixed;inset:0;z-index:200;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:16px;padding:24px;text-align:center;cursor:pointer;
+    background:var(--ink);
+    transition:opacity .55s ease;
+  }
+  #gate.gone{opacity:0;pointer-events:none}
+  .gate-k{
+    font-family:var(--mono);font-size:10.5px;font-weight:600;
+    letter-spacing:.24em;text-transform:uppercase;color:var(--dimmer);margin:0;
+  }
+  .gate-t{
+    font-family:var(--display);font-weight:800;
+    font-size:clamp(30px,6.5vw,58px);line-height:1;letter-spacing:-.01em;
+    color:var(--text);margin:0;
+  }
+  .gate-d{
+    max-width:34ch;margin:0;font-size:15px;line-height:1.6;color:var(--dim);
+  }
+  .gate-go{
+    margin-top:10px;
+    font-family:var(--mono);font-size:10.5px;font-weight:600;
+    letter-spacing:.2em;text-transform:uppercase;color:var(--gold);
+    animation:gateBreath 2.6s ease-in-out infinite;
+  }
+  @keyframes gateBreath{0%,100%{opacity:.45}50%{opacity:1}}
+  /* a thin candle of light down the middle, and nothing else */
+  .gate-lamp{
+    position:absolute;left:50%;top:0;width:2px;height:40vh;margin-left:-1px;
+    background:linear-gradient(180deg, rgba(160,122,46,0), rgba(160,122,46,.45), rgba(160,122,46,0));
+    animation:gateBreath 4s ease-in-out infinite;
+  }
+  #gate .alt{display:none}
+  body.tekk #gate{background:#06070C}
+  body.tekk #gate .std{display:none}
+  body.tekk #gate .alt{display:block}
+  body.tekk .gate-t{
+    font-family:"Grenze Gotisch","Pirata One",serif;
+    color:#A50D09;text-shadow:0 0 18px rgba(150,10,8,.5);
+  }
+  body.tekk .gate-lamp{
+    background:linear-gradient(180deg, rgba(150,10,8,0), rgba(150,10,8,.5), rgba(150,10,8,0));
+  }
+
   @media (prefers-reduced-motion:reduce){
     *{animation:none !important;transition:none !important}
     h1{background:none;color:var(--gold-hot);-webkit-text-fill-color:var(--gold-hot)}
@@ -916,9 +917,6 @@
 </head>
 <body>
 
-<div class="halo" aria-hidden="true"></div>
-<div class="heaven" aria-hidden="true"></div>
-<div class="plumes" id="plumes" aria-hidden="true"></div>
 <div class="smear" aria-hidden="true"></div>
 <div class="shafts" aria-hidden="true"></div>
 <div class="dust" id="dust" aria-hidden="true"></div>
@@ -986,6 +984,17 @@
   <span class="t1" id="themeLbl">Renounce</span>
 </button>
 
+<div id="gate" role="button" tabindex="0" aria-label="Enter">
+  <div class="gate-lamp" aria-hidden="true"></div>
+  <p class="gate-k std">Argent Dawn &middot; a small shrine, kept clean</p>
+  <p class="gate-k alt">Nobody has lit a candle here in a while</p>
+  <h2 class="gate-t std">Enter the shrine</h2>
+  <h2 class="gate-t alt">Come in anyway</h2>
+  <p class="gate-d std">Leave your key at the door. The Light is patient, the group finder is not.</p>
+  <p class="gate-d alt">The door was already open. It usually is.</p>
+  <p class="gate-go">Click anywhere</p>
+</div>
+
 <audio id="tekkAudio" src="/mercy.mp3" loop preload="none"></audio>
 <audio id="holyAudio" src="/tirion.mp3" loop preload="none"></audio>
 
@@ -1015,10 +1024,10 @@
       </a>
 
       <a class="door door-2" href="/kick/">
-        <span class="door-k" data-t="Not optional">Come along</span>
-        <span class="door-t" data-t="Think you can keep up?">Wanna join my keys?</span>
-        <span class="door-d" data-t="One button. One cast bar. Miss it and you find out how quickly a group can be four people.">Everyone is welcome. There is a short primer on interrupts here if you want to warm up first.</span>
-        <span class="door-go" data-t="Prove it →">Have a go →</span>
+        <span class="door-k" data-t="Not optional">Fancy a go</span>
+        <span class="door-t" data-t="Think you can keep up?">Test your interrupt skills</span>
+        <span class="door-d" data-t="One button. One cast bar. Miss it and you find out how quickly a group can be four people.">A cast bar appears, you press one key. See how many you catch. No score is sent anywhere.</span>
+        <span class="door-go" data-t="Prove it →">Try it →</span>
       </a>
     </div>
 
@@ -1054,20 +1063,23 @@
   var on     = false;
   try { on = localStorage.getItem('shy.tekk') === '1'; } catch(e){}
 
-  /* feathers of light on the bright side */
-  (function(){
-    var p = document.getElementById('plumes');
-    if (!p) return;
-    for (var i = 0; i < 16; i++){
-      var e = document.createElement('i');
-      e.style.left = (2 + Math.random() * 96).toFixed(1) + 'vw';
-      e.style.animationDuration = (13 + Math.random() * 16).toFixed(1) + 's';
-      e.style.animationDelay = (-Math.random() * 26).toFixed(1) + 's';
-      e.style.setProperty('--dx', ((Math.random() - 0.5) * 120).toFixed(0) + 'px');
-      e.style.height = (9 + Math.random() * 10).toFixed(0) + 'px';
-      p.appendChild(e);
-    }
-  })();
+  /* the light track runs across the whole site. its position lives in
+     sessionStorage so the next page carries on instead of starting over. */
+  var HKEY = 'shy.holy.t';
+  var holyAt = 0;
+  try { holyAt = parseFloat(sessionStorage.getItem(HKEY) || '0') || 0; } catch(e){}
+  function holySave(){
+    try { sessionStorage.setItem(HKEY, holy.currentTime.toFixed(2)); } catch(e){}
+  }
+  var lastSave = 0;
+  holy.addEventListener('timeupdate', function(){
+    var n = Date.now();
+    if (n - lastSave < 900) return;
+    lastSave = n;
+    holySave();
+  });
+  window.addEventListener('pagehide', holySave);
+  window.addEventListener('beforeunload', holySave);
 
   /* dust in the shafts, seeded the same way */
   (function(){
@@ -1133,9 +1145,18 @@
 
   /* one side plays, the other stops. a track always starts from the top,
      so the fade in at the head of each file does the work. */
+  function seek(el, at){
+    if (el.readyState > 0){ try { el.currentTime = at; } catch(e){} }
+    else el.addEventListener('loadedmetadata', function(){
+      try { el.currentTime = at; } catch(e){}
+    }, { once: true });
+  }
   function start(el, vol){
     try {
-      el.currentTime = 0;
+      /* renouncing and redeeming start a track fresh, so the fade in lands.
+         arriving from another page picks the light track back up. */
+      if (el === holy && holyAt > 0){ seek(el, holyAt); holyAt = 0; }
+      else el.currentTime = 0;
       el.volume = vol;
       var p = el.play();
       if (p && p.catch) p.catch(function(){});
@@ -1217,26 +1238,52 @@
   } catch(e){}
   if (on && hint) hint.classList.add('gone');
 
-  /* a reload cannot start audio on its own, so wait for any gesture */
-  if (on){
-    var once = function(){
-      play(); listen(); startCycle();
-      window.removeEventListener('pointerdown', once);
-      window.removeEventListener('keydown', once);
-    };
-    window.addEventListener('pointerdown', once);
-    window.addEventListener('keydown', once);
-  } else {
-    /* the light side waits for a gesture too, browsers do not care which
-       theme you are in */
-    var onceH = function(){
-      if (!on) play();
-      window.removeEventListener('pointerdown', onceH);
-      window.removeEventListener('keydown', onceH);
-    };
-    window.addEventListener('pointerdown', onceH);
-    window.addEventListener('keydown', onceH);
+  /* a reload cannot start audio on its own. the door handles that on the
+     first visit, and any gesture does after it has been opened. */
+  function begin(){
+    play();
+    if (on){
+      listen(); startCycle();
+      if (AC && AC.state === 'suspended'){ try { AC.resume(); } catch(e){} }
+    }
   }
+
+  (function(){
+    var gate = document.getElementById('gate');
+    if (!gate) return;
+
+    var seen = false;
+    try { seen = sessionStorage.getItem('shy.entered') === '1'; } catch(e){}
+
+    function drop(){
+      if (gate.parentNode) gate.parentNode.removeChild(gate);
+    }
+    if (seen){
+      drop();
+      var once = function(){
+        begin();
+        window.removeEventListener('pointerdown', once);
+        window.removeEventListener('keydown', once);
+      };
+      window.addEventListener('pointerdown', once);
+      window.addEventListener('keydown', once);
+      return;
+    }
+
+    document.documentElement.style.overflow = 'hidden';
+    var opened = false;
+    function open(){
+      if (opened) return;
+      opened = true;
+      try { sessionStorage.setItem('shy.entered', '1'); } catch(e){}
+      gate.classList.add('gone');
+      document.documentElement.style.overflow = '';
+      begin();
+      setTimeout(drop, 700);
+    }
+    gate.addEventListener('click', open);
+    window.addEventListener('keydown', open);
+  })();
 
   /* ---- the line under the name ---- */
   var tag = document.getElementById('tekkTag');

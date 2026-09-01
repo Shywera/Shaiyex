@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Shy - WoW raiding application. Holy Paladin, nine classes at mythic level, full progression, Warcraft Logs and thirteen guilds.">
-<meta name="theme-color" content="#E4D8BE">
+<meta name="theme-color" content="#F2F1EC">
 <meta property="og:type" content="profile">
 <meta property="og:title" content="Who This Guy - Shy">
 <meta property="og:description" content="Holy Paladin. Mythic+ score, keys, progression and logs.">
@@ -20,20 +20,20 @@
 
 <style>
   :root{
-    --ink:#E4D8BE;
-    --ink-2:#F6EEDC;
-    --panel:#FAF3E3;
-    --panel-2:#F3E9D2;
-    --line:#CFBE9B;
-    --line-hot:#B8A275;
+    --ink:#F2F1EC;
+    --ink-2:#FFFFFF;
+    --panel:#FFFFFF;
+    --panel-2:#F7F6F2;
+    --line:#E2E0D9;
+    --line-hot:#D2CFC5;
 
-    --text:#241E14;
-    --dim:#5C5340;
-    --dimmer:#8C7F66;
+    --text:#23231F;
+    --dim:#5E5D56;
+    --dimmer:#8B8A81;
 
-    --gold:#B5842F;
-    --gold-hot:#8A6116;
-    --gold-deep:#D9C289;
+    --gold:#A07A2E;
+    --gold-hot:#7E5D18;
+    --gold-deep:#CFC4A6;
     --pink:#F48CBA;
     --blue:#7FB6E8;
     --mint:#6FD5A0;
@@ -69,8 +69,7 @@
   body{
     margin:0;
     background:
-      radial-gradient(56% 34% at 50% -8%, rgba(255,250,236,.85) 0%, rgba(255,250,236,0) 70%),
-      linear-gradient(180deg, #F3E9D2 0%, rgba(243,233,210,0) 900px),
+      linear-gradient(180deg,#FAFAF8 0%, #F2F1EC 700px),
       var(--ink);
     background-attachment:fixed;
     color:var(--text);
@@ -101,26 +100,10 @@
     background-attachment:fixed;
   }
 
-  /* the canvases only read against the dark, so daylight gets shafts instead */
+  /* the canvases belong to the dark. daylight is just a page. */
   #rays, #motes{opacity:0;transition:opacity .5s ease}
   body.tekk #rays{opacity:.6}
   body.tekk #motes{opacity:1}
-  .heaven{
-    position:absolute;inset:0;z-index:0;pointer-events:none;
-    background:
-      conic-gradient(from 202deg at 50% -14%,
-        rgba(255,255,255,0) 0deg, rgba(255,251,236,.55) 13deg, rgba(255,255,255,0) 25deg,
-        rgba(255,255,255,0) 42deg, rgba(255,249,230,.4) 53deg, rgba(255,255,255,0) 66deg,
-        rgba(255,255,255,0) 360deg);
-    -webkit-mask-image:linear-gradient(180deg,#000 0%, rgba(0,0,0,.4) 52%, rgba(0,0,0,0) 88%);
-    mask-image:linear-gradient(180deg,#000 0%, rgba(0,0,0,.4) 52%, rgba(0,0,0,0) 88%);
-    animation:shafts 28s ease-in-out infinite alternate;
-  }
-  body.tekk .heaven{opacity:0}
-  @keyframes shafts{
-    0%{transform:rotate(-1.4deg) scale(1.02)}
-    100%{transform:rotate(1.4deg) scale(1.06)}
-  }
   a:hover{border-bottom-color:var(--gold);color:var(--gold-hot)}
   a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 
@@ -143,7 +126,7 @@
     letter-spacing:.02em;
     margin:.1em 0 0;
     color:var(--gold-hot);
-    text-shadow:0 0 46px rgba(214,170,90,.32), 0 0 110px rgba(214,170,90,.14);
+    text-shadow:none;
   }
 
   h2{
@@ -229,7 +212,7 @@
     border-radius:50%;
     object-fit:cover;
     border:2px solid var(--gold);
-    box-shadow:0 0 0 6px rgba(255,252,242,.7), 0 0 0 8px rgba(170,132,60,.3), 0 0 44px rgba(255,232,170,.6);
+    box-shadow:none;
     display:block;
   }
 
@@ -453,7 +436,7 @@
     background-clip:text;
     color:transparent;
     text-shadow:none;
-    filter:drop-shadow(0 2px 1px rgba(255,252,240,.7)) drop-shadow(0 0 26px rgba(214,170,90,.45));
+    filter:none;
     animation:shimmer 7s linear infinite;
   }
   @keyframes shimmer{
@@ -828,7 +811,6 @@
 <a class="backlink" href="/">← shaiyex.com</a>
 
 <header class="hero">
-  <div class="heaven" aria-hidden="true"></div>
   <canvas id="rays" aria-hidden="true"></canvas>
   <canvas id="motes" aria-hidden="true"></canvas>
   <div class="hero-inner">
@@ -1313,6 +1295,8 @@
   });
 })();
 </script>
+
+<script src="/holy.js" defer></script>
 
 </body>
 </html>

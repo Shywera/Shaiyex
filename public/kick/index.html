@@ -1815,7 +1815,7 @@
 
   <div class="gated locked" id="gated" aria-hidden="true">
 
-  <section>
+  <section id="secRule">
     <div class="sec-head">
       <p class="eyebrow">The one rule</p>
       <h2>Can't kick, can't CC? Leave. Now. Not at the last boss.</h2>
@@ -1966,7 +1966,7 @@
     </div>
   </section>
 
-  <section>
+  <section id="secRebut">
     <div class="sec-head">
       <p class="eyebrow">Step three · pre-emptive rebuttals</p>
       <h2>Things you will not be typing tonight.</h2>
@@ -4371,6 +4371,86 @@
   });
 })();
 </script>
+
+<script>
+/* This page was written for the version of me that has already been renounced.
+   On the light side it is a warm up instead of an entrance exam: the hostile
+   lines are swapped out and the two sections that exist purely to argue with
+   you are not shown at all. Nothing here touches the dark copy. */
+(function(){
+  var dark = false;
+  try { dark = localStorage.getItem('shy.tekk') === '1'; } catch(e){}
+  if (dark) return;
+
+  var CALM = {
+    pEyebrow: 'A warm up · no score, no judgement',
+    pLede: 'Interrupts are the one thing that turns a bad pull around, and almost nobody practises them outside of a key. <strong>So here is a cast bar and one button.</strong> Have a few goes, see how it feels, and take as long as you like. Nothing here is being recorded.',
+    pRule: 'If your class has no interrupt, or your kick is down, say so early and the rest of us will cover it. That is all the rule is. A group that knows who is on which cast almost never loses one.',
+    pReady: 'Read it through, and I will hold myself to the same.',
+    pPass: 'Nicely done.',
+    pFoot: '<b>You probably got this link from me. It is a training dummy, not a test.</b>'
+  };
+
+  function html(id, s){
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = s;
+  }
+  function textOf(sel, s){
+    var el = document.querySelector(sel);
+    if (el) el.innerHTML = s;
+  }
+
+  function calm(){
+    for (var k in CALM){ if (Object.prototype.hasOwnProperty.call(CALM, k)) html(k, CALM[k]); }
+
+    textOf('.hero h1', 'You Have An Interrupt.<br><span class="beg">Let’s See You Use It.</span>');
+    textOf('.lv-head .eyebrow', 'Nicely done. Fancy something harder?');
+
+    var rule = document.getElementById('secRule');
+    if (rule){
+      var re = rule.querySelector('.eyebrow'), rh = rule.querySelector('h2');
+      if (re) re.textContent = 'The one thing worth agreeing on';
+      if (rh) rh.textContent = 'Say early if you cannot cover a kick.';
+      var stakes = rule.querySelector('.stakes');
+      if (stakes) stakes.textContent = 'One interrupt is worth more than most of the cooldowns you own. A healer who is not being hit gets to heal, and everything downstream of that goes better.';
+      var ps = rule.querySelectorAll('.rule-body p');
+      for (var i = 0; i < ps.length; i++){
+        if (ps[i].id || ps[i].className) continue;
+        ps[i].hidden = true;
+      }
+    }
+
+    var reb = document.getElementById('secRebut');
+    if (reb) reb.hidden = true;
+
+    var b = document.getElementById('bootTitle');
+    if (b) b.textContent = 'That One Got Past You.';
+    var w = document.getElementById('winTitle');
+    if (w) w.textContent = 'Nicely Done.';
+
+    var bootSmall = document.querySelector('#boot .small');
+    if (bootSmall) bootSmall.textContent = 'Which is the whole reason this page exists. Have another go, it gets quick fast.';
+    var bootBtn = document.getElementById('bootBtn');
+    if (bootBtn) bootBtn.textContent = 'Show me how.';
+  }
+
+  function later(){ setTimeout(calm, 0); }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', later);
+  else later();
+
+  /* the point of view buttons rewrite some of the same lines, so follow them */
+  window.addEventListener('load', function(){
+    ['povMine', 'povJoined'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('click', later);
+    });
+    later();
+  });
+})();
+</script>
+
+<script src="/holy.js" defer></script>
 
 </body>
 </html>

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="What I bring to a group, plainly.">
-<meta name="theme-color" content="#F7F2E6">
+<meta name="theme-color" content="#F2F1EC">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Why Invite Me">
 <meta property="og:description" content="Holy Paladin. What I bring to a group, plainly.">
@@ -20,16 +20,16 @@
 
 <style>
   :root{
-    --ink:#F7F2E6;
-    --panel:#FFFDF8;
-    --line:#E6DAC0;
-    --line-hot:#CDB88C;
-    --text:#241E14;
-    --dim:#5C5340;
-    --dimmer:#8C7F66;
-    --gold:#B5842F;
-    --gold-hot:#8A6116;
-    --gold-deep:#D9C289;
+    --ink:#F2F1EC;
+    --panel:#FFFFFF;
+    --line:#E2E0D9;
+    --line-hot:#D2CFC5;
+    --text:#23231F;
+    --dim:#5E5D56;
+    --dimmer:#8B8A81;
+    --gold:#A07A2E;
+    --gold-hot:#7E5D18;
+    --gold-deep:#CFC4A6;
     --blue:#2E6E9E;
     --green:#2E7C55;
 
@@ -42,31 +42,13 @@
   body{
     margin:0;
     background:
-      radial-gradient(58% 40% at 50% -14%, #FFFFFF 0%, rgba(255,255,255,0) 68%),
-      radial-gradient(100% 60% at 50% 0%, #FFF6DF 0%, rgba(255,246,223,0) 64%),
-      linear-gradient(180deg,#FFFBF0 0%, #F4EDDC 60%, #EFE6CF 100%),
+      linear-gradient(180deg,#FAFAF8 0%, #F2F1EC 100%),
       var(--ink);
     background-attachment:fixed;
     color:var(--text);
     font-family:var(--body);
     font-size:17px;line-height:1.65;
     -webkit-font-smoothing:antialiased;
-  }
-  /* the same light that falls on the front page */
-  .heaven{
-    position:fixed;inset:0;z-index:0;pointer-events:none;
-    background:
-      conic-gradient(from 202deg at 50% -10%,
-        rgba(255,255,255,0) 0deg, rgba(255,250,232,.7) 13deg, rgba(255,255,255,0) 25deg,
-        rgba(255,255,255,0) 42deg, rgba(255,248,226,.55) 53deg, rgba(255,255,255,0) 66deg,
-        rgba(255,255,255,0) 360deg);
-    -webkit-mask-image:linear-gradient(180deg,#000 0%, rgba(0,0,0,.45) 44%, rgba(0,0,0,0) 78%);
-    mask-image:linear-gradient(180deg,#000 0%, rgba(0,0,0,.45) 44%, rgba(0,0,0,0) 78%);
-    animation:shafts 28s ease-in-out infinite alternate;
-  }
-  @keyframes shafts{
-    0%{transform:rotate(-1.4deg) scale(1.02)}
-    100%{transform:rotate(1.4deg) scale(1.06)}
   }
   .page{position:relative;z-index:1}
   .page{
@@ -80,7 +62,7 @@
     position:fixed;bottom:16px;left:16px;z-index:60;
     font-family:var(--mono);font-size:10.5px;font-weight:600;
     letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
-    background:rgba(255,253,248,.92);border:1px solid var(--line-hot);
+    background:#FFFFFF;border:1px solid var(--line);
     border-radius:2px;padding:7px 12px 8px;text-decoration:none;
   }
   .backlink:hover{color:var(--text);border-color:var(--gold)}
@@ -92,8 +74,7 @@
   h1{
     font-weight:700;font-size:clamp(40px,8vw,68px);
     line-height:1.02;letter-spacing:-.02em;margin:.18em 0 0;
-    background:linear-gradient(100deg, #A9781F 0%, #E7C77E 46%, #A9781F 100%);
-    -webkit-background-clip:text;background-clip:text;color:transparent;
+    color:#23231F;
   }
   .lede{
     font-size:clamp(17px,2.5vw,20px);color:var(--dim);
@@ -113,9 +94,8 @@
   .point{
     display:grid;grid-template-columns:auto 1fr;gap:16px;
     padding:20px 22px;
-    background:linear-gradient(160deg, #FFFFFF, rgba(255,255,255,0) 62%), var(--panel);
+    background:var(--panel);
     border:1px solid var(--line);border-left:3px solid var(--c);border-radius:2px;
-    box-shadow:0 8px 22px rgba(120,96,48,.08);
   }
   .point-n{
     font-family:var(--mono);font-size:11px;font-weight:600;
@@ -141,9 +121,8 @@
 
   .close{
     padding:clamp(24px,5vw,34px);text-align:center;border-radius:2px;
-    background:radial-gradient(90% 150% at 50% 0%, rgba(255,238,190,.55), rgba(255,238,190,0) 68%), var(--panel);
-    border:1px solid var(--line-hot);
-    box-shadow:0 10px 30px rgba(120,96,48,.10);
+    background:var(--panel);
+    border:1px solid var(--line);
   }
   .close p{font-size:clamp(19px,3.4vw,26px);line-height:1.3;color:var(--text);margin:0;font-weight:600}
   .close small{
@@ -167,8 +146,6 @@
 </style>
 </head>
 <body>
-
-<div class="heaven" aria-hidden="true"></div>
 
 <a class="backlink" href="/">shaiyex.com</a>
 
@@ -239,6 +216,8 @@
   </footer>
 
 </div>
+
+<script src="/holy.js" defer></script>
 
 </body>
 </html>
