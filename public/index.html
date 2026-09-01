@@ -202,16 +202,11 @@
   /* ---------- the two doors ---------- */
   .doors{
     display:grid;
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns:repeat(3,1fr);
     gap:14px;
     margin-top:clamp(34px,6vw,52px);
     text-align:left;
   }
-  /* the interrupt exam only exists once you have seen the other side */
-  .door-2{display:none}
-  body.tekk .door-2{display:flex}
-  body.tekk .doors{grid-template-columns:repeat(3,1fr)}
-
   .door{
     --c:var(--gold);
     position:relative;
@@ -1020,9 +1015,9 @@
       </a>
 
       <a class="door door-2" href="/kick/">
-        <span class="door-k" data-t="Not optional">Before we go</span>
+        <span class="door-k" data-t="Not optional">Come along</span>
         <span class="door-t" data-t="Think you can keep up?">Wanna join my keys?</span>
-        <span class="door-d" data-t="One button. One cast bar. Miss it and you find out how quickly a group can be four people.">A quick primer on interrupts. Press one button when a cast bar appears and we all have a good time.</span>
+        <span class="door-d" data-t="One button. One cast bar. Miss it and you find out how quickly a group can be four people.">Everyone is welcome. There is a short primer on interrupts here if you want to warm up first.</span>
         <span class="door-go" data-t="Prove it →">Have a go →</span>
       </a>
     </div>
