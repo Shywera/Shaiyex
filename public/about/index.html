@@ -16,7 +16,7 @@
 <link rel="apple-touch-icon" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Schibsted+Grotesk:wght@400;500;600;700&family=Pirata+One&family=Grenze+Gotisch:wght@600;700;800&display=swap">
 
 <style>
   :root{
@@ -98,6 +98,81 @@
       radial-gradient(120% 60% at 50% 112%, rgba(90,6,6,.26), rgba(90,6,6,0) 62%),
       linear-gradient(180deg, #080A11 0%, #06070C 46%, #08060A 100%);
     background-attachment:fixed;
+  }
+
+  /* ---------- the dark, properly ---------- */
+  body.tekk h1,
+  body.tekk h2,
+  body.tekk .ms-name,
+  body.tekk .titleline{
+    font-family:"Grenze Gotisch","Pirata One",serif;
+    font-weight:800;letter-spacing:.01em;
+  }
+  body.tekk h1{
+    background:none;color:#A50D09;-webkit-text-fill-color:#A50D09;
+    filter:none;
+    text-shadow:
+      3px 3px 0 #06070C, -1px -1px 0 #06070C,
+      0 0 18px rgba(150,10,8,.5), 0 0 70px rgba(90,4,4,.55);
+    animation:flicker 6.5s steps(1) infinite;
+  }
+  @keyframes flicker{
+    0%,52%,54%,58%,72%,74%,100%{opacity:1}
+    53%,73%{opacity:.35}
+    56%{opacity:.6}
+  }
+  body.tekk .ms-name{
+    background:none;color:#8E0F0F;-webkit-text-fill-color:#8E0F0F;
+    filter:none;text-shadow:0 0 22px rgba(150,10,8,.5);
+  }
+  body.tekk h2{color:#B6A8A4;text-shadow:0 0 20px rgba(120,8,8,.45)}
+  body.tekk .titleline{color:#6E5C59;font-size:1.15em}
+  body.tekk .eyebrow{color:#8E0F0F;letter-spacing:.26em}
+
+  /* plates, not cards: iron, rivets, and a stain along the top */
+  body.tekk .mainstage,
+  body.tekk .key,
+  body.tekk .tier,
+  body.tekk .logcard,
+  body.tekk .cls{
+    background:
+      radial-gradient(58% 20% at 24% 0%, rgba(110,11,8,.42), rgba(110,11,8,0) 74%),
+      radial-gradient(circle at 10px 10px, rgba(150,168,196,.14) 0 2px, rgba(0,0,0,0) 3px),
+      radial-gradient(circle at calc(100% - 10px) 10px, rgba(150,168,196,.14) 0 2px, rgba(0,0,0,0) 3px),
+      linear-gradient(165deg, rgba(160,180,220,.035), rgba(160,180,220,0) 60%),
+      #090B12;
+    border-color:#232A38;
+    border-top-color:#39424F;
+  }
+  body.tekk .key:hover,
+  body.tekk .tier:hover,
+  body.tekk .logcard:hover{
+    border-color:#8E0F0F;
+    box-shadow:0 0 30px rgba(140,10,10,.22), 0 14px 34px rgba(0,0,0,.7);
+  }
+  body.tekk .ms-link{
+    border-color:#3E1213;color:#C9B7B3;
+  }
+  body.tekk .ms-link:hover{border-color:#C21A12;color:#F0342A}
+  body.tekk .ms-n{color:#C21A12;text-shadow:0 0 22px rgba(150,10,8,.55)}
+  body.tekk #prog{background:linear-gradient(90deg,#3A0806,#C21A12);box-shadow:0 0 12px rgba(194,26,18,.7)}
+  body.tekk .backlink{background:rgba(9,11,18,.92);border-color:#3E1213;color:#8E7A76}
+  body.tekk .backlink:hover{border-color:#C21A12;color:#F0342A}
+  body.tekk .sec-head::before{background:linear-gradient(90deg,#C21A12,rgba(194,26,18,0))}
+  body.tekk .scrollcue i{background:linear-gradient(180deg, rgba(194,26,18,0), #8E0F0F)}
+  body.tekk .scrollcue span{color:#6E5C59}
+
+  /* the dark closes in at the edges here too */
+  .vig{
+    position:fixed;inset:0;z-index:3;pointer-events:none;opacity:0;
+    transition:opacity .6s ease;
+    background:radial-gradient(115% 88% at 50% 46%,
+      rgba(0,0,0,0) 34%, rgba(0,0,0,.5) 72%, rgba(0,0,0,.92) 100%);
+  }
+  body.tekk .vig{opacity:1;animation:thump 2.4s ease-in-out infinite}
+  @keyframes thump{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.03)}
   }
 
   /* the canvases belong to the dark. daylight is just a page. */
@@ -807,6 +882,7 @@
 
 
 <div id="prog" aria-hidden="true"></div>
+<div class="vig" aria-hidden="true"></div>
 
 <a class="backlink" href="/">← shaiyex.com</a>
 

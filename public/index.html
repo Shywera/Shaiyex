@@ -1125,12 +1125,33 @@
     will-change:transform;
   }
   body.travel #world{pointer-events:none}
-  /* up, into the light */
-  body.go-up #world{transform:translateY(48vh) scale(1.14);opacity:0;filter:blur(7px) brightness(1.5)}
-  /* dragged off to one side, on the end of a chain */
-  body.go-side #world{transform:translateX(-66vw) rotate(-2.6deg);opacity:0}
-  /* and straight down */
-  body.go-hell #world{transform:translateY(-62vh) scale(.82);opacity:0;filter:blur(5px) saturate(.35)}
+  /* wiped off to one side */
+  body.go-left  #world{transform:translateX(-62vw) rotate(-1.8deg);opacity:0}
+  body.go-right #world{transform:translateX(62vw)  rotate(1.8deg);opacity:0}
+  /* it comes at you instead */
+  body.go-lunge #world{transform:scale(1.55);opacity:0;filter:blur(9px) saturate(1.4)}
+  /* and down, a long way */
+  body.go-descend #world{transform:translateY(-72vh) scale(.88);opacity:0;filter:blur(4px) saturate(.4)}
+
+  /* a plate swinging out of the way before its section opens */
+  .swing-l{animation:swingL .5s cubic-bezier(.35,0,.25,1) forwards !important}
+  @keyframes swingL{
+    0%  {transform:rotate(var(--tilt,0deg))}
+    62% {transform:rotate(-19deg)}
+    100%{transform:rotate(-15deg)}
+  }
+  /* and one that simply keeps going down */
+  .dropping{animation:dropDown 1.25s cubic-bezier(.45,0,.85,1) forwards !important}
+  @keyframes dropDown{
+    0%  {transform:translateY(0) rotate(var(--tilt,0deg))}
+    100%{transform:translateY(88vh) rotate(calc(var(--tilt,0deg) + 2deg))}
+  }
+  body.tekk .blbar.dropping::before{
+    animation:chainDrop 1.25s cubic-bezier(.45,0,.85,1) forwards;
+  }
+  @keyframes chainDrop{
+    to{height:calc(var(--chain,46px) + 88vh)}
+  }
 
   #view{
     position:fixed;inset:0;z-index:150;background:var(--ink);
@@ -1163,13 +1184,13 @@
       radial-gradient(90% 60% at 50% 118%, rgba(190,14,10,.85), rgba(120,6,6,0) 62%),
       radial-gradient(60% 40% at 50% 100%, rgba(255,90,20,.5), rgba(255,90,20,0) 70%);
   }
-  body.go-hell .hellfx{animation:hellUp 1.5s ease-out forwards}
+  body.go-descend .hellfx{animation:hellUp 1.6s ease-out forwards}
   @keyframes hellUp{
     0%{opacity:0;transform:translateY(30%)}
     45%{opacity:1;transform:translateY(0)}
     100%{opacity:0;transform:translateY(-10%)}
   }
-  body.go-hell #world{animation:quake .12s steps(2) 9}
+  body.go-descend #world{animation:quake .12s steps(2) 9}
   @keyframes quake{
     0%{margin-left:0}25%{margin-left:-7px}50%{margin-left:6px}75%{margin-left:-4px}100%{margin-left:0}
   }
@@ -1327,7 +1348,7 @@
     <h1>Shaiyex</h1>
     <p class="tag" id="tekkTag"><span class="un">Un</span>holy Paladin</p>
     <div class="doors">
-      <a class="door door-1" href="/about/" data-go="up" data-go-tekk="side">
+      <a class="door door-1" href="/about/" data-go="left" data-go-tekk="swing-left">
         <span class="door-k" data-t="Required reading">Nice to meet you</span>
         <span class="door-t" data-t="Who you are dealing with">About me</span>
         <span class="door-d" data-t="Not a CV. A reminder. You have run with people who play this game. You have not run with me.">Score, this season’s keys, raid progression and the logs for every class I play. Have a look.</span>
@@ -1335,7 +1356,7 @@
         <span class="door-go" data-t="Look at it →">Read it →</span>
       </a>
 
-      <a class="door door-4" href="/pitch/" data-h="/why/" data-go="up" data-go-tekk="side">
+      <a class="door door-4" href="/pitch/" data-h="/why/" data-go="right" data-go-tekk="lunge" data-hush-tekk>
         <span class="door-k" data-t="Not a request">The pitch</span>
         <span class="door-t" data-t="Do not fight the invite">Why invite me</span>
         <span class="door-d" data-t="You were going to bring me anyway. This is only the part where you find out why.">Three honest reasons to bring me along, and what I actually do for a group.</span>
@@ -1343,7 +1364,7 @@
         <span class="door-go" data-t="Stop resisting →">Hear it →</span>
       </a>
 
-      <a class="door door-2" href="/kick/" data-go="side">
+      <a class="door door-2" href="/kick/" data-go="swing-left" data-hush data-silent>
         <span class="door-k" data-t="Not optional">Fancy a go</span>
         <span class="door-t" data-t="Think you can keep up?">Test your interrupt skills</span>
         <span class="door-d" data-t="One button. One cast bar. Miss it and you find out how quickly a group can be four people.">A cast bar appears, you press one key. See how many you catch. No score is sent anywhere.</span>
@@ -1352,7 +1373,7 @@
       </a>
     </div>
 
-    <a class="wip" href="/beat/" data-go="side">
+    <a class="wip" href="/beat/" data-go="swing-left" data-hush>
       <span>
         <span class="wip-t" data-t="Interrupt on the beat">Interrupt on the beat</span>
         <span class="wip-s" data-t="Prove it in time">Rhythm mode</span>
@@ -1360,7 +1381,7 @@
       <span class="wip-tag">WIP</span>
     </a>
 
-    <a class="blbar" href="/deplete/" data-go="hell">
+    <a class="blbar" href="/deplete/" data-go="drop" data-hush>
       <span class="bl-t" data-t="Blacklist">Blacklist</span>
       <span class="bl-d" data-t="The names that cost me a key. They are on here for good.">What went wrong in a depleted key, and the names I would rather not run with again.</span>
       <span class="bl-go" data-t="See who →">Open it →</span>
@@ -1503,13 +1524,17 @@
       try { el.currentTime = at; } catch(e){}
     }, { once: true });
   }
-  function start(el, vol){
+  function start(el, vol, fresh){
     try {
-      /* renouncing and redeeming start a track fresh, so the fade in lands.
-         arriving from another page picks the light track back up. */
-      if (el === holy && holyAt > 0){ seek(el, holyAt); holyAt = 0; }
-      else el.currentTime = 0;
+      /* if it is already running, leave it alone. only a deliberate side
+         change starts a track over, and only then does the fade in land. */
       el.volume = vol;
+      if (!el.paused && !el.ended){
+        if (!fresh) return;
+      }
+      if (fresh) el.currentTime = 0;
+      else if (el === holy && holyAt > 0){ seek(el, holyAt); holyAt = 0; }
+      else if (el.paused && el.currentTime === 0) el.currentTime = 0;
       var p = el.play();
       if (p && p.catch) p.catch(function(){});
     } catch(e){}
@@ -1517,9 +1542,9 @@
   function stop(el){
     try { el.pause(); } catch(e){}
   }
-  function play(){
-    if (on){ stop(holy); start(audio, 0.55); }
-    else   { stop(audio); start(holy, 0.34); }
+  function play(fresh){
+    if (on){ stop(holy); start(audio, 0.55, fresh); }
+    else   { stop(audio); start(holy, 0.34, fresh); }
   }
 
   /* letters coming apart, then knitting back together */
@@ -1571,7 +1596,7 @@
        allowed to start here and nowhere else */
     /* swap the music under the wipe, not before it */
     setTimeout(function(){
-      play();
+      play(true);
       if (on){
         listen();
         if (AC && AC.state === 'suspended'){ try { AC.resume(); } catch(e){} }
@@ -1610,16 +1635,57 @@
   var view  = document.getElementById('view');
   var frame = document.getElementById('viewFrame');
   var viewX = document.getElementById('viewX');
+
+  /* where the incoming view starts from, per direction */
   var FROM = {
-    up:   'translateY(-46vh) scale(1.06)',
-    side: 'translateX(54vw) rotate(2.2deg)',
-    hell: 'translateY(60vh) scale(1.12)'
+    left:    'translateX(58vw)',
+    right:   'translateX(-58vw)',
+    lunge:   'scale(.7)',
+    descend: 'translateY(66vh)'
   };
-  var open = false, moving = false, kind = 'up';
+  /* some doors do something first, then leave in a direction */
+  var PRE = {
+    'swing-left': { cls: 'swing-l', wait: 470, dir: 'left'  },
+    'drop':       { cls: 'dropping', wait: 1150, dir: 'descend' }
+  };
+
+  var vOpen = false, moving = false, dir = 'left', pre = null;
+  var quiet = false, fadeT = null, silent = false;
+
+  function nowPlaying(){ return on ? audio : holy; }
+  function fullVol(){ return on ? 0.55 : 0.34; }
+
+  /* a track never cuts, it walks down and back up again */
+  function fade(el, to, ms, done){
+    clearInterval(fadeT);
+    var from = el.volume, step = 40, n = Math.max(1, Math.round(ms / step)), i = 0;
+    fadeT = setInterval(function(){
+      i++;
+      var v = from + (to - from) * (i / n);
+      try { el.volume = Math.max(0, Math.min(1, v)); } catch(e){}
+      if (i >= n){
+        clearInterval(fadeT);
+        if (done) done();
+      }
+    }, step);
+  }
+
+  function hush(){
+    quiet = true;
+    var el = nowPlaying();
+    fade(el, 0, 620, function(){ try { el.pause(); } catch(e){} });
+  }
+  function unhush(){
+    if (!quiet) return;
+    quiet = false;
+    var el = nowPlaying();
+    try { el.volume = 0; var p = el.play(); if (p && p['catch']) p['catch'](function(){}); } catch(e){}
+    fade(el, fullVol(), 900);
+  }
 
   function dressFrame(){
     /* same origin, so the view can be told it is being looked at from
-       here: no back link of its own, and no second track. */
+       here: no back link of its own, and no second copy of the track. */
     try {
       var d = frame.contentDocument;
       if (!d) return;
@@ -1627,6 +1693,21 @@
       var s = d.createElement('style');
       s.textContent = '.backlink{display:none !important}';
       d.head.appendChild(s);
+      var mute = ['holyAudio', 'tekkAudio'];
+      if (silent) mute = mute.concat(['bgsong', 'hsong']);
+      mute.forEach(function(id){
+        var a = d.getElementById(id);
+        if (a){ try { a.pause(); a.muted = true; } catch(e){} }
+      });
+      if (silent){
+        /* it can start one later on a click of its own, so keep watching */
+        setTimeout(function(){
+          mute.forEach(function(id){
+            var a = d.getElementById(id);
+            if (a){ try { a.pause(); a.muted = true; } catch(e){} }
+          });
+        }, 900);
+      }
       var back = d.querySelector('.backlink');
       if (back) back.addEventListener('click', function(e){ e.preventDefault(); shut(); });
       d.addEventListener('keydown', function(e){ if (e.key === 'Escape') shut(); });
@@ -1634,36 +1715,55 @@
   }
   frame.addEventListener('load', dressFrame);
 
-  function travel(url, how){
-    if (open || moving) return;
-    moving = true; open = true; kind = how;
+  function go(url, how, opts){
+    if (vOpen || moving) return;
+    moving = true; vOpen = true; dir = how;
+    silent = !!(opts && opts.silent);
+    if (opts && opts.hush) hush();
     body.classList.add('travel', 'go-' + how);
     frame.src = url;
     view.hidden = false;
-    view.style.transform = FROM[how];
+    view.style.transform = FROM[how] || FROM.left;
     document.documentElement.style.overflow = 'hidden';
     requestAnimationFrame(function(){
       requestAnimationFrame(function(){ view.classList.add('on'); });
     });
-    setTimeout(function(){
-      body.classList.remove('go-' + how);
-      moving = false;
-    }, how === 'hell' ? 1500 : 900);
+    /* the world stays where it went until you come back for it */
+    setTimeout(function(){ moving = false; }, 900);
+  }
+
+  function travel(el, how){
+    var opts = {
+      hush:   el.hasAttribute('data-hush') ||
+              (on && el.hasAttribute('data-hush-tekk')),
+      silent: el.hasAttribute('data-silent')
+    };
+    var p = PRE[how];
+    if (!p) return go(el.getAttribute('href'), how, opts);
+    if (vOpen || moving) return;
+    pre = el;
+    el.classList.add(p.cls);
+    if (opts.hush) hush();
+    opts.hush = false;
+    setTimeout(function(){ go(el.getAttribute('href'), p.dir, opts); }, p.wait);
   }
 
   function shut(){
-    if (!open || moving) return;
+    if (!vOpen || moving) return;
     moving = true;
-    body.classList.add('go-' + kind);
     view.classList.remove('on');
-    view.style.transform = FROM[kind];
+    view.style.transform = FROM[dir] || FROM.left;
+    body.classList.remove('go-' + dir);
     setTimeout(function(){
-      body.classList.remove('travel', 'go-' + kind);
+      body.classList.remove('travel');
       view.hidden = true;
       frame.src = 'about:blank';
       document.documentElement.style.overflow = '';
-      open = false; moving = false;
-    }, 850);
+      if (pre){ pre.classList.remove('swing-l', 'dropping'); pre = null; }
+      silent = false;
+      unhush();
+      vOpen = false; moving = false;
+    }, 880);
   }
 
   viewX.addEventListener('click', shut);
@@ -1673,8 +1773,7 @@
     a.addEventListener('click', function(e){
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
       e.preventDefault();
-      var how = (on && a.getAttribute('data-go-tekk')) || a.getAttribute('data-go');
-      travel(a.getAttribute('href'), how);
+      travel(a, (on && a.getAttribute('data-go-tekk')) || a.getAttribute('data-go'));
     });
   });
 
