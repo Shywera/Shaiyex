@@ -43,6 +43,10 @@
   }
   *{box-sizing:border-box}
 
+  /* the takeover swaps every paragraph for one short line, which changes
+     the page height. without a reserved gutter the scrollbar comes and
+     goes and the whole layout jumps sideways by its width. */
+  html{overflow-y:scroll;scrollbar-gutter:stable}
   body{
     margin:0;
     background:var(--ink);
@@ -439,7 +443,7 @@
   /* ---------- stencil wall, light behind it ---------- */
   .wall{
     position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden;
-    display:none;
+    visibility:hidden;
     background:rgba(5,3,9, calc(.965 - var(--pdq) * .45));
   }
   .wall .cut{
@@ -1155,6 +1159,28 @@
   ];
   var LEAD = 0;
   var phase = 0, ph = 0, calm = false;
+
+  /* changing animation-duration on a running animation re-times it and
+     the strip jumps. keep the same progress across the change. */
+  function tickerSpeed(secs){
+    var ms = secs * 1000;
+    try {
+      if (tickIn.getAnimations){
+        var a = tickIn.getAnimations()[0];
+        if (a && a.effect){
+          var old = a.effect.getTiming().duration;
+          var cur = a.currentTime;
+          if (typeof old === 'number' && old > 0 && typeof cur === 'number'){
+            var frac = (cur % old) / old;
+            a.effect.updateTiming({ duration: ms });
+            a.currentTime = frac * ms;
+            return;
+          }
+        }
+      }
+    } catch(e){}
+    tickIn.style.animationDuration = secs + 's';
+  }
   var tickIn = document.getElementById('tick');
   var readBtn = document.getElementById('readbtn');
 
@@ -1176,15 +1202,15 @@
       stampEl.classList.remove('on');
       phEl.classList.remove('on');
       invEl.classList.remove('on');
-      wallEl.style.display = 'none';
+      wallEl.style.visibility = 'hidden';
       document.body.classList.remove('p5');
       pageEl.classList.remove('gl');
       root.style.setProperty('--roll', '0deg');
-      tickIn.style.animationDuration = '46s';
+      tickerSpeed(46);
     } else {
-      tickIn.style.animationDuration = Math.max(11, 46 - phase * 9) + 's';
+      tickerSpeed(Math.max(11, 46 - phase * 9));
       if (phase >= 3){
-        wallEl.style.display = 'block';
+        wallEl.style.visibility = 'visible';
         root.style.setProperty('--wall', phase >= 4 ? '1' : '.85');
       }
       if (phase >= 4){
@@ -1265,9 +1291,9 @@
     }
     invert(150);
     tear(10);
-    tickIn.style.animationDuration = Math.max(11, 46 - phase * 9) + 's';
+    tickerSpeed(Math.max(11, 46 - phase * 9));
     if (phase >= 3){
-      wallEl.style.display = 'block';
+      wallEl.style.visibility = 'visible';
       root.style.setProperty('--wall', phase >= 4 ? '1' : '.85');
       sweep();
     }
