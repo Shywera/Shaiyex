@@ -16,7 +16,7 @@
 <link rel="apple-touch-icon" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Schibsted+Grotesk:wght@400;500;600;700&family=Archivo+Black&family=Pirata+One&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Schibsted+Grotesk:wght@400;500;600;700&family=Archivo+Black&family=Pirata+One&family=Grenze+Gotisch:wght@600;700;800&display=swap">
 
 <style>
   :root{
@@ -450,7 +450,7 @@
     opacity:0;background-repeat:repeat;
     transition:opacity .5s ease;
   }
-  body.tekk .grain{opacity:.5;animation:grain 1.1s steps(6) infinite}
+  body.tekk .grain{opacity:.72;animation:grain 1.1s steps(6) infinite}
   @keyframes grain{
     0%{transform:translate(0,0)}      20%{transform:translate(-24px,12px)}
     40%{transform:translate(18px,-16px)}  60%{transform:translate(-14px,-20px)}
@@ -460,44 +460,114 @@
     position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;
     transition:opacity .6s ease;
     background:
-      radial-gradient(38% 26% at 24% 22%, rgba(226,222,214,.16), rgba(226,222,214,0) 70%),
-      radial-gradient(70% 55% at 18% 62%, rgba(150,10,10,.42), rgba(150,10,10,0) 72%),
-      radial-gradient(80% 60% at 82% 78%, rgba(96,6,6,.5), rgba(96,6,6,0) 74%),
-      radial-gradient(100% 80% at 50% 0%, rgba(40,4,4,.7), rgba(10,7,8,0) 70%);
+      radial-gradient(30% 20% at 22% 20%, rgba(190,186,180,.07), rgba(190,186,180,0) 72%),
+      radial-gradient(64% 50% at 16% 66%, rgba(96,4,4,.34), rgba(96,4,4,0) 74%),
+      radial-gradient(72% 54% at 84% 80%, rgba(58,2,2,.44), rgba(58,2,2,0) 76%),
+      radial-gradient(110% 85% at 50% 0%, rgba(22,2,2,.82), rgba(4,2,3,0) 72%);
   }
   body.tekk .smear{opacity:1}
 
-  body.tekk{
-    --text:#E9E3D8;
-    --dim:#9A8C86;
-    --dimmer:#6A5C58;
-    --line:#2A1416;
-    --line-hot:#5A1E1E;
-    --gold:#D01A1A;
-    --gold-hot:#FF3A2E;
-    --amber:#FF3A2E;
-    background:#0A0708;
+  /* the dark closes in, and it does it on a pulse */
+  .vig{
+    position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0;
+    transition:opacity .6s ease;
+    background:
+      radial-gradient(115% 88% at 50% 46%,
+        rgba(0,0,0,0) 34%, rgba(0,0,0,.55) 72%, rgba(0,0,0,.94) 100%);
   }
-  body.tekk #rays{opacity:.34}
-  body.tekk #themeSw{background:rgba(18,8,9,.88);border-color:#5A1E1E}
-  body.tekk #themeSw:hover{border-color:var(--gold-hot)}
-  body.tekk #themeSw .sw{background:#3A1113;border-color:#6E2020}
-  body.tekk #themeSw .sw::after{transform:translateX(13px);background:var(--gold-hot)}
+  body.tekk .vig{opacity:1;animation:thump 2.2s ease-in-out infinite}
+  /* once the analyser is running the vignette follows the track instead */
+  body.tekk.live .vig{
+    animation:none;
+    transform:scale(calc(1 + var(--pulse,0) * .06));
+  }
+  body.tekk.live .smear{opacity:calc(.75 + var(--pulse,0) * .35)}
+  body.tekk.live .grain{opacity:calc(.6 + var(--pulse,0) * .3)}
+  body.tekk.live h1{
+    text-shadow:
+      3px 3px 0 #040203, -1px -1px 0 #040203,
+      0 0 calc(14px + var(--pulse,0) * 40px) rgba(170,12,10,.75),
+      0 0 calc(60px + var(--pulse,0) * 90px) rgba(90,4,4,.6);
+  }
+  body.tekk.live .tag .un{
+    text-shadow:0 0 calc(10px + var(--pulse,0) * 26px) rgba(194,26,18,.95),
+                0 0 calc(30px + var(--pulse,0) * 50px) rgba(194,26,18,.5);
+  }
+  @keyframes thump{
+    0%   {transform:scale(1)}
+    6%   {transform:scale(1.028)}
+    12%  {transform:scale(1)}
+    19%  {transform:scale(1.018)}
+    26%  {transform:scale(1)}
+    100% {transform:scale(1)}
+  }
 
-  body.tekk .kicker{
-    font-family:"Pirata One","Grenze Gotisch",serif;
-    font-size:17px;letter-spacing:.12em;text-transform:none;
-    color:var(--gold-hot);
+  body.tekk{
+    --text:#C8BEB4;
+    --dim:#7C716C;
+    --dimmer:#544A47;
+    --line:#1C0C0D;
+    --line-hot:#3E1213;
+    --gold:#8E0F0F;
+    --gold-hot:#C21A12;
+    --amber:#C21A12;
+    background:#040203;
+  }
+  body.tekk #rays{opacity:.16}
+  body.tekk .avatar-wrap{display:none}
+  body.tekk #themeSw{background:rgba(9,4,5,.9);border-color:#3E1213}
+  body.tekk #themeSw:hover{border-color:var(--gold-hot)}
+  body.tekk #themeSw .sw{background:#24090A;border-color:#4E1414}
+  body.tekk #themeSw .sw::after{transform:translateX(13px);background:#C21A12}
+
+  /* in this theme the title sits under the name instead of over it */
+  body.tekk .kicker{display:none}
+  .tag{display:none}
+  body.tekk .tag{
+    display:block;margin:.5em 0 0;
+    font-family:"Grenze Gotisch","Pirata One",serif;
+    font-weight:700;
+    font-size:clamp(19px,3.4vw,30px);
+    line-height:1.1;letter-spacing:.04em;
+    color:#8E7A76;
+    min-height:1.2em;
+    text-shadow:0 0 18px rgba(120,8,8,.5);
+  }
+  .tag .un{
+    color:#C21A12;
+    text-shadow:0 0 14px rgba(194,26,18,.9), 0 0 40px rgba(194,26,18,.5);
+    animation:un 2.6s steps(1) infinite;
+  }
+  @keyframes un{
+    0%,8%   {opacity:0}
+    9%,11%  {opacity:1}
+    12%,14% {opacity:0}
+    15%,62% {opacity:1}
+    63%,65% {opacity:.25}
+    66%,100%{opacity:1}
+  }
+  .tag.swap{animation:tagIn .5s ease}
+  @keyframes tagIn{
+    0%{opacity:0;transform:translateY(4px)}
+    100%{opacity:1;transform:none}
   }
   body.tekk h1{
-    font-family:"Archivo Black","Arial Black",sans-serif;
-    font-weight:400;letter-spacing:-.01em;
-    background:none;color:#D8140F;-webkit-text-fill-color:#D8140F;
-    filter:none;animation:none;
+    font-family:"Grenze Gotisch","Pirata One",serif;
+    font-weight:800;letter-spacing:.01em;
+    background:none;color:#A50D09;-webkit-text-fill-color:#A50D09;
+    filter:none;
     text-shadow:
-      3px 3px 0 #0A0708, -1px -1px 0 #0A0708,
-      0 0 26px rgba(216,20,15,.55), 0 0 90px rgba(150,10,10,.5);
+      3px 3px 0 #040203, -1px -1px 0 #040203,
+      0 0 18px rgba(150,10,8,.5), 0 0 70px rgba(90,4,4,.55);
+    animation:flicker 6.5s steps(1) infinite;
   }
+  /* a bulb on its way out */
+  @keyframes flicker{
+    0%,52%,54%,58%,72%,74%,100%{opacity:1}
+    53%,57%{opacity:.62}
+    73%{opacity:.34}
+  }
+  body.tekk .kicker{animation:flicker 6.5s steps(1) .3s infinite}
   body.tekk .sub{color:var(--dim)}
   body.tekk .avatar{
     border-color:#8A1414;
@@ -508,28 +578,87 @@
     background:radial-gradient(circle, rgba(200,20,20,.34) 0%, rgba(200,20,20,0) 68%);
   }
   body.tekk .door{
-    background:linear-gradient(165deg, rgba(255,255,255,.03), rgba(255,255,255,0) 60%), #140B0C;
-    border-color:#3A1416;
+    background:linear-gradient(165deg, rgba(255,255,255,.018), rgba(255,255,255,0) 60%), #090405;
+    border-color:#240E0F;
   }
-  body.tekk .door-t{font-family:"Archivo Black","Arial Black",sans-serif;font-weight:400}
-  body.tekk .door-1{--c:#D01A1A}
-  body.tekk .door-2{--c:#FF6A2E}
-  body.tekk .door-4{--c:#8A1A1A}
+  body.tekk .door:hover{box-shadow:0 16px 40px rgba(0,0,0,.8)}
+  body.tekk .door-d{color:#6E635F}
+  body.tekk .door-t{font-family:"Grenze Gotisch",serif;font-weight:700;letter-spacing:.01em}
+  body.tekk .bl-t{font-family:"Grenze Gotisch",serif;font-weight:800}
+  body.tekk .wip-t{font-family:"Grenze Gotisch",serif;font-weight:700}
+  body.tekk .door-1{--c:#8E0F0F}
+  body.tekk .door-2{--c:#A8340F}
+  body.tekk .door-4{--c:#5A0A0A}
   body.tekk .wip{
-    background:linear-gradient(120deg, rgba(255,255,255,.04), rgba(255,255,255,0) 60%), #140B0C;
-    border-color:#5A1E1E;
-    box-shadow:-6px 0 26px rgba(0,0,0,.6), 0 0 30px rgba(200,20,20,.22);
+    background:linear-gradient(120deg, rgba(255,255,255,.02), rgba(255,255,255,0) 60%), #090405;
+    border-color:#3E1213;
+    box-shadow:-6px 0 26px rgba(0,0,0,.85), 0 0 26px rgba(140,10,10,.16);
   }
-  body.tekk .wip-s{color:#FF6A5A}
-  body.tekk .wip-tag{background:#D01A1A;color:#0A0708}
+  body.tekk .wip-s{color:#9A3A32}
+  body.tekk .wip-tag{background:#8E0F0F;color:#040203}
+  body.tekk .blbar{
+    background:radial-gradient(140% 260% at 50% 130%, rgba(120,6,6,.3), rgba(120,6,6,0) 70%), #070304;
+    border-color:#3E1213;
+    box-shadow:0 0 30px rgba(120,6,6,.35), inset 0 0 30px rgba(120,6,6,.14);
+  }
+  body.tekk .bl-t{color:#C9B7B3;text-shadow:0 0 18px rgba(180,14,14,.7)}
+  body.tekk .bl-d{color:#6E5F5C}
+  body.tekk .bl-go{color:#9A3A32}
   body.tekk footer{color:var(--dimmer);border-color:var(--line)}
 
   /* the sinister part: the page breathes */
-  body.tekk .inner{animation:breathe 5.5s ease-in-out infinite}
+  body.tekk .inner{animation:breathe 8s ease-in-out infinite}
   @keyframes breathe{
     0%,100%{transform:scale(1)}
-    50%{transform:scale(1.006)}
+    50%{transform:scale(1.009)}
   }
+  body.tekk .theme-color{color:#040203}
+
+  /* ---------- the corruption ----------
+     the theme does not swap, it gets taken over. a wipe passes down the
+     page, the type comes apart into glyphs, and it settles on the far side. */
+  .corrupt{
+    position:fixed;inset:0;z-index:65;pointer-events:none;
+    opacity:0;overflow:hidden;
+  }
+  body.corrupting .corrupt{opacity:1}
+  .corrupt .wipe{
+    position:absolute;left:-2%;right:-2%;top:0;height:100%;
+    transform:translateY(-102%);
+    background:
+      linear-gradient(180deg,
+        rgba(4,2,3,0) 0%, rgba(4,2,3,.92) 12%,
+        rgba(120,8,6,.95) 46%, rgba(200,22,14,.9) 52%,
+        rgba(4,2,3,.92) 60%, rgba(4,2,3,0) 100%);
+  }
+  body.corrupting .corrupt .wipe{animation:wipe 1.05s cubic-bezier(.35,0,.2,1) forwards}
+  @keyframes wipe{
+    0%{transform:translateY(-102%)}
+    100%{transform:translateY(102%)}
+  }
+  .corrupt .bar{
+    position:absolute;left:-10%;right:-10%;height:3px;
+    background:#C21A12;opacity:0;
+    box-shadow:0 0 22px rgba(194,26,18,.9);
+  }
+  body.corrupting .corrupt .bar{animation:cbar .16s steps(2) forwards}
+  .corrupt .bar:nth-child(2){top:22%;animation-delay:.10s}
+  .corrupt .bar:nth-child(3){top:47%;animation-delay:.26s}
+  .corrupt .bar:nth-child(4){top:68%;animation-delay:.42s}
+  .corrupt .bar:nth-child(5){top:35%;animation-delay:.58s}
+  @keyframes cbar{
+    0%{opacity:1;transform:translateX(-40px) scaleY(3)}
+    100%{opacity:0;transform:translateX(30px) scaleY(1)}
+  }
+  body.corrupting .inner{animation:cshake .34s steps(2) 3}
+  @keyframes cshake{
+    0%,100%{transform:translate(0,0)}
+    25%{transform:translate(-5px,2px)}
+    50%{transform:translate(4px,-3px)}
+    75%{transform:translate(-3px,-1px)}
+  }
+  body.corrupting .doors,
+  body.corrupting .blbar{filter:contrast(1.5) saturate(.4) brightness(.7)}
 
   #tekkAudio{display:none}
 
@@ -543,6 +672,12 @@
 
 <div class="smear" aria-hidden="true"></div>
 <div class="grain" id="grain" aria-hidden="true"></div>
+<div class="vig" aria-hidden="true"></div>
+<div class="corrupt" aria-hidden="true">
+  <div class="wipe"></div>
+  <div class="bar"></div><div class="bar"></div>
+  <div class="bar"></div><div class="bar"></div>
+</div>
 
 <button id="themeSw" type="button" aria-pressed="false">
   <span class="sw" aria-hidden="true"></span>
@@ -560,6 +695,7 @@
 
     <p class="kicker">Holy Paladin</p>
     <h1>Shaiyex</h1>
+    <p class="tag" id="tekkTag"><span class="un">Un</span>holy Paladin</p>
     <div class="doors">
       <a class="door door-1" href="/about/">
         <span class="door-k">Who this guy</span>
@@ -631,7 +767,7 @@
     lbl.textContent = on ? 'Mercy' : 'Hardtekk';
     document.documentElement.style.setProperty('color-scheme', 'dark');
     var m = document.querySelector('meta[name="theme-color"]');
-    if (m) m.setAttribute('content', on ? '#0A0708' : '#080A14');
+    if (m) m.setAttribute('content', on ? '#040203' : '#080A14');
   }
 
   function play(){
@@ -642,20 +778,64 @@
     } catch(e){}
   }
 
+  /* letters coming apart, then knitting back together */
+  var GLYPH = '\u2020\u2021\u00a7\u00b6\u2020\u25a0\u25ac\u2593\u2592\u2591XVIM\u00c6\u00d8';
+  function eat(el, done){
+    if (!el) { if (done) done(); return; }
+    var html = el.innerHTML;
+    var plain = el.textContent;
+    var n = 0;
+    var iv = setInterval(function(){
+      n++;
+      el.textContent = plain.replace(/\S/g, function(c){
+        return Math.random() > 0.45 ? c : GLYPH.charAt(Math.floor(Math.random() * GLYPH.length));
+      });
+      if (n > 5){
+        clearInterval(iv);
+        el.innerHTML = html;
+        if (done) done();
+      }
+    }, 55);
+  }
+
+  var busy = false;
   btn.addEventListener('click', function(){
+    if (busy) return;
+    busy = true;
     on = !on;
     try { localStorage.setItem('shy.tekk', on ? '1' : '0'); } catch(e){}
-    paint();
+
+    body.classList.add('corrupting');
+    var h1 = document.querySelector('h1');
+    eat(h1);
+    eat(document.querySelector('.sub'));
+
+    /* flip under the cover of the wipe, not before it */
+    setTimeout(paint, 360);
+    setTimeout(function(){
+      body.classList.remove('corrupting');
+      busy = false;
+    }, 1100);
     /* this click is the gesture the browser wants, so the track is
        allowed to start here and nowhere else */
-    if (on) play(); else { try { audio.pause(); } catch(e){} }
+    if (on){
+      play(); listen();
+      setTimeout(startCycle, 360);
+      if (AC && AC.state === 'suspended'){ try { AC.resume(); } catch(e){} }
+    } else {
+      try { audio.pause(); } catch(e){}
+      stopCycle();
+      body.classList.remove('live');
+      document.documentElement.style.setProperty('--pulse', '0');
+      lastQ = -1;
+    }
   });
 
   paint();
   /* a reload cannot start audio on its own, so wait for any gesture */
   if (on){
     var once = function(){
-      play();
+      play(); listen(); startCycle();
       window.removeEventListener('pointerdown', once);
       window.removeEventListener('keydown', once);
     };
@@ -663,7 +843,79 @@
     window.addEventListener('keydown', once);
   }
 
+  /* ---- the line under the name ---- */
+  var tag = document.getElementById('tekkTag');
+  var LINES = [
+    '<span class="un">Un</span>holy Paladin',
+    'I decide who lives',
+    'Your health bar is a favour',
+    'Nobody dies unless I allow it',
+    'Mercy is a cooldown',
+    'I have never been the problem',
+    'You were dead. I reconsidered.',
+    'The Light answers to me',
+    'Say thank you',
+    'Still the best player here'
+  ];
+  var li = 0, tagT = null;
+  function cycle(){
+    li = (li + 1) % LINES.length;
+    tag.innerHTML = LINES[li];
+    tag.classList.remove('swap');
+    void tag.offsetWidth;
+    tag.classList.add('swap');
+    tagT = setTimeout(cycle, li === 0 ? 7000 : 4200);
+  }
+  function startCycle(){
+    if (tagT) clearTimeout(tagT);
+    li = 0;
+    tag.innerHTML = LINES[0];
+    tagT = setTimeout(cycle, 7000);
+  }
+  function stopCycle(){
+    if (tagT){ clearTimeout(tagT); tagT = null; }
+    li = 0;
+    tag.innerHTML = LINES[0];
+  }
+
+  /* ---- pulse, taken from the track rather than guessed ---- */
+  var AC = null, ANA = null, DATA = null, raf = 0, lastQ = -1;
+  function listen(){
+    if (ANA) return;
+    try {
+      var C = window.AudioContext || window.webkitAudioContext;
+      if (!C) return;
+      AC = new C();
+      var src = AC.createMediaElementSource(audio);
+      ANA = AC.createAnalyser();
+      ANA.fftSize = 256;
+      ANA.smoothingTimeConstant = 0.75;
+      DATA = new Uint8Array(ANA.frequencyBinCount);
+      /* the graph has to reach the speakers or the page goes silent */
+      src.connect(ANA);
+      ANA.connect(AC.destination);
+      body.classList.add('live');
+      loop();
+    } catch(e){ /* no analyser, the css keyframe heartbeat carries on */ }
+  }
+  function loop(){
+    raf = requestAnimationFrame(loop);
+    if (!ANA || audio.paused) return;
+    ANA.getByteFrequencyData(DATA);
+    /* weight the low end, that is what you feel */
+    var lo = 0, n = 10;
+    for (var i = 0; i < n; i++) lo += DATA[i];
+    var v = Math.max(0, Math.min(1, (lo / n) / 190));
+    v = v * v;                       /* squash the quiet parts */
+    var q = Math.round(v * 12) / 12; /* steps, so the glow is not repainted 60 times a second */
+    if (q !== lastQ){
+      lastQ = q;
+      document.documentElement.style.setProperty('--pulse', q.toFixed(3));
+    }
+  }
+
   window.__tekk = function(){ return on; };
+  window.__pulse = function(){ return lastQ < 0 ? 0 : lastQ; };
 })();
 
 (function(){
@@ -693,10 +945,11 @@
       var a = base + t * 0.000035 + drift;
       var spread = 0.026 + 0.016 * (0.5 + 0.5 * Math.sin(t * 0.0004 + i * 2.3));
       var alpha = 0.10 + 0.07 * (0.5 + 0.5 * Math.sin(t * 0.0006 + i));
+      if (window.__pulse) alpha *= 1 + window.__pulse() * 1.1;
       var g = ctx.createLinearGradient(cx, cy, cx + Math.cos(a) * R, cy + Math.sin(a) * R);
       var tk = window.__tekk && window.__tekk();
-      var c0 = tk ? '255,90,60' : '255,224,160';
-      var c1 = tk ? '190,16,16'  : '240,200,104';
+      var c0 = tk ? '170,26,14' : '255,224,160';
+      var c1 = tk ? '96,4,4'     : '240,200,104';
       g.addColorStop(0, 'rgba(' + c0 + ',' + alpha.toFixed(3) + ')');
       g.addColorStop(0.45, 'rgba(' + c1 + ',' + (alpha * 0.45).toFixed(3) + ')');
       g.addColorStop(1, 'rgba(' + c1 + ',0)');
@@ -709,7 +962,7 @@
       ctx.fill();
     }
     var core = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(w, h) * 0.52);
-    var ctk = (window.__tekk && window.__tekk()) ? '210,40,26' : '255,229,175';
+    var ctk = (window.__tekk && window.__tekk()) ? '120,10,6' : '255,229,175';
     core.addColorStop(0, 'rgba(' + ctk + ',0.20)');
     core.addColorStop(1, 'rgba(' + ctk + ',0)');
     ctx.fillStyle = core;
