@@ -450,14 +450,9 @@
     transition:color .3s ease, border-color .3s ease, transform .5s ease;
   }
   #themeSw .rune::before{content:"\271D"}
-  #themeSw .txt{display:flex;flex-direction:column;gap:2px}
   #themeSw .t1{
-    font-family:var(--display);font-weight:700;font-size:15px;line-height:1;
+    font-family:var(--display);font-weight:700;font-size:16px;line-height:1;
     letter-spacing:.02em;color:var(--text);
-  }
-  #themeSw .t2{
-    font-family:var(--mono);font-size:8.5px;font-weight:600;
-    letter-spacing:.14em;text-transform:uppercase;color:var(--dimmer);
   }
   /* the nudge, shown once until it is pressed */
   #themeHint{
@@ -907,10 +902,7 @@
 <span id="themeHint">what is he without it &rarr;</span>
 <button id="themeSw" type="button" aria-pressed="false" title="Renounce">
   <span class="rune" aria-hidden="true"></span>
-  <span class="txt">
-    <span class="t1" id="themeLbl">Renounce</span>
-    <span class="t2" id="themeSub">give up the Light</span>
-  </span>
+  <span class="t1" id="themeLbl">Renounce</span>
 </button>
 
 <audio id="tekkAudio" src="/mercy.mp3" loop preload="none"></audio>
@@ -1019,14 +1011,12 @@
     });
   }
 
-  var sub2 = document.getElementById('themeSub');
   var hint = document.getElementById('themeHint');
 
   function paint(){
     body.classList.toggle('tekk', on);
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     lbl.textContent = on ? 'Redeem' : 'Renounce';
-    if (sub2) sub2.textContent = on ? 'take the Light back' : 'give up the Light';
     btn.title = on ? 'Redeem' : 'Renounce';
     copy();
     document.documentElement.style.setProperty('color-scheme', 'dark');
