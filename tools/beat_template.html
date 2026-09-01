@@ -315,8 +315,8 @@
     position:fixed;inset:0;z-index:30;pointer-events:none;
     overflow:hidden;display:none;
   }
-  body.rt .rt{display:block}
-  body.rt .stage{transform:translate3d(var(--rx,0px), var(--ry,0px), 0)}
+  body.rtmode .rt{display:block}
+  body.rtmode .stage{transform:translate3d(var(--rx,0px), var(--ry,0px), 0)}
   .rtp{
     position:absolute;
     font-family:var(--display);
@@ -490,6 +490,30 @@
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
   @media (max-width:620px){ .pb-best{grid-template-columns:1fr} }
+  .pb-cell.live{border-top-color:var(--c);background:#1A1330}
+  .pb-tag{
+    display:inline-block;margin-left:6px;padding:1px 5px 2px;border-radius:2px;
+    font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.14em;
+    color:#0A0710;background:var(--jade);vertical-align:middle;
+  }
+  .lb{margin-top:12px;border-top:1px solid var(--line)}
+  .lb-r{
+    display:grid;grid-template-columns:22px 1fr auto auto;
+    gap:10px;align-items:baseline;
+    padding:6px 2px;border-bottom:1px solid var(--line);
+    font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--dim);
+  }
+  .lb-r span:first-child{color:var(--dimmer)}
+  .lb-r b{
+    font-family:var(--display);font-size:17px;line-height:1;color:var(--text);
+    font-variant-numeric:tabular-nums;letter-spacing:.02em;
+  }
+  .lb-r.me{color:var(--gold)}
+  .lb-r.me b{color:var(--gold)}
+  .lb-e{
+    padding:8px 2px;font-family:var(--mono);font-size:10px;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--dimmer);
+  }
 
   .cal{
     margin-top:14px;font-family:var(--mono);font-size:10px;
@@ -658,6 +682,7 @@
     <div class="pb" id="pbBox">
       <span class="pb-k" id="pbTitle">Personal best</span>
       <div class="pb-row"><span id="pbWho">nobody yet</span><b id="pbScore">0</b></div>
+      <div class="lb" id="lb"></div>
       <div class="pb-new" id="pbNew" style="display:none">
         <input id="pbName" maxlength="14" placeholder="Your name" autocomplete="off" spellcheck="false">
         <button id="pbSave" type="button">Save it</button>
@@ -1245,9 +1270,14 @@ __DUNGEONS__
     /* did that beat the record for this dungeon and difficulty */
     var prev = bestFor(dung, diff);
     var accPct = Math.round(acc * 100);
-    if (survived && (!prev || score > prev.score)){
+    var live = boardFor(dung, diff);
+    var wouldRank = !!live && (live.length < 25 || score > live[live.length - 1].s);
+    paintLb(dung, diff, playerName);
+    if (survived && score > 0 && (!prev || score > prev.score || wouldRank)){
       pending = { g: dung, d: diff, score: score, acc: accPct, combo: best };
-      pbTitle.textContent = prev ? 'New best, beat ' + prev.score.toLocaleString() : 'First run on this one';
+      pbTitle.textContent = (!prev || score > prev.score)
+        ? (prev ? 'New best, beat ' + prev.score.toLocaleString() : 'First run on this one')
+        : 'Good enough for the board';
       pbWho.textContent = 'Put your name on it';
       pbScore.textContent = score.toLocaleString();
       pbName.value = playerName;
@@ -1360,15 +1390,71 @@ __DUNGEONS__
   var pbBest  = document.getElementById('pbBest');
   var pending = null;
 
+  /* ---- the live board. if the endpoint is not wired up this stays off
+     and everything falls back to the local bests. ---- */
+  var ONLINE = false, BOARD = {};
+  var lbEl = document.getElementById('lb');
+
+  function api(path, opts){
+    return fetch(path, opts).then(function(r){
+      if (!r.ok) throw new Error(r.status);
+      return r.json();
+    });
+  }
+  function loadBoard(g, after){
+    api('/api/scores?g=' + encodeURIComponent(g)).then(function(j){
+      ONLINE = true; BOARD[g] = j;
+      paintBest();
+      if (after) after();
+    }).catch(function(){
+      ONLINE = false;
+      paintBest();
+      if (after) after();
+    });
+  }
+  function boardFor(g, d){
+    return (ONLINE && BOARD[g] && BOARD[g][d]) ? BOARD[g][d] : null;
+  }
+  function paintLb(g, d, mine){
+    var list = boardFor(g, d);
+    if (!list){ lbEl.innerHTML = ''; return; }
+    if (!list.length){
+      lbEl.innerHTML = '<div class="lb-e">No runs on this one yet. Be the first.</div>';
+      return;
+    }
+    lbEl.innerHTML = list.slice(0, 5).map(function(e, i){
+      var me = mine && e.n.toLowerCase() === String(mine).toLowerCase();
+      return '<div class="lb-r' + (me ? ' me' : '') + '">' +
+             '<span>' + (i + 1) + '</span>' +
+             '<span>' + esc(e.n) + '</span>' +
+             '<span>' + e.a + '%</span>' +
+             '<b>' + e.s.toLocaleString() + '</b></div>';
+    }).join('');
+  }
+
   function paintBest(){
     var g = dung;
     var cols = { normal: '#2FD8C3', heroic: '#E8C468', mythic: '#FF3FA4' };
     pbBest.innerHTML = ['normal','heroic','mythic'].map(function(d){
+      var live = boardFor(g, d);
+      var top = live && live.length ? live[0] : null;
       var b = bestFor(g, d);
-      return '<div class="pb-cell" style="--c:' + cols[d] + '">' +
-             '<span>' + d + '</span>' +
-             '<b>' + (b ? b.score.toLocaleString() : '&mdash;') + '</b>' +
-             '<i>' + (b ? esc(b.name) + ' &middot; ' + b.acc + '%' : 'no run yet') + '</i>' +
+      var head, sub, cls = '';
+      if (top){
+        cls = ' live';
+        head = top.s.toLocaleString();
+        sub = esc(top.n) + ' &middot; ' + top.a + '%';
+      } else if (b){
+        head = b.score.toLocaleString();
+        sub = esc(b.name) + ' &middot; ' + b.acc + '%';
+      } else {
+        head = '&mdash;';
+        sub = ONLINE ? 'no runs yet' : 'no run yet';
+      }
+      return '<div class="pb-cell' + cls + '" style="--c:' + cols[d] + '">' +
+             '<span>' + d + (top ? '<i class="pb-tag">live</i>' : '') + '</span>' +
+             '<b>' + head + '</b>' +
+             '<i>' + sub + '</i>' +
              '</div>';
     }).join('');
   }
@@ -1388,10 +1474,29 @@ __DUNGEONS__
       combo: pending.combo, when: new Date().toISOString().slice(0, 10)
     };
     saveScores();
+    var sent = pending;
     pending = null;
     pbNew.style.display = 'none';
-    pbTitle.textContent = 'Personal best';
+    pbTitle.textContent = ONLINE ? 'On the board' : 'Personal best';
     pbWho.textContent = nm;
+
+    if (ONLINE){
+      api('/api/scores', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ g: sent.g, d: sent.d, n: nm,
+                               s: sent.score, a: sent.acc, c: sent.combo })
+      }).then(function(j){
+        if (j && j.board){
+          BOARD[sent.g] = BOARD[sent.g] || {};
+          BOARD[sent.g][sent.d] = j.board;
+        }
+        paintLb(sent.g, sent.d, nm);
+        paintBest();
+      }).catch(function(){
+        pbTitle.textContent = 'Saved here, board did not take it';
+      });
+    }
     paintBest();
   });
 
@@ -1459,7 +1564,7 @@ __DUNGEONS__
     root.style.setProperty('--ry', '0px');
   }
   function paintRt(){
-    document.body.classList.toggle('rt', rt);
+    document.body.classList.toggle('rtmode', rt);
     rtBtn.classList.toggle('on', rt);
     if (!rt) rtClear();
   }
@@ -1635,6 +1740,7 @@ __DUNGEONS__
   function paintDung(){
     var g = DUNGEONS[dung];
     if (typeof paintBest === 'function') paintBest();
+    if (typeof loadBoard === 'function' && !BOARD[dung]) loadBoard(dung);
     dungBtns.forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-g') === dung); });
     ['normal','heroic','mythic'].forEach(function(k){
       var el = document.getElementById('cnt-' + k);
@@ -1651,6 +1757,7 @@ __DUNGEONS__
   paintDung();
   paintKeys();
   paintBest();
+  loadBoard(dung);
   if (offset){
     keysNote.textContent = 'Offset ' + (offset > 0 ? '+' : '') + Math.round(offset * 1000) + ' ms';
   }
