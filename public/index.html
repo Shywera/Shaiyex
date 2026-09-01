@@ -888,16 +888,18 @@
     transform-origin:50% calc(-1 * var(--chain));
     animation:hang 7s ease-in-out infinite;
   }
-  body.tekk .door:nth-child(2){animation-duration:8.2s;animation-delay:-2.1s}
-  body.tekk .door:nth-child(3){animation-duration:6.4s;animation-delay:-4.3s}
+  body.tekk .door:nth-child(1){animation-duration:9.4s}
+  body.tekk .door:nth-child(2){animation-duration:11.8s;animation-delay:-3.1s}
+  body.tekk .door:nth-child(3){animation-duration:8.1s;animation-delay:-5.3s}
   @keyframes hang{
-    0%     {transform:rotate(calc(var(--tilt,0deg) - .7deg)) translate(0,0)}
-    17%    {transform:rotate(calc(var(--tilt,0deg) - .2deg)) translate(1px,-1px)}
-    34%    {transform:rotate(calc(var(--tilt,0deg) + .5deg)) translate(-1px,1px)}
-    51%    {transform:rotate(calc(var(--tilt,0deg) + .8deg)) translate(2px,0)}
-    68%    {transform:rotate(calc(var(--tilt,0deg) + .1deg)) translate(-1px,-1px)}
-    85%    {transform:rotate(calc(var(--tilt,0deg) - .5deg)) translate(1px,1px)}
-    100%   {transform:rotate(calc(var(--tilt,0deg) - .7deg)) translate(0,0)}
+    0%     {transform:rotate(calc(var(--tilt,0deg) - 2.6deg)) translate(0,0)}
+    14%    {transform:rotate(calc(var(--tilt,0deg) - 1.1deg)) translate(2px,-1px)}
+    29%    {transform:rotate(calc(var(--tilt,0deg) + 1.4deg)) translate(-2px,1px)}
+    43%    {transform:rotate(calc(var(--tilt,0deg) + 2.9deg)) translate(3px,0)}
+    57%    {transform:rotate(calc(var(--tilt,0deg) + 1.7deg)) translate(-2px,-1px)}
+    71%    {transform:rotate(calc(var(--tilt,0deg) - .9deg)) translate(2px,1px)}
+    86%    {transform:rotate(calc(var(--tilt,0deg) - 2.1deg)) translate(-1px,0)}
+    100%   {transform:rotate(calc(var(--tilt,0deg) - 2.6deg)) translate(0,0)}
   }
   /* and every so often something upstairs shifts */
   body.tekk .doors{animation:jolt 11s ease-in-out infinite}
@@ -921,6 +923,18 @@
     background-position:22% top, 78% top, 22% bottom, 78% bottom;
     background-size:12px 17px, 12px 17px, 3px 60%, 2px 40%;
     opacity:.85;
+    transform-origin:50% 0;
+    animation:chainSway 9.4s ease-in-out infinite;
+  }
+  body.tekk .door:nth-child(2)::before{animation-duration:11.8s;animation-delay:-3.1s}
+  body.tekk .door:nth-child(3)::before{animation-duration:8.1s;animation-delay:-5.3s}
+  /* the chain gives a little less than the plate on the end of it */
+  @keyframes chainSway{
+    0%   {transform:skewX(1.4deg)}
+    29%  {transform:skewX(-.8deg)}
+    43%  {transform:skewX(-1.6deg)}
+    71%  {transform:skewX(.5deg)}
+    100% {transform:skewX(1.4deg)}
   }
   /* it has been running down these for a while */
   body.tekk .drip{
@@ -963,7 +977,7 @@
     border-radius:3px;
     --tilt:-2deg;
     transform-origin:50% calc(-1 * var(--chain,70px));
-    animation:hang 7.6s ease-in-out infinite;
+    animation:hang 10.6s ease-in-out infinite;
     overflow:visible;
     background:
       radial-gradient(circle at 10px 10px, rgba(150,168,196,.18) 0 2px, rgba(0,0,0,0) 3px),
@@ -994,7 +1008,7 @@
     width:min(100%,780px);
     --tilt:1.4deg;
     transform-origin:50% -46px;
-    animation:hang 9s ease-in-out infinite;
+    animation:hang 12.4s ease-in-out infinite;
     background:radial-gradient(140% 260% at 50% 130%, rgba(120,6,6,.34), rgba(120,6,6,0) 70%), #08070C;
     border-color:#3E1213;
     box-shadow:0 0 30px rgba(120,6,6,.35), inset 0 0 30px rgba(120,6,6,.14);
