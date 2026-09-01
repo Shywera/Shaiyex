@@ -309,6 +309,48 @@
     transform:scale(1.12);border-color:var(--gold);
     background:rgba(232,196,104,.16);color:var(--text);
   }
+  /* ---------- shy plus ---------- */
+  .dung.locked{opacity:.62}
+  .dung.locked .dung-n{color:var(--dimmer)}
+  .dung.locked:hover{border-color:var(--rose);opacity:.85}
+  .lockbadge{
+    display:inline-block;margin-left:6px;padding:1px 5px 2px;border-radius:2px;
+    font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.14em;
+    color:#0A0710;background:var(--rose);vertical-align:middle;
+  }
+  .shy-price{
+    font-family:var(--display);
+    font-size:clamp(52px,13vw,120px);line-height:.9;
+    margin:.06em 0 0;color:var(--gold);
+    text-shadow:0 0 60px rgba(232,196,104,.4);
+  }
+  .shy-per{
+    font-family:var(--mono);font-size:11px;font-weight:700;
+    letter-spacing:.22em;text-transform:uppercase;color:var(--dimmer);
+    margin-top:6px;
+  }
+  .shy-list{
+    list-style:none;margin:20px auto 0;padding:0;max-width:400px;text-align:left;
+  }
+  .shy-list li{
+    position:relative;padding:7px 0 7px 24px;
+    border-bottom:1px solid var(--line);
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;color:var(--dim);
+  }
+  .shy-list li::before{
+    content:"";position:absolute;left:2px;top:13px;
+    width:8px;height:8px;background:var(--gold);box-shadow:0 0 10px var(--gold);
+  }
+  .shy-list li.no{color:var(--dimmer)}
+  .shy-list li.no::before{background:var(--dimmer);box-shadow:none}
+  .shy-note{
+    margin-top:14px;font-family:var(--mono);font-size:10px;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--dimmer);
+  }
+  #shyRestore{
+    background:none;border:0;padding:0;cursor:pointer;
+    font:inherit;color:var(--jade);text-decoration:underline;
+  }
   .keys-note{
     width:100%;text-align:center;margin-top:6px;
     font-family:var(--mono);font-size:9px;letter-spacing:.1em;
@@ -552,27 +594,27 @@
       </button>
       <button class="dung" data-g="disc" type="button">
         <span class="dung-n">Disconnected</span>
-        <span class="dung-d">200 BPM &middot; 3:40</span>
+        <span class="dung-d">200 BPM &middot; 3:40 <i class="lockbadge">SHY+</i></span>
       </button>
       <button class="dung" data-g="sd2" type="button">
         <span class="dung-n">Snow Drive</span>
-        <span class="dung-d">224 BPM &middot; 4:27</span>
+        <span class="dung-d">224 BPM &middot; 4:27 <i class="lockbadge">SHY+</i></span>
       </button>
       <button class="dung" data-g="nok" type="button">
         <span class="dung-n">Night of Knights</span>
-        <span class="dung-d">180 BPM &middot; 3:10</span>
+        <span class="dung-d">180 BPM &middot; 3:10 <i class="lockbadge">SHY+</i></span>
       </button>
       <button class="dung" data-g="fd" type="button">
         <span class="dung-n">FREEDOM DiVE</span>
-        <span class="dung-d">222.22 BPM &middot; 4:29</span>
+        <span class="dung-d">222.22 BPM &middot; 4:29 <i class="lockbadge">SHY+</i></span>
       </button>
       <button class="dung" data-g="iffa" type="button">
         <span class="dung-n">Immortal Flame</span>
-        <span class="dung-d">110 BPM &middot; 4:06</span>
+        <span class="dung-d">110 BPM &middot; 4:06 <i class="lockbadge">SHY+</i></span>
       </button>
       <button class="dung" data-g="chea" type="button">
         <span class="dung-n">cheatreal</span>
-        <span class="dung-d">200 BPM &middot; 4:55</span>
+        <span class="dung-d">200 BPM &middot; 4:55 <i class="lockbadge">SHY+</i></span>
       </button>
     </div>
     <div class="diffs">
@@ -621,6 +663,27 @@
       <button class="btn alt" id="calRetry" type="button">Again</button>
     </div>
     <button class="btn alt" id="calQuit" type="button" style="margin-top:18px">Back</button>
+  </div>
+</div>
+
+<div class="over gone" id="shy">
+  <div class="over-in">
+    <p class="ov-k">Members only</p>
+    <p class="ov-t">Shy+</p>
+    <p class="shy-price">10,99 &euro;</p>
+    <p class="shy-per">per month, cancel any time, you will not</p>
+    <ul class="shy-list">
+      <li>Every track I add, the moment I add it</li>
+      <li>Six dungeons your free account cannot see</li>
+      <li>The right to say you pay for this</li>
+      <li class="no">No effect whatsoever on your interrupts</li>
+      <li class="no">No refunds, obviously</li>
+    </ul>
+    <button class="btn" id="shySub" type="button">Subscribe</button>
+    <button class="btn alt" id="shyNo" type="button">Stay poor</button>
+    <p class="shy-note" id="shyNote">
+      Already a member? <button id="shyRestore" type="button">Restore purchase</button>
+    </p>
   </div>
 </div>
 
@@ -3260,6 +3323,7 @@
       track: "disc.mp3", song: "Helblinde - Disconnected",
       bpm: 200, beat: 0.3, zero: 9.498, end: 220.6,
       charts: { normal: DC_N, heroic: DC_H, mythic: DC_M },
+      locked: true,
       pulls: [
         { b: 0,  mob: "Disconnected",             spell: "Interrupt" }
       ]
@@ -3269,6 +3333,7 @@
       track: "sd2.mp3", song: "Omoi - Snow Drive",
       bpm: 224, beat: 0.267857, zero: 0.695, end: 266.1,
       charts: { normal: SNOW_N, heroic: SNOW_H, mythic: SNOW_M },
+      locked: true,
       pulls: [
         { b: 0,  mob: "Snow Drive",               spell: "Interrupt" }
       ]
@@ -3278,6 +3343,7 @@
       track: "nok.mp3", song: "Hanataba - Night of Knights",
       bpm: 180, beat: 0.333333, zero: 21.75, end: 176.1,
       charts: { normal: NOK_N, heroic: NOK_H, mythic: NOK_M },
+      locked: true,
       pulls: [
         { b: 0,  mob: "Night of Knights",         spell: "Interrupt" }
       ]
@@ -3287,6 +3353,7 @@
       track: "fd.mp3", song: "xi - FREEDOM DiVE",
       bpm: 222.22, beat: 0.270003, zero: 2.133, end: 262.0,
       charts: { normal: FD_N, heroic: FD_H, mythic: FD_M },
+      locked: true,
       pulls: [
         { b: 0,  mob: "FREEDOM DiVE",             spell: "Interrupt" }
       ]
@@ -3296,6 +3363,7 @@
       track: "iffa.mp3", song: "Panda Eyes & Teminite - Immortal Flame (feat. Anna Yvette)",
       bpm: 110, beat: 0.545455, zero: 4.415, end: 227.6,
       charts: { normal: IF_N, heroic: IF_H, mythic: IF_M },
+      locked: true,
       pulls: [
         { b: 0,  mob: "Immortal Flame (feat. Anna Yvette)",  spell: "Interrupt" }
       ]
@@ -3305,6 +3373,7 @@
       track: "chea.mp3", song: "t+pazolite - cheatreal",
       bpm: 200, beat: 0.3, zero: 0.091, end: 257.1,
       charts: { normal: CR_N, heroic: CR_H, mythic: CR_M },
+      locked: true,
       pulls: [
         { b: 0,  mob: "cheatreal",                spell: "Interrupt" }
       ]
@@ -3312,6 +3381,10 @@
   };
   var dung = 'kr', G = DUNGEONS.kr;
   try { var sg = localStorage.getItem('beat.dung'); if (sg && DUNGEONS[sg]) dung = sg; } catch(e){}
+  if (DUNGEONS[dung] && DUNGEONS[dung].locked){
+    var free = localStorage.getItem('beat.shyplus') === '1';
+    if (!free) dung = 'kr';
+  }
   var BEAT = G.beat, ZERO = G.zero, SONG_END = G.end, PULLS = G.pulls;
 
   var DIFF = {
@@ -3809,6 +3882,7 @@
   }
 
   function start(){
+    if (isLocked(dung)){ showShy(); return; }
     if (countT){ clearTimeout(countT); countT = null; }
     build(); size(); clockReset(); audioInit();
     if (AC && AC.state === 'suspended'){ try { AC.resume(); } catch(e){} }
@@ -4255,12 +4329,44 @@
     });
   });
 
+  /* ---- shy plus ---- */
+  var shyEl   = document.getElementById('shy');
+  var shyNote = document.getElementById('shyNote');
+  var subbed  = false;
+  try { subbed = localStorage.getItem('beat.shyplus') === '1'; } catch(e){}
+
+  function isLocked(g){ return !!(DUNGEONS[g] && DUNGEONS[g].locked) && !subbed; }
+  function showShy(){
+    shyEl.classList.remove('gone');
+    shyEl.style.display = '';
+  }
+  function hideShy(){ shyEl.classList.add('gone'); }
+  document.getElementById('shyNo').addEventListener('click', hideShy);
+  document.getElementById('shySub').addEventListener('click', function(){
+    shyNote.innerHTML = 'Card declined. ' +
+      '<button id="shyRestore2" type="button" style="background:none;border:0;padding:0;' +
+      'cursor:pointer;font:inherit;color:var(--jade);text-decoration:underline">Restore purchase</button>';
+    var r2 = document.getElementById('shyRestore2');
+    if (r2) r2.addEventListener('click', unlockShy);
+  });
+  function unlockShy(){
+    subbed = true;
+    try { localStorage.setItem('beat.shyplus', '1'); } catch(e){}
+    hideShy();
+    paintDung();
+  }
+  document.getElementById('shyRestore').addEventListener('click', unlockShy);
+
   var dungBtns = [].slice.call(document.querySelectorAll('.dung'));
   function paintDung(){
     var g = DUNGEONS[dung];
     if (typeof paintBest === 'function') paintBest();
     if (typeof loadBoard === 'function' && !BOARD[dung]) loadBoard(dung);
-    dungBtns.forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-g') === dung); });
+    dungBtns.forEach(function(b){
+      var bk = b.getAttribute('data-g');
+      b.classList.toggle('on', bk === dung && !isLocked(bk));
+      b.classList.toggle('locked', isLocked(bk));
+    });
     ['normal','heroic','mythic'].forEach(function(k){
       var el = document.getElementById('cnt-' + k);
       if (el) el.textContent = g.charts[k].length;
@@ -4268,7 +4374,9 @@
   }
   dungBtns.forEach(function(b){
     b.addEventListener('click', function(){
-      dung = b.getAttribute('data-g');
+      var g = b.getAttribute('data-g');
+      if (isLocked(g)){ showShy(); return; }
+      dung = g;
       try { localStorage.setItem('beat.dung', dung); } catch(e){}
       paintDung();
     });

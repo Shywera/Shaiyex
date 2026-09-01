@@ -38,18 +38,20 @@ def build():
             '        { b: %-3s mob: "%s",%s spell: "%s" }'
             % (str(p["b"]) + ",", p["mob"], " " * max(1, 24 - len(p["mob"])), p["spell"])
             for p in d["pulls"])
+        bpm = repr(int(d["bpm"])) if float(d["bpm"]).is_integer() else repr(d["bpm"])
+        lock = "\n      locked: true," if d.get("locked") else ""
         blocks.append(
             '    %s: {\n'
             '      name: "%s", short: "%s",\n'
             '      track: "%s", song: "%s",\n'
             '      bpm: %s, beat: %s, zero: %s, end: %s,\n'
-            '      charts: { normal: %s, heroic: %s, mythic: %s },\n'
+            '      charts: { normal: %s, heroic: %s, mythic: %s },%s\n'
             '      pulls: [\n%s\n      ]\n'
             '    }'
             % (d["key"], d["name"], d["short"], d["track"], d["song"],
-               (repr(int(d["bpm"])) if float(d["bpm"]).is_integer() else repr(d["bpm"])), repr(d["beat"]), repr(d["zero"]), repr(d["end"]),
+               bpm, repr(d["beat"]), repr(d["zero"]), repr(d["end"]),
                d["charts"]["normal"], d["charts"]["heroic"], d["charts"]["mythic"],
-               pulls))
+               lock, pulls))
     out.append(",\n".join(blocks))
     out.append("  };")
 
@@ -60,9 +62,10 @@ def build():
     btns = "\n".join(
         '      <button class="dung" data-g="%s" type="button">\n'
         '        <span class="dung-n">%s</span>\n'
-        '        <span class="dung-d">%g BPM &middot; %d:%02d</span>\n'
+        '        <span class="dung-d">%g BPM &middot; %d:%02d%s</span>\n'
         '      </button>' % (d["key"], d["name"], d["bpm"],
-                             int(d.get("len", d["end"])) // 60, int(d.get("len", d["end"])) % 60)
+                             int(d.get("len", d["end"])) // 60, int(d.get("len", d["end"])) % 60,
+                             ' <i class="lockbadge">SHY+</i>' if d.get("locked") else '')
         for d in cfg)
     page = re.sub(r'(<div class="dungs">\n).*?(\n    </div>)',
                   lambda m: m.group(1) + btns + m.group(2), page, count=1, flags=re.S)

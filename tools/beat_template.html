@@ -309,6 +309,48 @@
     transform:scale(1.12);border-color:var(--gold);
     background:rgba(232,196,104,.16);color:var(--text);
   }
+  /* ---------- shy plus ---------- */
+  .dung.locked{opacity:.62}
+  .dung.locked .dung-n{color:var(--dimmer)}
+  .dung.locked:hover{border-color:var(--rose);opacity:.85}
+  .lockbadge{
+    display:inline-block;margin-left:6px;padding:1px 5px 2px;border-radius:2px;
+    font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.14em;
+    color:#0A0710;background:var(--rose);vertical-align:middle;
+  }
+  .shy-price{
+    font-family:var(--display);
+    font-size:clamp(52px,13vw,120px);line-height:.9;
+    margin:.06em 0 0;color:var(--gold);
+    text-shadow:0 0 60px rgba(232,196,104,.4);
+  }
+  .shy-per{
+    font-family:var(--mono);font-size:11px;font-weight:700;
+    letter-spacing:.22em;text-transform:uppercase;color:var(--dimmer);
+    margin-top:6px;
+  }
+  .shy-list{
+    list-style:none;margin:20px auto 0;padding:0;max-width:400px;text-align:left;
+  }
+  .shy-list li{
+    position:relative;padding:7px 0 7px 24px;
+    border-bottom:1px solid var(--line);
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;color:var(--dim);
+  }
+  .shy-list li::before{
+    content:"";position:absolute;left:2px;top:13px;
+    width:8px;height:8px;background:var(--gold);box-shadow:0 0 10px var(--gold);
+  }
+  .shy-list li.no{color:var(--dimmer)}
+  .shy-list li.no::before{background:var(--dimmer);box-shadow:none}
+  .shy-note{
+    margin-top:14px;font-family:var(--mono);font-size:10px;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--dimmer);
+  }
+  #shyRestore{
+    background:none;border:0;padding:0;cursor:pointer;
+    font:inherit;color:var(--jade);text-decoration:underline;
+  }
   .keys-note{
     width:100%;text-align:center;margin-top:6px;
     font-family:var(--mono);font-size:9px;letter-spacing:.1em;
@@ -596,6 +638,27 @@
   </div>
 </div>
 
+<div class="over gone" id="shy">
+  <div class="over-in">
+    <p class="ov-k">Members only</p>
+    <p class="ov-t">Shy+</p>
+    <p class="shy-price">10,99 &euro;</p>
+    <p class="shy-per">per month, cancel any time, you will not</p>
+    <ul class="shy-list">
+      <li>Every track I add, the moment I add it</li>
+      <li>Six dungeons your free account cannot see</li>
+      <li>The right to say you pay for this</li>
+      <li class="no">No effect whatsoever on your interrupts</li>
+      <li class="no">No refunds, obviously</li>
+    </ul>
+    <button class="btn" id="shySub" type="button">Subscribe</button>
+    <button class="btn alt" id="shyNo" type="button">Stay poor</button>
+    <p class="shy-note" id="shyNote">
+      Already a member? <button id="shyRestore" type="button">Restore purchase</button>
+    </p>
+  </div>
+</div>
+
 <div class="over gone" id="pause">
   <div class="over-in">
     <p class="ov-k">Key on hold</p>
@@ -642,6 +705,10 @@
 __DUNGEONS__
   var dung = 'kr', G = DUNGEONS.kr;
   try { var sg = localStorage.getItem('beat.dung'); if (sg && DUNGEONS[sg]) dung = sg; } catch(e){}
+  if (DUNGEONS[dung] && DUNGEONS[dung].locked){
+    var free = localStorage.getItem('beat.shyplus') === '1';
+    if (!free) dung = 'kr';
+  }
   var BEAT = G.beat, ZERO = G.zero, SONG_END = G.end, PULLS = G.pulls;
 
   var DIFF = {
@@ -1139,6 +1206,7 @@ __DUNGEONS__
   }
 
   function start(){
+    if (isLocked(dung)){ showShy(); return; }
     if (countT){ clearTimeout(countT); countT = null; }
     build(); size(); clockReset(); audioInit();
     if (AC && AC.state === 'suspended'){ try { AC.resume(); } catch(e){} }
@@ -1585,12 +1653,44 @@ __DUNGEONS__
     });
   });
 
+  /* ---- shy plus ---- */
+  var shyEl   = document.getElementById('shy');
+  var shyNote = document.getElementById('shyNote');
+  var subbed  = false;
+  try { subbed = localStorage.getItem('beat.shyplus') === '1'; } catch(e){}
+
+  function isLocked(g){ return !!(DUNGEONS[g] && DUNGEONS[g].locked) && !subbed; }
+  function showShy(){
+    shyEl.classList.remove('gone');
+    shyEl.style.display = '';
+  }
+  function hideShy(){ shyEl.classList.add('gone'); }
+  document.getElementById('shyNo').addEventListener('click', hideShy);
+  document.getElementById('shySub').addEventListener('click', function(){
+    shyNote.innerHTML = 'Card declined. ' +
+      '<button id="shyRestore2" type="button" style="background:none;border:0;padding:0;' +
+      'cursor:pointer;font:inherit;color:var(--jade);text-decoration:underline">Restore purchase</button>';
+    var r2 = document.getElementById('shyRestore2');
+    if (r2) r2.addEventListener('click', unlockShy);
+  });
+  function unlockShy(){
+    subbed = true;
+    try { localStorage.setItem('beat.shyplus', '1'); } catch(e){}
+    hideShy();
+    paintDung();
+  }
+  document.getElementById('shyRestore').addEventListener('click', unlockShy);
+
   var dungBtns = [].slice.call(document.querySelectorAll('.dung'));
   function paintDung(){
     var g = DUNGEONS[dung];
     if (typeof paintBest === 'function') paintBest();
     if (typeof loadBoard === 'function' && !BOARD[dung]) loadBoard(dung);
-    dungBtns.forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-g') === dung); });
+    dungBtns.forEach(function(b){
+      var bk = b.getAttribute('data-g');
+      b.classList.toggle('on', bk === dung && !isLocked(bk));
+      b.classList.toggle('locked', isLocked(bk));
+    });
     ['normal','heroic','mythic'].forEach(function(k){
       var el = document.getElementById('cnt-' + k);
       if (el) el.textContent = g.charts[k].length;
@@ -1598,7 +1698,9 @@ __DUNGEONS__
   }
   dungBtns.forEach(function(b){
     b.addEventListener('click', function(){
-      dung = b.getAttribute('data-g');
+      var g = b.getAttribute('data-g');
+      if (isLocked(g)){ showShy(); return; }
+      dung = g;
       try { localStorage.setItem('beat.dung', dung); } catch(e){}
       paintDung();
     });

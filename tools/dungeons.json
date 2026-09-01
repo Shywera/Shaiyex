@@ -51,7 +51,8 @@
         "spell": "Deathly Roar"
       }
     ],
-    "len": 164.68
+    "len": 164.68,
+    "locked": false
   },
   {
     "key": "rlp",
@@ -105,7 +106,8 @@
         "spell": "Stormslam"
       }
     ],
-    "len": 199.02
+    "len": 199.02,
+    "locked": false
   },
   {
     "key": "vsa",
@@ -164,7 +166,8 @@
         "spell": "Mind-Numbing Poison"
       }
     ],
-    "len": 107.65
+    "len": 107.65,
+    "locked": false
   },
   {
     "key": "sd",
@@ -218,7 +221,8 @@
         "mob": "Bilge Rat Tempest",
         "spell": "Sea Spout"
       }
-    ]
+    ],
+    "locked": false
   },
   {
     "key": "disc",
@@ -242,7 +246,8 @@
         "mob": "Disconnected",
         "spell": "Interrupt"
       }
-    ]
+    ],
+    "locked": true
   },
   {
     "key": "sd2",
@@ -266,7 +271,8 @@
         "mob": "Snow Drive",
         "spell": "Interrupt"
       }
-    ]
+    ],
+    "locked": true
   },
   {
     "key": "nok",
@@ -290,7 +296,8 @@
         "mob": "Night of Knights",
         "spell": "Interrupt"
       }
-    ]
+    ],
+    "locked": true
   },
   {
     "key": "fd",
@@ -314,7 +321,8 @@
         "mob": "FREEDOM DiVE",
         "spell": "Interrupt"
       }
-    ]
+    ],
+    "locked": true
   },
   {
     "key": "iffa",
@@ -338,7 +346,8 @@
         "mob": "Immortal Flame (feat. Anna Yvette)",
         "spell": "Interrupt"
       }
-    ]
+    ],
+    "locked": true
   },
   {
     "key": "chea",
@@ -362,6 +371,7 @@
         "mob": "cheatreal",
         "spell": "Interrupt"
       }
-    ]
+    ],
+    "locked": true
   }
 ]
