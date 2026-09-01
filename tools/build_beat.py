@@ -66,9 +66,9 @@ def build():
         for d in cfg)
     page = re.sub(r'(<div class="dungs">\n).*?(\n    </div>)',
                   lambda m: m.group(1) + btns + m.group(2), page, count=1, flags=re.S)
-    cols = 2 if len(cfg) == 4 else min(3, len(cfg))
-    page = re.sub(r'(\.dungs\{\n\s*display:grid;grid-template-columns:)repeat\(\d+,1fr\)',
-                  lambda m: m.group(1) + "repeat(%d,1fr)" % cols, page, count=1)
+    cols = min(3, len(cfg)) if len(cfg) <= 3 else (2 if len(cfg) == 4 else 0)
+    page = re.sub(r'(\.dungs\{\n\s*display:grid;grid-template-columns:)repeat\([^)]*\)',
+                  lambda m: m.group(1) + ("repeat(%d,1fr)" % cols if cols else "repeat(auto-fit,minmax(170px,1fr))"), page, count=1)
 
     io.open(ROOT + "/public/beat/index.html", "w", encoding="utf-8", newline="").write(page)
     return cfg, names, len(page)

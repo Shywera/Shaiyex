@@ -777,8 +777,8 @@ __DUNGEONS__
       try { track.load(); } catch(e){}
     }
     notes = G.charts[diff].map(function(c){
-      var pull = spellAt(c[0]);
-      return { b: c[0], lane: c[1], t: ZERO + c[0] * BEAT,
+      var pull = spellAt((c[0] - ZERO) / BEAT);
+      return { b: c[0], lane: c[1], t: c[0],
                hit: false, gone: false, name: pull.spell };
     });
     idx = 0; combo = 0; best = 0; perf = 0; good = 0; missed = 0;

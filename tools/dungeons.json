@@ -219,5 +219,149 @@
         "spell": "Sea Spout"
       }
     ]
+  },
+  {
+    "key": "disc",
+    "name": "Disconnected",
+    "short": "DC",
+    "track": "disc.mp3",
+    "song": "Helblinde - Disconnected",
+    "bpm": 200.0,
+    "beat": 0.3,
+    "zero": 9.498,
+    "end": 220.6,
+    "len": 220.87,
+    "charts": {
+      "normal": "DC_N",
+      "heroic": "DC_H",
+      "mythic": "DC_M"
+    },
+    "pulls": [
+      {
+        "b": 0,
+        "mob": "Disconnected",
+        "spell": "Interrupt"
+      }
+    ]
+  },
+  {
+    "key": "sd2",
+    "name": "Snow Drive",
+    "short": "SNOW",
+    "track": "sd2.mp3",
+    "song": "Omoi - Snow Drive",
+    "bpm": 224.0,
+    "beat": 0.267857,
+    "zero": 0.695,
+    "end": 266.1,
+    "len": 267.02,
+    "charts": {
+      "normal": "SNOW_N",
+      "heroic": "SNOW_H",
+      "mythic": "SNOW_M"
+    },
+    "pulls": [
+      {
+        "b": 0,
+        "mob": "Snow Drive",
+        "spell": "Interrupt"
+      }
+    ]
+  },
+  {
+    "key": "nok",
+    "name": "Night of Knights",
+    "short": "NOK",
+    "track": "nok.mp3",
+    "song": "Hanataba - Night of Knights",
+    "bpm": 180.0,
+    "beat": 0.333333,
+    "zero": 21.75,
+    "end": 176.1,
+    "len": 190.92,
+    "charts": {
+      "normal": "NOK_N",
+      "heroic": "NOK_H",
+      "mythic": "NOK_M"
+    },
+    "pulls": [
+      {
+        "b": 0,
+        "mob": "Night of Knights",
+        "spell": "Interrupt"
+      }
+    ]
+  },
+  {
+    "key": "fd",
+    "name": "FREEDOM DiVE",
+    "short": "FD",
+    "track": "fd.mp3",
+    "song": "xi - FREEDOM DiVE",
+    "bpm": 222.22,
+    "beat": 0.270003,
+    "zero": 2.133,
+    "end": 262.0,
+    "len": 269.64,
+    "charts": {
+      "normal": "FD_N",
+      "heroic": "FD_H",
+      "mythic": "FD_M"
+    },
+    "pulls": [
+      {
+        "b": 0,
+        "mob": "FREEDOM DiVE",
+        "spell": "Interrupt"
+      }
+    ]
+  },
+  {
+    "key": "iffa",
+    "name": "Immortal Flame",
+    "short": "IF",
+    "track": "iffa.mp3",
+    "song": "Panda Eyes & Teminite - Immortal Flame (feat. Anna Yvette)",
+    "bpm": 110.0,
+    "beat": 0.545455,
+    "zero": 4.415,
+    "end": 227.6,
+    "len": 246.99,
+    "charts": {
+      "normal": "IF_N",
+      "heroic": "IF_H",
+      "mythic": "IF_M"
+    },
+    "pulls": [
+      {
+        "b": 0,
+        "mob": "Immortal Flame (feat. Anna Yvette)",
+        "spell": "Interrupt"
+      }
+    ]
+  },
+  {
+    "key": "chea",
+    "name": "cheatreal",
+    "short": "CR",
+    "track": "chea.mp3",
+    "song": "t+pazolite - cheatreal",
+    "bpm": 200.0,
+    "beat": 0.3,
+    "zero": 0.091,
+    "end": 257.1,
+    "len": 295.85,
+    "charts": {
+      "normal": "CR_N",
+      "heroic": "CR_H",
+      "mythic": "CR_M"
+    },
+    "pulls": [
+      {
+        "b": 0,
+        "mob": "cheatreal",
+        "spell": "Interrupt"
+      }
+    ]
   }
 ]

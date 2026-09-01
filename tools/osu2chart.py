@@ -1,25 +1,25 @@
 """
 Turn an osu! beatmap into a chart for /beat/.
 
-Works with:
-  .osu   a single difficulty
-  .osz   the packaged map, picks the difficulty you name or the busiest one
+Charts are stored in SECONDS, not beats. osu maps are allowed to change
+tempo part way through and several of them do, so a single beat length
+cannot describe the whole song. The beat position is still computed, using
+whichever timing point is in effect at that moment, but only so the
+difficulty split can tell an on beat note from an off beat one.
 
-osu!mania maps are ideal: the columns are already there, so the lanes come
-straight from the map maker rather than from me guessing. Standard, taiko and
-catch maps still work, we take the hit times and lay the lanes out with hand
-alternation, same rules the generated charts use.
+  .osu   a single difficulty
+  .osz   the package, picks the difficulty you name or the busiest one
+  folder picks the busiest .osu inside
 
 Usage:
-  python osu2chart.py <file.osu|file.osz> [--diff "name"] [--out chart.txt]
+  python osu2chart.py <file.osu|file.osz|folder> [--diff "name"] [--out chart.txt]
 """
-import sys, os, re, zipfile, io, random
+import sys, os, io, re, zipfile, random, glob
 from collections import defaultdict
 
 
 def read_osu(text):
-    sec, out = None, defaultdict(list)
-    meta = {}
+    sec, out, meta = None, defaultdict(list), {}
     for raw in text.splitlines():
         line = raw.strip()
         if not line or line.startswith("//"):
@@ -37,7 +37,7 @@ def read_osu(text):
 
 
 def timing(points):
-    """uninherited points only: (time_ms, ms_per_beat)"""
+    """uninherited points only, as (time_seconds, seconds_per_beat)"""
     res = []
     for line in points:
         p = line.split(",")
@@ -47,19 +47,30 @@ def timing(points):
             t = float(p[0]); beat = float(p[1])
         except ValueError:
             continue
-        uninherited = True
-        if len(p) >= 7:
-            uninherited = p[6].strip() == "1"
-        elif beat < 0:
-            uninherited = False
+        uninherited = p[6].strip() == "1" if len(p) >= 7 else beat > 0
         if uninherited and beat > 0:
-            res.append((t, beat))
+            res.append((t / 1000.0, beat / 1000.0))
     res.sort()
-    return res
+    # collapse points that do not actually change the tempo
+    out = []
+    for t, b in res:
+        if not out or abs(out[-1][1] - b) > 1e-9:
+            out.append((t, b))
+    return out
+
+
+def beat_pos(t, tp):
+    """where t sits on the grid, as a beat number within its timing section"""
+    seg = tp[0]
+    for p in tp:
+        if p[0] <= t + 1e-9:
+            seg = p
+        else:
+            break
+    return (t - seg[0]) / seg[1]
 
 
 def hit_objects(lines, mode, keys):
-    """returns [(time_seconds, column_or_None)]"""
     notes = []
     for line in lines:
         p = line.split(",")
@@ -71,30 +82,23 @@ def hit_objects(lines, mode, keys):
             continue
         col = None
         if mode == 3 and keys:
-            col = int(x * keys / 512)
-            col = max(0, min(keys - 1, col))
+            col = max(0, min(keys - 1, int(x * keys / 512)))
         notes.append((t / 1000.0, col))
-        # mania hold notes: the tail is in p[5] before the colon. we only
-        # want the press, so the tail is deliberately ignored.
     notes.sort(key=lambda n: n[0])
     return notes
 
 
 def to_four(notes, keys):
-    """map however many mania columns onto our four lanes"""
     if not keys or keys == 4:
         return notes
-    out = []
-    for t, c in notes:
-        out.append((t, None if c is None else min(3, int(c * 4 / keys))))
-    return out
+    return [(t, None if c is None else min(3, int(c * 4 / keys))) for t, c in notes]
 
 
 def assign_lanes(notes, minjack=0.27, seed=7):
-    """for maps with no columns: alternate hands, never jack a finger too fast"""
+    """maps without columns: alternate hands, never jack one finger too fast"""
     random.seed(seed)
     pattern = [0, 2, 1, 3, 1, 2, 0, 3]
-    last = {0: -99, 1: -99, 2: -99, 3: -99}
+    last = {0: -99.0, 1: -99.0, 2: -99.0, 3: -99.0}
     out, i = [], 0
     for t, c in notes:
         if c is not None:
@@ -118,95 +122,81 @@ def dedupe(notes, max_chord=2):
     return res
 
 
-def convert(path, diff=None):
+def pick_source(path, diff=None):
+    """returns (text, label)"""
+    if os.path.isdir(path):
+        cands = glob.glob(os.path.join(path, "**", "*.osu"), recursive=True)
+        if not cands:
+            raise SystemExit("no .osu under " + path)
+        if diff:
+            m = [c for c in cands if diff.lower() in os.path.basename(c).lower()]
+            if m:
+                cands = m
+        pick = max(cands, key=lambda c: io.open(c, encoding="utf-8", errors="ignore").read().count("\n"))
+        return io.open(pick, encoding="utf-8", errors="ignore").read(), os.path.basename(pick)
     if path.lower().endswith(".osz"):
         z = zipfile.ZipFile(path)
         cands = [n for n in z.namelist() if n.lower().endswith(".osu")]
         if not cands:
             raise SystemExit("no .osu inside that .osz")
-        pick = None
         if diff:
-            for n in cands:
-                if diff.lower() in n.lower():
-                    pick = n; break
-        if not pick:
-            # the busiest difficulty is usually the one worth charting
-            pick = max(cands, key=lambda n: len(z.read(n).decode("utf-8", "ignore")))
-        text = z.read(pick).decode("utf-8", "ignore")
-        name = pick
-    else:
-        text = io.open(path, encoding="utf-8", errors="ignore").read()
-        name = os.path.basename(path)
+            m = [n for n in cands if diff.lower() in n.lower()]
+            if m:
+                cands = m
+        pick = max(cands, key=lambda n: len(z.read(n)))
+        return z.read(pick).decode("utf-8", "ignore"), pick
+    return io.open(path, encoding="utf-8", errors="ignore").read(), os.path.basename(path)
 
+
+def convert(path, diff=None):
+    text, label = pick_source(path, diff)
     meta, sec = read_osu(text)
     mode = int(float(meta.get("Mode", 0)))
     keys = int(float(meta.get("CircleSize", 4))) if mode == 3 else 0
+
     tp = timing(sec["TimingPoints"])
     if not tp:
-        raise SystemExit("no uninherited timing point, cannot read the grid")
-    offset_ms, mspb = tp[0]
-    bpm = 60000.0 / mspb
+        raise SystemExit("no uninherited timing point in " + label)
 
-    notes = hit_objects(sec["HitObjects"], mode, keys)
-    notes = to_four(notes, keys)
-    notes = assign_lanes(notes)
-    notes = dedupe(notes)
+    notes = dedupe(assign_lanes(to_four(hit_objects(sec["HitObjects"], mode, keys), keys)))
 
     return {
-        "file": name,
+        "file": label,
         "audio": meta.get("AudioFilename", "?"),
         "title": meta.get("Title", "?"),
+        "artist": meta.get("Artist", "?"),
         "version": meta.get("Version", "?"),
         "mode": {0: "standard", 1: "taiko", 2: "catch", 3: "mania"}.get(mode, mode),
         "keys": keys,
-        "bpm": bpm,
-        "beat": mspb / 1000.0,
-        "zero": offset_ms / 1000.0,
-        "timing_points": len(tp),
-        "notes": notes,
+        "tp": tp,
+        "bpm": 60.0 / tp[0][1],
+        "beat": tp[0][1],
+        "zero": tp[0][0],
+        "notes": notes,          # (seconds, lane)
     }
-
-
-def as_chart(res):
-    """our format is [beat, lane], beat measured from the map's own offset"""
-    BEAT, ZERO = res["beat"], res["zero"]
-    out = []
-    for t, l in res["notes"]:
-        b = (t - ZERO) / BEAT
-        if b < -0.5:
-            continue
-        out.append((round(max(0.0, b), 4), l))
-    return out
 
 
 if __name__ == "__main__":
     args = sys.argv[1:]
     if not args:
         raise SystemExit(__doc__)
-    src = args[0]
-    diff = None; out = None
-    if "--diff" in args: diff = args[args.index("--diff") + 1]
-    if "--out"  in args: out  = args[args.index("--out") + 1]
-
-    r = convert(src, diff)
-    ch = as_chart(r)
+    diff = args[args.index("--diff") + 1] if "--diff" in args else None
+    out = args[args.index("--out") + 1] if "--out" in args else None
+    r = convert(args[0], diff)
+    ch = r["notes"]
     lanes = [sum(1 for _, l in ch if l == i) for i in range(4)]
-    times = sorted(set(b for b, _ in ch))
-    gaps = [(times[i + 1] - times[i]) * r["beat"] for i in range(len(times) - 1)]
-
-    print("map      :", r["file"])
-    print("title    :", r["title"], "[" + r["version"] + "]")
-    print("audio    :", r["audio"])
-    print("mode     :", r["mode"], ("%dK" % r["keys"]) if r["keys"] else "")
-    print("bpm      : %.3f   beat %.5f s   offset %.3f s   (%d timing points)"
-          % (r["bpm"], r["beat"], r["zero"], r["timing_points"]))
-    print("notes    : %d   lanes %s   shortest gap %.0f ms"
-          % (len(ch), lanes, (min(gaps) * 1000) if gaps else 0))
-    if r["timing_points"] > 1:
-        print("note     : the map has more than one timing point, so the tempo")
-        print("           changes. our engine assumes one grid, tell me if this")
-        print("           map actually changes speed part way through.")
+    times = sorted(set(t for t, _ in ch))
+    gaps = [times[i + 1] - times[i] for i in range(len(times) - 1)]
+    print("map    :", r["file"])
+    print("song   :", r["artist"], "-", r["title"], "[" + r["version"] + "]")
+    print("audio  :", r["audio"])
+    print("mode   :", r["mode"], ("%dK" % r["keys"]) if r["keys"] else "")
+    print("tempo  : %.2f BPM at %.3f s, %d timing section%s"
+          % (r["bpm"], r["zero"], len(r["tp"]), "" if len(r["tp"]) == 1 else "s"))
+    if len(r["tp"]) > 1:
+        print("         changes:", ", ".join("%.1fs=%.0fbpm" % (t, 60 / b) for t, b in r["tp"][:6]))
+    print("notes  : %d, lanes %s, shortest gap %.0f ms, last at %.1f s"
+          % (len(ch), lanes, min(gaps) * 1000, times[-1]))
     if out:
-        io.open(out, "w", encoding="utf-8").write(
-            ",".join("[%g,%d]" % (b, l) for b, l in ch))
-        print("written  :", out)
+        io.open(out, "w", encoding="utf-8").write(",".join("[%g,%d]" % (t, l) for t, l in ch))
+        print("written:", out)
