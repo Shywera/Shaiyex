@@ -662,9 +662,44 @@
   body.tekk .avatar-wrap::after{
     background:radial-gradient(circle, rgba(200,20,20,.34) 0%, rgba(200,20,20,0) 68%);
   }
+  /* the cards stop being cards. they hang. */
+  body.tekk .doors{padding-top:52px}
   body.tekk .door{
-    background:linear-gradient(165deg, rgba(160,180,220,.03), rgba(160,180,220,0) 60%), #090B12;
-    border-color:#1E2430;
+    background:
+      radial-gradient(circle at 12px 12px, rgba(150,168,196,.16) 0 2px, rgba(0,0,0,0) 3px),
+      radial-gradient(circle at calc(100% - 12px) 12px, rgba(150,168,196,.16) 0 2px, rgba(0,0,0,0) 3px),
+      radial-gradient(circle at 12px calc(100% - 12px), rgba(150,168,196,.12) 0 2px, rgba(0,0,0,0) 3px),
+      radial-gradient(circle at calc(100% - 12px) calc(100% - 12px), rgba(150,168,196,.12) 0 2px, rgba(0,0,0,0) 3px),
+      linear-gradient(165deg, rgba(160,180,220,.035), rgba(160,180,220,0) 60%),
+      #090B12;
+    border-color:#232A38;
+    border-top-color:#39424F;
+    transform-origin:50% -52px;
+    animation:hang 7s ease-in-out infinite;
+  }
+  body.tekk .door:nth-child(2){animation-duration:8.2s;animation-delay:-2.1s}
+  body.tekk .door:nth-child(3){animation-duration:6.4s;animation-delay:-4.3s}
+  @keyframes hang{
+    0%,100%{transform:rotate(-.45deg)}
+    50%    {transform:rotate(.45deg)}
+  }
+  /* two chains up into the dark above each one */
+  body.tekk .door::before{
+    content:"";position:absolute;left:0;right:0;top:-52px;height:52px;
+    pointer-events:none;
+    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='17'%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23545C6B' stroke-width='1.7'/%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23222833' stroke-width='.6'/%3E%3C/svg%3E"), url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='17'%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23545C6B' stroke-width='1.7'/%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23222833' stroke-width='.6'/%3E%3C/svg%3E");
+    background-repeat:repeat-y, repeat-y;
+    background-position:22% top, 78% top;
+    background-size:12px 17px, 12px 17px;
+    opacity:.85;
+  }
+  /* hovering does not lift an iron plate, it just catches the light */
+  body.tekk .door:hover,
+  body.tekk .door:focus-visible{
+    transform:rotate(0deg);
+    animation-play-state:paused;
+    border-color:var(--c);
+    box-shadow:0 18px 44px rgba(0,0,0,.85), 0 0 30px rgba(140,10,10,.18);
   }
   body.tekk .door:hover{box-shadow:0 16px 40px rgba(0,0,0,.8)}
   body.tekk .door-d{color:#6E635F}
@@ -675,17 +710,34 @@
   body.tekk .door-2{--c:#A8340F}
   body.tekk .door-4{--c:#5A0A0A}
   body.tekk .wip{
-    background:linear-gradient(120deg, rgba(160,180,220,.03), rgba(160,180,220,0) 60%), #090B12;
+    background:
+      radial-gradient(circle at 10px 10px, rgba(150,168,196,.18) 0 2px, rgba(0,0,0,0) 3px),
+      radial-gradient(circle at 10px calc(100% - 10px), rgba(150,168,196,.18) 0 2px, rgba(0,0,0,0) 3px),
+      linear-gradient(120deg, rgba(160,180,220,.03), rgba(160,180,220,0) 60%), #090B12;
     border-color:#2A3040;
     box-shadow:-6px 0 26px rgba(0,0,0,.85), 0 0 26px rgba(140,10,10,.16);
   }
   body.tekk .wip-s{color:#9A3A32}
   body.tekk .wip-tag{background:#8E0F0F;color:#040203}
+  /* the blacklist hangs lower and swings wider, like a sign outside a door */
   body.tekk .blbar{
+    margin-top:56px;
+    transform-origin:50% -46px;
+    animation:hang 9s ease-in-out infinite;
     background:radial-gradient(140% 260% at 50% 130%, rgba(120,6,6,.34), rgba(120,6,6,0) 70%), #08070C;
     border-color:#3E1213;
     box-shadow:0 0 30px rgba(120,6,6,.35), inset 0 0 30px rgba(120,6,6,.14);
   }
+  body.tekk .blbar::before{
+    content:"";position:absolute;left:0;right:0;top:-46px;height:46px;
+    pointer-events:none;
+    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='17'%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23545C6B' stroke-width='1.7'/%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23222833' stroke-width='.6'/%3E%3C/svg%3E"), url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='17'%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23545C6B' stroke-width='1.7'/%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23222833' stroke-width='.6'/%3E%3C/svg%3E");
+    background-repeat:repeat-y, repeat-y;
+    background-position:14% top, 86% top;
+    background-size:12px 17px, 12px 17px;
+    opacity:.8;
+  }
+  body.tekk .blbar:hover{animation-play-state:paused;transform:rotate(0deg)}
   body.tekk .bl-t{color:#C9B7B3;text-shadow:0 0 18px rgba(180,14,14,.7)}
   body.tekk .bl-d{color:#6E5F5C}
   body.tekk .bl-go{color:#9A3A32}
@@ -716,11 +768,49 @@
         rgba(120,8,6,.95) 46%, rgba(200,22,14,.9) 52%,
         rgba(6,7,12,.92) 60%, rgba(6,7,12,0) 100%);
   }
-  body.corrupting .corrupt .wipe{animation:wipe 1.05s cubic-bezier(.35,0,.2,1) forwards}
-  @keyframes wipe{
+  /* down into it */
+  body.corrupting.desc .corrupt .wipe{animation:wipeDown 1.05s cubic-bezier(.35,0,.2,1) forwards}
+  @keyframes wipeDown{
     0%{transform:translateY(-102%)}
     100%{transform:translateY(102%)}
   }
+
+  /* and back up out of it, in the other colour entirely */
+  body.corrupting.asc .corrupt .wipe{
+    animation:wipeUp 1.05s cubic-bezier(.35,0,.2,1) forwards;
+    background:
+      linear-gradient(180deg,
+        rgba(8,10,20,0) 0%, rgba(255,244,214,.06) 20%,
+        rgba(255,232,168,.72) 44%, rgba(255,255,255,.94) 51%,
+        rgba(255,224,150,.7) 58%, rgba(8,10,20,0) 100%);
+  }
+  @keyframes wipeUp{
+    0%{transform:translateY(102%)}
+    100%{transform:translateY(-102%)}
+  }
+  body.corrupting.asc .corrupt .bar{background:#FFE6A6;box-shadow:0 0 26px rgba(255,224,160,.95)}
+  body.corrupting.asc .doors,
+  body.corrupting.asc .blbar{filter:brightness(1.5) saturate(.7)}
+  body.corrupting.asc .inner{animation:rise 1.05s cubic-bezier(.3,.9,.2,1)}
+  @keyframes rise{
+    0%{transform:translateY(16px);opacity:.5;filter:blur(2px)}
+    60%{filter:blur(0)}
+    100%{transform:translateY(0);opacity:1}
+  }
+  /* the light itself, only on the way up */
+  .bloom{
+    position:absolute;left:50%;top:58%;width:10px;height:10px;
+    margin:-5px 0 0 -5px;border-radius:50%;opacity:0;
+    background:radial-gradient(circle, rgba(255,248,224,.95) 0%, rgba(255,224,150,.45) 40%, rgba(255,214,120,0) 70%);
+  }
+  body.corrupting.asc .bloom{animation:bloom 1.05s cubic-bezier(.2,.8,.3,1) forwards}
+  @keyframes bloom{
+    0%{opacity:0;transform:scale(1)}
+    22%{opacity:1}
+    100%{opacity:0;transform:scale(170)}
+  }
+  /* falling is heavier than rising */
+  body.corrupting.desc .inner{animation:cshake .34s steps(2) 3}
   .corrupt .bar{
     position:absolute;left:-10%;right:-10%;height:3px;
     background:#C21A12;opacity:0;
@@ -735,7 +825,6 @@
     0%{opacity:1;transform:translateX(-40px) scaleY(3)}
     100%{opacity:0;transform:translateX(30px) scaleY(1)}
   }
-  body.corrupting .inner{animation:cshake .34s steps(2) 3}
   @keyframes cshake{
     0%,100%{transform:translate(0,0)}
     25%{transform:translate(-5px,2px)}
@@ -810,6 +899,7 @@
 <div class="vig" aria-hidden="true"></div>
 <div class="corrupt" aria-hidden="true">
   <div class="wipe"></div>
+  <div class="bloom"></div>
   <div class="bar"></div><div class="bar"></div>
   <div class="bar"></div><div class="bar"></div>
 </div>
@@ -979,6 +1069,9 @@
 
     if (hint) hint.classList.add('gone');
     try { localStorage.setItem('shy.dispelled', '1'); } catch(e){}
+    /* down into it, or back up out of it */
+    body.classList.remove('desc', 'asc');
+    body.classList.add(on ? 'desc' : 'asc');
     body.classList.add('corrupting');
     var h1 = document.querySelector('h1');
     eat(h1);
@@ -987,7 +1080,7 @@
     /* flip under the cover of the wipe, not before it */
     setTimeout(paint, 360);
     setTimeout(function(){
-      body.classList.remove('corrupting');
+      body.classList.remove('corrupting', 'desc', 'asc');
       busy = false;
     }, 1100);
     /* this click is the gesture the browser wants, so the track is
