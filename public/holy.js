@@ -7,6 +7,10 @@
   var KEY = 'shy.holy.t';
   var VOL = 0.34;
 
+  /* inside the view on the front page the track is already playing out
+     there, so an embedded copy stays quiet */
+  try { if (window.top !== window.self) return; } catch(e){ return; }
+
   var dark = false;
   try { dark = localStorage.getItem('shy.tekk') === '1'; } catch (e) {}
   if (dark) return;
