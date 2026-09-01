@@ -426,7 +426,7 @@
   </div>
 
   <div class="bottom">
-    <div><span id="keyHint"></span> interrupt <span class="key">Esc</span> pause <span class="key">R</span> restart <span class="key">&larr;</span><span class="key">&rarr;</span> offset</div>
+    <div><span id="keyHint"></span> interrupt <span class="key">Esc</span> pause and leave <span class="key">R</span> restart <span class="key">&larr;</span><span class="key">&rarr;</span> offset</div>
     <div>
       <button id="calm" type="button">Reduce flashing</button>
       <a href="/" style="margin-left:12px">shaiyex.com</a>
@@ -511,6 +511,10 @@
     <p class="ov-k">Key on hold</p>
     <p class="ov-t" id="ptxt">Paused</p>
     <p class="ov-s" id="psub">Space or Esc to get back in</p>
+    <div id="pauseBtns">
+      <button class="btn" id="pauseGo" type="button">Back in</button>
+      <button class="btn alt" id="pauseMenu" type="button">Leave the key</button>
+    </div>
   </div>
 </div>
 
@@ -529,7 +533,7 @@
     </div>
     <p class="ov-s" id="rline"></p>
     <button class="btn" id="again" type="button">Run it back</button>
-    <button class="btn alt" id="home" type="button">Leave group</button>
+    <button class="btn alt" id="home" type="button">Pick another</button>
   </div>
 </div>
 
@@ -1545,6 +1549,7 @@
   var pauseEl= document.getElementById('pause');
   var pauseTxt = document.getElementById('ptxt');
   var pauseSub = document.getElementById('psub');
+  var pauseBtns = document.getElementById('pauseBtns');
   var diffTag  = document.getElementById('diffTag');
   var brandT   = document.getElementById('brandT');
   var brandS   = document.getElementById('brandS');
@@ -1952,13 +1957,29 @@
     pauseEl.classList.remove('gone');
     pauseTxt.textContent = 'Paused';
     pauseSub.textContent = 'Space or Esc to get back in';
+    pauseBtns.style.display = '';
+  }
+
+  /* drop the run and go back to the start screen */
+  function toMenu(){
+    if (countT){ clearTimeout(countT); countT = null; }
+    try { track.pause(); } catch(e){}
+    state = 'idle';
+    pauseEl.classList.add('gone');
+    result.classList.add('gone');
+    gate.style.display = '';
+    void gate.offsetWidth;
+    gate.classList.remove('gone');
   }
   var countT = null;
   function resume(){
     if (state !== 'paused') return;
     state = 'count';
     var k = 3;
-    pauseSub.textContent = 'Hands on D F J K';
+    pauseBtns.style.display = 'none';
+    pauseSub.textContent = 'Hands on ' + KEYS.map(function(x){
+      return x === ' ' ? 'SPC' : x.toUpperCase();
+    }).join(' ');
     (function tick(){
       pauseTxt.textContent = k > 0 ? String(k) : 'Go';
       if (k > 0){ k--; countT = setTimeout(tick, 700); }
@@ -2285,8 +2306,10 @@
       start();
     });
   });
+  document.getElementById('pauseGo').addEventListener('click', resume);
+  document.getElementById('pauseMenu').addEventListener('click', toMenu);
   document.getElementById('again').addEventListener('click', start);
-  document.getElementById('home').addEventListener('click', function(){ location.href = '/'; });
+  document.getElementById('home').addEventListener('click', toMenu);
 
   size();
   build();
