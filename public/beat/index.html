@@ -213,8 +213,13 @@
     background:
       radial-gradient(78% 60% at 50% 45%, rgba(169,108,255,.2) 0%, rgba(10,7,16,.985) 74%),
       var(--ink);
-    transition:opacity .4s ease;
+    transition:opacity .4s ease, background .25s ease;
   }
+  .over.snap{transition:none}
+  /* counting back in: let the lane show through */
+  .over.count{background:rgba(10,7,16,.34)}
+  .over.count .ov-k, .over.count .ov-s{opacity:.75}
+  .over.count .ov-t{text-shadow:0 0 30px #000, 0 4px 18px #000}
   .over.gone{opacity:0;pointer-events:none}
   .over-in{max-width:700px;width:100%}
   .ov-k{
@@ -303,6 +308,60 @@
   .dot.hit{
     transform:scale(1.12);border-color:var(--gold);
     background:rgba(232,196,104,.16);color:var(--text);
+  }
+  /* ---------- retard mode ---------- */
+  #rtBtn.on{color:#0A0710;background:var(--rose);border-color:#FF8AC8}
+  .rt{
+    position:fixed;inset:0;z-index:30;pointer-events:none;
+    overflow:hidden;display:none;
+  }
+  body.rt .rt{display:block}
+  body.rt .stage{transform:translate3d(var(--rx,0px), var(--ry,0px), 0)}
+  .rtp{
+    position:absolute;
+    font-family:var(--display);
+    font-size:clamp(20px,3.6vw,44px);
+    line-height:1;white-space:nowrap;opacity:0;
+    text-shadow:0 0 18px currentColor, 0 0 44px currentColor;
+    will-change:transform, opacity;
+  }
+  .rtp.run{animation:rtp 1.1s cubic-bezier(.15,.85,.3,1) forwards}
+  @keyframes rtp{
+    0%  {opacity:0; transform:translate(-50%,0)     scale(.55) rotate(var(--r))}
+    12% {opacity:1; transform:translate(-50%,-14px) scale(1.14) rotate(var(--r))}
+    22% {           transform:translate(-50%,-24px) scale(1)   rotate(var(--r))}
+    100%{opacity:0; transform:translate(-50%,-130px) scale(.9) rotate(var(--r))}
+  }
+  .rts{
+    position:absolute;left:50%;top:38%;
+    font-family:var(--display);
+    font-size:clamp(40px,11vw,130px);
+    line-height:.9;white-space:nowrap;color:#fff;opacity:0;
+    transform:translate(-50%,-50%) rotate(var(--sr,-7deg)) scale(.4);
+    text-shadow:0 0 26px var(--rose), 0 0 80px var(--violet);
+  }
+  .rts.run{animation:rts .8s linear forwards}
+  @keyframes rts{
+    0%  {opacity:0; transform:translate(-50%,-50%) rotate(var(--sr)) scale(2.6);
+         text-shadow:-40px 0 var(--rose), 40px 0 var(--jade)}
+    6%  {opacity:1; transform:translate(-50%,-50%) rotate(var(--sr)) scale(1.7);
+         text-shadow:-22px 0 var(--rose), 22px 0 var(--jade)}
+    12% {opacity:1; transform:translate(-50%,-52%) rotate(var(--sr)) scale(.85)}
+    18% {opacity:1; transform:translate(-50%,-48%) rotate(var(--sr)) scale(1.16)}
+    26% {opacity:1; transform:translate(-50%,-50%) rotate(var(--sr)) scale(1);
+         text-shadow:0 0 26px var(--rose), 0 0 80px var(--violet)}
+    76% {opacity:1; transform:translate(-50%,-50%) rotate(var(--sr)) scale(1)}
+    100%{opacity:0; transform:translate(-50%,-50%) rotate(var(--sr)) scale(1.06)}
+  }
+  .rtt{
+    position:absolute;left:-10%;right:-10%;opacity:0;
+    will-change:transform, opacity;
+  }
+  .rtt.run{animation:rtt .2s steps(3) forwards}
+  @keyframes rtt{
+    0%{opacity:1;transform:translateX(var(--tx))}
+    60%{opacity:.9;transform:translateX(calc(var(--tx) * -.6))}
+    100%{opacity:0;transform:translateX(0)}
   }
   .keys-note{
     width:100%;text-align:center;margin-top:6px;
@@ -435,6 +494,8 @@
 
 </div>
 
+<div class="rt" id="rtLayer" aria-hidden="true"><div class="rts" id="rtStamp"></div></div>
+
 <div class="over" id="gate">
   <div class="over-in">
     <p class="ov-k">Interrupt on the beat</p>
@@ -485,6 +546,7 @@
         <button class="slot" style="--c:#A96CFF" data-s="3" type="button">K</button>
       </span>
       <button class="kb cal" id="calBtn" type="button">Calibrate</button>
+      <button class="kb" id="rtBtn" type="button">Retard mode</button>
       <span class="keys-note" id="keysNote"></span>
     </div>
     <p class="cal">Sound on. If your hits feel off, nudge the offset with the arrow keys</p>
@@ -1734,6 +1796,7 @@
     n.gone = true;
     missed++; combo = 0; streak = 0;
     say('MISSED', '#FF4B4B'); paintHud();
+    if (rt) rtSlam('SKILL ISSUE');
     if (damage(n.lane)) finish(false);
   }
 
@@ -1932,6 +1995,12 @@
       if (b !== lastBeat){
         lastBeat = b;
         if (!calm){ p = 1; flash = 1; }
+        if (rt){
+          rtPop();
+          if (((b % 4) + 4) % 4 === 0){ rtPop(); rtShake = 1; }
+          if (b % 8 === 0) rtTear(2 + Math.floor(Math.random() * 2));
+          if (b % 16 === 0) rtSlam();
+        }
         var pull = spellAt(b);
         sectEl.innerHTML = pull.mob + ' <b>' + pull.spell + '</b>';
       }
@@ -1939,6 +2008,17 @@
         p *= 0.82; pd *= 0.88;
         root.style.setProperty('--p', p.toFixed(3));
         root.style.setProperty('--pd', pd.toFixed(3));
+      }
+      if (rt){
+        if (rtShake > 0.01){
+          rtShake *= 0.72;
+          root.style.setProperty('--rx', ((Math.random() - 0.5) * rtShake * 9).toFixed(2) + 'px');
+          root.style.setProperty('--ry', ((Math.random() - 0.5) * rtShake * 7).toFixed(2) + 'px');
+        } else if (rtShake !== 0){
+          rtShake = 0;
+          root.style.setProperty('--rx', '0px');
+          root.style.setProperty('--ry', '0px');
+        }
       }
       draw();
       /* let the song play out. it runs to 164.7s */
@@ -1955,6 +2035,7 @@
     state = 'paused';
     try { track.pause(); } catch(e){}
     pauseEl.classList.remove('gone');
+    pauseEl.classList.remove('count');
     pauseTxt.textContent = 'Paused';
     pauseSub.textContent = 'Space or Esc to get back in';
     pauseBtns.style.display = '';
@@ -1962,6 +2043,7 @@
 
   /* drop the run and go back to the start screen */
   function toMenu(){
+    rtClear();
     if (countT){ clearTimeout(countT); countT = null; }
     try { track.pause(); } catch(e){}
     state = 'idle';
@@ -1976,6 +2058,7 @@
     if (state !== 'paused') return;
     state = 'count';
     var k = 3;
+    pauseEl.classList.add('count');
     pauseBtns.style.display = 'none';
     pauseSub.textContent = 'Hands on ' + KEYS.map(function(x){
       return x === ' ' ? 'SPC' : x.toUpperCase();
@@ -1985,7 +2068,12 @@
       if (k > 0){ k--; countT = setTimeout(tick, 700); }
       else {
         countT = setTimeout(function(){
+          pauseEl.classList.add('snap');
           pauseEl.classList.add('gone');
+          setTimeout(function(){
+            pauseEl.classList.remove('snap');
+            pauseEl.classList.remove('count');
+          }, 60);
           clockReset();
           try { var pr = track.play(); if (pr && pr.catch) pr.catch(function(){}); } catch(e){}
           state = 'play';
@@ -2115,6 +2203,81 @@
       if (x >= colX(l) && x <= colX(l) + COLW){ press(l); return; }
     }
   });
+
+  /* ---- retard mode: everything from the why page, on top of the run ---- */
+  var rt = false;
+  try { rt = localStorage.getItem('beat.rt') === '1'; } catch(e){}
+  var rtLayer = document.getElementById('rtLayer');
+  var rtStamp = document.getElementById('rtStamp');
+  var rtBtn   = document.getElementById('rtBtn');
+  var RTW = [
+    "KICK IT","PRESS IT","TOO SLOW","SKILL ISSUE","THAT WAS ME","SIT DOWN DOG",
+    "COUNT YOUR KICKS","YOU ARE SHIT","LOL","AGAIN?","MY KEY","GG GO NEXT",
+    "STILL ME","WHO KICKED? NOBODY","HEAL DIFF? YES","ONE BUTTON","CRY","HEEL"
+  ];
+  var RTS = [
+    "SKILL ISSUE","THAT WAS ME","SIT DOWN DOG","PRESS YOUR KICK",
+    "COUNT YOUR KICKS","NOT MY FAULT","STILL ME","GUESS WHO"
+  ];
+  var RTC = ['255,63,164','47,216,195','232,196,104','169,108,255','255,255,255'];
+  var RTPOOL = [], rti = 0, RTTPOOL = [], rtti = 0, rtsi = 0, rtShake = 0;
+  (function(){
+    for (var i = 0; i < 20; i++){
+      var e = document.createElement('span');
+      e.className = 'rtp'; rtLayer.appendChild(e); RTPOOL.push(e);
+    }
+    for (var j = 0; j < 8; j++){
+      var d = document.createElement('div');
+      d.className = 'rtt'; rtLayer.appendChild(d); RTTPOOL.push(d);
+    }
+  })();
+  function rtPop(){
+    var e = RTPOOL[rti++ % RTPOOL.length];
+    e.classList.remove('run'); void e.offsetWidth;
+    e.textContent = RTW[Math.floor(Math.random() * RTW.length)];
+    e.style.left = (6 + Math.random() * 88) + 'vw';
+    e.style.top  = (10 + Math.random() * 70) + 'vh';
+    e.style.color = 'rgb(' + RTC[Math.floor(Math.random() * RTC.length)] + ')';
+    e.style.setProperty('--r', ((Math.random() - 0.5) * 16).toFixed(1) + 'deg');
+    e.classList.add('run');
+  }
+  function rtTear(n){
+    for (var i = 0; i < n; i++){
+      var e = RTTPOOL[rtti++ % RTTPOOL.length];
+      e.classList.remove('run'); void e.offsetWidth;
+      e.style.top = (Math.random() * 92) + 'vh';
+      e.style.height = (2 + Math.random() * 26) + 'px';
+      e.style.background = 'rgba(' + RTC[Math.floor(Math.random() * 4)] + ',.55)';
+      e.style.setProperty('--tx', ((Math.random() - 0.5) * 80).toFixed(0) + 'px');
+      e.classList.add('run');
+    }
+  }
+  function rtSlam(word){
+    rtStamp.textContent = word || RTS[rtsi++ % RTS.length];
+    rtStamp.style.setProperty('--sr', ((Math.random() < 0.5 ? -1 : 1) * (5 + Math.random() * 9)).toFixed(1) + 'deg');
+    rtStamp.style.top = (32 + Math.random() * 14) + '%';
+    rtStamp.classList.remove('run'); void rtStamp.offsetWidth;
+    rtStamp.classList.add('run');
+  }
+  function rtClear(){
+    RTPOOL.forEach(function(e){ e.classList.remove('run'); });
+    RTTPOOL.forEach(function(e){ e.classList.remove('run'); });
+    rtStamp.classList.remove('run');
+    rtShake = 0;
+    root.style.setProperty('--rx', '0px');
+    root.style.setProperty('--ry', '0px');
+  }
+  function paintRt(){
+    document.body.classList.toggle('rt', rt);
+    rtBtn.classList.toggle('on', rt);
+    if (!rt) rtClear();
+  }
+  rtBtn.addEventListener('click', function(){
+    rt = !rt;
+    try { localStorage.setItem('beat.rt', rt ? '1' : '0'); } catch(e){}
+    paintRt();
+  });
+  paintRt();
 
   /* ---- latency calibration ----
      the game clock runs on track.currentTime, which is ahead of what you
