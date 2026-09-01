@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="What I bring to a group, plainly.">
+<meta name="theme-color" content="#F7F2E6">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Why Invite Me">
+<meta property="og:description" content="Holy Paladin. What I bring to a group, plainly.">
+<meta property="og:url" content="https://shaiyex.com/pitch/">
+<meta name="twitter:card" content="summary">
+<title>Why Invite Me</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+
+<style>
+  :root{
+    --ink:#F7F2E6;
+    --panel:#FFFDF8;
+    --line:#E6DAC0;
+    --line-hot:#CDB88C;
+    --text:#241E14;
+    --dim:#5C5340;
+    --dimmer:#8C7F66;
+    --gold:#B5842F;
+    --gold-hot:#8A6116;
+    --gold-deep:#D9C289;
+    --blue:#2E6E9E;
+    --green:#2E7C55;
+
+    --display:"Schibsted Grotesk","Segoe UI",Helvetica,Arial,sans-serif;
+    --body:"Schibsted Grotesk","Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:"IBM Plex Mono",Consolas,ui-monospace,monospace;
+    --wrap:70ch;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:
+      radial-gradient(58% 40% at 50% -14%, #FFFFFF 0%, rgba(255,255,255,0) 68%),
+      radial-gradient(100% 60% at 50% 0%, #FFF6DF 0%, rgba(255,246,223,0) 64%),
+      linear-gradient(180deg,#FFFBF0 0%, #F4EDDC 60%, #EFE6CF 100%),
+      var(--ink);
+    background-attachment:fixed;
+    color:var(--text);
+    font-family:var(--body);
+    font-size:17px;line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* the same light that falls on the front page */
+  .heaven{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      conic-gradient(from 202deg at 50% -10%,
+        rgba(255,255,255,0) 0deg, rgba(255,250,232,.7) 13deg, rgba(255,255,255,0) 25deg,
+        rgba(255,255,255,0) 42deg, rgba(255,248,226,.55) 53deg, rgba(255,255,255,0) 66deg,
+        rgba(255,255,255,0) 360deg);
+    -webkit-mask-image:linear-gradient(180deg,#000 0%, rgba(0,0,0,.45) 44%, rgba(0,0,0,0) 78%);
+    mask-image:linear-gradient(180deg,#000 0%, rgba(0,0,0,.45) 44%, rgba(0,0,0,0) 78%);
+    animation:shafts 28s ease-in-out infinite alternate;
+  }
+  @keyframes shafts{
+    0%{transform:rotate(-1.4deg) scale(1.02)}
+    100%{transform:rotate(1.4deg) scale(1.06)}
+  }
+  .page{position:relative;z-index:1}
+  .page{
+    max-width:var(--wrap);margin:0 auto;
+    padding:clamp(34px,7vw,68px) clamp(18px,5vw,28px) 96px;
+    display:flex;flex-direction:column;gap:clamp(40px,7vw,64px);
+  }
+  a{color:inherit}
+
+  .backlink{
+    position:fixed;bottom:16px;left:16px;z-index:60;
+    font-family:var(--mono);font-size:10.5px;font-weight:600;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+    background:rgba(255,253,248,.92);border:1px solid var(--line-hot);
+    border-radius:2px;padding:7px 12px 8px;text-decoration:none;
+  }
+  .backlink:hover{color:var(--text);border-color:var(--gold)}
+
+  .eyebrow{
+    font-family:var(--mono);font-size:11px;font-weight:600;
+    letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin:0;
+  }
+  h1{
+    font-weight:700;font-size:clamp(40px,8vw,68px);
+    line-height:1.02;letter-spacing:-.02em;margin:.18em 0 0;
+    background:linear-gradient(100deg, #A9781F 0%, #E7C77E 46%, #A9781F 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .lede{
+    font-size:clamp(17px,2.5vw,20px);color:var(--dim);
+    max-width:54ch;margin:1.1em 0 0;
+  }
+  .lede b{color:var(--text);font-weight:600}
+  h2{
+    font-weight:700;font-size:clamp(24px,4.4vw,34px);
+    line-height:1.1;letter-spacing:-.01em;margin:0;
+  }
+  .sec-head{display:flex;flex-direction:column;gap:.5em;margin-bottom:1.3em}
+  p{margin:1em 0 0}
+  .prose{color:var(--dim);max-width:60ch}
+  .prose b{color:var(--text);font-weight:600}
+
+  .points{display:flex;flex-direction:column;gap:12px}
+  .point{
+    display:grid;grid-template-columns:auto 1fr;gap:16px;
+    padding:20px 22px;
+    background:linear-gradient(160deg, #FFFFFF, rgba(255,255,255,0) 62%), var(--panel);
+    border:1px solid var(--line);border-left:3px solid var(--c);border-radius:2px;
+    box-shadow:0 8px 22px rgba(120,96,48,.08);
+  }
+  .point-n{
+    font-family:var(--mono);font-size:11px;font-weight:600;
+    letter-spacing:.14em;color:var(--c);padding-top:4px;
+  }
+  .point-t{font-weight:700;font-size:18px;color:var(--text);margin:0}
+  .point-d{margin:.4em 0 0;color:var(--dim);font-size:15.5px;line-height:1.6}
+
+  .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .fact{
+    padding:16px 16px 17px;background:var(--panel);
+    border:1px solid var(--line);border-top:2px solid var(--gold-deep);border-radius:2px;
+  }
+  .fact b{
+    display:block;font-size:26px;font-weight:700;line-height:1;
+    color:var(--gold);font-variant-numeric:tabular-nums;
+  }
+  .fact span{
+    display:block;margin-top:6px;font-family:var(--mono);font-size:9.5px;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--dimmer);
+  }
+  @media (max-width:620px){ .facts{grid-template-columns:1fr} }
+
+  .close{
+    padding:clamp(24px,5vw,34px);text-align:center;border-radius:2px;
+    background:radial-gradient(90% 150% at 50% 0%, rgba(255,238,190,.55), rgba(255,238,190,0) 68%), var(--panel);
+    border:1px solid var(--line-hot);
+    box-shadow:0 10px 30px rgba(120,96,48,.10);
+  }
+  .close p{font-size:clamp(19px,3.4vw,26px);line-height:1.3;color:var(--text);margin:0;font-weight:600}
+  .close small{
+    display:block;margin-top:12px;font-family:var(--mono);font-size:11px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--dimmer);
+  }
+  .cta{
+    display:inline-block;margin-top:20px;
+    font-family:var(--mono);font-size:11px;font-weight:600;
+    letter-spacing:.14em;text-transform:uppercase;
+    padding:11px 22px 12px;color:#FFFDF6;background:var(--gold);
+    border:1px solid var(--gold-hot);border-radius:2px;text-decoration:none;
+  }
+  .cta:hover{background:var(--gold-hot);border-color:var(--gold-hot)}
+
+  footer{
+    border-top:1px solid var(--line);padding-top:20px;
+    font-family:var(--mono);font-size:11px;line-height:1.9;
+    letter-spacing:.04em;color:var(--dimmer);
+  }
+</style>
+</head>
+<body>
+
+<div class="heaven" aria-hidden="true"></div>
+
+<a class="backlink" href="/">shaiyex.com</a>
+
+<div class="page">
+
+  <header>
+    <p class="eyebrow">Holy Paladin &middot; Twisting Nether</p>
+    <h1>Why invite me</h1>
+    <p class="lede">Short version: <b>you get a healer who reads the pull before it happens</b>, says what he needs once, and keeps the group standing while everyone else gets on with their job.</p>
+  </header>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">What I bring</p>
+      <h2>Three things, honestly.</h2>
+    </div>
+
+    <div class="points">
+      <div class="point" style="--c:var(--gold)">
+        <span class="point-n">01</span>
+        <div>
+          <p class="point-t">Healing that plans ahead</p>
+          <p class="point-d">Cooldowns go out before the damage lands, not after. If a pull is going to hurt, it is already covered by the time you notice. You should mostly find the run uneventful, and that is the point.</p>
+        </div>
+      </div>
+      <div class="point" style="--c:var(--blue)">
+        <span class="point-n">02</span>
+        <div>
+          <p class="point-t">Utility people forget a paladin has</p>
+          <p class="point-d">Blessings where they matter, Lay on Hands for the save nobody else can cover, and crowd control on the pulls that want it. Ask and it is yours. I would rather spend it than sit on it.</p>
+        </div>
+      </div>
+      <div class="point" style="--c:var(--green)">
+        <span class="point-n">03</span>
+        <div>
+          <p class="point-t">Easy to run with</p>
+          <p class="point-d">I call things once, clearly, and I do not spend the run talking. If something went wrong I will say what I would do differently first. No meter arguments, no sighing in chat.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">The short of it</p>
+      <h2>Where I am at.</h2>
+    </div>
+    <div class="facts">
+      <div class="fact"><b>Holy</b><span>Main spec</span></div>
+      <div class="fact"><b>Mythic+</b><span>Weekly, most weeks</span></div>
+      <div class="fact"><b>9</b><span>Classes played at mythic</span></div>
+    </div>
+    <p class="prose" style="margin-top:16px">Full numbers, the season's keys, raid progression and logs are on the <a href="/about/">about page</a> if you want the detail.</p>
+  </section>
+
+  <section>
+    <div class="close">
+      <p>Bring me along. Worst case you get a quiet run and everybody lives.</p>
+      <small>That is usually the best case too</small>
+      <br>
+      <a class="cta" href="/beat/">Or try the interrupt game &rarr;</a>
+    </div>
+  </section>
+
+  <footer>
+    <div>Shaiyex &middot; Holy Paladin &middot; Twisting Nether</div>
+    <div>Happy to answer anything before you invite.</div>
+  </footer>
+
+</div>
+
+</body>
+</html>

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Shaiyex - Holy Paladin. Mythic+ score, current keys, raid progression and logs.">
-<meta name="theme-color" content="#080A14">
+<meta name="theme-color" content="#F7F2E6">
 <meta property="og:type" content="profile">
 <meta property="og:title" content="Shaiyex">
 <meta property="og:description" content="Holy Paladin. Mythic+ score, keys, progression and logs.">
@@ -20,18 +20,18 @@
 
 <style>
   :root{
-    --ink:#080A14;
-    --ink-2:#0C1020;
-    --panel:#111629;
-    --panel-2:#171D34;
-    --line:#232B47;
-    --line-hot:#36406B;
-    --text:#F0EDE4;
-    --dim:#A3A8BE;
-    --dimmer:#767C96;
-    --gold:#F0C868;
-    --gold-hot:#FFE0A0;
-    --gold-deep:#B8873A;
+    --ink:#F7F2E6;
+    --ink-2:#FFFCF4;
+    --panel:#FFFDF8;
+    --panel-2:#FFF8E9;
+    --line:#E6DAC0;
+    --line-hot:#CDB88C;
+    --text:#241E14;
+    --dim:#5C5340;
+    --dimmer:#8C7F66;
+    --gold:#B5842F;
+    --gold-hot:#8A6116;
+    --gold-deep:#D9C289;
     --amber:#E9A83C;
     --pink:#F48CBA;
     --blue:#7FB6E8;
@@ -46,7 +46,9 @@
   body{
     margin:0;
     background:
-      linear-gradient(180deg,#10142A 0%, rgba(16,20,42,0) 90%),
+      radial-gradient(58% 42% at 50% -12%, #FFFFFF 0%, rgba(255,255,255,0) 66%),
+      radial-gradient(90% 60% at 50% 0%, #FFF6DF 0%, rgba(255,246,223,0) 62%),
+      linear-gradient(180deg,#FFFBF0 0%, #F4EDDC 58%, #EFE6CF 100%),
       var(--ink);
     background-attachment:fixed;
     color:var(--text);
@@ -73,13 +75,55 @@
 
   }
   #rays{
-    position:fixed;
-    inset:0;
-    width:100%;
-    height:100%;
-    pointer-events:none;
-    opacity:.6;
-    z-index:0;
+    position:fixed;inset:0;width:100%;height:100%;
+    pointer-events:none;opacity:0;z-index:0;display:none;
+  }
+  body.tekk #rays{display:block}
+
+  /* daylight: a shaft from above, and the air moving in it */
+  .heaven{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    transition:opacity .6s ease;
+    background:
+      conic-gradient(from 200deg at 50% -10%,
+        rgba(255,255,255,0) 0deg, rgba(255,250,232,.85) 14deg, rgba(255,255,255,0) 26deg,
+        rgba(255,255,255,0) 40deg, rgba(255,248,226,.7) 52deg, rgba(255,255,255,0) 66deg,
+        rgba(255,255,255,0) 96deg, rgba(255,250,235,.6) 108deg, rgba(255,255,255,0) 122deg,
+        rgba(255,255,255,0) 360deg);
+    -webkit-mask-image:linear-gradient(180deg,#000 0%, rgba(0,0,0,.5) 46%, rgba(0,0,0,0) 82%);
+    mask-image:linear-gradient(180deg,#000 0%, rgba(0,0,0,.5) 46%, rgba(0,0,0,0) 82%);
+    animation:shafts 26s ease-in-out infinite alternate;
+  }
+  body.tekk .heaven{opacity:0}
+  @keyframes shafts{
+    0%{transform:rotate(-1.6deg) scale(1.02)}
+    100%{transform:rotate(1.6deg) scale(1.06)}
+  }
+  .halo{
+    position:fixed;left:50%;top:-24vh;width:130vw;height:80vh;
+    margin-left:-65vw;z-index:0;pointer-events:none;
+    background:radial-gradient(closest-side, rgba(255,255,255,.95) 0%, rgba(255,244,214,.55) 42%, rgba(255,238,196,0) 72%);
+    animation:halo2 7s ease-in-out infinite;
+  }
+  body.tekk .halo{opacity:0}
+  @keyframes halo2{
+    0%,100%{opacity:.75;transform:scale(1)}
+    50%{opacity:1;transform:scale(1.04)}
+  }
+  /* feathers of light drifting down */
+  .plumes{position:fixed;inset:0;z-index:1;pointer-events:none}
+  body.tekk .plumes{opacity:0}
+  .plumes i{
+    position:absolute;top:-6vh;width:3px;height:12px;border-radius:60% 60% 40% 40%;
+    background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,236,190,.15));
+    box-shadow:0 0 8px rgba(255,244,214,.8);
+    animation:fall linear infinite;
+  }
+  @keyframes fall{
+    0%{transform:translateY(0) translateX(0) rotate(0deg);opacity:0}
+    10%{opacity:.9}
+    80%{opacity:.5}
+    100%{transform:translateY(112vh) translateX(var(--dx,20px)) rotate(140deg);opacity:0}
   }
   .hero > .inner, footer{position:relative;z-index:1}
   .inner{
@@ -95,7 +139,7 @@
     content:"";
     position:absolute;inset:-16px;
     border-radius:50%;
-    background:radial-gradient(circle, rgba(240,200,104,.34) 0%, rgba(240,200,104,0) 68%);
+    background:radial-gradient(circle, rgba(255,255,255,.9) 0%, rgba(255,238,196,0) 68%);
     animation:halo 5.5s ease-in-out infinite;
   }
   @keyframes halo{
@@ -108,7 +152,7 @@
     border-radius:50%;
     object-fit:cover;
     border:2px solid var(--gold);
-    box-shadow:0 0 0 6px rgba(240,200,104,.09), 0 0 44px rgba(240,200,104,.36);
+    box-shadow:0 0 0 6px rgba(255,255,255,.85), 0 0 0 8px rgba(210,172,96,.35), 0 0 54px rgba(255,226,158,.9);
     display:block;
   }
 
@@ -131,14 +175,14 @@
     letter-spacing:.02em;
     margin:.12em 0 0;
     background:linear-gradient(100deg,
-      var(--gold) 0%, var(--gold) 32%,
-      #FFF9EC 46%, var(--gold-hot) 54%,
-      var(--gold) 70%, var(--gold) 100%);
+      #A9781F 0%, #C79A3C 30%,
+      #FFF3D0 46%, #E8C579 54%,
+      #C79A3C 70%, #A9781F 100%);
     background-size:260% 100%;
     -webkit-background-clip:text;
     background-clip:text;
     color:transparent;
-    filter:drop-shadow(0 0 34px rgba(240,200,104,.42));
+    filter:drop-shadow(0 2px 1px rgba(255,255,255,.9)) drop-shadow(0 0 26px rgba(255,226,158,.75));
     animation:shimmer 7s linear infinite;
   }
   @keyframes shimmer{
@@ -158,11 +202,16 @@
   /* ---------- the two doors ---------- */
   .doors{
     display:grid;
-    grid-template-columns:repeat(3,1fr);
+    grid-template-columns:repeat(2,1fr);
     gap:14px;
     margin-top:clamp(34px,6vw,52px);
     text-align:left;
   }
+  /* the interrupt exam only exists once you have seen the other side */
+  .door-2{display:none}
+  body.tekk .door-2{display:flex}
+  body.tekk .doors{grid-template-columns:repeat(3,1fr)}
+
   .door{
     --c:var(--gold);
     position:relative;
@@ -170,8 +219,9 @@
     flex-direction:column;
     gap:9px;
     padding:22px 20px 20px;
-    background:linear-gradient(165deg, rgba(255,255,255,.04), rgba(255,255,255,0) 60%), var(--panel);
+    background:linear-gradient(165deg, #FFFFFF, rgba(255,255,255,0) 62%), var(--panel);
     border:1px solid var(--line-hot);
+    box-shadow:0 10px 26px rgba(120,96,48,.10);
     border-radius:2px;
     overflow:hidden;
     transition:transform .28s cubic-bezier(.2,.8,.25,1), border-color .28s ease, box-shadow .28s ease;
@@ -187,7 +237,7 @@
   .door:hover,.door:focus-visible{
     transform:translateY(-5px);
     border-color:var(--c);
-    box-shadow:0 16px 40px rgba(0,0,0,.55);
+    box-shadow:0 18px 40px rgba(120,96,48,.22);
     outline:none;
   }
   .door:hover::after,.door:focus-visible::after{opacity:1;box-shadow:0 0 24px var(--c)}
@@ -265,15 +315,19 @@
     align-items:center;
     gap:9px;
     padding:11px 14px 12px 15px;
-    background:linear-gradient(120deg, rgba(255,255,255,.05), rgba(255,255,255,0) 60%), #120A1E;
-    border:1px solid #4B2A7A;
+    background:linear-gradient(120deg, #FFFFFF, #FFF6E0 70%);
+    border:1px solid var(--line-hot);
     border-right:0;
     border-radius:3px 0 0 3px;
-    box-shadow:-6px 0 26px rgba(0,0,0,.5), 0 0 30px rgba(150,60,255,.22);
+    box-shadow:-6px 0 22px rgba(120,96,48,.16);
     transition:transform .25s cubic-bezier(.2,.8,.25,1), box-shadow .25s ease, border-color .25s ease;
   }
   .wip:hover{
     transform:translateY(-50%) translateX(-4px);
+    border-color:var(--gold);
+    box-shadow:-8px 0 30px rgba(120,96,48,.28);
+  }
+  body.tekk .wip:hover{
     border-color:#8A4BFF;
     box-shadow:-8px 0 34px rgba(0,0,0,.6), 0 0 44px rgba(150,60,255,.4);
   }
@@ -292,17 +346,18 @@
     font-weight:600;
     letter-spacing:.14em;
     text-transform:uppercase;
-    color:#B98CFF;
+    color:var(--gold);
     margin-top:3px;
   }
+  body.tekk .wip-s{color:#B98CFF}
   .wip-tag{
     font-family:var(--mono);
     font-size:9px;
     font-weight:600;
     letter-spacing:.14em;
     padding:3px 6px 4px;
-    color:#0B0714;
-    background:#C08BFF;
+    color:#FFFDF6;
+    background:var(--gold);
     border-radius:2px;
     animation:wipPulse 2.4s ease-in-out infinite;
   }
@@ -316,7 +371,7 @@
       transform:none;
       margin:18px auto 0;
       width:fit-content;
-      border-right:1px solid #4B2A7A;
+      border-right:1px solid var(--line-hot);
       border-radius:3px;
     }
     .wip:hover{transform:none}
@@ -325,7 +380,7 @@
   /* ---------- blacklist strip ---------- */
   .blbar{
     position:relative;
-    display:flex;
+    display:none;
     align-items:center;
     gap:clamp(14px,3vw,28px);
     margin-top:14px;
@@ -428,9 +483,9 @@
     display:flex;align-items:center;gap:11px;
     padding:11px 17px 12px;cursor:pointer;text-align:left;
     color:var(--text);
-    background:linear-gradient(150deg, rgba(240,200,104,.12), rgba(240,200,104,.02) 60%), rgba(14,18,34,.92);
-    border:1px solid var(--gold-deep);border-radius:3px;
-    box-shadow:0 0 0 0 rgba(240,200,104,.5), 0 8px 26px rgba(0,0,0,.5);
+    background:linear-gradient(150deg, #FFFFFF, #FFF6E0 70%);
+    border:1px solid var(--line-hot);border-radius:3px;
+    box-shadow:0 0 0 0 rgba(181,132,47,.4), 0 8px 22px rgba(120,96,48,.18);
     transition:transform .18s cubic-bezier(.2,.8,.25,1), border-color .2s ease, box-shadow .2s ease;
     animation:lure 3.6s ease-out infinite;
   }
@@ -438,9 +493,9 @@
   #themeSw:active{transform:translateY(0) scale(.99)}
   /* a ring going out, the way a dispel reads in game */
   @keyframes lure{
-    0%   {box-shadow:0 0 0 0 rgba(240,200,104,.45), 0 8px 26px rgba(0,0,0,.5)}
-    55%  {box-shadow:0 0 0 14px rgba(240,200,104,0), 0 8px 26px rgba(0,0,0,.5)}
-    100% {box-shadow:0 0 0 0 rgba(240,200,104,0), 0 8px 26px rgba(0,0,0,.5)}
+    0%   {box-shadow:0 0 0 0 rgba(181,132,47,.42), 0 8px 22px rgba(120,96,48,.18)}
+    55%  {box-shadow:0 0 0 14px rgba(181,132,47,0), 0 8px 22px rgba(120,96,48,.18)}
+    100% {box-shadow:0 0 0 0 rgba(181,132,47,0), 0 8px 22px rgba(120,96,48,.18)}
   }
   #themeSw .rune{
     position:relative;width:26px;height:26px;flex:0 0 26px;
@@ -456,7 +511,7 @@
   }
   /* the nudge, shown once until it is pressed */
   #themeHint{
-    position:fixed;top:26px;right:16px;z-index:69;
+    position:fixed;top:30px;right:16px;z-index:69;
     transform:translateX(-100%);
     padding-right:12px;
     font-family:var(--mono);font-size:10px;font-weight:700;
@@ -471,17 +526,6 @@
   }
   body.tekk #themeHint{display:none}
 
-  .grain{
-    position:fixed;inset:-120px;z-index:1;pointer-events:none;
-    opacity:0;background-repeat:repeat;
-    transition:opacity .5s ease;
-  }
-  body.tekk .grain{opacity:.72;animation:grain 1.1s steps(6) infinite}
-  @keyframes grain{
-    0%{transform:translate(0,0)}      20%{transform:translate(-24px,12px)}
-    40%{transform:translate(18px,-16px)}  60%{transform:translate(-14px,-20px)}
-    80%{transform:translate(22px,14px)}   100%{transform:translate(0,0)}
-  }
   /* cold moonlight from above, a red ember glow from below, nothing blotchy */
   .smear{
     position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;
@@ -503,6 +547,43 @@
   .arch svg{
     width:min(1150px,150vw);height:auto;margin-top:-6vh;
     filter:drop-shadow(0 0 60px rgba(120,150,200,.10));
+  }
+
+  /* moonlight coming through the window, and the dust hanging in it */
+  .shafts{
+    position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;
+    transition:opacity .9s ease;
+    background:
+      conic-gradient(from 196deg at 50% -6%,
+        rgba(0,0,0,0) 0deg, rgba(150,178,224,.13) 12deg, rgba(0,0,0,0) 22deg,
+        rgba(0,0,0,0) 34deg, rgba(160,186,230,.10) 45deg, rgba(0,0,0,0) 56deg,
+        rgba(0,0,0,0) 92deg, rgba(140,168,215,.08) 102deg, rgba(0,0,0,0) 113deg,
+        rgba(0,0,0,0) 360deg);
+    -webkit-mask-image:linear-gradient(180deg,#000 0%, rgba(0,0,0,.55) 52%, rgba(0,0,0,0) 88%);
+    mask-image:linear-gradient(180deg,#000 0%, rgba(0,0,0,.55) 52%, rgba(0,0,0,0) 88%);
+    animation:sway 34s ease-in-out infinite alternate;
+  }
+  body.tekk .shafts{opacity:1}
+  @keyframes sway{
+    0%{transform:rotate(-1.2deg) scale(1.03)}
+    100%{transform:rotate(1.2deg) scale(1.07)}
+  }
+  /* the light itself breathes with the track */
+  body.tekk.live .shafts{opacity:calc(.7 + var(--pulse,0) * .5)}
+
+  /* dust, falling through the shafts, slower than the embers rise */
+  .dust{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity .9s ease}
+  body.tekk .dust{opacity:.7}
+  .dust i{
+    position:absolute;top:-4vh;width:1.6px;height:1.6px;border-radius:50%;
+    background:#C8D6EE;box-shadow:0 0 6px rgba(180,200,235,.7);
+    animation:sink linear infinite;
+  }
+  @keyframes sink{
+    0%{transform:translateY(0) translateX(0);opacity:0}
+    14%{opacity:.7}
+    76%{opacity:.35}
+    100%{transform:translateY(112vh) translateX(var(--dx,18px));opacity:0}
   }
 
   /* fog rolling along the floor */
@@ -552,7 +633,6 @@
     transform:scale(calc(1 + var(--pulse,0) * .06));
   }
   body.tekk.live .smear{opacity:calc(.75 + var(--pulse,0) * .35)}
-  body.tekk.live .grain{opacity:calc(.6 + var(--pulse,0) * .3)}
   body.tekk.live h1{
     text-shadow:
       3px 3px 0 #06070C, -1px -1px 0 #06070C,
@@ -696,6 +776,7 @@
     border-color:var(--c);
     box-shadow:0 18px 44px rgba(0,0,0,.85), 0 0 30px rgba(140,10,10,.18);
   }
+  body.tekk .door{box-shadow:0 14px 34px rgba(0,0,0,.6)}
   body.tekk .door:hover{box-shadow:0 16px 40px rgba(0,0,0,.8)}
   body.tekk .door-d{color:#6E635F}
   body.tekk .door-t{font-family:"Grenze Gotisch",serif;font-weight:700;letter-spacing:.01em}
@@ -716,6 +797,7 @@
   body.tekk .wip-tag{background:#8E0F0F;color:#040203}
   /* the blacklist hangs lower and swings wider, like a sign outside a door */
   body.tekk .blbar{
+    display:flex;
     margin-top:56px;
     transform-origin:50% -46px;
     animation:hang 9s ease-in-out infinite;
@@ -839,7 +921,12 @@
 </head>
 <body>
 
+<div class="halo" aria-hidden="true"></div>
+<div class="heaven" aria-hidden="true"></div>
+<div class="plumes" id="plumes" aria-hidden="true"></div>
 <div class="smear" aria-hidden="true"></div>
+<div class="shafts" aria-hidden="true"></div>
+<div class="dust" id="dust" aria-hidden="true"></div>
 <div class="arch" aria-hidden="true">
   <svg viewBox="0 0 1200 900" preserveAspectRatio="xMidYMin slice">
     <defs>
@@ -890,7 +977,6 @@
 </div>
 <div class="fog" aria-hidden="true"></div>
 <div class="motes" id="motes" aria-hidden="true"></div>
-<div class="grain" id="grain" aria-hidden="true"></div>
 <div class="vig" aria-hidden="true"></div>
 <div class="corrupt" aria-hidden="true">
   <div class="wipe"></div>
@@ -920,23 +1006,23 @@
     <p class="tag" id="tekkTag"><span class="un">Un</span>holy Paladin</p>
     <div class="doors">
       <a class="door door-1" href="/about/">
-        <span class="door-k" data-t="Know your healer">Nice to meet you</span>
-        <span class="door-t" data-t="About me">About me</span>
-        <span class="door-d" data-t="The score, the progression, the logs. Read it before you type diff in my chat.">Score, this season’s keys, raid progression and the logs for every class I play. Have a look.</span>
+        <span class="door-k" data-t="Required reading">Nice to meet you</span>
+        <span class="door-t" data-t="Who you are dealing with">About me</span>
+        <span class="door-d" data-t="Not a CV. A reminder. You have run with people who play this game. You have not run with me.">Score, this season’s keys, raid progression and the logs for every class I play. Have a look.</span>
         <span class="door-go" data-t="Look at it →">Read it →</span>
       </a>
 
-      <a class="door door-4" href="/why/">
+      <a class="door door-4" href="/pitch/" data-h="/why/">
         <span class="door-k" data-t="Not a request">The pitch</span>
-        <span class="door-t" data-t="Why invite me">Why invite me</span>
-        <span class="door-d" data-t="Because nobody dies, and because you will hear about it for the rest of the week.">Three honest reasons to bring me along, and what I actually do for a group.</span>
-        <span class="door-go" data-t="Hear it →">Hear it →</span>
+        <span class="door-t" data-t="Do not fight the invite">Why invite me</span>
+        <span class="door-d" data-t="You were going to bring me anyway. This is only the part where you find out why.">Three honest reasons to bring me along, and what I actually do for a group.</span>
+        <span class="door-go" data-t="Stop resisting →">Hear it →</span>
       </a>
 
       <a class="door door-2" href="/kick/">
-        <span class="door-k" data-t="Mandatory">Before we go</span>
-        <span class="door-t" data-t="Wanna join my keys?">Wanna join my keys?</span>
-        <span class="door-d" data-t="Then press one button when a cast bar appears. That is the whole ask. Fail it and leave.">A quick primer on interrupts. Press one button when a cast bar appears and we all have a good time.</span>
+        <span class="door-k" data-t="Not optional">Before we go</span>
+        <span class="door-t" data-t="Think you can keep up?">Wanna join my keys?</span>
+        <span class="door-d" data-t="One button. One cast bar. Miss it and you find out how quickly a group can be four people.">A quick primer on interrupts. Press one button when a cast bar appears and we all have a good time.</span>
         <span class="door-go" data-t="Prove it →">Have a go →</span>
       </a>
     </div>
@@ -970,7 +1056,6 @@
   var lbl    = document.getElementById('themeLbl');
   var audio  = document.getElementById('tekkAudio');
   var holy   = document.getElementById('holyAudio');
-  var grain  = document.getElementById('grain');
   var on     = false;
   try { on = localStorage.getItem('shy.tekk') === '1'; } catch(e){}
 
@@ -983,6 +1068,35 @@
       '<feColorMatrix type="saturate" values="0"/></filter>' +
       '<rect width="180" height="180" filter="url(#n)" opacity="0.5"/></svg>'
     ) + "\")";
+
+  /* feathers of light on the bright side */
+  (function(){
+    var p = document.getElementById('plumes');
+    if (!p) return;
+    for (var i = 0; i < 16; i++){
+      var e = document.createElement('i');
+      e.style.left = (2 + Math.random() * 96).toFixed(1) + 'vw';
+      e.style.animationDuration = (13 + Math.random() * 16).toFixed(1) + 's';
+      e.style.animationDelay = (-Math.random() * 26).toFixed(1) + 's';
+      e.style.setProperty('--dx', ((Math.random() - 0.5) * 120).toFixed(0) + 'px');
+      e.style.height = (9 + Math.random() * 10).toFixed(0) + 'px';
+      p.appendChild(e);
+    }
+  })();
+
+  /* dust in the shafts, seeded the same way */
+  (function(){
+    var d = document.getElementById('dust');
+    if (!d) return;
+    for (var i = 0; i < 22; i++){
+      var e = document.createElement('i');
+      e.style.left = (2 + Math.random() * 96).toFixed(1) + 'vw';
+      e.style.animationDuration = (22 + Math.random() * 26).toFixed(1) + 's';
+      e.style.animationDelay = (-Math.random() * 40).toFixed(1) + 's';
+      e.style.setProperty('--dx', ((Math.random() - 0.5) * 70).toFixed(0) + 'px');
+      d.appendChild(e);
+    }
+  })();
 
   /* a dozen embers, seeded once, each with its own drift and pace */
   (function(){
@@ -1005,9 +1119,17 @@
   /* every line with a data-t has a second, worse version */
   var swaps = [].slice.call(document.querySelectorAll('[data-t]'));
   swaps.forEach(function(el){ el.setAttribute('data-n', el.textContent); });
+
+  /* some doors lead somewhere else depending on which side you are on */
+  var links = [].slice.call(document.querySelectorAll('[data-h]'));
+  links.forEach(function(el){ el.setAttribute('data-hn', el.getAttribute('href')); });
+
   function copy(){
     swaps.forEach(function(el){
       el.textContent = el.getAttribute(on ? 'data-t' : 'data-n');
+    });
+    links.forEach(function(el){
+      el.setAttribute('href', el.getAttribute(on ? 'data-h' : 'data-hn'));
     });
   }
 
@@ -1021,7 +1143,7 @@
     copy();
     document.documentElement.style.setProperty('color-scheme', 'dark');
     var m = document.querySelector('meta[name="theme-color"]');
-    if (m) m.setAttribute('content', on ? '#06070C' : '#080A14');
+    if (m) m.setAttribute('content', on ? '#06070C' : '#F7F2E6');
   }
 
   /* one side plays, the other stops. a track always starts from the top,
