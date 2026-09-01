@@ -485,6 +485,9 @@
       linear-gradient(180deg, #080A11 0%, #06070C 46%, #08060A 100%);
   }
   body.tekk .smear{opacity:1}
+  .smear, .arch, .fog{transition:opacity .9s ease, background .9s ease}
+  .arch .tracery, .arch .pillars, .arch .arcade,
+  .arch stop{transition:stroke .9s ease, stop-color .9s ease, stop-opacity .9s ease}
 
   /* the window and the pillars */
   .arch{
@@ -492,7 +495,29 @@
     display:grid;place-items:start center;
     transition:opacity .8s ease;
   }
+  /* the room does not change when you renounce. only the light in it does,
+     so the window and the pillars stand on the bright side too, in stone. */
+  .arch{opacity:1}
+  .arch .m1{stop-color:#FFFFFF;stop-opacity:.92}
+  .arch .m2{stop-color:#FBF6E6;stop-opacity:.5}
+  .arch .m3{stop-color:#FBF6E6;stop-opacity:0}
+  .arch .s1{stop-color:#EFEDE6}
+  .arch .s2{stop-color:#DCD9CF}
+  .arch .tracery{stroke:#D6D3C9}
+  .arch .pillars{stroke:#CFCBC0}
+  .arch .arcade{stroke:#E1DED5}
+  .arch svg{filter:none}
+
   body.tekk .arch{opacity:1}
+  body.tekk .arch .m1{stop-color:#9FB4D8;stop-opacity:.30}
+  body.tekk .arch .m2{stop-color:#6E82A8;stop-opacity:.10}
+  body.tekk .arch .m3{stop-color:#6E82A8;stop-opacity:0}
+  body.tekk .arch .s1{stop-color:#10131B}
+  body.tekk .arch .s2{stop-color:#07080D}
+  body.tekk .arch .tracery{stroke:#1B2130}
+  body.tekk .arch .pillars{stroke:#161B26}
+  body.tekk .arch .arcade{stroke:#131824}
+  body.tekk .arch svg{filter:drop-shadow(0 0 60px rgba(120,150,200,.10))}
   .arch svg{
     width:min(1150px,150vw);height:auto;margin-top:-6vh;
     filter:drop-shadow(0 0 60px rgba(120,150,200,.10));
@@ -546,7 +571,22 @@
       radial-gradient(40% 55% at 88% 72%, rgba(150,165,200,.07), rgba(150,165,200,0) 70%);
     filter:blur(6px);
   }
-  body.tekk .fog{opacity:1;animation:drift 46s ease-in-out infinite alternate}
+  .fog{
+    opacity:.5;
+    background:
+      radial-gradient(48% 60% at 20% 70%, rgba(255,252,240,.75), rgba(255,252,240,0) 70%),
+      radial-gradient(52% 66% at 62% 78%, rgba(255,250,236,.6), rgba(255,250,236,0) 72%),
+      radial-gradient(40% 55% at 88% 72%, rgba(255,252,242,.5), rgba(255,252,242,0) 70%);
+    animation:drift 46s ease-in-out infinite alternate;
+  }
+  body.tekk .fog{
+    opacity:1;
+    background:
+      radial-gradient(48% 60% at 20% 70%, rgba(140,160,195,.09), rgba(140,160,195,0) 70%),
+      radial-gradient(52% 66% at 62% 78%, rgba(120,140,180,.08), rgba(120,140,180,0) 72%),
+      radial-gradient(40% 55% at 88% 72%, rgba(150,165,200,.07), rgba(150,165,200,0) 70%);
+    animation:drift 46s ease-in-out infinite alternate;
+  }
   @keyframes drift{
     0%{transform:translateX(-4%) scaleX(1)}
     100%{transform:translateX(4%) scaleX(1.08)}
@@ -924,13 +964,13 @@
   <svg viewBox="0 0 1200 900" preserveAspectRatio="xMidYMin slice">
     <defs>
       <linearGradient id="moon" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="#9FB4D8" stop-opacity=".30"/>
-        <stop offset="55%"  stop-color="#6E82A8" stop-opacity=".10"/>
-        <stop offset="100%" stop-color="#6E82A8" stop-opacity="0"/>
+        <stop class="m1" offset="0%"   stop-color="#9FB4D8" stop-opacity=".30"/>
+        <stop class="m2" offset="55%"  stop-color="#6E82A8" stop-opacity=".10"/>
+        <stop class="m3" offset="100%" stop-color="#6E82A8" stop-opacity="0"/>
       </linearGradient>
       <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="#10131B"/>
-        <stop offset="100%" stop-color="#07080D"/>
+        <stop class="s1" offset="0%"   stop-color="#10131B"/>
+        <stop class="s2" offset="100%" stop-color="#07080D"/>
       </linearGradient>
       <clipPath id="win">
         <path d="M600 84 C742 84 830 190 830 322 L830 700 L370 700 L370 322 C370 190 458 84 600 84 Z"/>
@@ -943,7 +983,7 @@
     </g>
 
     <!-- the window itself, tracery only, no fill -->
-    <g fill="none" stroke="#1B2130" stroke-width="7">
+    <g class="tracery" fill="none" stroke="#1B2130" stroke-width="7">
       <path d="M600 84 C742 84 830 190 830 322 L830 700 L370 700 L370 322 C370 190 458 84 600 84 Z"/>
       <path d="M600 150 C706 150 770 232 770 330 L770 700"/>
       <path d="M600 150 C494 150 430 232 430 330 L430 700"/>
@@ -954,7 +994,7 @@
     </g>
 
     <!-- pillars either side -->
-    <g fill="url(#stone)" stroke="#161B26" stroke-width="4">
+    <g class="pillars" fill="url(#stone)" stroke="#161B26" stroke-width="4">
       <rect x="150" y="120" width="86" height="780" rx="6"/>
       <rect x="964" y="120" width="86" height="780" rx="6"/>
       <path d="M138 120 L248 120 L228 74 L158 74 Z"/>
@@ -962,7 +1002,7 @@
     </g>
 
     <!-- arcade running off to both sides -->
-    <g fill="none" stroke="#131824" stroke-width="5">
+    <g class="arcade" fill="none" stroke="#131824" stroke-width="5">
       <path d="M0 250 C60 250 96 300 96 356 L96 900"/>
       <path d="M1200 250 C1140 250 1104 300 1104 356 L1104 900"/>
     </g>
