@@ -66,7 +66,7 @@ def build():
         for d in cfg)
     page = re.sub(r'(<div class="dungs">\n).*?(\n    </div>)',
                   lambda m: m.group(1) + btns + m.group(2), page, count=1, flags=re.S)
-    cols = min(3, len(cfg))
+    cols = 2 if len(cfg) == 4 else min(3, len(cfg))
     page = re.sub(r'(\.dungs\{\n\s*display:grid;grid-template-columns:)repeat\(\d+,1fr\)',
                   lambda m: m.group(1) + "repeat(%d,1fr)" % cols, page, count=1)
 

@@ -165,5 +165,59 @@
       }
     ],
     "len": 107.65
+  },
+  {
+    "key": "fh",
+    "name": "Freehold",
+    "short": "FH",
+    "track": "furioso.mp3",
+    "song": "gmtn. - furioso melodia",
+    "bpm": 155.0,
+    "beat": 0.3871,
+    "zero": 1.652,
+    "end": 315.0,
+    "len": 318.0,
+    "charts": {
+      "normal": "FH_N",
+      "heroic": "FH_H",
+      "mythic": "FH_M"
+    },
+    "pulls": [
+      {
+        "b": 0,
+        "mob": "Irontide Crackshot",
+        "spell": "Powder Shot"
+      },
+      {
+        "b": 120,
+        "mob": "Bilge Rat Tempest",
+        "spell": "Sea Spout"
+      },
+      {
+        "b": 240,
+        "mob": "Irontide Oarsman",
+        "spell": "Hooked Net"
+      },
+      {
+        "b": 360,
+        "mob": "Irontide Crackshot",
+        "spell": "Powder Shot"
+      },
+      {
+        "b": 480,
+        "mob": "Bilge Rat Tempest",
+        "spell": "Sea Spout"
+      },
+      {
+        "b": 600,
+        "mob": "Irontide Oarsman",
+        "spell": "Hooked Net"
+      },
+      {
+        "b": 720,
+        "mob": "Bilge Rat Tempest",
+        "spell": "Sea Spout"
+      }
+    ]
   }
 ]
