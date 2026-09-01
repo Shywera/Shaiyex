@@ -1140,8 +1140,8 @@
   }
   body.travel #world{pointer-events:none}
   /* wiped off to one side */
-  body.go-left  #world{transform:translateX(-62vw) rotate(-1.8deg);opacity:0}
-  body.go-right #world{transform:translateX(62vw)  rotate(1.8deg);opacity:0}
+  body.go-left  #world{transform:translateX(62vw)  rotate(1.8deg);opacity:0}
+  body.go-right #world{transform:translateX(-62vw) rotate(-1.8deg);opacity:0}
   /* it comes at you instead */
   body.go-lunge #world{transform:scale(1.55);opacity:0;filter:blur(9px) saturate(1.4)}
   /* and down, a long way */
@@ -1155,17 +1155,41 @@
     100%{transform:rotate(-15deg)}
   }
   /* and one that simply keeps going down */
-  .dropping{animation:dropDown 1.25s cubic-bezier(.45,0,.85,1) forwards !important}
+  /* a steady pace with a little slack at each end. nothing about this
+     should read as falling. */
+  /* it is let down on the chain, and the camera goes with it. the plate
+     only creeps down the screen because the room is rising past it. */
+  .dropping{animation:dropDown 3.2s cubic-bezier(.42,.02,.58,1) forwards !important}
   @keyframes dropDown{
     0%  {transform:translateY(0) rotate(var(--tilt,0deg))}
-    100%{transform:translateY(88vh) rotate(calc(var(--tilt,0deg) + 2deg))}
+    5%  {transform:translateY(-10px) rotate(calc(var(--tilt,0deg) - 1.6deg))}
+    34% {transform:translateY(30vh) rotate(calc(var(--tilt,0deg) + 1.8deg))}
+    62% {transform:translateY(60vh) rotate(calc(var(--tilt,0deg) - 1.2deg))}
+    100%{transform:translateY(98vh) rotate(calc(var(--tilt,0deg) + .9deg))}
   }
+  /* the chain pays out behind it the whole way down */
   body.tekk .blbar.dropping::before{
-    animation:chainDrop 1.25s cubic-bezier(.45,0,.85,1) forwards;
+    animation:chainDrop 3.2s cubic-bezier(.42,.02,.58,1) forwards;
   }
   @keyframes chainDrop{
-    to{height:calc(var(--chain,46px) + 88vh)}
+    0%  {height:var(--chain,46px)}
+    5%  {height:calc(var(--chain,46px) - 10px)}
+    34% {height:calc(var(--chain,46px) + 30vh)}
+    62% {height:calc(var(--chain,46px) + 60vh)}
+    100%{height:calc(var(--chain,46px) + 98vh)}
   }
+  /* the room rises past it, and lands exactly where the descent leaves
+     the world, so handing over to the view does not snap */
+  body.winch #world{animation:winchDown 3.2s cubic-bezier(.42,.02,.58,1) forwards}
+  @keyframes winchDown{
+    0%  {transform:translateY(0) scale(1);opacity:1;filter:none}
+    18% {transform:translateY(-6vh) scale(.99);opacity:1}
+    70% {opacity:.85}
+    100%{transform:translateY(-72vh) scale(.88);opacity:0;filter:blur(4px) saturate(.4)}
+  }
+  body.winch{overflow:hidden}
+  body.winch .hellfx{animation:hellUp 3.2s ease-in forwards}
+  body.winch #world .doors{animation:quake .14s steps(2) 22}
 
   #view{
     position:fixed;inset:0;z-index:150;background:var(--ink);
@@ -1652,15 +1676,15 @@
 
   /* where the incoming view starts from, per direction */
   var FROM = {
-    left:    'translateX(58vw)',
-    right:   'translateX(-58vw)',
+    left:    'translateX(-58vw)',
+    right:   'translateX(58vw)',
     lunge:   'scale(.7)',
     descend: 'translateY(66vh)'
   };
   /* some doors do something first, then leave in a direction */
   var PRE = {
     'swing-left': { cls: 'swing-l', wait: 470, dir: 'left'  },
-    'drop':       { cls: 'dropping', wait: 1150, dir: 'descend' }
+    'drop':       { cls: 'dropping', wait: 3120, dir: 'descend' }
   };
 
   var vOpen = false, moving = false, dir = 'left', pre = null;
@@ -1734,6 +1758,7 @@
     moving = true; vOpen = true; dir = how;
     silent = !!(opts && opts.silent);
     if (opts && opts.hush) hush();
+    body.classList.remove('winch');
     body.classList.add('travel', 'go-' + how);
     frame.src = url;
     view.hidden = false;
@@ -1757,6 +1782,7 @@
     if (vOpen || moving) return;
     pre = el;
     el.classList.add(p.cls);
+    if (p.cls === 'dropping') body.classList.add('winch');
     if (opts.hush) hush();
     opts.hush = false;
     setTimeout(function(){ go(el.getAttribute('href'), p.dir, opts); }, p.wait);
@@ -1773,6 +1799,7 @@
       view.hidden = true;
       frame.src = 'about:blank';
       document.documentElement.style.overflow = '';
+      body.classList.remove('winch');
       if (pre){ pre.classList.remove('swing-l', 'dropping'); pre = null; }
       silent = false;
       unhush();
