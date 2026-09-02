@@ -864,6 +864,24 @@
     h1{animation:none;background:none;color:var(--gold-hot);-webkit-text-fill-color:var(--gold-hot)}
   }
 </style>
+
+<script>
+  /* The stylesheet above is the daylight one, so on the dark side the
+     browser would paint a frame of gold before the script at the top of
+     the body could add the class. Decide here, in the head, and put a
+     holding colour on the document itself so there is nothing to flash. */
+  (function(){
+    try {
+      if (localStorage.getItem('shy.tekk') === '1') {
+        document.documentElement.className = 'pre-tekk';
+      }
+    } catch(e){}
+  })();
+</script>
+<style>
+  html.pre-tekk{background:#06070C}
+  html.pre-tekk body{background:#06070C;color:#C8BEB4}
+</style>
 </head>
 <body>
 <script>
@@ -873,6 +891,8 @@
     try { on = localStorage.getItem('shy.tekk') === '1'; } catch(e){}
     if (!on) return;
     document.body.classList.add('tekk');
+    /* the holding colour has done its job, let the real one through */
+    document.documentElement.classList.remove('pre-tekk');
     var m = document.querySelector('meta[name="theme-color"]');
     if (m) m.setAttribute('content', '#06070C');
     document.addEventListener('DOMContentLoaded', function(){
