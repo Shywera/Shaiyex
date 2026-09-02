@@ -772,13 +772,13 @@
   /* the light under the floor answers it */
   /* opacity is already spoken for by the pulse here, and it cannot go
      past 1 anyway, so the flare rides on brightness instead */
-  body.tekk.boom .smear{animation:smearBoom .26s ease-out}
+  body.tekk.boom:not(.travel):not(.winch) .smear{animation:smearBoom .26s ease-out}
   @keyframes smearBoom{
     0%  {filter:brightness(1)}
     22% {filter:brightness(2.1) saturate(1.3)}
     100%{filter:brightness(1)}
   }
-  body.tekk.boom .vig{animation:vigBoom .38s cubic-bezier(.15,.85,.3,1)}
+  body.tekk.boom:not(.travel):not(.winch) .vig{animation:vigBoom .38s cubic-bezier(.15,.85,.3,1)}
   @keyframes vigBoom{
     0%  {transform:scale(1)}
     14% {transform:scale(1.14)}
@@ -786,8 +786,8 @@
     100%{transform:scale(1)}
   }
   /* every plate lights along its edge for as long as the hit lasts */
-  body.tekk.boom .door::after,
-  body.tekk.boom .blbar::after{
+  body.tekk.boom:not(.travel):not(.winch) .door::after,
+  body.tekk.boom:not(.travel):not(.winch) .blbar::after{
     animation:edgeBoom .26s ease-out;
   }
   @keyframes edgeBoom{
@@ -804,7 +804,7 @@
     100%{transform:scale(1)}
   }
   /* the window rattles in its frame */
-  body.tekk.boom .arch svg{animation:archBoom .44s cubic-bezier(.15,.85,.3,1)}
+  body.tekk.boom:not(.travel):not(.winch) .arch svg{animation:archBoom .44s cubic-bezier(.15,.85,.3,1)}
   @keyframes archBoom{
     0%  {transform:translateY(0) scale(1)}
     12% {transform:translateY(-11px) scale(1.014)}
@@ -813,14 +813,14 @@
     100%{transform:translateY(0) scale(1)}
   }
   /* embers get shoved up off the floor */
-  body.tekk.boom .motes{animation:moteBoom .5s cubic-bezier(.1,.8,.3,1)}
+  body.tekk.boom:not(.travel):not(.winch) .motes{animation:moteBoom .5s cubic-bezier(.1,.8,.3,1)}
   @keyframes moteBoom{
     0%  {transform:translateY(0) scale(1)}
     16% {transform:translateY(-22px) scale(1.03)}
     48% {transform:translateY(6px) scale(.99)}
     100%{transform:translateY(0) scale(1)}
   }
-  body.tekk.boom .dust{animation:dustBoom .5s cubic-bezier(.1,.8,.3,1)}
+  body.tekk.boom:not(.travel):not(.winch) .dust{animation:dustBoom .5s cubic-bezier(.1,.8,.3,1)}
   @keyframes dustBoom{
     0%  {transform:translateY(0)}
     16% {transform:translateY(14px)}
@@ -834,7 +834,7 @@
   /* the walls, the window and the air in front of them, one piece so
      the whole backdrop can take the hit together */
   #room{position:fixed;inset:0;z-index:0;pointer-events:none}
-  body.tekk.boom #room{animation:wallBoom .46s cubic-bezier(.15,.85,.3,1)}
+  body.tekk.boom:not(.travel):not(.winch) #room{animation:wallBoom .46s cubic-bezier(.15,.85,.3,1)}
   @keyframes wallBoom{
     0%  {transform:translate3d(0,0,0) scale(1)}
     9%  {transform:translate3d(9px,-19px,0) scale(1.05)}
@@ -860,7 +860,7 @@
     box-shadow:0 0 12px var(--col,#FF6A2A), 0 0 26px rgba(255,90,20,.5);
     opacity:0;
   }
-  body.tekk.boom .sparks i{
+  body.tekk.boom:not(.travel):not(.winch) .sparks i{
     animation:spark var(--dur,.7s) cubic-bezier(.15,.72,.35,1) var(--sd,0s) both;
   }
   @keyframes spark{
@@ -878,7 +878,7 @@
       radial-gradient(120% 74% at 50% 112%, rgba(226,26,16,.72), rgba(120,6,6,0) 58%),
       radial-gradient(70% 46% at 50% 104%, rgba(255,120,40,.5), rgba(255,120,40,0) 66%);
   }
-  body.tekk.boom .bf-flash{animation:bfFlash .34s ease-out}
+  body.tekk.boom:not(.travel):not(.winch) .bf-flash{animation:bfFlash .34s ease-out}
   @keyframes bfFlash{
     0%  {opacity:0;   transform:translateY(14%) scaleY(.9)}
     12% {opacity:1;   transform:translateY(0) scaleY(1)}
@@ -891,7 +891,7 @@
     border:2px solid rgba(240,52,42,.55);
     box-shadow:0 0 40px rgba(240,52,42,.35), inset 0 0 60px rgba(240,52,42,.2);
   }
-  body.tekk.boom .bf-ring{animation:bfRing .62s cubic-bezier(.12,.7,.3,1)}
+  body.tekk.boom:not(.travel):not(.winch) .bf-ring{animation:bfRing .62s cubic-bezier(.12,.7,.3,1)}
   @keyframes bfRing{
     0%  {opacity:.9; transform:scale(.2)}
     100%{opacity:0;  transform:scale(1.9)}
@@ -1098,7 +1098,7 @@
      a beat behind the last, so the rack answers in sequence rather than
      all of it twitching at once. the angles are small because the arm is
      long: a degree at the end of a chain this size is a long way. */
-  body.tekk.boom .door{
+  body.tekk.boom:not(.travel):not(.winch) .door{
     animation:plateHit .9s cubic-bezier(.14,.8,.3,1) var(--hd,0s) both;
   }
   body.tekk .door:nth-child(1){--hd:0s;    --hdir:1}
@@ -1195,7 +1195,7 @@
     opacity:.8;
     transform:none;
   }
-  body.tekk.boom .wip{animation:plateHit .9s cubic-bezier(.14,.8,.3,1) var(--hd,0s) both}
+  body.tekk.boom:not(.travel):not(.winch) .wip{animation:plateHit .9s cubic-bezier(.14,.8,.3,1) var(--hd,0s) both}
   body.tekk .wip-tag{background:#8E0F0F;color:#040203}
   /* the blacklist hangs lower and swings wider, like a sign outside a door */
   body.tekk .blbar.dropping{z-index:1}
@@ -1228,7 +1228,7 @@
     opacity:.8;
     transform:none;
   }
-  body.tekk.boom .blbar{animation:plateHit .9s cubic-bezier(.14,.8,.3,1) var(--hd,0s) both}
+  body.tekk.boom:not(.travel):not(.winch) .blbar{animation:plateHit .9s cubic-bezier(.14,.8,.3,1) var(--hd,0s) both}
   body.tekk .blbar:hover{animation-play-state:paused;transform:rotate(0deg)}
   body.tekk .blbar .drip{
     display:block;position:absolute;left:0;right:0;bottom:-32px;height:38px;
@@ -1442,7 +1442,7 @@
   }
   body.winch{overflow:hidden}
   body.winch .hellfx{animation:hellUp 1.9s ease-in forwards}
-  body.winch #world .doors{animation:quake .1s steps(2) 19}
+  body.winch .doors{animation:quake .1s steps(2) 19}
 
   #view{
     position:fixed;inset:0;z-index:150;background:var(--ink);
@@ -1574,9 +1574,12 @@
     45%{opacity:1;transform:translateY(0)}
     100%{opacity:0;transform:translateY(-10%)}
   }
-  body.go-descend #world{animation:quake .12s steps(2) 9}
   @keyframes quake{
-    0%{margin-left:0}25%{margin-left:-7px}50%{margin-left:6px}75%{margin-left:-4px}100%{margin-left:0}
+    0%  {transform:translate3d(0,0,0)}
+    25% {transform:translate3d(-7px,1px,0)}
+    50% {transform:translate3d(6px,-2px,0)}
+    75% {transform:translate3d(-4px,1px,0)}
+    100%{transform:translate3d(0,0,0)}
   }
 
   /* the door. a browser will not start a track on its own, so the site asks
