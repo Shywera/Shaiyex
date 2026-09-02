@@ -7,6 +7,7 @@
  * page quietly falls back to local best scores.
  *
  *   GET  /api/scores?g=kr        -> { normal: [...], heroic: [...], mythic: [...] }
+ *   GET  /api/scores?board=total -> { hall: [...], boards: n, at: iso }
  *   POST /api/scores             -> { ok: true, board: [...] }
  *        body { g, d, n, s, a, c }
  *
@@ -67,9 +68,58 @@ function num(v, max) {
   return i >= 0 && i <= max ? i : null;
 }
 
+/**
+ * Everyone's total across the whole site: their best on each dungeon at
+ * each difficulty, added up. A name that has only run one key is on the
+ * same table as someone who has run all thirty, which is the point.
+ */
+async function hall(store) {
+  const lists = await Promise.all(
+    DUNGEONS.map((g) => DIFFS.map((d) => board(store, g, d))).flat()
+  );
+
+  const by = new Map();
+  for (const list of lists) {
+    for (const e of list) {
+      const id = e.n.toLowerCase();
+      let row = by.get(id);
+      if (!row) {
+        row = { n: e.n, s: 0, runs: 0, best: 0, acc: 0 };
+        by.set(id, row);
+      }
+      row.s += e.s;
+      row.runs += 1;
+      row.acc += e.a;
+      if (e.s > row.best) {
+        row.best = e.s;
+        row.n = e.n; // however they spelled it on their best run
+      }
+    }
+  }
+
+  const rows = [...by.values()].map((r) => ({
+    n: r.n,
+    s: r.s,
+    runs: r.runs,
+    acc: r.runs ? Math.round(r.acc / r.runs) : 0,
+  }));
+  rows.sort((x, y) => y.s - x.s || y.runs - x.runs);
+  return rows.slice(0, KEEP);
+}
+
 export async function onRequestGet({ request, env }) {
   if (!env.SCORES) return json({ error: "no store" }, 503);
-  const g = new URL(request.url).searchParams.get("g");
+  const q = new URL(request.url).searchParams;
+
+  if (q.get("board") === "total") {
+    return json({
+      hall: await hall(env.SCORES),
+      boards: DUNGEONS.length * DIFFS.length,
+      at: new Date().toISOString(),
+    });
+  }
+
+  const g = q.get("g");
   if (!DUNGEONS.includes(g)) return json({ error: "bad dungeon" }, 400);
 
   const out = {};

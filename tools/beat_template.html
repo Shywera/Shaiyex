@@ -313,7 +313,7 @@
   }
   /* ---------- shy plus ---------- */
   #shyLock{
-    position:fixed;top:10px;right:10px;z-index:60;
+    position:fixed;top:10px;right:10px;z-index:62;
     width:30px;height:30px;padding:0;
     display:grid;place-items:center;
     font-size:14px;line-height:1;cursor:pointer;
@@ -497,6 +497,121 @@
     font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.14em;
     color:#0A0710;background:var(--jade);vertical-align:middle;
   }
+  /* ---------- the hall, down the right hand side ---------- */
+  .hall{
+    position:fixed;top:0;right:0;bottom:0;z-index:60;
+    width:clamp(220px,20vw,290px);
+    display:flex;flex-direction:column;
+    padding:20px 18px 18px;
+    background:
+      linear-gradient(270deg, rgba(21,15,34,.96), rgba(10,7,16,.72) 78%, rgba(10,7,16,0));
+    border-left:1px solid var(--line);
+    pointer-events:none;
+    transition:opacity .45s ease, transform .45s cubic-bezier(.2,.8,.25,1);
+  }
+  .hall.off{opacity:0;transform:translateX(30px);pointer-events:none}
+  @media (max-width:1180px){ .hall{display:none} }
+  /* the lock steps aside for it rather than sitting on top of it */
+  @media (min-width:1181px){
+    #shyLock{right:calc(clamp(220px,20vw,290px) + 14px)}
+  }
+
+  /* it glows on its own, and harder on the beat when one is running */
+  .hall-t{animation:hallGlow 4.6s ease-in-out infinite}
+  @keyframes hallGlow{
+    0%,100%{filter:brightness(.92)}
+    50%    {filter:brightness(1.12)}
+  }
+  .hr.p1{animation:hallLead 3.4s ease-in-out infinite}
+  @keyframes hallLead{
+    0%,100%{box-shadow:inset 2px 0 0 var(--gold), 0 0 0 rgba(232,196,104,0)}
+    50%    {box-shadow:inset 2px 0 0 var(--gold), 0 0 26px rgba(232,196,104,.22)}
+  }
+  /* a thin light down the edge of the panel */
+  .hall::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:1px;
+    background:linear-gradient(180deg,
+      rgba(232,196,104,0), rgba(232,196,104,.55) 22%,
+      rgba(169,108,255,.4) 62%, rgba(232,196,104,0));
+    opacity:calc(.55 + var(--p,0) * .45);
+  }
+
+  .hall-k{
+    font-family:var(--mono);font-size:9.5px;font-weight:600;
+    letter-spacing:.24em;text-transform:uppercase;color:var(--dimmer);
+    margin:0 0 2px;
+  }
+  .hall-t{
+    font-family:var(--display);font-size:34px;line-height:.92;
+    letter-spacing:.03em;color:var(--gold);margin:0 0 2px;
+    text-shadow:
+      0 0 calc(10px + var(--p,0) * 22px) rgba(232,196,104,.85),
+      0 0 calc(34px + var(--p,0) * 60px) rgba(232,196,104,.35);
+  }
+  .hall-s{
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--dimmer);margin:0 0 14px;
+  }
+  .hall-list{
+    flex:1 1 auto;overflow:hidden;
+    display:flex;flex-direction:column;gap:1px;
+    -webkit-mask-image:linear-gradient(180deg,#000 88%, rgba(0,0,0,0));
+    mask-image:linear-gradient(180deg,#000 88%, rgba(0,0,0,0));
+  }
+  .hr{
+    display:grid;grid-template-columns:20px 1fr auto;
+    gap:9px;align-items:baseline;
+    padding:7px 8px;border-radius:2px;
+    font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--dim);
+    background:linear-gradient(90deg, rgba(232,196,104,0), rgba(232,196,104,0));
+  }
+  .hr-i{color:var(--dimmer);font-variant-numeric:tabular-nums}
+  .hr-n{
+    color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .hr-s{
+    font-family:var(--display);font-size:18px;line-height:1;color:var(--gold);
+    font-variant-numeric:tabular-nums;letter-spacing:.02em;
+  }
+  /* the top three are lit, and the first one burns */
+  .hr.p1{
+    background:linear-gradient(90deg, rgba(232,196,104,.22), rgba(232,196,104,.03) 70%, rgba(232,196,104,0));
+    box-shadow:inset 2px 0 0 var(--gold);
+  }
+  .hr.p1 .hr-i, .hr.p1 .hr-n{color:#FFF3D2}
+  .hr.p1 .hr-s{
+    color:#FFF3D2;
+    text-shadow:
+      0 0 calc(8px + var(--p,0) * 16px) rgba(232,196,104,.95),
+      0 0 calc(26px + var(--p,0) * 40px) rgba(232,196,104,.5);
+  }
+  .hr.p2{
+    background:linear-gradient(90deg, rgba(169,108,255,.16), rgba(169,108,255,0) 72%);
+    box-shadow:inset 2px 0 0 var(--violet);
+  }
+  .hr.p2 .hr-s{color:#D9BCFF;text-shadow:0 0 12px rgba(169,108,255,.6)}
+  .hr.p3{
+    background:linear-gradient(90deg, rgba(47,216,195,.14), rgba(47,216,195,0) 72%);
+    box-shadow:inset 2px 0 0 var(--jade);
+  }
+  .hr.p3 .hr-s{color:#A8F0E6;text-shadow:0 0 12px rgba(47,216,195,.5)}
+  .hr.me{outline:1px solid rgba(232,196,104,.45)}
+  .hr-runs{
+    grid-column:2 / -1;
+    font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--dimmer);margin-top:-2px;
+  }
+  .hall-e{
+    font-family:var(--mono);font-size:10.5px;line-height:1.7;
+    letter-spacing:.06em;color:var(--dimmer);
+  }
+  .hall-f{
+    margin-top:12px;padding-top:10px;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:9px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--dimmer);
+  }
+  .hall-f b{color:var(--gold);font-weight:600}
+
   .lb{margin-top:12px;border-top:1px solid var(--line)}
   .lb-r{
     display:grid;grid-template-columns:22px 1fr auto auto;
@@ -582,6 +697,14 @@
   </div>
 
 </div>
+
+<aside class="hall off" id="hall" aria-label="Total scores">
+  <p class="hall-k">Every key, added up</p>
+  <p class="hall-t">The Hall</p>
+  <p class="hall-s" id="hallSub">Loading</p>
+  <div class="hall-list" id="hallList"></div>
+  <div class="hall-f" id="hallFoot"></div>
+</aside>
 
 <div class="over" id="gate">
   <div class="over-in">
@@ -1193,6 +1316,7 @@ __DUNGEONS__
     gate.style.display = '';
     void gate.offsetWidth;
     gate.classList.remove('gone');
+    showHall(true);
   }
   var countT = null;
   function resume(){
@@ -1233,6 +1357,7 @@ __DUNGEONS__
       var pr = track.play(); if (pr && pr.catch) pr.catch(function(){});
     } catch(e){}
     state = 'play';
+    showHall(false);
     gate.classList.add('gone');
     result.classList.add('gone');
     pauseEl.classList.add('gone');
@@ -1302,6 +1427,7 @@ __DUNGEONS__
     pauseEl.classList.add('gone');
     result.style.display = '';
     result.classList.remove('gone');
+    showHall(true);
   }
 
   /* ---- input ---- */
@@ -1422,6 +1548,61 @@ __DUNGEONS__
       if (after) after();
     });
   }
+  /* ---- the hall: one row per person, every key they have run added
+     together. it refreshes on its own and after anyone saves a run. ---- */
+  var hallEl  = document.getElementById('hall');
+  var hallList= document.getElementById('hallList');
+  var hallSub = document.getElementById('hallSub');
+  var hallFoot= document.getElementById('hallFoot');
+  var HALL = null, hallT = null;
+
+  function fmt(n){
+    return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  }
+  function paintHall(){
+    if (!hallList) return;
+    if (!HALL){
+      hallSub.textContent = 'Offline';
+      hallList.innerHTML = '<div class="hall-e">No board reachable. Your runs are still saved on this machine.</div>';
+      hallFoot.textContent = '';
+      return;
+    }
+    if (!HALL.length){
+      hallSub.textContent = 'Nobody yet';
+      hallList.innerHTML = '<div class="hall-e">Not one name on here. Whoever runs a key first owns the top of it.</div>';
+      hallFoot.textContent = '';
+      return;
+    }
+    hallSub.textContent = HALL.length + (HALL.length === 1 ? ' name' : ' names');
+    var mine = String(playerName || '').toLowerCase();
+    hallList.innerHTML = HALL.slice(0, 12).map(function(e, i){
+      var cls = 'hr' + (i < 3 ? ' p' + (i + 1) : '') +
+                (mine && e.n.toLowerCase() === mine ? ' me' : '');
+      return '<div class="' + cls + '">' +
+               '<span class="hr-i">' + (i + 1) + '</span>' +
+               '<span class="hr-n">' + esc(e.n) + '</span>' +
+               '<span class="hr-s">' + fmt(e.s) + '</span>' +
+               '<span class="hr-runs">' + e.runs + (e.runs === 1 ? ' run' : ' runs') +
+                 ' &middot; ' + e.acc + '%</span>' +
+             '</div>';
+    }).join('');
+    var top = HALL[0];
+    hallFoot.innerHTML = 'Leading: <b>' + esc(top.n) + '</b>';
+  }
+  function loadHall(){
+    api('/api/scores?board=total').then(function(j){
+      HALL = (j && j.hall) ? j.hall : [];
+      paintHall();
+    }).catch(function(){
+      HALL = null;
+      paintHall();
+    });
+  }
+  function showHall(on){
+    if (!hallEl) return;
+    hallEl.classList.toggle('off', !on);
+  }
+
   function boardFor(g, d){
     return (ONLINE && BOARD[g] && BOARD[g][d]) ? BOARD[g][d] : null;
   }
@@ -1503,6 +1684,7 @@ __DUNGEONS__
         }
         paintLb(sent.g, sent.d, nm);
         paintBest();
+        loadHall();
       }).catch(function(){
         pbTitle.textContent = 'Saved here, board did not take it';
       });
@@ -1746,6 +1928,14 @@ __DUNGEONS__
   paintKeys();
   paintBest();
   loadBoard(dung);
+  loadHall();
+  showHall(true);
+  /* someone else finishing a key should show up without a reload, but
+     only while the panel is actually on screen */
+  hallT = setInterval(function(){
+    if (state === 'play' || document.hidden) return;
+    loadHall();
+  }, 45000);
   if (offset){
     keysNote.textContent = 'Offset ' + (offset > 0 ? '+' : '') + Math.round(offset * 1000) + ' ms';
   }
