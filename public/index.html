@@ -762,17 +762,34 @@
     100%{transform:translateY(0) scale(1)}
   }
   /* and the plates least of all, because they are on chains */
+  /* the rack itself hangs from somewhere above the page and swings as
+     one piece, which is what actually moves the chains left and right */
+  body.tekk .doors{
+    transform-origin:50% -520px;
+    animation:rackSway 7.5s ease-in-out infinite;
+  }
+  @keyframes rackSway{
+    0%  {transform:rotate(calc(-1.5deg * var(--rack,1)))}
+    25% {transform:rotate(calc(.8deg * var(--rack,1)))}
+    50% {transform:rotate(calc(1.5deg * var(--rack,1)))}
+    75% {transform:rotate(calc(-.8deg * var(--rack,1)))}
+    100%{transform:rotate(calc(-1.5deg * var(--rack,1)))}
+  }
+  /* and the bass shoves the whole rack, hard */
   body.tekk.boom:not(.travel):not(.winch) .doors{
-    animation:platesBoom .56s cubic-bezier(.1,.75,.25,1);
+    animation:rackShove .72s cubic-bezier(.1,.8,.25,1);
   }
-  @keyframes platesBoom{
-    0%  {transform:translate(0,0) rotate(0deg)}
-    12% {transform:translate(9px,-7px) rotate(.5deg)}
-    30% {transform:translate(-8px,5px) rotate(-.42deg)}
-    52% {transform:translate(5px,-3px) rotate(.24deg)}
-    74% {transform:translate(-2px,1px) rotate(-.1deg)}
-    100%{transform:translate(0,0) rotate(0deg)}
+  @keyframes rackShove{
+    0%  {transform:rotate(0deg)}
+    11% {transform:rotate(2.6deg)}
+    31% {transform:rotate(-2.1deg)}
+    52% {transform:rotate(1.3deg)}
+    72% {transform:rotate(-.6deg)}
+    88% {transform:rotate(.25deg)}
+    100%{transform:rotate(0deg)}
   }
+  .doors{--rack:1}
+  body.tekk.live .doors{--rack:calc(1 + var(--pulse,0) * 1.6)}
   /* the light under the floor answers it */
   /* opacity is already spoken for by the pulse here, and it cannot go
      past 1 anyway, so the flare rides on brightness instead */
@@ -838,8 +855,45 @@
   body.tekk.live .wip{--amp:calc(1 + var(--pulse,0) * 2.4)}
   .door, .blbar, .wip{--amp:1}
 
+  /* the walls, the window and the air in front of them, one piece so
+     the whole backdrop can take the hit together */
+  #room{position:fixed;inset:0;z-index:0;pointer-events:none}
+  body.tekk.boom #room{animation:wallBoom .46s cubic-bezier(.15,.85,.3,1)}
+  @keyframes wallBoom{
+    0%  {transform:translate3d(0,0,0) scale(1)}
+    9%  {transform:translate3d(9px,-19px,0) scale(1.05)}
+    26% {transform:translate3d(-10px,11px,0) scale(.975)}
+    45% {transform:translate3d(6px,-6px,0) scale(1.022)}
+    66% {transform:translate3d(-3px,3px,0) scale(.993)}
+    85% {transform:translate3d(1px,-1px,0) scale(1.004)}
+    100%{transform:translate3d(0,0,0) scale(1)}
+  }
+
   /* the light of the hit. both layers are transform and opacity only,
      so they cost the compositor and nothing else. */
+  /* sparks off the floor, one burst per hit */
+  .sparks{
+    position:fixed;left:0;right:0;bottom:0;height:86vh;
+    z-index:3;pointer-events:none;opacity:0;
+  }
+  body.tekk .sparks{opacity:1}
+  .sparks i{
+    position:absolute;bottom:-8px;
+    width:var(--w,5px);height:var(--w,5px);border-radius:50%;
+    background:var(--col,#FF6A2A);
+    box-shadow:0 0 12px var(--col,#FF6A2A), 0 0 26px rgba(255,90,20,.5);
+    opacity:0;
+  }
+  body.tekk.boom .sparks i{
+    animation:spark var(--dur,.7s) cubic-bezier(.15,.72,.35,1) var(--sd,0s) both;
+  }
+  @keyframes spark{
+    0%  {opacity:0; transform:translate3d(0,0,0) scale(.35)}
+    8%  {opacity:1}
+    70% {opacity:.85}
+    100%{opacity:0; transform:translate3d(var(--sx,0px), calc(-1 * var(--sy,44vh)), 0) scale(var(--ss,1.1))}
+  }
+
   .boomfx{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:0}
   body.tekk .boomfx{opacity:1}
   .bf-flash{
@@ -881,8 +935,11 @@
     body.tekk.boom h1,
     body.tekk.boom .smear,
     body.tekk.boom .door::after,
-    body.tekk.boom .blbar::after{animation:none !important}
-    .boomfx{display:none}
+    body.tekk.boom .blbar::after,
+    body.tekk.boom #room,
+    body.tekk.boom .sparks i{animation:none !important}
+    body.tekk .doors{animation:none}
+    .boomfx, .sparks{display:none}
   }
 
   /* the dark closes in, and it does it on a pulse */
@@ -1065,18 +1122,18 @@
   body.tekk .door:nth-child(3)::before{animation-duration:8.1s;animation-delay:-5.3s}
   /* pure rotation, so the chain can cancel it exactly */
   @keyframes hang{
-    0%  {transform:rotate(calc(var(--tilt,0deg) - 2.4deg * var(--amp,1)))}
-    25% {transform:rotate(calc(var(--tilt,0deg) + 1.2deg * var(--amp,1)))}
-    50% {transform:rotate(calc(var(--tilt,0deg) + 2.4deg * var(--amp,1)))}
-    75% {transform:rotate(calc(var(--tilt,0deg) - 1.2deg * var(--amp,1)))}
-    100%{transform:rotate(calc(var(--tilt,0deg) - 2.4deg * var(--amp,1)))}
+    0%  {transform:rotate(calc(var(--tilt,0deg) - 4.6deg * var(--amp,1)))}
+    25% {transform:rotate(calc(var(--tilt,0deg) + 2.3deg * var(--amp,1)))}
+    50% {transform:rotate(calc(var(--tilt,0deg) + 4.6deg * var(--amp,1)))}
+    75% {transform:rotate(calc(var(--tilt,0deg) - 2.3deg * var(--amp,1)))}
+    100%{transform:rotate(calc(var(--tilt,0deg) - 4.6deg * var(--amp,1)))}
   }
   @keyframes hangChain{
-    0%  {transform:rotate(calc(-1 * (var(--tilt,0deg) - 2.4deg * var(--amp,1))))}
-    25% {transform:rotate(calc(-1 * (var(--tilt,0deg) + 1.2deg * var(--amp,1))))}
-    50% {transform:rotate(calc(-1 * (var(--tilt,0deg) + 2.4deg * var(--amp,1))))}
-    75% {transform:rotate(calc(-1 * (var(--tilt,0deg) - 1.2deg * var(--amp,1))))}
-    100%{transform:rotate(calc(-1 * (var(--tilt,0deg) - 2.4deg * var(--amp,1))))}
+    0%  {transform:rotate(calc(-1 * (var(--tilt,0deg) - 4.6deg * var(--amp,1))))}
+    25% {transform:rotate(calc(-1 * (var(--tilt,0deg) + 2.3deg * var(--amp,1))))}
+    50% {transform:rotate(calc(-1 * (var(--tilt,0deg) + 4.6deg * var(--amp,1))))}
+    75% {transform:rotate(calc(-1 * (var(--tilt,0deg) - 2.3deg * var(--amp,1))))}
+    100%{transform:rotate(calc(-1 * (var(--tilt,0deg) - 4.6deg * var(--amp,1))))}
   }
   /* and every so often something upstairs shifts */
   body.tekk:not(.live) .doors{animation:jolt 11s ease-in-out infinite}
@@ -1635,6 +1692,7 @@
 <div class="glory-eye" aria-hidden="true"></div>
 <div class="glory" aria-hidden="true"></div>
 <div class="plumes" id="plumes" aria-hidden="true"></div>
+<div id="room" aria-hidden="true">
 <div class="smear" aria-hidden="true"></div>
 <div class="shafts" aria-hidden="true"></div>
 <div class="dust" id="dust" aria-hidden="true"></div>
@@ -1688,6 +1746,8 @@
 </div>
 <div class="fog" aria-hidden="true"></div>
 <div class="motes" id="motes" aria-hidden="true"></div>
+</div>
+
 <div class="vig" aria-hidden="true"></div>
 <div class="corrupt" aria-hidden="true">
   <div class="wipe"></div>
@@ -1777,6 +1837,7 @@
 </div>
 
 <div class="hellfx" aria-hidden="true"></div>
+<div class="sparks" id="sparks" aria-hidden="true"></div>
 <div class="boomfx" aria-hidden="true">
   <i class="bf-flash"></i>
   <i class="bf-ring"></i>
@@ -1835,6 +1896,25 @@
         e.style.height = (20 * s).toFixed(1) + 'px';
       }
       p.appendChild(e);
+    }
+  })();
+
+  /* the sparks are seeded once and thrown again on every hit */
+  (function(){
+    var s = document.getElementById('sparks');
+    if (!s) return;
+    var cols = ['#FF6A2A', '#FF3B18', '#FFA24A', '#E8452A'];
+    for (var i = 0; i < 22; i++){
+      var e = document.createElement('i');
+      e.style.left = (2 + Math.random() * 96).toFixed(1) + 'vw';
+      e.style.setProperty('--sx', ((Math.random() - 0.5) * 260).toFixed(0) + 'px');
+      e.style.setProperty('--sy', (26 + Math.random() * 46).toFixed(0) + 'vh');
+      e.style.setProperty('--ss', (0.2 + Math.random() * 0.5).toFixed(2));
+      e.style.setProperty('--sd', (Math.random() * 0.07).toFixed(3) + 's');
+      e.style.setProperty('--dur', (0.5 + Math.random() * 0.5).toFixed(2) + 's');
+      e.style.setProperty('--w', (3 + Math.random() * 5).toFixed(1) + 'px');
+      e.style.setProperty('--col', cols[(Math.random() * cols.length) | 0]);
+      s.appendChild(e);
     }
   })();
 
