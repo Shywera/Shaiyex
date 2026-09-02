@@ -742,8 +742,8 @@
   }
   @keyframes roomBoom{
     0%  {transform:translate3d(0,0,0) scale(1)}
-    16% {transform:translate3d(0,calc(5px * var(--amp,1)),0) scale(calc(1 + .004 * var(--amp,1)))}
-    52% {transform:translate3d(0,calc(-2px * var(--amp,1)),0) scale(1)}
+    16% {transform:translate3d(0,calc(1.6px * var(--amp,1)),0) scale(calc(1 + .0014 * var(--amp,1)))}
+    52% {transform:translate3d(0,calc(-.6px * var(--amp,1)),0) scale(1)}
     100%{transform:translate3d(0,0,0) scale(1)}
   }
   /* the menu is not bolted to the room, so it lags and overshoots it */
@@ -752,8 +752,8 @@
   }
   @keyframes innerBoom{
     0%  {transform:translateY(0) scale(1)}
-    16% {transform:translateY(calc(-4px * var(--amp,1))) scale(calc(1 + .006 * var(--amp,1)))}
-    54% {transform:translateY(calc(2px * var(--amp,1))) scale(1)}
+    16% {transform:translateY(calc(-1.3px * var(--amp,1))) scale(calc(1 + .002 * var(--amp,1)))}
+    54% {transform:translateY(calc(.6px * var(--amp,1))) scale(1)}
     100%{transform:translateY(0) scale(1)}
   }
   /* and the plates least of all, because they are on chains */
@@ -773,7 +773,7 @@
   body.tekk.boom:not(.travel):not(.winch) .vig{animation:vigBoom .28s cubic-bezier(.15,.85,.3,1)}
   @keyframes vigBoom{
     0%  {transform:scale(1)}
-    16% {transform:scale(calc(1 + .04 * var(--amp,1)))}
+    16% {transform:scale(calc(1 + .012 * var(--amp,1)))}
     100%{transform:scale(1)}
   }
   /* every plate lights along its edge for as long as the hit lasts */
@@ -783,34 +783,34 @@
   }
   @keyframes edgeBoom{
     0%  {opacity:.6; box-shadow:0 0 0 rgba(194,26,18,0)}
-    16% {opacity:1;  box-shadow:0 0 22px rgba(240,52,42,.7)}
+    16% {opacity:.85; box-shadow:0 0 11px rgba(240,52,42,.4)}
     100%{opacity:.6; box-shadow:0 0 0 rgba(194,26,18,0)}
   }
   /* the name takes it too */
   body.tekk.boom:not(.travel):not(.winch) h1{animation:nameBoom .28s cubic-bezier(.15,.85,.3,1)}
   @keyframes nameBoom{
     0%  {transform:scale(1)}
-    16% {transform:scale(calc(1 + .012 * var(--amp,1)))}
+    16% {transform:scale(calc(1 + .004 * var(--amp,1)))}
     100%{transform:scale(1)}
   }
   /* the window rattles in its frame */
   body.tekk.boom:not(.travel):not(.winch) .arch svg{animation:archBoom .3s cubic-bezier(.15,.85,.3,1)}
   @keyframes archBoom{
     0%  {transform:translateY(0) scale(1)}
-    16% {transform:translateY(calc(-4px * var(--amp,1))) scale(calc(1 + .004 * var(--amp,1)))}
+    16% {transform:translateY(calc(-1.4px * var(--amp,1))) scale(calc(1 + .0014 * var(--amp,1)))}
     100%{transform:translateY(0) scale(1)}
   }
   /* embers get shoved up off the floor */
   body.tekk.boom:not(.travel):not(.winch) .motes{animation:moteBoom .32s cubic-bezier(.1,.8,.3,1)}
   @keyframes moteBoom{
     0%  {transform:translateY(0)}
-    18% {transform:translateY(calc(-8px * var(--amp,1)))}
+    18% {transform:translateY(calc(-3px * var(--amp,1)))}
     100%{transform:translateY(0)}
   }
   body.tekk.boom:not(.travel):not(.winch) .dust{animation:dustBoom .32s cubic-bezier(.1,.8,.3,1)}
   @keyframes dustBoom{
     0%  {transform:translateY(0)}
-    18% {transform:translateY(calc(5px * var(--amp,1)))}
+    18% {transform:translateY(calc(1.8px * var(--amp,1)))}
     100%{transform:translateY(0)}
   }
 
@@ -824,8 +824,8 @@
   body.tekk.boom:not(.travel):not(.winch) #room{animation:wallBoom .32s cubic-bezier(.15,.85,.3,1)}
   @keyframes wallBoom{
     0%  {transform:translate3d(0,0,0) scale(1)}
-    16% {transform:translate3d(0,calc(-6px * var(--amp,1)),0) scale(calc(1 + .012 * var(--amp,1)))}
-    54% {transform:translate3d(0,calc(3px * var(--amp,1)),0) scale(1)}
+    16% {transform:translate3d(0,calc(-2px * var(--amp,1)),0) scale(calc(1 + .004 * var(--amp,1)))}
+    54% {transform:translate3d(0,calc(1px * var(--amp,1)),0) scale(1)}
     100%{transform:translate3d(0,0,0) scale(1)}
   }
 
@@ -865,7 +865,7 @@
   body.tekk.boom:not(.travel):not(.winch) .bf-flash{animation:bfFlash .28s ease-out}
   @keyframes bfFlash{
     0%  {opacity:0;   transform:translateY(8%)}
-    14% {opacity:calc(.3 * var(--amp,1)); transform:translateY(0)}
+    14% {opacity:calc(.1 * var(--amp,1)); transform:translateY(0)}
     100%{opacity:0;   transform:translateY(-3%)}
   }
 
@@ -1068,9 +1068,9 @@
 
   @keyframes plateHit{
     0%  {transform:rotate(var(--tilt,0deg))}
-    18% {transform:rotate(calc(var(--tilt,0deg) + .85deg * var(--hdir,1) * var(--amp,1)))}
-    54% {transform:rotate(calc(var(--tilt,0deg) - .45deg * var(--hdir,1) * var(--amp,1)))}
-    82% {transform:rotate(calc(var(--tilt,0deg) + .16deg * var(--hdir,1) * var(--amp,1)))}
+    18% {transform:rotate(calc(var(--tilt,0deg) + .28deg * var(--hdir,1) * var(--amp,1)))}
+    54% {transform:rotate(calc(var(--tilt,0deg) - .15deg * var(--hdir,1) * var(--amp,1)))}
+    82% {transform:rotate(calc(var(--tilt,0deg) + .05deg * var(--hdir,1) * var(--amp,1)))}
     100%{transform:rotate(var(--tilt,0deg))}
   }
   /* and every so often something upstairs shifts */
@@ -1817,15 +1817,15 @@
     var s = document.getElementById('sparks');
     if (!s) return;
     var cols = ['#FF6A2A', '#FF3B18', '#FFA24A', '#E8452A'];
-    for (var i = 0; i < 10; i++){
+    for (var i = 0; i < 6; i++){
       var e = document.createElement('i');
       e.style.left = (2 + Math.random() * 96).toFixed(1) + 'vw';
       e.style.setProperty('--sx', ((Math.random() - 0.5) * 120).toFixed(0) + 'px');
-      e.style.setProperty('--sy', (10 + Math.random() * 16).toFixed(0) + 'vh');
+      e.style.setProperty('--sy', (5 + Math.random() * 8).toFixed(0) + 'vh');
       e.style.setProperty('--ss', (0.2 + Math.random() * 0.5).toFixed(2));
       e.style.setProperty('--sd', (Math.random() * 0.04).toFixed(3) + 's');
       e.style.setProperty('--dur', (0.3 + Math.random() * 0.14).toFixed(2) + 's');
-      e.style.setProperty('--w', (2 + Math.random() * 3).toFixed(1) + 'px');
+      e.style.setProperty('--w', (1.5 + Math.random() * 1.5).toFixed(1) + 'px');
       e.style.setProperty('--col', cols[(Math.random() * cols.length) | 0]);
       s.appendChild(e);
     }
