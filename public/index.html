@@ -737,15 +737,41 @@
      one transform on one element, so the whole room moves together and
      the compositor does the work. it never runs while the camera is
      already moving somewhere. */
-  body.tekk.boom:not(.travel):not(.winch) #world{
-    animation:roomBoom .26s cubic-bezier(.2,.9,.3,1);
+  body.tekk.boom:not(.travel):not(.winch):not(.corrupting) #world{
+    animation:roomBoom .42s cubic-bezier(.15,.85,.3,1);
   }
   @keyframes roomBoom{
+    0%  {transform:translate3d(0,0,0) scale(1) rotate(0deg)}
+    9%  {transform:translate3d(-6px,16px,0) scale(1.026) rotate(-.35deg)}
+    24% {transform:translate3d(7px,-9px,0) scale(.988) rotate(.28deg)}
+    41% {transform:translate3d(-4px,6px,0) scale(1.012) rotate(-.16deg)}
+    60% {transform:translate3d(3px,-3px,0) scale(.996) rotate(.08deg)}
+    80% {transform:translate3d(-1px,1px,0) scale(1.003) rotate(-.03deg)}
+    100%{transform:translate3d(0,0,0) scale(1) rotate(0deg)}
+  }
+  /* the menu is not bolted to the room, so it lags and overshoots it */
+  body.tekk.boom:not(.travel):not(.winch):not(.corrupting) .inner{
+    animation:innerBoom .5s cubic-bezier(.12,.8,.28,1);
+  }
+  @keyframes innerBoom{
     0%  {transform:translateY(0) scale(1)}
-    18% {transform:translateY(5px) scale(1.006)}
-    46% {transform:translateY(-2px) scale(.998)}
-    72% {transform:translateY(1px) scale(1.002)}
+    14% {transform:translateY(-13px) scale(1.035)}
+    34% {transform:translateY(8px) scale(.982)}
+    56% {transform:translateY(-4px) scale(1.012)}
+    78% {transform:translateY(2px) scale(.996)}
     100%{transform:translateY(0) scale(1)}
+  }
+  /* and the plates least of all, because they are on chains */
+  body.tekk.boom:not(.travel):not(.winch) .doors{
+    animation:platesBoom .56s cubic-bezier(.1,.75,.25,1);
+  }
+  @keyframes platesBoom{
+    0%  {transform:translate(0,0) rotate(0deg)}
+    12% {transform:translate(9px,-7px) rotate(.5deg)}
+    30% {transform:translate(-8px,5px) rotate(-.42deg)}
+    52% {transform:translate(5px,-3px) rotate(.24deg)}
+    74% {transform:translate(-2px,1px) rotate(-.1deg)}
+    100%{transform:translate(0,0) rotate(0deg)}
   }
   /* the light under the floor answers it */
   /* opacity is already spoken for by the pulse here, and it cannot go
@@ -756,10 +782,11 @@
     22% {filter:brightness(2.1) saturate(1.3)}
     100%{filter:brightness(1)}
   }
-  body.tekk.boom .vig{animation:vigBoom .26s ease-out}
+  body.tekk.boom .vig{animation:vigBoom .38s cubic-bezier(.15,.85,.3,1)}
   @keyframes vigBoom{
     0%  {transform:scale(1)}
-    20% {transform:scale(1.045)}
+    14% {transform:scale(1.14)}
+    44% {transform:scale(.97)}
     100%{transform:scale(1)}
   }
   /* every plate lights along its edge for as long as the hit lasts */
@@ -769,21 +796,38 @@
   }
   @keyframes edgeBoom{
     0%  {opacity:.6; box-shadow:0 0 0 rgba(194,26,18,0)}
-    20% {opacity:1;  box-shadow:0 0 26px rgba(240,52,42,.85)}
+    14% {opacity:1;  box-shadow:0 0 44px rgba(240,52,42,1), 0 0 90px rgba(194,26,18,.6)}
     100%{opacity:.6; box-shadow:0 0 0 rgba(194,26,18,0)}
   }
+  /* the name takes it too */
+  body.tekk.boom h1{animation:nameBoom .4s cubic-bezier(.15,.85,.3,1)}
+  @keyframes nameBoom{
+    0%  {transform:scale(1)}
+    12% {transform:scale(1.055) translateY(3px)}
+    40% {transform:scale(.985) translateY(-2px)}
+    100%{transform:scale(1)}
+  }
   /* the window rattles in its frame */
-  body.tekk.boom .arch svg{animation:archBoom .26s ease-out}
+  body.tekk.boom .arch svg{animation:archBoom .44s cubic-bezier(.15,.85,.3,1)}
   @keyframes archBoom{
-    0%  {transform:translateY(0)}
-    20% {transform:translateY(-3px) scaleY(1.004)}
-    100%{transform:translateY(0)}
+    0%  {transform:translateY(0) scale(1)}
+    12% {transform:translateY(-11px) scale(1.014)}
+    36% {transform:translateY(5px) scale(.994)}
+    64% {transform:translateY(-2px) scale(1.004)}
+    100%{transform:translateY(0) scale(1)}
   }
   /* embers get shoved up off the floor */
-  body.tekk.boom .motes{animation:moteBoom .26s ease-out}
+  body.tekk.boom .motes{animation:moteBoom .5s cubic-bezier(.1,.8,.3,1)}
   @keyframes moteBoom{
+    0%  {transform:translateY(0) scale(1)}
+    16% {transform:translateY(-22px) scale(1.03)}
+    48% {transform:translateY(6px) scale(.99)}
+    100%{transform:translateY(0) scale(1)}
+  }
+  body.tekk.boom .dust{animation:dustBoom .5s cubic-bezier(.1,.8,.3,1)}
+  @keyframes dustBoom{
     0%  {transform:translateY(0)}
-    24% {transform:translateY(-7px)}
+    16% {transform:translateY(14px)}
     100%{transform:translateY(0)}
   }
 
@@ -791,8 +835,55 @@
      passage barely moves and a loud one swings */
   body.tekk.live .door,
   body.tekk.live .blbar,
-  body.tekk.live .wip{--amp:calc(1 + var(--pulse,0) * 1.15)}
+  body.tekk.live .wip{--amp:calc(1 + var(--pulse,0) * 2.4)}
   .door, .blbar, .wip{--amp:1}
+
+  /* the light of the hit. both layers are transform and opacity only,
+     so they cost the compositor and nothing else. */
+  .boomfx{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:0}
+  body.tekk .boomfx{opacity:1}
+  .bf-flash{
+    position:absolute;inset:0;opacity:0;
+    background:
+      radial-gradient(120% 74% at 50% 112%, rgba(226,26,16,.72), rgba(120,6,6,0) 58%),
+      radial-gradient(70% 46% at 50% 104%, rgba(255,120,40,.5), rgba(255,120,40,0) 66%);
+  }
+  body.tekk.boom .bf-flash{animation:bfFlash .34s ease-out}
+  @keyframes bfFlash{
+    0%  {opacity:0;   transform:translateY(14%) scaleY(.9)}
+    12% {opacity:1;   transform:translateY(0) scaleY(1)}
+    100%{opacity:0;   transform:translateY(-6%) scaleY(1.06)}
+  }
+  .bf-ring{
+    position:absolute;left:50%;bottom:-32vh;
+    width:80vw;height:80vw;margin-left:-40vw;
+    border-radius:50%;opacity:0;
+    border:2px solid rgba(240,52,42,.55);
+    box-shadow:0 0 40px rgba(240,52,42,.35), inset 0 0 60px rgba(240,52,42,.2);
+  }
+  body.tekk.boom .bf-ring{animation:bfRing .62s cubic-bezier(.12,.7,.3,1)}
+  @keyframes bfRing{
+    0%  {opacity:.9; transform:scale(.2)}
+    100%{opacity:0;  transform:scale(1.9)}
+  }
+
+  /* a red flash off the floor two or three times a second is exactly
+     the thing some people cannot look at, so anyone who has asked for
+     less movement gets the pulse and none of the hit. */
+  @media (prefers-reduced-motion: reduce){
+    body.tekk.boom #world,
+    body.tekk.boom .inner,
+    body.tekk.boom .doors,
+    body.tekk.boom .vig,
+    body.tekk.boom .arch svg,
+    body.tekk.boom .motes,
+    body.tekk.boom .dust,
+    body.tekk.boom h1,
+    body.tekk.boom .smear,
+    body.tekk.boom .door::after,
+    body.tekk.boom .blbar::after{animation:none !important}
+    .boomfx{display:none}
+  }
 
   /* the dark closes in, and it does it on a pulse */
   .vig{
@@ -1686,6 +1777,10 @@
 </div>
 
 <div class="hellfx" aria-hidden="true"></div>
+<div class="boomfx" aria-hidden="true">
+  <i class="bf-flash"></i>
+  <i class="bf-ring"></i>
+</div>
 <div id="view" hidden>
   <button class="view-x" id="viewX" type="button" aria-label="Back">
     <span class="vb-arrow" aria-hidden="true"></span>
@@ -2228,7 +2323,7 @@
     boomT = setTimeout(function(){
       body.classList.remove('boom');
       boomT = null;
-    }, 260);
+    }, 380);
   }
 
   function loop(){
