@@ -733,6 +733,67 @@
     100%{transform:translateY(-108vh) translateX(var(--dx,14px));opacity:0}
   }
 
+  /* ---------- the room takes the bass ----------
+     one transform on one element, so the whole room moves together and
+     the compositor does the work. it never runs while the camera is
+     already moving somewhere. */
+  body.tekk.boom:not(.travel):not(.winch) #world{
+    animation:roomBoom .26s cubic-bezier(.2,.9,.3,1);
+  }
+  @keyframes roomBoom{
+    0%  {transform:translateY(0) scale(1)}
+    18% {transform:translateY(5px) scale(1.006)}
+    46% {transform:translateY(-2px) scale(.998)}
+    72% {transform:translateY(1px) scale(1.002)}
+    100%{transform:translateY(0) scale(1)}
+  }
+  /* the light under the floor answers it */
+  /* opacity is already spoken for by the pulse here, and it cannot go
+     past 1 anyway, so the flare rides on brightness instead */
+  body.tekk.boom .smear{animation:smearBoom .26s ease-out}
+  @keyframes smearBoom{
+    0%  {filter:brightness(1)}
+    22% {filter:brightness(2.1) saturate(1.3)}
+    100%{filter:brightness(1)}
+  }
+  body.tekk.boom .vig{animation:vigBoom .26s ease-out}
+  @keyframes vigBoom{
+    0%  {transform:scale(1)}
+    20% {transform:scale(1.045)}
+    100%{transform:scale(1)}
+  }
+  /* every plate lights along its edge for as long as the hit lasts */
+  body.tekk.boom .door::after,
+  body.tekk.boom .blbar::after{
+    animation:edgeBoom .26s ease-out;
+  }
+  @keyframes edgeBoom{
+    0%  {opacity:.6; box-shadow:0 0 0 rgba(194,26,18,0)}
+    20% {opacity:1;  box-shadow:0 0 26px rgba(240,52,42,.85)}
+    100%{opacity:.6; box-shadow:0 0 0 rgba(194,26,18,0)}
+  }
+  /* the window rattles in its frame */
+  body.tekk.boom .arch svg{animation:archBoom .26s ease-out}
+  @keyframes archBoom{
+    0%  {transform:translateY(0)}
+    20% {transform:translateY(-3px) scaleY(1.004)}
+    100%{transform:translateY(0)}
+  }
+  /* embers get shoved up off the floor */
+  body.tekk.boom .motes{animation:moteBoom .26s ease-out}
+  @keyframes moteBoom{
+    0%  {transform:translateY(0)}
+    24% {transform:translateY(-7px)}
+    100%{transform:translateY(0)}
+  }
+
+  /* between hits the sway itself breathes with the low end, so a quiet
+     passage barely moves and a loud one swings */
+  body.tekk.live .door,
+  body.tekk.live .blbar,
+  body.tekk.live .wip{--amp:calc(1 + var(--pulse,0) * 1.15)}
+  .door, .blbar, .wip{--amp:1}
+
   /* the dark closes in, and it does it on a pulse */
   .vig{
     position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0;
@@ -913,21 +974,21 @@
   body.tekk .door:nth-child(3)::before{animation-duration:8.1s;animation-delay:-5.3s}
   /* pure rotation, so the chain can cancel it exactly */
   @keyframes hang{
-    0%  {transform:rotate(calc(var(--tilt,0deg) - 2.4deg))}
-    25% {transform:rotate(calc(var(--tilt,0deg) + 1.2deg))}
-    50% {transform:rotate(calc(var(--tilt,0deg) + 2.4deg))}
-    75% {transform:rotate(calc(var(--tilt,0deg) - 1.2deg))}
-    100%{transform:rotate(calc(var(--tilt,0deg) - 2.4deg))}
+    0%  {transform:rotate(calc(var(--tilt,0deg) - 2.4deg * var(--amp,1)))}
+    25% {transform:rotate(calc(var(--tilt,0deg) + 1.2deg * var(--amp,1)))}
+    50% {transform:rotate(calc(var(--tilt,0deg) + 2.4deg * var(--amp,1)))}
+    75% {transform:rotate(calc(var(--tilt,0deg) - 1.2deg * var(--amp,1)))}
+    100%{transform:rotate(calc(var(--tilt,0deg) - 2.4deg * var(--amp,1)))}
   }
   @keyframes hangChain{
-    0%  {transform:rotate(calc(-1 * (var(--tilt,0deg) - 2.4deg)))}
-    25% {transform:rotate(calc(-1 * (var(--tilt,0deg) + 1.2deg)))}
-    50% {transform:rotate(calc(-1 * (var(--tilt,0deg) + 2.4deg)))}
-    75% {transform:rotate(calc(-1 * (var(--tilt,0deg) - 1.2deg)))}
-    100%{transform:rotate(calc(-1 * (var(--tilt,0deg) - 2.4deg)))}
+    0%  {transform:rotate(calc(-1 * (var(--tilt,0deg) - 2.4deg * var(--amp,1))))}
+    25% {transform:rotate(calc(-1 * (var(--tilt,0deg) + 1.2deg * var(--amp,1))))}
+    50% {transform:rotate(calc(-1 * (var(--tilt,0deg) + 2.4deg * var(--amp,1))))}
+    75% {transform:rotate(calc(-1 * (var(--tilt,0deg) - 1.2deg * var(--amp,1))))}
+    100%{transform:rotate(calc(-1 * (var(--tilt,0deg) - 2.4deg * var(--amp,1))))}
   }
   /* and every so often something upstairs shifts */
-  body.tekk .doors{animation:jolt 11s ease-in-out infinite}
+  body.tekk:not(.live) .doors{animation:jolt 11s ease-in-out infinite}
   @keyframes jolt{
     0%,88%,100%{transform:translate(0,0)}
     89%{transform:translate(-4px,2px)}
@@ -2154,6 +2215,22 @@
       loop();
     } catch(e){ /* no analyser, the css keyframe heartbeat carries on */ }
   }
+  /* a kick is the bottom of the spectrum jumping well above where it has
+     been sitting. keep a slow average, fire when the moment beats it by
+     enough, and refuse to fire again for a while so a long note does not
+     rattle the room continuously. */
+  var avg = 0, lastKick = 0, boomT = null;
+  function kick(){
+    if (boomT) clearTimeout(boomT);
+    body.classList.remove('boom');
+    void body.offsetWidth;
+    body.classList.add('boom');
+    boomT = setTimeout(function(){
+      body.classList.remove('boom');
+      boomT = null;
+    }, 260);
+  }
+
   function loop(){
     raf = requestAnimationFrame(loop);
     if (!ANA || audio.paused) return;
@@ -2161,12 +2238,20 @@
     /* weight the low end, that is what you feel */
     var lo = 0, n = 10;
     for (var i = 0; i < n; i++) lo += DATA[i];
-    var v = Math.max(0, Math.min(1, (lo / n) / 190));
+    var raw = (lo / n) / 190;
+    var v = Math.max(0, Math.min(1, raw));
     v = v * v;                       /* squash the quiet parts */
     var q = Math.round(v * 12) / 12; /* steps, so the glow is not repainted 60 times a second */
     if (q !== lastQ){
       lastQ = q;
       document.documentElement.style.setProperty('--pulse', q.toFixed(3));
+    }
+
+    avg = avg ? avg * 0.92 + raw * 0.08 : raw;
+    var now = performance.now();
+    if (raw > avg * 1.32 && raw > 0.34 && now - lastKick > 190){
+      lastKick = now;
+      kick();
     }
   }
 
