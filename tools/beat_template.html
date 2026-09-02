@@ -499,23 +499,18 @@
   }
   /* ---------- the hall, down the right hand side ---------- */
   .hall{
-    position:fixed;top:0;right:0;bottom:0;z-index:60;
+    position:fixed;top:0;left:0;bottom:0;z-index:60;
     width:clamp(220px,20vw,290px);
     display:flex;flex-direction:column;
     padding:20px 18px 18px;
     background:
-      linear-gradient(270deg, rgba(21,15,34,.96), rgba(10,7,16,.72) 78%, rgba(10,7,16,0));
-    border-left:1px solid var(--line);
+      linear-gradient(90deg, rgba(21,15,34,.96), rgba(10,7,16,.72) 78%, rgba(10,7,16,0));
+    border-right:1px solid var(--line);
     pointer-events:none;
     transition:opacity .45s ease, transform .45s cubic-bezier(.2,.8,.25,1);
   }
-  .hall.off{opacity:0;transform:translateX(30px);pointer-events:none}
+  .hall.off{opacity:0;transform:translateX(-30px);pointer-events:none}
   @media (max-width:1180px){ .hall{display:none} }
-  /* the lock steps aside for it rather than sitting on top of it */
-  @media (min-width:1181px){
-    #shyLock{right:calc(clamp(220px,20vw,290px) + 14px)}
-  }
-
   /* it glows on its own, and harder on the beat when one is running */
   .hall-t{animation:hallGlow 4.6s ease-in-out infinite}
   @keyframes hallGlow{
@@ -529,7 +524,7 @@
   }
   /* a thin light down the edge of the panel */
   .hall::before{
-    content:"";position:absolute;left:0;top:0;bottom:0;width:1px;
+    content:"";position:absolute;right:0;top:0;bottom:0;width:1px;
     background:linear-gradient(180deg,
       rgba(232,196,104,0), rgba(232,196,104,.55) 22%,
       rgba(169,108,255,.4) 62%, rgba(232,196,104,0));
