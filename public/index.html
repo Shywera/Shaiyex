@@ -2329,16 +2329,17 @@
       loop();
     } catch(e){ /* no analyser, the css keyframe heartbeat carries on */ }
   }
-  /* a kick is the bottom of the spectrum jumping well above where it has
-     been sitting. keep a slow average, fire when the moment beats it by
-     enough, and refuse to fire again for a while so a long note does not
-     rattle the room continuously. */
-  var avg = 0, lastKick = 0, boomT = null, boomRaf = 0;
+  /* a kick is the bottom of the spectrum rising sharply. keep a running
+     idea of how much it usually rises between frames, fire when one rise
+     is a couple of times that, and refuse to fire again for a while so a
+     long note does not rattle the room continuously. */
+  var lowPrev = 0, rise = 0, lastKick = 0, boomT = null, boomRaf = 0;
+  var kickHard = 0;
   function kick(){
     /* how hard this one lands is settled here and held for the whole
        swing. read it live and every plate re-computes mid flight, which
        is a twitch rather than a swing. */
-    var hard = lastQ < 0 ? 0 : lastQ;
+    var hard = kickHard;
     var root = document.documentElement.style;
     root.setProperty('--amp',  (0.8 + hard * 0.9).toFixed(2));
     root.setProperty('--rack', (0.75 + hard * 0.8).toFixed(2));
@@ -2377,10 +2378,18 @@
       document.documentElement.style.setProperty('--pulse', q.toFixed(3));
     }
 
-    avg = avg ? avg * 0.92 + raw * 0.08 : raw;
+    /* how far the low end climbed since the last frame, and how far it
+       usually climbs */
+    var d = raw - lowPrev;
+    lowPrev = raw;
+    if (d < 0) d = 0;
+    rise = rise * 0.94 + d * 0.06;
+
     var now = performance.now();
-    if (raw > avg * 1.32 && raw > 0.34 && now - lastKick > 230){
+    if (d > Math.max(rise * 2, 0.006) && raw > 0.1 && now - lastKick > 230){
       lastKick = now;
+      /* a bigger jump is a harder hit, measured against the usual one */
+      kickHard = Math.max(0, Math.min(1, d / Math.max(0.03, rise * 8)));
       kick();
     }
   }
