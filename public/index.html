@@ -360,10 +360,7 @@
     border-color:var(--gold);
     box-shadow:-8px 0 30px rgba(120,96,48,.28);
   }
-  body.tekk .wip:hover{
-    border-color:#8A4BFF;
-    box-shadow:-8px 0 34px rgba(0,0,0,.6), 0 0 44px rgba(150,60,255,.4);
-  }
+
   .wip-t{
     font-family:var(--display);
     font-weight:800;
@@ -741,7 +738,7 @@
      the compositor does the work. it never runs while the camera is
      already moving somewhere. */
   body.tekk.boom:not(.travel):not(.winch):not(.corrupting) #world{
-    animation:roomBoom .42s cubic-bezier(.15,.85,.3,1);
+    animation:roomBoom .3s cubic-bezier(.15,.85,.3,1);
   }
   @keyframes roomBoom{
     0%  {transform:translate3d(0,0,0) scale(1) rotate(0deg)}
@@ -754,7 +751,7 @@
   }
   /* the menu is not bolted to the room, so it lags and overshoots it */
   body.tekk.boom:not(.travel):not(.winch):not(.corrupting) .inner{
-    animation:innerBoom .5s cubic-bezier(.12,.8,.28,1);
+    animation:innerBoom .32s cubic-bezier(.12,.8,.28,1);
   }
   @keyframes innerBoom{
     0%  {transform:translateY(0) scale(1)}
@@ -778,7 +775,7 @@
     22% {filter:brightness(2.1) saturate(1.3)}
     100%{filter:brightness(1)}
   }
-  body.tekk.boom:not(.travel):not(.winch) .vig{animation:vigBoom .38s cubic-bezier(.15,.85,.3,1)}
+  body.tekk.boom:not(.travel):not(.winch) .vig{animation:vigBoom .28s cubic-bezier(.15,.85,.3,1)}
   @keyframes vigBoom{
     0%  {transform:scale(1)}
     14% {transform:scale(1.14)}
@@ -796,7 +793,7 @@
     100%{opacity:.6; box-shadow:0 0 0 rgba(194,26,18,0)}
   }
   /* the name takes it too */
-  body.tekk.boom h1{animation:nameBoom .4s cubic-bezier(.15,.85,.3,1)}
+  body.tekk.boom:not(.travel):not(.winch) h1{animation:nameBoom .28s cubic-bezier(.15,.85,.3,1)}
   @keyframes nameBoom{
     0%  {transform:scale(1)}
     12% {transform:scale(1.055) translateY(3px)}
@@ -804,7 +801,7 @@
     100%{transform:scale(1)}
   }
   /* the window rattles in its frame */
-  body.tekk.boom:not(.travel):not(.winch) .arch svg{animation:archBoom .44s cubic-bezier(.15,.85,.3,1)}
+  body.tekk.boom:not(.travel):not(.winch) .arch svg{animation:archBoom .3s cubic-bezier(.15,.85,.3,1)}
   @keyframes archBoom{
     0%  {transform:translateY(0) scale(1)}
     12% {transform:translateY(-11px) scale(1.014)}
@@ -813,14 +810,14 @@
     100%{transform:translateY(0) scale(1)}
   }
   /* embers get shoved up off the floor */
-  body.tekk.boom:not(.travel):not(.winch) .motes{animation:moteBoom .5s cubic-bezier(.1,.8,.3,1)}
+  body.tekk.boom:not(.travel):not(.winch) .motes{animation:moteBoom .32s cubic-bezier(.1,.8,.3,1)}
   @keyframes moteBoom{
     0%  {transform:translateY(0) scale(1)}
     16% {transform:translateY(-22px) scale(1.03)}
     48% {transform:translateY(6px) scale(.99)}
     100%{transform:translateY(0) scale(1)}
   }
-  body.tekk.boom:not(.travel):not(.winch) .dust{animation:dustBoom .5s cubic-bezier(.1,.8,.3,1)}
+  body.tekk.boom:not(.travel):not(.winch) .dust{animation:dustBoom .32s cubic-bezier(.1,.8,.3,1)}
   @keyframes dustBoom{
     0%  {transform:translateY(0)}
     16% {transform:translateY(14px)}
@@ -834,7 +831,7 @@
   /* the walls, the window and the air in front of them, one piece so
      the whole backdrop can take the hit together */
   #room{position:fixed;inset:0;z-index:0;pointer-events:none}
-  body.tekk.boom:not(.travel):not(.winch) #room{animation:wallBoom .46s cubic-bezier(.15,.85,.3,1)}
+  body.tekk.boom:not(.travel):not(.winch) #room{animation:wallBoom .32s cubic-bezier(.15,.85,.3,1)}
   @keyframes wallBoom{
     0%  {transform:translate3d(0,0,0) scale(1)}
     9%  {transform:translate3d(9px,-19px,0) scale(1.05)}
@@ -878,7 +875,7 @@
       radial-gradient(120% 74% at 50% 112%, rgba(226,26,16,.72), rgba(120,6,6,0) 58%),
       radial-gradient(70% 46% at 50% 104%, rgba(255,120,40,.5), rgba(255,120,40,0) 66%);
   }
-  body.tekk.boom:not(.travel):not(.winch) .bf-flash{animation:bfFlash .34s ease-out}
+  body.tekk.boom:not(.travel):not(.winch) .bf-flash{animation:bfFlash .28s ease-out}
   @keyframes bfFlash{
     0%  {opacity:0;   transform:translateY(14%) scaleY(.9)}
     12% {opacity:1;   transform:translateY(0) scaleY(1)}
@@ -891,7 +888,7 @@
     border:2px solid rgba(240,52,42,.55);
     box-shadow:0 0 40px rgba(240,52,42,.35), inset 0 0 60px rgba(240,52,42,.2);
   }
-  body.tekk.boom:not(.travel):not(.winch) .bf-ring{animation:bfRing .62s cubic-bezier(.12,.7,.3,1)}
+  body.tekk.boom:not(.travel):not(.winch) .bf-ring{animation:bfRing .34s cubic-bezier(.12,.7,.3,1)}
   @keyframes bfRing{
     0%  {opacity:.9; transform:scale(.2)}
     100%{opacity:0;  transform:scale(1.9)}
@@ -930,12 +927,9 @@
       radial-gradient(115% 88% at 50% 46%,
         rgba(0,0,0,0) 34%, rgba(0,0,0,.55) 72%, rgba(0,0,0,.94) 100%);
   }
-  body.tekk .vig{opacity:1;animation:thump 2.2s ease-in-out infinite}
-  /* once the analyser is running the vignette follows the track instead */
-  body.tekk.live .vig{
-    animation:none;
-    transform:scale(calc(1 + var(--pulse,0) * .06));
-  }
+  /* the dark sits still and closes in on the hit, rather than scaling
+     off a variable that steps twelve times a second */
+  body.tekk .vig{opacity:1}
   body.tekk.live .smear{opacity:calc(.75 + var(--pulse,0) * .35)}
   body.tekk.live h1{
     text-shadow:
@@ -946,14 +940,6 @@
   body.tekk.live .tag .un{
     text-shadow:0 0 calc(10px + var(--pulse,0) * 26px) rgba(194,26,18,.95),
                 0 0 calc(30px + var(--pulse,0) * 50px) rgba(194,26,18,.5);
-  }
-  @keyframes thump{
-    0%   {transform:scale(1)}
-    6%   {transform:scale(1.028)}
-    12%  {transform:scale(1)}
-    19%  {transform:scale(1.018)}
-    26%  {transform:scale(1)}
-    100% {transform:scale(1)}
   }
 
   body.tekk{
@@ -1099,18 +1085,17 @@
      all of it twitching at once. the angles are small because the arm is
      long: a degree at the end of a chain this size is a long way. */
   body.tekk.boom:not(.travel):not(.winch) .door{
-    animation:plateHit .9s cubic-bezier(.14,.8,.3,1) var(--hd,0s) both;
+    animation:plateHit .34s cubic-bezier(.18,.72,.3,1) var(--hd,0s) both;
   }
   body.tekk .door:nth-child(1){--hd:0s;    --hdir:1}
-  body.tekk .door:nth-child(2){--hd:.055s; --hdir:-1}
-  body.tekk .door:nth-child(3){--hd:.11s;  --hdir:1}
+  body.tekk .door:nth-child(2){--hd:.03s;  --hdir:-1}
+  body.tekk .door:nth-child(3){--hd:.06s;  --hdir:1}
 
   @keyframes plateHit{
     0%  {transform:rotate(var(--tilt,0deg))}
-    11% {transform:rotate(calc(var(--tilt,0deg) + 1.9deg * var(--hdir,1) * var(--amp,1)))}
-    34% {transform:rotate(calc(var(--tilt,0deg) - 1.2deg * var(--hdir,1) * var(--amp,1)))}
-    56% {transform:rotate(calc(var(--tilt,0deg) + .62deg * var(--hdir,1) * var(--amp,1)))}
-    76% {transform:rotate(calc(var(--tilt,0deg) - .27deg * var(--hdir,1) * var(--amp,1)))}
+    18% {transform:rotate(calc(var(--tilt,0deg) + 2.1deg * var(--hdir,1) * var(--amp,1)))}
+    54% {transform:rotate(calc(var(--tilt,0deg) - 1.1deg * var(--hdir,1) * var(--amp,1)))}
+    82% {transform:rotate(calc(var(--tilt,0deg) + .38deg * var(--hdir,1) * var(--amp,1)))}
     100%{transform:rotate(var(--tilt,0deg))}
   }
   /* and every so often something upstairs shifts */
@@ -1146,8 +1131,7 @@
   /* hovering does not lift an iron plate, it just catches the light */
   body.tekk .door:hover,
   body.tekk .door:focus-visible{
-    transform:rotate(0deg);
-    animation-play-state:paused;
+    transform:rotate(var(--tilt,0deg));
     border-color:var(--c);
     box-shadow:0 18px 44px rgba(0,0,0,.85), 0 0 30px rgba(140,10,10,.18);
   }
@@ -1170,7 +1154,7 @@
     border-right:1px solid #2A3040;
     border-radius:3px;
     --tilt:-.8deg;
-    --hd:.16s;
+    --hd:.09s;
     --hdir:-1;
     transform-origin:50% calc(-1 * (var(--chain,70px) + 60vh));
     transform:rotate(var(--tilt));
@@ -1183,7 +1167,14 @@
     box-shadow:-6px 0 26px rgba(0,0,0,.85), 0 0 26px rgba(140,10,10,.16);
   }
   body.tekk .wip-s{color:#9A3A32}
-  body.tekk .wip:hover{transform:none;animation-play-state:paused}
+  /* and it lights the same way the plates do */
+  body.tekk .wip:hover{
+    transform:rotate(var(--tilt,0deg));
+    border-color:#C21A12;
+    box-shadow:0 0 34px rgba(194,26,18,.45), 0 16px 40px rgba(0,0,0,.8);
+  }
+  body.tekk .wip:hover .wip-t{color:#F0E4E0}
+  body.tekk .wip:hover .wip-s{color:#F0342A}
   body.tekk .wip::before{
     content:"";position:absolute;left:0;right:0;z-index:-1;
     top:calc(-1 * (var(--chain,70px) + 60vh));height:calc(var(--chain,70px) + 60vh);
@@ -1195,7 +1186,7 @@
     opacity:.8;
     transform:none;
   }
-  body.tekk.boom:not(.travel):not(.winch) .wip{animation:plateHit .9s cubic-bezier(.14,.8,.3,1) var(--hd,0s) both}
+  body.tekk.boom:not(.travel):not(.winch) .wip{animation:plateHit .34s cubic-bezier(.18,.72,.3,1) var(--hd,0s) both}
   body.tekk .wip-tag{background:#8E0F0F;color:#040203}
   /* the blacklist hangs lower and swings wider, like a sign outside a door */
   body.tekk .blbar.dropping{z-index:1}
@@ -1206,7 +1197,7 @@
     margin-right:0;
     width:min(100%,780px);
     --tilt:.5deg;
-    --hd:.21s;
+    --hd:.12s;
     --hdir:1;
     transform-origin:50% calc(-1 * (var(--chain,46px) + 60vh));
     transform:rotate(var(--tilt));
@@ -1228,8 +1219,12 @@
     opacity:.8;
     transform:none;
   }
-  body.tekk.boom:not(.travel):not(.winch) .blbar{animation:plateHit .9s cubic-bezier(.14,.8,.3,1) var(--hd,0s) both}
-  body.tekk .blbar:hover{animation-play-state:paused;transform:rotate(0deg)}
+  body.tekk.boom:not(.travel):not(.winch) .blbar{animation:plateHit .34s cubic-bezier(.18,.72,.3,1) var(--hd,0s) both}
+
+  body.tekk .blbar:hover{
+    transform:rotate(var(--tilt,0deg));
+    box-shadow:0 0 40px rgba(194,26,18,.4), 0 16px 40px rgba(0,0,0,.8);
+  }
   body.tekk .blbar .drip{
     display:block;position:absolute;left:0;right:0;bottom:-32px;height:38px;
     pointer-events:none;
@@ -1246,12 +1241,6 @@
   body.tekk .bl-go{color:#9A3A32}
   body.tekk footer{color:var(--dimmer);border-color:var(--line)}
 
-  /* the sinister part: the page breathes */
-  body.tekk .inner{animation:breathe 8s ease-in-out infinite}
-  @keyframes breathe{
-    0%,100%{transform:scale(1)}
-    50%{transform:scale(1.009)}
-  }
   body.tekk .theme-color{color:#040203}
 
   /* ---------- the corruption ----------
@@ -1860,8 +1849,8 @@
       e.style.setProperty('--sx', ((Math.random() - 0.5) * 260).toFixed(0) + 'px');
       e.style.setProperty('--sy', (26 + Math.random() * 46).toFixed(0) + 'vh');
       e.style.setProperty('--ss', (0.2 + Math.random() * 0.5).toFixed(2));
-      e.style.setProperty('--sd', (Math.random() * 0.07).toFixed(3) + 's');
-      e.style.setProperty('--dur', (0.5 + Math.random() * 0.5).toFixed(2) + 's');
+      e.style.setProperty('--sd', (Math.random() * 0.04).toFixed(3) + 's');
+      e.style.setProperty('--dur', (0.3 + Math.random() * 0.14).toFixed(2) + 's');
       e.style.setProperty('--w', (3 + Math.random() * 5).toFixed(1) + 'px');
       e.style.setProperty('--col', cols[(Math.random() * cols.length) | 0]);
       s.appendChild(e);
@@ -2344,7 +2333,7 @@
      been sitting. keep a slow average, fire when the moment beats it by
      enough, and refuse to fire again for a while so a long note does not
      rattle the room continuously. */
-  var avg = 0, lastKick = 0, boomT = null;
+  var avg = 0, lastKick = 0, boomT = null, boomRaf = 0;
   function kick(){
     /* how hard this one lands is settled here and held for the whole
        swing. read it live and every plate re-computes mid flight, which
@@ -2355,13 +2344,21 @@
     root.setProperty('--rack', (0.75 + hard * 0.8).toFixed(2));
 
     if (boomT) clearTimeout(boomT);
+    /* restarting across a frame rather than forcing a reflow: the same
+       restart without a synchronous layout two or three times a second,
+       which was a hitch of its own */
     body.classList.remove('boom');
-    void body.offsetWidth;
-    body.classList.add('boom');
+    if (boomRaf) cancelAnimationFrame(boomRaf);
+    boomRaf = requestAnimationFrame(function(){
+      boomRaf = 0;
+      body.classList.add('boom');
+    });
+    /* the class outlives the longest thing it starts, so nothing is ever
+       cut off half way and snapped back to where it started */
     boomT = setTimeout(function(){
       body.classList.remove('boom');
       boomT = null;
-    }, 380);
+    }, 460);
   }
 
   function loop(){
@@ -2382,7 +2379,7 @@
 
     avg = avg ? avg * 0.92 + raw * 0.08 : raw;
     var now = performance.now();
-    if (raw > avg * 1.32 && raw > 0.34 && now - lastKick > 190){
+    if (raw > avg * 1.32 && raw > 0.34 && now - lastKick > 230){
       lastKick = now;
       kick();
     }
