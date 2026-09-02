@@ -1684,6 +1684,11 @@
   }
   chains();
   window.addEventListener('load', chains);
+  /* the gothic faces are wider than the fallback, so the whole column
+     moves when they land. measure again once they have. */
+  try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(chains); } catch(e){}
+  /* and once more after the room has finished settling */
+  setTimeout(chains, 2600);
   var chainT;
   window.addEventListener('resize', function(){
     clearTimeout(chainT);
@@ -1828,6 +1833,7 @@
       silent = false;
       unhush();
       vOpen = false; moving = false;
+      chains();
     }, 880);
   }
 
