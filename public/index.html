@@ -886,8 +886,9 @@
   }
   body.tekk .door{
     background:
-      radial-gradient(58% 22% at 22% 0%, rgba(110,11,8,.5), rgba(110,11,8,0) 72%),
-      radial-gradient(42% 16% at 78% 0%, rgba(110,11,8,.34), rgba(110,11,8,0) 72%),
+      radial-gradient(circle at 50% 7px, #7E8898 0 3.5px, rgba(0,0,0,0) 4.5px),
+      radial-gradient(circle at 50% 7px, rgba(0,0,0,0) 0 5px, rgba(120,132,150,.45) 6px, rgba(0,0,0,0) 7px),
+      radial-gradient(54% 26% at 50% 0%, rgba(110,11,8,.5), rgba(110,11,8,0) 74%),
       radial-gradient(circle at 12px 12px, rgba(150,168,196,.16) 0 2px, rgba(0,0,0,0) 3px),
       radial-gradient(circle at calc(100% - 12px) 12px, rgba(150,168,196,.16) 0 2px, rgba(0,0,0,0) 3px),
       radial-gradient(circle at 12px calc(100% - 12px), rgba(150,168,196,.12) 0 2px, rgba(0,0,0,0) 3px),
@@ -896,21 +897,34 @@
       #090B12;
     border-color:#232A38;
     border-top-color:#39424F;
-    transform-origin:50% calc(-1 * var(--chain));
-    animation:hang 7s ease-in-out infinite;
+    transform-origin:50% 0;
+    animation:hang 9.4s ease-in-out infinite;
   }
   body.tekk .door:nth-child(1){animation-duration:9.4s}
   body.tekk .door:nth-child(2){animation-duration:11.8s;animation-delay:-3.1s}
   body.tekk .door:nth-child(3){animation-duration:8.1s;animation-delay:-5.3s}
+  /* the chain takes the opposite turn on the same clock, so it hangs
+     straight while the plate rocks under it */
+  body.tekk .door::before{
+    transform-origin:50% 100%;
+    animation:hangChain 9.4s ease-in-out infinite;
+  }
+  body.tekk .door:nth-child(2)::before{animation-duration:11.8s;animation-delay:-3.1s}
+  body.tekk .door:nth-child(3)::before{animation-duration:8.1s;animation-delay:-5.3s}
+  /* pure rotation, so the chain can cancel it exactly */
   @keyframes hang{
-    0%     {transform:rotate(calc(var(--tilt,0deg) - 1.5deg)) translate(0,0)}
-    14%    {transform:rotate(calc(var(--tilt,0deg) - .6deg)) translate(1px,-1px)}
-    29%    {transform:rotate(calc(var(--tilt,0deg) + .8deg)) translate(-1px,1px)}
-    43%    {transform:rotate(calc(var(--tilt,0deg) + 1.7deg)) translate(2px,0)}
-    57%    {transform:rotate(calc(var(--tilt,0deg) + 1deg))  translate(-1px,-1px)}
-    71%    {transform:rotate(calc(var(--tilt,0deg) - .5deg)) translate(1px,1px)}
-    86%    {transform:rotate(calc(var(--tilt,0deg) - 1.2deg)) translate(-1px,0)}
-    100%   {transform:rotate(calc(var(--tilt,0deg) - 1.5deg)) translate(0,0)}
+    0%  {transform:rotate(calc(var(--tilt,0deg) - 2.4deg))}
+    25% {transform:rotate(calc(var(--tilt,0deg) + 1.2deg))}
+    50% {transform:rotate(calc(var(--tilt,0deg) + 2.4deg))}
+    75% {transform:rotate(calc(var(--tilt,0deg) - 1.2deg))}
+    100%{transform:rotate(calc(var(--tilt,0deg) - 2.4deg))}
+  }
+  @keyframes hangChain{
+    0%  {transform:rotate(calc(-1 * (var(--tilt,0deg) - 2.4deg)))}
+    25% {transform:rotate(calc(-1 * (var(--tilt,0deg) + 1.2deg)))}
+    50% {transform:rotate(calc(-1 * (var(--tilt,0deg) + 2.4deg)))}
+    75% {transform:rotate(calc(-1 * (var(--tilt,0deg) - 1.2deg)))}
+    100%{transform:rotate(calc(-1 * (var(--tilt,0deg) - 2.4deg)))}
   }
   /* and every so often something upstairs shifts */
   body.tekk .doors{animation:jolt 11s ease-in-out infinite}
@@ -927,26 +941,16 @@
     content:"";position:absolute;left:0;right:0;z-index:-1;
     top:calc(-1 * (var(--chain) + 60vh));height:calc(var(--chain) + 60vh);
     pointer-events:none;
-    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='17'%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23545C6B' stroke-width='1.7'/%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23222833' stroke-width='.6'/%3E%3C/svg%3E"), url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='17'%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23545C6B' stroke-width='1.7'/%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23222833' stroke-width='.6'/%3E%3C/svg%3E"),
-      linear-gradient(180deg, rgba(110,11,8,0), rgba(110,11,8,.55)),
-      linear-gradient(180deg, rgba(110,11,8,0), rgba(110,11,8,.4));
-    background-repeat:repeat-y, repeat-y, no-repeat, no-repeat;
-    background-position:22% top, 78% top, 22% bottom, 78% bottom;
-    background-size:12px 17px, 12px 17px, 3px 60%, 2px 40%;
+    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='17'%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23545C6B' stroke-width='1.7'/%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23222833' stroke-width='.6'/%3E%3C/svg%3E"),
+      linear-gradient(180deg, rgba(110,11,8,0), rgba(110,11,8,.5));
+    background-repeat:repeat-y, no-repeat;
+    background-position:50% top, 50% bottom;
+    background-size:12px 17px, 3px 42%;
     opacity:.85;
-    transform-origin:50% 0;
-    animation:chainSway 9.4s ease-in-out infinite;
   }
   body.tekk .door:nth-child(2)::before{animation-duration:11.8s;animation-delay:-3.1s}
   body.tekk .door:nth-child(3)::before{animation-duration:8.1s;animation-delay:-5.3s}
   /* the chain gives a little less than the plate on the end of it */
-  @keyframes chainSway{
-    0%   {transform:skewX(1.4deg)}
-    29%  {transform:skewX(-.8deg)}
-    43%  {transform:skewX(-1.6deg)}
-    71%  {transform:skewX(.5deg)}
-    100% {transform:skewX(1.4deg)}
-  }
   /* it has been running down these for a while */
   body.tekk .drip{
     display:block;position:absolute;left:-1px;right:-1px;bottom:-32px;height:38px;
@@ -988,12 +992,12 @@
     border-right:1px solid #2A3040;
     border-radius:3px;
     --tilt:-2deg;
-    transform-origin:50% calc(-1 * var(--chain,70px));
+    transform-origin:50% 0;
     animation:hang 10.6s ease-in-out infinite;
     overflow:visible;
     background:
-      radial-gradient(circle at 10px 10px, rgba(150,168,196,.18) 0 2px, rgba(0,0,0,0) 3px),
-      radial-gradient(circle at 10px calc(100% - 10px), rgba(150,168,196,.18) 0 2px, rgba(0,0,0,0) 3px),
+      radial-gradient(circle at 50% 6px, #7E8898 0 3px, rgba(0,0,0,0) 4px),
+      radial-gradient(circle at 50% 6px, rgba(0,0,0,0) 0 4.5px, rgba(120,132,150,.4) 5.5px, rgba(0,0,0,0) 6.5px),
       linear-gradient(120deg, rgba(160,180,220,.03), rgba(160,180,220,0) 60%), #090B12;
     border-color:#2A3040;
     box-shadow:-6px 0 26px rgba(0,0,0,.85), 0 0 26px rgba(140,10,10,.16);
@@ -1004,16 +1008,17 @@
     content:"";position:absolute;left:0;right:0;z-index:-1;
     top:calc(-1 * (var(--chain,70px) + 60vh));height:calc(var(--chain,70px) + 60vh);
     pointer-events:none;
-    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='17'%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23545C6B' stroke-width='1.7'/%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23222833' stroke-width='.6'/%3E%3C/svg%3E"), url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='17'%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23545C6B' stroke-width='1.7'/%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23222833' stroke-width='.6'/%3E%3C/svg%3E");
-    background-repeat:repeat-y, repeat-y;
-    background-position:26% top, 74% top;
-    background-size:12px 17px, 12px 17px;
+    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='17'%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23545C6B' stroke-width='1.7'/%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23222833' stroke-width='.6'/%3E%3C/svg%3E");
+    background-repeat:repeat-y;
+    background-position:50% top;
+    background-size:12px 17px;
     opacity:.8;
-    transform-origin:50% 0;
-    animation:chainSway 10.6s ease-in-out infinite;
+    transform-origin:50% 100%;
+    animation:hangChain 10.6s ease-in-out infinite;
   }
   body.tekk .wip-tag{background:#8E0F0F;color:#040203}
   /* the blacklist hangs lower and swings wider, like a sign outside a door */
+  body.tekk .blbar.dropping{z-index:1}
   body.tekk .blbar{
     display:flex;
     margin-top:104px;
@@ -1021,9 +1026,12 @@
     margin-right:0;
     width:min(100%,780px);
     --tilt:1.4deg;
-    transform-origin:50% calc(-1 * var(--chain,46px));
+    transform-origin:50% 0;
     animation:hang 12.4s ease-in-out infinite;
-    background:radial-gradient(140% 260% at 50% 130%, rgba(120,6,6,.34), rgba(120,6,6,0) 70%), #08070C;
+    background:
+      radial-gradient(circle at 50% 7px, #7E8898 0 3.5px, rgba(0,0,0,0) 4.5px),
+      radial-gradient(circle at 50% 7px, rgba(0,0,0,0) 0 5px, rgba(120,132,150,.45) 6px, rgba(0,0,0,0) 7px),
+      radial-gradient(140% 260% at 50% 130%, rgba(120,6,6,.34), rgba(120,6,6,0) 70%), #08070C;
     border-color:#3E1213;
     box-shadow:0 0 30px rgba(120,6,6,.35), inset 0 0 30px rgba(120,6,6,.14);
   }
@@ -1031,13 +1039,13 @@
     content:"";position:absolute;left:0;right:0;z-index:-1;
     top:calc(-1 * (var(--chain,46px) + 60vh));height:calc(var(--chain,46px) + 60vh);
     pointer-events:none;
-    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='17'%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23545C6B' stroke-width='1.7'/%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23222833' stroke-width='.6'/%3E%3C/svg%3E"), url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='17'%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23545C6B' stroke-width='1.7'/%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23222833' stroke-width='.6'/%3E%3C/svg%3E");
-    background-repeat:repeat-y, repeat-y;
-    background-position:14% top, 86% top;
-    background-size:12px 17px, 12px 17px;
+    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='17'%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23545C6B' stroke-width='1.7'/%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23222833' stroke-width='.6'/%3E%3C/svg%3E");
+    background-repeat:repeat-y;
+    background-position:50% top;
+    background-size:12px 17px;
     opacity:.8;
-    transform-origin:50% 0;
-    animation:chainSway 12.4s ease-in-out infinite;
+    transform-origin:50% 100%;
+    animation:hangChain 12.4s ease-in-out infinite;
   }
   body.tekk .blbar:hover{animation-play-state:paused;transform:rotate(0deg)}
   body.tekk .blbar .drip{
@@ -1178,6 +1186,33 @@
     100%{transform:rotate(-15deg)}
   }
   /* and back, with the overshoot a thing on a chain actually has */
+  body.tekk .swing-l::before{animation:chainL .5s cubic-bezier(.35,0,.25,1) forwards !important}
+  @keyframes chainL{
+    0%  {transform:rotate(calc(-1 * var(--tilt,0deg)))}
+    62% {transform:rotate(-19deg)}
+    100%{transform:rotate(-15deg)}
+  }
+  body.tekk .swing-r::before{animation:chainR .5s cubic-bezier(.35,0,.25,1) forwards !important}
+  @keyframes chainR{
+    0%  {transform:rotate(calc(-1 * var(--tilt,0deg)))}
+    62% {transform:rotate(19deg)}
+    100%{transform:rotate(15deg)}
+  }
+  body.tekk .unswing-l::before{animation:chainUnL .78s cubic-bezier(.3,.85,.3,1) forwards !important}
+  @keyframes chainUnL{
+    0%  {transform:rotate(-15deg)}
+    46% {transform:rotate(calc(-1 * (var(--tilt,0deg) - 5deg)))}
+    72% {transform:rotate(calc(-1 * (var(--tilt,0deg) + 2.2deg)))}
+    100%{transform:rotate(calc(-1 * var(--tilt,0deg)))}
+  }
+  body.tekk .unswing-r::before{animation:chainUnR .78s cubic-bezier(.3,.85,.3,1) forwards !important}
+  @keyframes chainUnR{
+    0%  {transform:rotate(15deg)}
+    46% {transform:rotate(calc(-1 * (var(--tilt,0deg) + 5deg)))}
+    72% {transform:rotate(calc(-1 * (var(--tilt,0deg) - 2.2deg)))}
+    100%{transform:rotate(calc(-1 * var(--tilt,0deg)))}
+  }
+
   .unswing-l{animation:unswingL .78s cubic-bezier(.3,.85,.3,1) forwards !important}
   @keyframes unswingL{
     0%  {transform:rotate(15deg)}
@@ -1203,8 +1238,12 @@
   }
   body.tekk .blbar.raising::before{animation:chainRaise .95s cubic-bezier(.35,.05,.25,1) forwards}
   @keyframes chainRaise{
-    0%  {height:calc(var(--chain,46px) + 60vh + 120vh)}
-    100%{height:calc(var(--chain,46px) + 60vh)}
+    0%  {top:calc(-1 * (var(--chain,46px) + 60vh + 120vh));
+         height:calc(var(--chain,46px) + 60vh + 120vh)}
+    82% {top:calc(-1 * (var(--chain,46px) + 60vh) + 10px);
+         height:calc(var(--chain,46px) + 60vh - 10px)}
+    100%{top:calc(-1 * (var(--chain,46px) + 60vh));
+         height:calc(var(--chain,46px) + 60vh)}
   }
   /* and one that simply keeps going down */
   /* a steady pace with a little slack at each end. nothing about this
@@ -1225,10 +1264,16 @@
     animation:chainDrop 1.9s cubic-bezier(.5,.02,.72,1) forwards;
   }
   @keyframes chainDrop{
-    0%  {height:calc(var(--chain,46px) + 60vh)}
-    7%  {height:calc(var(--chain,46px) + 60vh - 14px)}
-    46% {height:calc(var(--chain,46px) + 60vh + 38vh)}
-    100%{height:calc(var(--chain,46px) + 60vh + 120vh)}
+    0%  {top:calc(-1 * (var(--chain,46px) + 60vh));
+         height:calc(var(--chain,46px) + 60vh)}
+    7%  {top:calc(-1 * (var(--chain,46px) + 60vh) + 14px);
+         height:calc(var(--chain,46px) + 60vh - 14px)}
+    13% {top:calc(-1 * (var(--chain,46px) + 60vh) - 6px);
+         height:calc(var(--chain,46px) + 60vh + 6px)}
+    46% {top:calc(-1 * (var(--chain,46px) + 60vh + 38vh));
+         height:calc(var(--chain,46px) + 60vh + 38vh)}
+    100%{top:calc(-1 * (var(--chain,46px) + 60vh + 120vh));
+         height:calc(var(--chain,46px) + 60vh + 120vh)}
   }
   /* the room goes up past you. it never travels far enough to show the
      top of a chain, because every chain now runs well off the page. */
