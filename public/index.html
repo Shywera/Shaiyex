@@ -1221,20 +1221,109 @@
   #view.from-descend{transform:translateY(66vh)}
   #view iframe{display:block;width:100%;height:100%;border:0;background:var(--ink)}
   .view-x{
-    position:fixed;top:14px;left:14px;z-index:160;
-    display:flex;align-items:center;gap:8px;
-    font-family:var(--mono);font-size:10.5px;font-weight:700;
-    letter-spacing:.16em;text-transform:uppercase;
-    padding:9px 14px 10px;cursor:pointer;
-    color:var(--text);background:var(--panel);
-    border:1px solid var(--line-hot);border-radius:2px;
+    position:fixed;z-index:161;
+    display:flex;align-items:center;justify-content:center;
+    gap:14px;padding:0;border:0;cursor:pointer;
+    color:var(--gold);background:transparent;
+    transition:color .25s ease, opacity .25s ease;
+    -webkit-tap-highlight-color:transparent;
   }
-  .view-x:hover{border-color:var(--gold);color:var(--gold)}
-  body.tekk .view-x{
-    background:#0A0B12;border-color:#3E1213;color:#C8BEB4;
-    font-family:"Grenze Gotisch",serif;letter-spacing:.06em;font-size:14px;
+  .view-x:focus-visible{outline:2px solid var(--gold);outline-offset:-4px}
+
+  /* the strip itself: strongest at the edge, gone by the time it
+     reaches anything the page wanted to put there */
+  .view-x::before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    transition:opacity .25s ease;
+    opacity:.85;
   }
-  body.tekk .view-x:hover{border-color:#C21A12;color:#F0342A}
+  .view-x:hover::before{opacity:1}
+
+  .vb-arrow{
+    position:relative;width:clamp(30px,3.4vw,46px);height:clamp(30px,3.4vw,46px);
+    border-left:4px solid currentColor;
+    border-bottom:4px solid currentColor;
+    transition:transform .25s cubic-bezier(.2,.8,.25,1);
+  }
+  /* it leans toward the way out, so you can see it is a way out */
+  #view.back-left .vb-arrow{animation:vbL 2.4s ease-in-out infinite}
+  #view.back-right .vb-arrow{animation:vbR 2.4s ease-in-out infinite}
+  #view.back-bottom .vb-arrow{animation:vbB 2.4s ease-in-out infinite}
+  @keyframes vbL{
+    0%,100%{transform:rotate(45deg) translate(0,0)}
+    50%    {transform:rotate(45deg) translate(5px,-5px)}
+  }
+  @keyframes vbR{
+    0%,100%{transform:rotate(-135deg) translate(0,0)}
+    50%    {transform:rotate(-135deg) translate(5px,-5px)}
+  }
+  @keyframes vbB{
+    0%,100%{transform:rotate(135deg) translate(0,0)}
+    50%    {transform:rotate(135deg) translate(5px,-5px)}
+  }
+  .view-x:hover .vb-arrow{animation-play-state:paused}
+  .vb-word{
+    position:relative;
+    font-family:var(--mono);font-size:11px;font-weight:700;
+    letter-spacing:.24em;text-transform:uppercase;
+    opacity:.8;
+  }
+  .view-x:hover .vb-word{opacity:1}
+
+  /* down the left */
+  #view.back-left .view-x{
+    left:0;top:0;bottom:0;width:clamp(66px,7vw,108px);flex-direction:column;
+  }
+  #view.back-left .view-x::before{
+    background:linear-gradient(90deg, rgba(0,0,0,.30), rgba(0,0,0,0));
+  }
+  #view.back-left .vb-arrow{transform:rotate(45deg)}
+  #view.back-left .view-x:hover .vb-arrow{transform:rotate(45deg) translate(4px,-4px)}
+  #view.back-left .vb-word{writing-mode:vertical-rl;transform:rotate(180deg)}
+
+  /* down the right */
+  #view.back-right .view-x{
+    right:0;top:0;bottom:0;width:clamp(66px,7vw,108px);flex-direction:column;
+  }
+  #view.back-right .view-x::before{
+    background:linear-gradient(270deg, rgba(0,0,0,.30), rgba(0,0,0,0));
+  }
+  #view.back-right .vb-arrow{transform:rotate(-135deg)}
+  #view.back-right .view-x:hover .vb-arrow{transform:rotate(-135deg) translate(4px,-4px)}
+  #view.back-right .vb-word{writing-mode:vertical-rl}
+
+  /* along the bottom, for the one you climb out of */
+  #view.back-bottom .view-x{
+    left:0;right:0;bottom:0;height:clamp(54px,7vh,86px);flex-direction:row;
+  }
+  #view.back-bottom .view-x::before{
+    background:linear-gradient(0deg, rgba(0,0,0,.42), rgba(0,0,0,0));
+  }
+  #view.back-bottom .vb-arrow{transform:rotate(135deg)}
+  #view.back-bottom .view-x:hover .vb-arrow{transform:rotate(135deg) translate(4px,-4px)}
+
+  /* on the light side the edge is bright, not dark */
+  #view.back-left .view-x::before,
+  #view.back-right .view-x::before,
+  #view.back-bottom .view-x::before{
+    background-color:transparent;
+  }
+  body:not(.tekk) #view.back-left .view-x::before{
+    background:linear-gradient(90deg, rgba(255,252,242,.92), rgba(255,252,242,0));
+  }
+  body:not(.tekk) #view.back-right .view-x::before{
+    background:linear-gradient(270deg, rgba(255,252,242,.92), rgba(255,252,242,0));
+  }
+  body:not(.tekk) #view.back-bottom .view-x::before{
+    background:linear-gradient(0deg, rgba(255,252,242,.95), rgba(255,252,242,0));
+  }
+
+  body.tekk .view-x{color:#C21A12}
+  body.tekk .view-x:hover{color:#F0342A}
+  body.tekk .vb-word{font-family:"Grenze Gotisch",serif;letter-spacing:.1em;font-size:15px}
+  .view-x .alt{display:none}
+  body.tekk .view-x .std{display:none}
+  body.tekk .view-x .alt{display:inline}
 
   /* the descent gets its own light */
   .hellfx{
@@ -1457,9 +1546,9 @@
 
 <div class="hellfx" aria-hidden="true"></div>
 <div id="view" hidden>
-  <button class="view-x" id="viewX" type="button">
-    <span class="std">&larr; Back</span>
-    <span class="alt">&larr; Crawl back</span>
+  <button class="view-x" id="viewX" type="button" aria-label="Back">
+    <span class="vb-arrow" aria-hidden="true"></span>
+    <span class="vb-word"><span class="std">Back</span><span class="alt">Crawl back</span></span>
   </button>
   <iframe id="viewFrame" title="Shaiyex" src="about:blank"></iframe>
 </div>
@@ -1707,6 +1796,12 @@
   function clearFrom(){
     for (var i = 0; i < DIRS.length; i++) view.classList.remove('from-' + DIRS[i]);
   }
+  /* the way out is the edge you came in through */
+  var BACK = { left:'left', right:'right', lunge:'left', descend:'bottom' };
+  function markBack(how){
+    view.classList.remove('back-left', 'back-right', 'back-bottom');
+    view.classList.add('back-' + (BACK[how] || 'left'));
+  }
   /* some doors do something first, then leave in a direction */
   var PRE = {
     'swing-left': { cls: 'swing-l', wait: 470, dir: 'left'  },
@@ -1788,6 +1883,7 @@
     body.classList.add('travel', 'go-' + how);
     frame.src = url;
     clearFrom();
+    markBack(how);
     view.classList.add(fromClass(how));
     view.hidden = false;
     document.documentElement.style.overflow = 'hidden';

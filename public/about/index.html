@@ -242,7 +242,9 @@
   /* ---------- hero ---------- */
   .hero{
     position:relative;
-    margin:0 calc(-1 * clamp(18px,5vw,28px));
+    /* it is a child of body, not of the padded column, so pulling it
+       out sideways only pushed it past both edges of the window */
+    margin:0;
     padding:clamp(46px,10vw,86px) clamp(18px,5vw,28px) clamp(34px,6vw,52px);
     border-bottom:1px solid var(--line);
   }
