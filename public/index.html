@@ -1171,6 +1171,12 @@
     62% {transform:rotate(19deg)}
     100%{transform:rotate(15deg)}
   }
+  .swing-r{animation:swingR .5s cubic-bezier(.35,0,.25,1) forwards !important}
+  @keyframes swingR{
+    0%  {transform:rotate(var(--tilt,0deg))}
+    62% {transform:rotate(-19deg)}
+    100%{transform:rotate(-15deg)}
+  }
   /* and one that simply keeps going down */
   /* a steady pace with a little slack at each end. nothing about this
      should read as falling. */
@@ -1248,7 +1254,7 @@
   /* it leans toward the way out, so you can see it is a way out */
   #view.back-left .vb-arrow{animation:vbL 2.4s ease-in-out infinite}
   #view.back-right .vb-arrow{animation:vbR 2.4s ease-in-out infinite}
-  #view.back-bottom .vb-arrow{animation:vbB 2.4s ease-in-out infinite}
+  #view.back-top .vb-arrow{animation:vbB 2.4s ease-in-out infinite}
   @keyframes vbL{
     0%,100%{transform:rotate(45deg) translate(0,0)}
     50%    {transform:rotate(45deg) translate(5px,-5px)}
@@ -1292,20 +1298,20 @@
   #view.back-right .view-x:hover .vb-arrow{transform:rotate(-135deg) translate(4px,-4px)}
   #view.back-right .vb-word{writing-mode:vertical-rl}
 
-  /* along the bottom, for the one you climb out of */
-  #view.back-bottom .view-x{
-    left:0;right:0;bottom:0;height:clamp(54px,7vh,86px);flex-direction:row;
+  /* along the top, for the one you climb back out of */
+  #view.back-top .view-x{
+    left:0;right:0;top:0;height:clamp(54px,7vh,86px);flex-direction:row;
   }
-  #view.back-bottom .view-x::before{
-    background:linear-gradient(0deg, rgba(0,0,0,.42), rgba(0,0,0,0));
+  #view.back-top .view-x::before{
+    background:linear-gradient(180deg, rgba(0,0,0,.45), rgba(0,0,0,0));
   }
-  #view.back-bottom .vb-arrow{transform:rotate(135deg)}
-  #view.back-bottom .view-x:hover .vb-arrow{transform:rotate(135deg) translate(4px,-4px)}
+  #view.back-top .vb-arrow{transform:rotate(135deg)}
+  #view.back-top .view-x:hover .vb-arrow{transform:rotate(135deg) translate(4px,-4px)}
 
   /* on the light side the edge is bright, not dark */
   #view.back-left .view-x::before,
   #view.back-right .view-x::before,
-  #view.back-bottom .view-x::before{
+  #view.back-top .view-x::before{
     background-color:transparent;
   }
   body:not(.tekk) #view.back-left .view-x::before{
@@ -1314,8 +1320,8 @@
   body:not(.tekk) #view.back-right .view-x::before{
     background:linear-gradient(270deg, rgba(255,252,242,.92), rgba(255,252,242,0));
   }
-  body:not(.tekk) #view.back-bottom .view-x::before{
-    background:linear-gradient(0deg, rgba(255,252,242,.95), rgba(255,252,242,0));
+  body:not(.tekk) #view.back-top .view-x::before{
+    background:linear-gradient(180deg, rgba(255,252,242,.95), rgba(255,252,242,0));
   }
 
   body.tekk .view-x{color:#C21A12}
@@ -1512,7 +1518,7 @@
         <span class="door-go" data-t="Stop resisting →">Hear it →</span>
       </a>
 
-      <a class="door door-2" href="/kick/" data-go="swing-left" data-hush data-silent>
+      <a class="door door-2" href="/kick/" data-go="swing-right" data-hush data-silent>
         <span class="door-k" data-t="Not optional">Fancy a go</span>
         <span class="door-t" data-t="Think you can keep up?">Test your interrupt skills</span>
         <span class="door-d" data-t="One button. One cast bar. Miss it and you find out how quickly a group can be four people.">A cast bar appears, you press one key. See how many you catch. No score is sent anywhere.</span>
@@ -1797,15 +1803,16 @@
     for (var i = 0; i < DIRS.length; i++) view.classList.remove('from-' + DIRS[i]);
   }
   /* the way out is the edge you came in through */
-  var BACK = { left:'left', right:'right', lunge:'left', descend:'bottom' };
+  var BACK = { left:'right', right:'left', lunge:'left', descend:'top' };
   function markBack(how){
-    view.classList.remove('back-left', 'back-right', 'back-bottom');
-    view.classList.add('back-' + (BACK[how] || 'left'));
+    view.classList.remove('back-left', 'back-right', 'back-top');
+    view.classList.add('back-' + (BACK[how] || 'right'));
   }
   /* some doors do something first, then leave in a direction */
   var PRE = {
-    'swing-left': { cls: 'swing-l', wait: 470, dir: 'left'  },
-    'drop':       { cls: 'dropping', wait: 3120, dir: 'descend' }
+    'swing-left':  { cls: 'swing-l', wait: 470, dir: 'left'  },
+    'swing-right': { cls: 'swing-r', wait: 470, dir: 'right' },
+    'drop':        { cls: 'dropping', wait: 3120, dir: 'descend' }
   };
 
   var vOpen = false, moving = false, dir = 'left', pre = null;
@@ -1925,7 +1932,7 @@
       document.documentElement.style.overflow = '';
       body.classList.remove('winch');
       clearFrom();
-      if (pre){ pre.classList.remove('swing-l', 'dropping'); pre = null; }
+      if (pre){ pre.classList.remove('swing-l', 'swing-r', 'dropping'); pre = null; }
       silent = false;
       unhush();
       vOpen = false; moving = false;
