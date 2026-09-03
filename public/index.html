@@ -1019,19 +1019,72 @@
   body.tekk .door:nth-child(3)::before{animation-duration:8.1s;animation-delay:-5.3s}
   /* the chain gives a little less than the plate on the end of it */
   /* it has been running down these for a while */
+  /* what has run down the front of this plate, and is still running.
+     three gradients, no tile, no repeat, and a different arrangement on
+     every plate. */
   body.tekk .drip{
-    display:block;position:absolute;left:-1px;right:-1px;bottom:-32px;height:38px;
-    pointer-events:none;
-    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='38'%3E%3Cdefs%3E%3ClinearGradient id='b' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23631008'/%3E%3Cstop offset='1' stop-color='%233A0704'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg fill='url(%23b)'%3E%3Cpath d='M18 0 c5 0 7 3 7 7 l0 9 a3.5 3.5 0 1 1 -7 0 l0 -9 z'/%3E%3Cpath d='M64 0 c4 0 5 2 5 5 l0 18 a2.6 2.6 0 1 1 -5 0 l0 -18 z'/%3E%3Cpath d='M119 0 c6 0 8 3 8 8 l0 4 a4 4 0 1 1 -8 0 l0 -4 z'/%3E%3Cpath d='M168 0 c4 0 5 2 5 5 l0 24 a2.8 2.8 0 1 1 -5 0 l0 -24 z'/%3E%3Cpath d='M221 0 c5 0 6 2 6 6 l0 7 a3 3 0 1 1 -6 0 l0 -7 z'/%3E%3C/g%3E%3Crect width='260' height='4' fill='%234A0906' opacity='.85'/%3E%3C/svg%3E");
-    background-repeat:repeat-x;
-    background-position:var(--dx,0px) top;
-    background-size:260px 38px;
-    opacity:.6;
-    filter:drop-shadow(0 2px 3px rgba(0,0,0,.6));
+    /* it starts at the bottom edge of the plate and runs down from
+       there, not up into the words */
+    display:block;position:absolute;left:0;right:0;
+    top:calc(100% - 5px);bottom:auto;height:70px;
+    pointer-events:none;overflow:visible;
+    background:
+      /* the seep along the bottom edge it came from */
+      linear-gradient(180deg, rgba(94,14,8,.85), rgba(58,7,4,0) 62%)
+        no-repeat 0 0 / 100% 7px,
+      /* the long one */
+      linear-gradient(180deg, #6B1109 0%, #4A0A05 62%, rgba(58,7,4,0) 100%)
+        no-repeat var(--r1x,18%) 0 / var(--r1w,5px) var(--r1h,38px),
+      /* and two that gave up earlier */
+      linear-gradient(180deg, #5E0F08 0%, #3E0804 70%, rgba(58,7,4,0) 100%)
+        no-repeat var(--r2x,52%) 0 / var(--r2w,4px) var(--r2h,18px),
+      linear-gradient(180deg, #560D07 0%, #380703 74%, rgba(58,7,4,0) 100%)
+        no-repeat var(--r3x,79%) 0 / var(--r3w,3px) var(--r3h,11px);
+    opacity:.85;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.7));
   }
-  body.tekk .door:nth-child(1) .drip{--dx:-34px}
-  body.tekk .door:nth-child(2) .drip{--dx:-148px;opacity:.6}
-  body.tekk .door:nth-child(3) .drip{--dx:-212px;opacity:.75}
+  /* the bead on the end of the long one. it hangs, swells, and every
+     so often it goes. */
+  body.tekk .drip::after{
+    content:"";position:absolute;
+    left:var(--r1x,18%);top:calc(var(--r1h,38px) - 3px);
+    width:var(--r1w,5px);height:var(--r1w,5px);
+    margin-left:calc(var(--r1w,5px) / -2 + 1px);
+    border-radius:0 0 50% 50% / 0 0 60% 60%;
+    background:linear-gradient(180deg,#7A1309,#420904);
+    box-shadow:0 1px 3px rgba(0,0,0,.7);
+    transform-origin:50% 0;
+    animation:bead var(--bt,13s) cubic-bezier(.4,0,.85,1) var(--bd,0s) infinite;
+  }
+  @keyframes bead{
+    /* most of the time it is just sitting there getting heavier */
+    0%,58%  {transform:translateY(0) scaleY(.6) scaleX(.8); opacity:.9}
+    76%     {transform:translateY(2px) scaleY(1.25) scaleX(1); opacity:1}
+    84%     {transform:translateY(3px) scaleY(1.5) scaleX(.92); opacity:1}
+    92%     {transform:translateY(26px) scaleY(1.7) scaleX(.7); opacity:.55}
+    100%    {transform:translateY(52px) scaleY(1.8) scaleX(.55); opacity:0}
+  }
+
+  /* no two of them the same, and none of them lined up */
+  body.tekk .door:nth-child(1) .drip{
+    --r1x:23%; --r1w:6px; --r1h:44px;
+    --r2x:61%; --r2w:4px; --r2h:15px;
+    --r3x:9%;  --r3w:3px; --r3h:9px;
+    --bt:13s;  --bd:-2s;
+  }
+  body.tekk .door:nth-child(2) .drip{
+    --r1x:74%; --r1w:5px; --r1h:31px;
+    --r2x:38%; --r2w:4px; --r2h:20px;
+    --r3x:88%; --r3w:3px; --r3h:8px;
+    --bt:17s;  --bd:-9s;
+    opacity:.7;
+  }
+  body.tekk .door:nth-child(3) .drip{
+    --r1x:44%; --r1w:6px; --r1h:52px;
+    --r2x:17%; --r2w:3px; --r2h:12px;
+    --r3x:83%; --r3w:4px; --r3h:22px;
+    --bt:11s;  --bd:-5s;
+  }
   /* hovering does not lift an iron plate, it just catches the light */
   body.tekk .door:hover,
   body.tekk .door:focus-visible{
@@ -1091,6 +1144,13 @@
     transform:none;
   }
   body.tekk.boom:not(.travel):not(.winch) .wip{animation:plateHit .62s cubic-bezier(.4,0,.35,1) var(--hd,0s) both}
+  body.tekk .wip .drip{
+    --r1x:64%; --r1w:4px; --r1h:19px;
+    --r2x:28%; --r2w:3px; --r2h:9px;
+    --r3x:88%; --r3w:2px; --r3h:6px;
+    --bt:19s;  --bd:-14s;
+    opacity:.6;
+  }
   body.tekk .wip-tag{background:#8E0F0F;color:#040203}
   /* the blacklist hangs lower and swings wider, like a sign outside a door */
   body.tekk .blbar.dropping{z-index:1}
@@ -1130,14 +1190,11 @@
     box-shadow:0 0 40px rgba(194,26,18,.4), 0 16px 40px rgba(0,0,0,.8);
   }
   body.tekk .blbar .drip{
-    display:block;position:absolute;left:0;right:0;bottom:-32px;height:38px;
-    pointer-events:none;
-    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='38'%3E%3Cdefs%3E%3ClinearGradient id='b' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23631008'/%3E%3Cstop offset='1' stop-color='%233A0704'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg fill='url(%23b)'%3E%3Cpath d='M18 0 c5 0 7 3 7 7 l0 9 a3.5 3.5 0 1 1 -7 0 l0 -9 z'/%3E%3Cpath d='M64 0 c4 0 5 2 5 5 l0 18 a2.6 2.6 0 1 1 -5 0 l0 -18 z'/%3E%3Cpath d='M119 0 c6 0 8 3 8 8 l0 4 a4 4 0 1 1 -8 0 l0 -4 z'/%3E%3Cpath d='M168 0 c4 0 5 2 5 5 l0 24 a2.8 2.8 0 1 1 -5 0 l0 -24 z'/%3E%3Cpath d='M221 0 c5 0 6 2 6 6 l0 7 a3 3 0 1 1 -6 0 l0 -7 z'/%3E%3C/g%3E%3Crect width='260' height='4' fill='%234A0906' opacity='.85'/%3E%3C/svg%3E");
-    background-repeat:repeat-x;
-    background-position:-96px top;
-    background-size:260px 38px;
-    opacity:.55;
-    filter:drop-shadow(0 2px 3px rgba(0,0,0,.6));
+    --r1x:31%; --r1w:6px; --r1h:47px;
+    --r2x:66%; --r2w:4px; --r2h:17px;
+    --r3x:12%; --r3w:3px; --r3h:10px;
+    --bt:15s;  --bd:-11s;
+    opacity:.7;
   }
   body.tekk .blbar{overflow:visible}
   body.tekk .bl-t{color:#C9B7B3;text-shadow:0 0 18px rgba(180,14,14,.7)}
@@ -1662,6 +1719,7 @@
         <span class="wip-s" data-t="Prove it in time">Rhythm mode</span>
       </span>
       <span class="wip-tag">WIP</span>
+      <span class="drip" aria-hidden="true"></span>
     </a>
 
     <a class="blbar" href="/deplete/" data-go="drop" data-hush>
