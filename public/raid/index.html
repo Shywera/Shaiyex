@@ -210,6 +210,45 @@
   }
   .boss-m{display:block;margin-top:6px;font-size:12.5px;color:var(--dim);line-height:1.5}
 
+  .roles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:700px;margin-bottom:14px}
+  .role{
+    font:inherit;cursor:pointer;text-align:left;
+    border:1px solid var(--line);border-top:2px solid var(--c);border-radius:2px;
+    background:var(--panel);color:var(--text);padding:10px 12px 12px;
+    transition:background .2s ease, border-color .2s ease, transform .2s ease;
+  }
+  .role:hover{background:var(--panel-2);transform:translateY(-2px)}
+  .role.on{background:var(--panel-2);border-color:var(--c)}
+  .role b{display:block;font-family:var(--display);font-size:23px;letter-spacing:.03em;color:var(--c)}
+  .role span{display:block;margin-top:4px;font-size:12.5px;line-height:1.5;color:var(--dim)}
+  .role i{
+    display:block;margin-top:7px;font-style:normal;
+    font-family:var(--mono);font-size:9px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--dimmer);
+  }
+
+  /* the party, for the two roles that have one */
+  .party{display:flex;flex-direction:column;gap:4px}
+  .mate{display:grid;grid-template-columns:52px 1fr;gap:7px;align-items:center}
+  .mate-n{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;color:var(--dimmer)}
+  .mate-b{height:7px;background:#0A0710;border:1px solid var(--line);border-radius:2px;overflow:hidden}
+  .mate-b i{display:block;height:100%;background:linear-gradient(90deg,#2FD8C3,#7FE8AC);transition:width .12s linear}
+  .mate.down .mate-n{color:var(--bad)}
+  .mate.down .mate-b i{background:#5A1E20}
+
+  .meter{height:8px;background:#0A0710;border:1px solid var(--line-hot);border-radius:2px;overflow:hidden}
+  .meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),#FFF0C0);transition:width .15s linear}
+  .meter-n{display:flex;justify-content:space-between;margin-top:5px;font-family:var(--mono);font-size:10px;color:var(--dim)}
+  .cdrow{display:flex;gap:6px;margin-top:8px}
+  .cd{
+    flex:1 1 0;text-align:center;border:1px solid var(--line);border-radius:2px;
+    background:#0A0710;padding:5px 4px 6px;
+    font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dimmer);
+  }
+  .cd b{display:block;font-family:var(--display);font-size:17px;letter-spacing:.03em;color:var(--gold)}
+  .cd.ready b{color:var(--good)}
+  .cd.ready{border-color:var(--line-hot)}
+
   .diffs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-width:460px;margin-bottom:18px}
   .diff{
     font:inherit;cursor:pointer;text-align:left;
@@ -306,18 +345,18 @@
         <div class="hp"><i id="hpFill"></i></div>
         <div class="hpn"><span id="hpNum">100 / 100</span><span id="hpDeaths">wipes 0</span></div>
       </div>
+
+      <div class="panel" id="rolePanel">
+        <h3 id="roleH">Uptime</h3>
+        <div id="roleBody"></div>
+      </div>
       <div class="panel" style="flex:1 1 auto;display:flex;flex-direction:column;min-height:0">
         <h3>Coming up</h3>
         <div class="tl" id="tl"></div>
       </div>
       <div class="panel">
         <h3>Keys</h3>
-        <div class="keys">
-          <b>W A S D</b> or arrows to move<br>
-          <b>Shift</b> to dash, 3s<br>
-          <b>Space</b> to pause<br>
-          <b>R</b> to pull again
-        </div>
+        <div class="keys" id="keyList"></div>
       </div>
     </aside>
   </div>
@@ -330,7 +369,25 @@
   <div class="over-in">
     <p class="ov-k">The Venomous Abyss &middot; training</p>
     <p class="ov-t">Learn It Here</p>
-    <p class="ov-s">Every boss below is a real encounter from the current tier. What you are dodging are the shapes: <b>swirls, cones, donuts, soaks, beams, expanding rings, fixates.</b> Learn to read those and a first pull stops being a surprise. Nothing here costs anyone a lockout.</p>
+    <p class="ov-s">Every boss below is a real encounter from the current tier. What you are dodging are the shapes: <b>swirls, cones, donuts, soaks, beams, expanding rings, fixates.</b> Learn to read those and a first pull stops being a surprise. Nothing here costs anyone a lockout. Pick the job you actually do: they are scored on different things.</p>
+
+    <div class="roles">
+      <button class="role on" id="rDps" type="button" style="--c:var(--rose)">
+        <b>Damage</b>
+        <span>You only do damage while you are near it. Every step you did not have to take is a bit of the kill.</span>
+        <i>Watch the uptime</i>
+      </button>
+      <button class="role" id="rTank" type="button" style="--c:var(--gold)">
+        <b>Tank</b>
+        <span>It follows you and points everything at you. Where you stand is where the group does not get hit.</span>
+        <i>E to mitigate a buster</i>
+      </button>
+      <button class="role" id="rHeal" type="button" style="--c:var(--jade)">
+        <b>Healer</b>
+        <span>Four other people, dodging about as well as pugs do. Keep them up while you dodge it yourself.</span>
+        <i>1 heals lowest &middot; 2 heals all</i>
+      </button>
+    </div>
 
     <div class="diffs">
       <button class="diff on" id="dNorm" type="button" style="--c:var(--jade)">
@@ -608,14 +665,32 @@
   var arena = document.getElementById('arena');
 
   var W = 0, H = 0, DPR = 1;
-  var boss = BOSSES[0], diff = 'normal';
+  var boss = BOSSES[0], diff = 'normal', role = 'dps';
+
+  var ROLES = {
+    dps:    { label: 'Damage', c: 'var(--rose)' },
+    tank:   { label: 'Tank',   c: 'var(--gold)' },
+    healer: { label: 'Healer', c: 'var(--jade)' }
+  };
+
+  /* the four other people, for the roles that have to care about them */
+  var MATE_NAMES = ['Brumak', 'Nyxelle', 'Kordak', 'Mirelle'];
+  var mates = [];
+
+  /* what each role is actually being scored on */
+  var upTime = 0, upTotal = 0;     /* dps  */
+  var holdLost = 0;                /* tank */
+  var mitigated = 0, busted = 0;   /* tank */
+  var healed = 0, dropped = 0;     /* healer */
+  var bossHp = 1;
   var state = 'idle';             /* idle | play | paused | over */
   var t = 0, last = 0, raf = 0;
   var player, bossPos, casts, live, hits, deaths = 0, killedBy = '';
+  var cdHeal = 0, cdGroup = 0, cdMit = 0, mitOn = 0;
   var best = {};
 
   try { best = JSON.parse(localStorage.getItem('raid.best') || '{}') || {}; } catch(e){ best = {}; }
-  function bestKey(){ return boss.id + '|' + diff; }
+  function bestKey(){ return boss.id + '|' + diff + '|' + role; }
   function saveBest(sec){
     var k = bestKey();
     if (!best[k] || sec > best[k]){ best[k] = sec; }
@@ -645,6 +720,11 @@
       return;
     }
     if (k === 'r' && (state === 'play' || state === 'over')){ e.preventDefault(); pull(); return; }
+    if (state === 'play'){
+      if (k === '1'){ e.preventDefault(); healLowest(); return; }
+      if (k === '2'){ e.preventDefault(); healGroup(); return; }
+      if (k === 'e'){ e.preventDefault(); mitigate(); return; }
+    }
     if (k === 'escape' && state === 'play'){ pause(); return; }
     if (['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright','shift'].indexOf(k) > -1){
       e.preventDefault();
@@ -658,6 +738,60 @@
   window.addEventListener('blur', function(){ keys = {}; if (state === 'play') pause(); });
 
   /* ==================================================================
+     the other four
+     They dodge about as well as a pug does, which is the point: on
+     healer they are why you are busy, and on tank they are what you are
+     standing between the boss and.
+     ================================================================== */
+  function spawnMates(){
+    mates = [];
+    if (role === 'dps') return;
+    for (var i = 0; i < 4; i++){
+      var a = (i / 4) * Math.PI * 2 + 0.5;
+      mates.push({
+        n: MATE_NAMES[i],
+        x: W * 0.5 + Math.cos(a) * 110,
+        y: H * 0.7 + Math.sin(a) * 70,
+        hp: 100, max: 100,
+        /* how often they actually get out of it */
+        skill: 0.52 + Math.random() * 0.3,
+        wob: Math.random() * 6.28
+      });
+    }
+  }
+
+  function stepMates(dt){
+    for (var i = 0; i < mates.length; i++){
+      var m = mates[i];
+      if (m.hp <= 0) continue;
+      m.wob += dt * (0.5 + i * 0.13);
+      /* they drift around behind the boss, roughly where a group stands */
+      var hx = W * 0.5 + Math.cos(m.wob) * (90 + i * 26);
+      var hy = H * 0.72 + Math.sin(m.wob * 0.8) * 46;
+      m.x += (hx - m.x) * Math.min(1, dt * 1.1);
+      m.y += (hy - m.y) * Math.min(1, dt * 1.1);
+    }
+  }
+
+  /* a shape going off hits whoever is standing in it and did not move */
+  function hitMates(test, dmg, name){
+    for (var i = 0; i < mates.length; i++){
+      var m = mates[i];
+      if (m.hp <= 0) continue;
+      if (!test(m.x, m.y)) continue;
+      if (Math.random() < m.skill) continue;      /* they got out of it */
+      m.hp -= dmg;
+      if (m.hp <= 0){ m.hp = 0; dropped++; }
+    }
+  }
+
+  function aliveMates(){
+    var n = 0;
+    for (var i = 0; i < mates.length; i++) if (mates[i].hp > 0) n++;
+    return n;
+  }
+
+  /* ==================================================================
      a pull
      ================================================================== */
   function pull(){
@@ -669,12 +803,23 @@
       dash: 0, dashCd: 0, ix: 0, iy: -1, iframe: 0
     };
     bossPos = { x: W * 0.5, y: H * 0.34, r: 30 };
+    upTime = 0; upTotal = 0; holdLost = 0; mitigated = 0; busted = 0;
+    healed = 0; dropped = 0; bossHp = 1;
+    cdHeal = 0; cdGroup = 0; cdMit = 0; mitOn = 0;
+    spawnMates();
     casts = boss.script.map(function(c){
       var o = {}; for (var k in c) o[k] = c[k];
       o.done = false;
       o.at = c.at;
       return o;
     });
+    if (role === 'tank'){
+      for (var bt = 14; bt < boss.len; bt += 19){
+        casts.push({ at: bt, type: 'buster', name: 'Crushing Coil',
+                     hint: 'press E', warn: 2.6, done: false });
+      }
+      casts.sort(function(a, b){ return a.at - b.at; });
+    }
     live = [];
     state = 'play';
     hide('gate'); hide('result'); hide('pause');
@@ -709,10 +854,23 @@
     document.getElementById('rt').textContent = won ? boss.short + ' Dies' : (killedBy || 'Killed');
     var rows = [
       ['Survived', fmt(sec) + (won ? '' : ' of ' + fmt(boss.len)), won ? 'good' : ''],
-      ['Hits taken', String(hits), hits ? 'bad' : 'good'],
-      ['Difficulty', DIFF[diff].label, ''],
-      ['Best on this one', best[bestKey()] ? fmt(best[bestKey()]) : '-', '']
+      ['Hits taken', String(hits), hits ? 'bad' : 'good']
     ];
+    if (role === 'dps'){
+      var up = upTotal > 0 ? Math.round(upTime / upTotal * 100) : 0;
+      rows.push(['Uptime', up + '%', up >= 80 ? 'good' : (up < 60 ? 'bad' : '')]);
+    }
+    if (role === 'tank'){
+      rows.push(['Busters mitigated', mitigated + ' of ' + (mitigated + busted),
+                 busted ? 'bad' : 'good']);
+      rows.push(['Group still up', aliveMates() + ' of 4', aliveMates() < 4 ? 'bad' : 'good']);
+    }
+    if (role === 'healer'){
+      rows.push(['Group still up', aliveMates() + ' of 4', aliveMates() < 4 ? 'bad' : 'good']);
+      rows.push(['Casts', String(healed), '']);
+    }
+    rows.push(['Role', ROLES[role].label + ' \u00b7 ' + DIFF[diff].label, '']);
+    rows.push(['Best on this one', best[bestKey()] ? fmt(best[bestKey()]) : '-', '']);
     document.getElementById('rrows').innerHTML = rows.map(function(r){
       return '<div class="row-l ' + r[2] + '"><span>' + r[0] + '</span><b>' + r[1] + '</b></div>';
     }).join('');
@@ -743,11 +901,26 @@
     var d = DIFF[diff];
     t += dt;
 
-    /* the boss walks a slow figure so frontals are not always the same */
-    bossPos.x = W * 0.5 + Math.sin(t * 0.32) * Math.min(150, W * 0.16);
-    bossPos.y = H * 0.34 + Math.cos(t * 0.21) * Math.min(60, H * 0.08);
+    if (role === 'tank'){
+      /* it comes to you. where you put it is the whole job. */
+      var tdx = player.x - bossPos.x, tdy = player.y - bossPos.y;
+      var td = Math.hypot(tdx, tdy) || 1;
+      if (td > 74){
+        var ts = Math.min(96, 40 + td * 0.5);
+        bossPos.x += (tdx / td) * ts * dt;
+        bossPos.y += (tdy / td) * ts * dt;
+      }
+    } else {
+      /* the boss walks a slow figure so frontals are not always the same */
+      bossPos.x = W * 0.5 + Math.sin(t * 0.32) * Math.min(150, W * 0.16);
+      bossPos.y = H * 0.34 + Math.cos(t * 0.21) * Math.min(60, H * 0.08);
+    }
+    bossPos.x = Math.max(60, Math.min(W - 60, bossPos.x));
+    bossPos.y = Math.max(60, Math.min(H - 60, bossPos.y));
 
     movePlayer(dt);
+    stepMates(dt);
+    roleStep(dt);
 
     /* start anything that is due */
     for (var i = 0; i < casts.length; i++){
@@ -771,8 +944,92 @@
     if (player.dashCd > 0) player.dashCd -= dt;
 
     if (player.hp <= 0){ finish(false); return; }
-    if (t >= boss.len){ finish(true); return; }
+    if (mates.length && aliveMates() <= 2){
+      killedBy = 'The group died';
+      finish(false); return;
+    }
+    if (bossHp <= 0){ finish(true); return; }
+    if (t >= boss.len * 1.25){
+      killedBy = 'Enrage';
+      finish(false); return;
+    }
     paintHud();
+  }
+
+  var DPS_RANGE = 300;
+
+  function roleStep(dt){
+    var d = DIFF[diff];
+    /* how fast the boss dies. on tank and healer the group is doing the
+       damage, so it is steady and the job is to still be there at the
+       end. on damage it is yours, and only counts while you are on it. */
+    var rate = 1 / boss.len;
+    if (role === 'dps'){
+      var near = Math.hypot(player.x - bossPos.x, player.y - bossPos.y) < DPS_RANGE;
+      upTotal += dt;
+      if (near) upTime += dt;
+      rate *= near ? 1.42 : 0;
+    } else {
+      rate *= 0.9 * (aliveMates() / 4 * 0.5 + 0.5);
+    }
+    bossHp -= rate * dt;
+    if (bossHp < 0) bossHp = 0;
+
+    if (cdHeal > 0) cdHeal -= dt;
+    if (cdGroup > 0) cdGroup -= dt;
+    if (cdMit > 0) cdMit -= dt;
+    if (mitOn > 0) mitOn -= dt;
+
+    if (role === 'tank'){
+      /* let it go and it walks off to eat the group */
+      var far = Math.hypot(player.x - bossPos.x, player.y - bossPos.y) > 210;
+      if (far){
+        holdLost += dt;
+        if (holdLost > 3){
+          holdLost = 0;
+          for (var i = 0; i < mates.length; i++){
+            if (mates[i].hp > 0){ mates[i].hp -= 22 * d.dmg; if (mates[i].hp <= 0){ mates[i].hp = 0; dropped++; } }
+          }
+          killedBy = 'Lost threat';
+        }
+      } else if (holdLost > 0){
+        holdLost = Math.max(0, holdLost - dt * 2);
+      }
+    }
+  }
+
+  /* the healer's two buttons */
+  function healLowest(){
+    if (cdHeal > 0 || role !== 'healer') return;
+    var low = null;
+    for (var i = 0; i < mates.length; i++){
+      var m = mates[i];
+      if (m.hp <= 0) continue;
+      if (!low || m.hp < low.hp) low = m;
+    }
+    /* if the group is fine, it lands on you */
+    if (!low || (player.hp < player.max * 0.7 && (!low || low.hp > 70))){
+      player.hp = Math.min(player.max, player.hp + 30);
+    } else {
+      low.hp = Math.min(low.max, low.hp + 38);
+    }
+    healed++;
+    cdHeal = 2.1;
+  }
+  function healGroup(){
+    if (cdGroup > 0 || role !== 'healer') return;
+    for (var i = 0; i < mates.length; i++){
+      var m = mates[i];
+      if (m.hp > 0) m.hp = Math.min(m.max, m.hp + 22);
+    }
+    player.hp = Math.min(player.max, player.hp + 14);
+    healed++;
+    cdGroup = 11;
+  }
+  function mitigate(){
+    if (cdMit > 0 || role !== 'tank') return;
+    mitOn = 4;
+    cdMit = 12;
   }
 
   function movePlayer(dt){
@@ -804,7 +1061,8 @@
   function hurt(amount, name){
     if (GOD) return;
     if (player.iframe > 0) return;
-    player.hp -= amount * DIFF[diff].dmg;
+    var mult = DIFF[diff].dmg * (mitOn > 0 ? 0.4 : 1);
+    player.hp -= amount * mult;
     hits++;
     killedBy = name;
     player.iframe = 0.55;
@@ -836,6 +1094,12 @@
           for (var k = 0; k < m.pts.length; k++){
             if (inside(m.pts[k].x, m.pts[k].y, m.r)) { hurt(24, m.name); break; }
           }
+          hitMates(function(x, y){
+            for (var k2 = 0; k2 < m.pts.length; k2++){
+              if (Math.hypot(x - m.pts[k2].x, y - m.pts[k2].y) < m.r) return true;
+            }
+            return false;
+          }, 26, m.name);
         }
       });
     }
@@ -854,6 +1118,16 @@
           while (a > Math.PI) a -= Math.PI * 2;
           while (a < -Math.PI) a += Math.PI * 2;
           if (Math.abs(a) < m.deg / 2) hurt(28, m.name);
+          /* and this is the one the tank is being judged on: point it
+             away from them or they eat it */
+          hitMates(function(x, y){
+            var ddx = x - bossPos.x, ddy = y - bossPos.y;
+            if (Math.hypot(ddx, ddy) > m.len) return false;
+            var aa = Math.atan2(ddy, ddx) - m.ang;
+            while (aa > Math.PI) aa -= Math.PI * 2;
+            while (aa < -Math.PI) aa += Math.PI * 2;
+            return Math.abs(aa) < m.deg / 2;
+          }, 34, m.name);
         }
       });
     }
@@ -890,10 +1164,26 @@
         kind: 'soak', name: c.name, hint: c.hint, pts: sp, r: c.r,
         age: 0, warn: warn, life: warn + 0.5, fired: false,
         fire: function(m){
+          var ok = false;
           for (var k = 0; k < m.pts.length; k++){
-            if (inside(m.pts[k].x, m.pts[k].y, m.r)) return;   /* one is enough */
+            if (inside(m.pts[k].x, m.pts[k].y, m.r)) ok = true;   /* one is enough */
           }
-          hurt(22, m.name);
+          if (!ok) hurt(22, m.name);
+          /* an unsoaked circle goes out on the whole group */
+          for (var s2 = 0; s2 < m.pts.length; s2++){
+            var taken = ok && inside(m.pts[s2].x, m.pts[s2].y, m.r);
+            for (var q = 0; q < mates.length && !taken; q++){
+              if (mates[q].hp > 0 && Math.hypot(mates[q].x - m.pts[s2].x, mates[q].y - m.pts[s2].y) < m.r) taken = true;
+            }
+            if (!taken){
+              for (var q2 = 0; q2 < mates.length; q2++){
+                if (mates[q2].hp > 0){
+                  mates[q2].hp -= 13 * DIFF[diff].dmg;
+                  if (mates[q2].hp <= 0){ mates[q2].hp = 0; dropped++; }
+                }
+              }
+            }
+          }
         }
       });
     }
@@ -934,6 +1224,17 @@
             m.hit = true;
             hurt(26, m.name);
           }
+        }
+      });
+    }
+
+    else if (c.type === 'buster'){
+      live.push({
+        kind: 'buster', name: c.name, hint: c.hint,
+        age: 0, warn: warn, life: warn + 0.5, fired: false,
+        fire: function(m){
+          if (mitOn > 0){ mitigated++; hurt(16, m.name); }
+          else { busted++; hurt(52, m.name); }
         }
       });
     }
@@ -982,6 +1283,49 @@
 
     for (var i = 0; i < live.length; i++) drawShape(live[i]);
 
+    /* how far out you can be and still be doing anything */
+    if (role === 'dps' && state === 'play'){
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(bossPos.x, bossPos.y, DPS_RANGE, 0, Math.PI * 2);
+      ctx.setLineDash([6, 10]);
+      ctx.lineWidth = 1.5;
+      var near = Math.hypot(player.x - bossPos.x, player.y - bossPos.y) < DPS_RANGE;
+      ctx.strokeStyle = near ? 'rgba(255,63,164,.30)' : 'rgba(255,63,164,.65)';
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    /* the other four */
+    for (var mi = 0; mi < mates.length; mi++){
+      var mt = mates[mi];
+      ctx.save();
+      if (mt.hp <= 0){
+        ctx.globalAlpha = .35;
+        ctx.strokeStyle = '#5A1E20';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(mt.x - 7, mt.y - 7); ctx.lineTo(mt.x + 7, mt.y + 7);
+        ctx.moveTo(mt.x + 7, mt.y - 7); ctx.lineTo(mt.x - 7, mt.y + 7);
+        ctx.stroke();
+      } else {
+        var frac = mt.hp / mt.max;
+        ctx.fillStyle = frac > .5 ? '#5EC8E8' : (frac > .25 ? '#E8C468' : '#FF4B4B');
+        ctx.beginPath();
+        ctx.arc(mt.x, mt.y, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(10,7,16,.8)';
+        ctx.stroke();
+        /* a sliver of health over their head, like a nameplate */
+        ctx.fillStyle = 'rgba(10,7,16,.9)';
+        ctx.fillRect(mt.x - 11, mt.y - 17, 22, 3);
+        ctx.fillStyle = frac > .5 ? '#7FE8AC' : (frac > .25 ? '#E8C468' : '#FF4B4B');
+        ctx.fillRect(mt.x - 11, mt.y - 17, 22 * frac, 3);
+      }
+      ctx.restore();
+    }
+
     /* the boss */
     ctx.save();
     ctx.shadowColor = boss.c; ctx.shadowBlur = 22;
@@ -992,6 +1336,19 @@
     ctx.arc(bossPos.x, bossPos.y, bossPos.r, 0, Math.PI * 2);
     ctx.fill(); ctx.stroke();
     ctx.restore();
+
+    if (role === 'tank' && state === 'play'){
+      var hd = Math.hypot(player.x - bossPos.x, player.y - bossPos.y);
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(bossPos.x, bossPos.y);
+      ctx.lineTo(player.x, player.y);
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 6]);
+      ctx.strokeStyle = hd > 210 ? 'rgba(255,75,75,.8)' : 'rgba(232,196,104,.35)';
+      ctx.stroke();
+      ctx.restore();
+    }
 
     /* you */
     var flick = player.iframe > 0 && Math.floor(player.iframe * 20) % 2 === 0;
@@ -1130,6 +1487,24 @@
       }
     }
 
+    else if (m.kind === 'buster'){
+      /* it is on you, and the only answer is the button */
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(player.x, player.y, 30 + 16 * (1 - k), 0, Math.PI * 2);
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = mitOn > 0 ? 'rgba(127,232,172,.9)' : 'rgba(255,75,75,' + (0.35 + 0.6 * k) + ')';
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(bossPos.x, bossPos.y);
+      ctx.lineTo(player.x, player.y);
+      ctx.lineWidth = 2;
+      ctx.setLineDash([7, 7]);
+      ctx.strokeStyle = 'rgba(255,75,75,.55)';
+      ctx.stroke();
+      ctx.restore();
+    }
+
     else if (m.kind === 'fixate'){
       ctx.save();
       if (m.age < m.warn){
@@ -1171,6 +1546,64 @@
   var elCastF = document.getElementById('castF');
   var elTl = document.getElementById('tl');
 
+  var elRoleH = document.getElementById('roleH');
+  var elRoleB = document.getElementById('roleBody');
+
+  function cdBox(label, left, total){
+    var ready = left <= 0;
+    return '<div class="cd' + (ready ? ' ready' : '') + '"><b>' +
+           (ready ? 'up' : left.toFixed(1)) + '</b>' + label + '</div>';
+  }
+
+  function paintRole(){
+    if (role === 'dps'){
+      elRoleH.textContent = 'Uptime';
+      var pct = upTotal > 0 ? (upTime / upTotal) : 1;
+      elRoleB.innerHTML =
+        '<div class="meter"><i style="width:' + (pct * 100).toFixed(1) + '%"></i></div>' +
+        '<div class="meter-n"><span>' + Math.round(pct * 100) + '% on target</span>' +
+        '<span>' + (Math.hypot(player.x - bossPos.x, player.y - bossPos.y) < DPS_RANGE ? 'in range' : 'out of range') + '</span></div>';
+      return;
+    }
+    if (role === 'tank'){
+      elRoleH.textContent = 'Threat and cooldown';
+      var hd = Math.hypot(player.x - bossPos.x, player.y - bossPos.y);
+      var slip = Math.min(1, holdLost / 3);
+      elRoleB.innerHTML =
+        '<div class="meter"><i style="width:' + ((1 - slip) * 100).toFixed(0) + '%;background:' +
+          (hd > 210 ? 'linear-gradient(90deg,#8E2B2E,#FF4B4B)' : 'linear-gradient(90deg,#E8C468,#FFF0C0)') +
+        '"></i></div>' +
+        '<div class="meter-n"><span>' + (hd > 210 ? 'it is walking off' : 'holding it') + '</span>' +
+        '<span>' + Math.round(hd) + 'px</span></div>' +
+        '<div class="cdrow">' + cdBox('E mitigate', cdMit) +
+        '<div class="cd' + (mitOn > 0 ? ' ready' : '') + '"><b>' + (mitOn > 0 ? 'on' : '-') + '</b>active</div></div>' +
+        paintParty();
+      return;
+    }
+    elRoleH.textContent = 'The group';
+    elRoleB.innerHTML = paintParty() +
+      '<div class="cdrow">' + cdBox('1 heal', cdHeal) + cdBox('2 group', cdGroup) + '</div>';
+  }
+
+  function paintParty(){
+    if (!mates.length) return '';
+    return '<div class="party">' + mates.map(function(m){
+      var f = Math.max(0, m.hp / m.max);
+      return '<div class="mate' + (m.hp <= 0 ? ' down' : '') + '">' +
+             '<span class="mate-n">' + m.n + '</span>' +
+             '<span class="mate-b"><i style="width:' + (f * 100).toFixed(0) + '%"></i></span></div>';
+    }).join('') + '</div>';
+  }
+
+  function paintKeys(){
+    var rows = ['<b>W A S D</b> or arrows to move', '<b>Shift</b> to dash, 3s'];
+    if (role === 'tank') rows.push('<b>E</b> to mitigate a buster');
+    if (role === 'healer'){ rows.push('<b>1</b> heal the lowest'); rows.push('<b>2</b> heal everyone'); }
+    rows.push('<b>Space</b> to pause');
+    rows.push('<b>R</b> to pull again');
+    document.getElementById('keyList').innerHTML = rows.join('<br>');
+  }
+
   function paintHud(){
     elTime.textContent = fmt(t);
     elHits.textContent = String(hits);
@@ -1180,9 +1613,9 @@
     elHpN.textContent = Math.ceil(player.hp) + ' / ' + player.max;
     elHpD.textContent = 'wipes ' + deaths;
 
-    var bp = Math.max(0, 1 - t / boss.len);
-    elBB.style.width = (bp * 100).toFixed(1) + '%';
-    elBP.textContent = Math.ceil(bp * 100) + '%';
+    elBB.style.width = (bossHp * 100).toFixed(1) + '%';
+    elBP.textContent = Math.ceil(bossHp * 100) + '%';
+    paintRole();
 
     /* the cast bar shows whatever is closest to going off */
     var soonest = null;
@@ -1252,8 +1685,22 @@
   function paintTitles(){
     document.getElementById('bossName').textContent = boss.name;
     document.getElementById('bbName').textContent = boss.short;
-    document.getElementById('diffTag').textContent = DIFF[diff].label;
+    document.getElementById('diffTag').textContent = ROLES[role].label + ' \u00b7 ' + DIFF[diff].label;
   }
+
+  var roleBtns = { dps: document.getElementById('rDps'),
+                   tank: document.getElementById('rTank'),
+                   healer: document.getElementById('rHeal') };
+  function setRole(r){
+    role = r;
+    for (var k in roleBtns) roleBtns[k].classList.toggle('on', k === r);
+    paintList();
+    paintKeys();
+    paintTitles();
+  }
+  roleBtns.dps.addEventListener('click', function(){ setRole('dps'); });
+  roleBtns.tank.addEventListener('click', function(){ setRole('tank'); });
+  roleBtns.healer.addEventListener('click', function(){ setRole('healer'); });
 
   var dN = document.getElementById('dNorm'), dH = document.getElementById('dHeroic');
   dN.addEventListener('click', function(){ diff = 'normal'; dN.classList.add('on'); dH.classList.remove('on'); paintList(); paintTitles(); });
@@ -1277,6 +1724,7 @@
      ================================================================== */
   size();
   paintList();
+  paintKeys();
   paintTitles();
   player = { x: W/2, y: H/2, r: 11, hp: 100, max: 100, dash: 0, dashCd: 0, iframe: 0 };
   bossPos = { x: W/2, y: H*0.34, r: 30 };
@@ -1292,7 +1740,15 @@
     step: function(dt){ if (state === 'play') step(dt); },
     seen: function(){ return seen.slice(); },
     clearSeen: function(){ seen = []; },
-    setDiff: function(d){ diff = d; },
+    setDiff: function(d){ diff = d; paintTitles(); },
+    setRole: function(r){ setRole(r); },
+    mates: function(){ return mates.map(function(m){ return Math.round(m.hp); }); },
+    bossHp: function(){ return bossHp; },
+    press: function(k){
+      if (k === '1') healLowest();
+      if (k === '2') healGroup();
+      if (k === 'e') mitigate();
+    },
     god: function(v){ GOD = !!v; },
     move: function(dx, dy){ player.x += dx; player.y += dy; },
     pos: function(){ return { x: player.x, y: player.y, bx: bossPos.x, by: bossPos.y }; },
