@@ -1123,6 +1123,19 @@
     --bt:19s;  --bd:-14s;
     opacity:.6;
   }
+  /* the second one hangs under the first, further out and leaning the
+     other way, so they do not read as a pair of buttons */
+  body.tekk .wip-b{
+    margin:74px auto 0 14%;
+    --tilt:.7deg;
+    --hd:.13s;
+    --hdir:1;
+  }
+  body.tekk .wip-b .wip-tag{background:#2FD8C3;color:#04120F}
+  body.tekk .wip-b .wip-s{color:#7FE8AC}
+  body.tekk .wip-b:hover{border-color:#2FD8C3;box-shadow:0 0 34px rgba(47,216,195,.3), 0 16px 40px rgba(0,0,0,.8)}
+  body.tekk .wip-b:hover .wip-s{color:#A8F0E6}
+
   body.tekk .wip-tag{background:#8E0F0F;color:#040203}
   /* the blacklist hangs lower and swings wider, like a sign outside a door */
   body.tekk .blbar.dropping{z-index:1}
@@ -1691,6 +1704,15 @@
         <span class="wip-s" data-t="Prove it in time">Rhythm mode</span>
       </span>
       <span class="wip-tag">WIP</span>
+      <span class="drip" aria-hidden="true"></span>
+    </a>
+
+    <a class="wip wip-b" href="/raid/" data-go="swing-left" data-hush>
+      <span>
+        <span class="wip-t" data-t="Learn the abyss">Learn the abyss</span>
+        <span class="wip-s" data-t="Before it learns you">Raid trainer</span>
+      </span>
+      <span class="wip-tag">NEW</span>
       <span class="drip" aria-hidden="true"></span>
     </a>
 

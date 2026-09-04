@@ -1,0 +1,1310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Learn the mechanics of The Venomous Abyss without wasting anyone's evening.">
+<meta name="theme-color" content="#0A0710">
+<title>Abyss Training</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+
+<style>
+  :root{
+    --ink:#0A0710;
+    --panel:#150F22;
+    --panel-2:#1C1430;
+    --line:#2E2140;
+    --line-hot:#4E3A6B;
+    --text:#F3ECDC;
+    --dim:#B4A68F;
+    --dimmer:#7C6E5E;
+
+    --gold:#E8C468;
+    --jade:#2FD8C3;
+    --violet:#A96CFF;
+    --rose:#FF3FA4;
+    --bad:#FF4B4B;
+    --good:#7FE8AC;
+
+    --display:"Bebas Neue","Arial Narrow",sans-serif;
+    --body:"Archivo","Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:"JetBrains Mono",Consolas,ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--ink);color:var(--text);
+    font-family:var(--body);-webkit-font-smoothing:antialiased;
+    overflow:hidden;touch-action:manipulation;
+  }
+
+  /* ---------- the room it is played in ---------- */
+  .lights{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(60% 48% at 16% 0%,  rgba(169,108,255,.20), rgba(169,108,255,0) 62%),
+      radial-gradient(56% 44% at 86% 6%,  rgba(47,216,195,.13),  rgba(47,216,195,0) 62%),
+      radial-gradient(84% 60% at 50% 104%, rgba(232,196,104,.10), rgba(232,196,104,0) 64%);
+  }
+  .scan{
+    position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.16;
+    background:repeating-linear-gradient(180deg, rgba(255,255,255,.07) 0 1px, rgba(0,0,0,0) 1px 3px);
+  }
+
+  .stage{
+    position:relative;z-index:1;
+    height:100%;display:flex;flex-direction:column;
+    padding:14px clamp(12px,2.5vw,26px) 16px;
+    gap:12px;
+  }
+
+  /* ---------- top bar ---------- */
+  .top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex:0 0 auto}
+  .brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .brand-t{
+    font-family:var(--display);font-size:clamp(26px,3.4vw,40px);
+    line-height:1;letter-spacing:.02em;color:var(--gold);
+  }
+  .brand-s{
+    font-family:var(--mono);font-size:10px;font-weight:600;
+    letter-spacing:.2em;text-transform:uppercase;color:var(--dimmer);
+  }
+  #diffTag{
+    font-family:var(--mono);font-size:9.5px;font-weight:700;
+    letter-spacing:.16em;text-transform:uppercase;
+    padding:3px 8px 4px;border:1px solid var(--line-hot);border-radius:2px;
+    color:var(--violet);
+  }
+  .stats{display:flex;gap:10px}
+  .stat{
+    min-width:86px;text-align:right;
+    border:1px solid var(--line);border-top:2px solid var(--c,var(--gold));
+    border-radius:2px;padding:5px 10px 7px;background:var(--panel);
+  }
+  .stat b{
+    display:block;font-family:var(--display);font-size:24px;line-height:1;
+    letter-spacing:.02em;color:var(--text);font-variant-numeric:tabular-nums;
+  }
+  .stat span{
+    display:block;margin-top:2px;font-family:var(--mono);font-size:8.5px;
+    font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--dimmer);
+  }
+
+  /* ---------- the fight ---------- */
+  .field{
+    flex:1 1 auto;min-height:0;
+    display:grid;grid-template-columns:1fr clamp(190px,20vw,250px);gap:12px;
+  }
+  @media (max-width:820px){ .field{grid-template-columns:1fr} .side{display:none} }
+
+  .arena{
+    position:relative;min-height:0;
+    border:1px solid var(--line);border-radius:3px;
+    background:
+      radial-gradient(70% 70% at 50% 45%, rgba(169,108,255,.07), rgba(169,108,255,0) 70%),
+      var(--panel);
+    overflow:hidden;
+  }
+  #cv{display:block;width:100%;height:100%}
+
+  /* the boss frame, over the arena */
+  .bossbar{
+    position:absolute;left:50%;top:10px;transform:translateX(-50%);
+    width:min(560px,86%);pointer-events:none;
+  }
+  .bb-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+  .bb-n{font-family:var(--display);font-size:19px;letter-spacing:.03em;color:var(--text)}
+  .bb-p{font-family:var(--mono);font-size:11px;color:var(--dim);font-variant-numeric:tabular-nums}
+  .bb-t{height:9px;background:#0A0710;border:1px solid var(--line-hot);border-radius:2px;overflow:hidden}
+  .bb-f{height:100%;width:100%;background:linear-gradient(90deg,#8E2B2E,#FF4B4B);transition:width .12s linear}
+
+  /* the cast bar, the thing you are meant to be reading */
+  .castwrap{
+    position:absolute;left:50%;bottom:14px;transform:translateX(-50%);
+    width:min(520px,88%);pointer-events:none;
+  }
+  .cast{
+    margin-top:6px;border:1px solid var(--line-hot);border-radius:2px;
+    background:rgba(10,7,16,.86);padding:6px 8px 7px;
+    opacity:0;transition:opacity .12s ease;
+  }
+  .cast.on{opacity:1}
+  .cast-r{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .cast-n{font-family:var(--body);font-weight:700;font-size:14px;color:var(--text)}
+  .cast-h{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--gold)}
+  .cast-t{margin-top:5px;height:6px;background:#0A0710;border:1px solid var(--line);border-radius:2px;overflow:hidden}
+  .cast-f{height:100%;width:0;background:linear-gradient(90deg,var(--gold),#FFF0C0)}
+
+  /* ---------- what is coming ---------- */
+  .side{
+    display:flex;flex-direction:column;gap:10px;min-height:0;
+  }
+  .panel{
+    border:1px solid var(--line);border-radius:3px;background:var(--panel);
+    padding:10px 11px 12px;min-height:0;
+  }
+  .panel h3{
+    margin:0 0 8px;font-family:var(--mono);font-size:9px;font-weight:700;
+    letter-spacing:.2em;text-transform:uppercase;color:var(--dimmer);
+  }
+  .tl{display:flex;flex-direction:column;gap:5px;overflow:hidden;flex:1 1 auto}
+  .tl-r{
+    display:grid;grid-template-columns:38px 1fr;gap:8px;align-items:baseline;
+    font-family:var(--mono);font-size:11px;color:var(--dim);
+    padding:4px 6px;border-left:2px solid var(--c,var(--line-hot));
+    background:rgba(255,255,255,.02);border-radius:0 2px 2px 0;
+  }
+  .tl-r.now{color:var(--text);background:rgba(232,196,104,.10)}
+  .tl-t{color:var(--dimmer);font-variant-numeric:tabular-nums}
+  .hp{height:8px;background:#0A0710;border:1px solid var(--line-hot);border-radius:2px;overflow:hidden}
+  .hp i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#2FD8C3,#7FE8AC);transition:width .1s linear}
+  .hpn{
+    display:flex;justify-content:space-between;margin-top:5px;
+    font-family:var(--mono);font-size:10px;color:var(--dim);
+  }
+  .keys{
+    font-family:var(--mono);font-size:10px;line-height:1.9;color:var(--dimmer);
+  }
+  .keys b{color:var(--gold);font-weight:600}
+
+  /* ---------- overlays ---------- */
+  .over{
+    position:fixed;inset:0;z-index:80;
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;background:rgba(10,7,16,.93);
+    transition:opacity .3s ease;
+  }
+  /* transparent is not the same as gone: a faded overlay is still in
+     the page for anything that reads it */
+  .over.gone{opacity:0;pointer-events:none;visibility:hidden;transition:opacity .3s ease, visibility 0s linear .3s}
+  .over-in{width:min(920px,100%);max-height:100%;overflow:auto}
+  .ov-k{
+    margin:0;font-family:var(--mono);font-size:10px;font-weight:700;
+    letter-spacing:.24em;text-transform:uppercase;color:var(--jade);
+  }
+  .ov-t{
+    margin:.1em 0 .3em;font-family:var(--display);
+    font-size:clamp(40px,8vw,84px);line-height:.9;letter-spacing:.02em;color:var(--gold);
+  }
+  .ov-s{margin:0 0 20px;max-width:64ch;color:var(--dim);font-size:15px;line-height:1.65}
+  .ov-s b{color:var(--text)}
+
+  .bosses{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-bottom:16px}
+  .boss{
+    text-align:left;font:inherit;cursor:pointer;
+    border:1px solid var(--line);border-left:3px solid var(--c,var(--violet));
+    border-radius:2px;background:var(--panel);color:var(--text);
+    padding:10px 12px 11px;
+    transition:border-color .2s ease, background .2s ease, transform .2s ease;
+  }
+  .boss:hover{background:var(--panel-2);transform:translateY(-2px)}
+  .boss.on{border-color:var(--gold);background:var(--panel-2)}
+  .boss-n{display:block;font-family:var(--display);font-size:19px;letter-spacing:.02em;line-height:1.1}
+  .boss-d{
+    display:block;margin-top:3px;font-family:var(--mono);font-size:9.5px;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--dimmer);
+  }
+  .boss-m{display:block;margin-top:6px;font-size:12.5px;color:var(--dim);line-height:1.5}
+
+  .diffs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-width:460px;margin-bottom:18px}
+  .diff{
+    font:inherit;cursor:pointer;text-align:left;
+    border:1px solid var(--line);border-top:2px solid var(--c);border-radius:2px;
+    background:var(--panel);color:var(--text);padding:9px 11px 10px;
+  }
+  .diff.on{background:var(--panel-2);border-color:var(--c)}
+  .diff b{display:block;font-family:var(--display);font-size:20px;letter-spacing:.03em;color:var(--c)}
+  .diff span{
+    display:block;margin-top:2px;font-family:var(--mono);font-size:9.5px;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--dimmer);
+  }
+
+  .btn{
+    font:inherit;cursor:pointer;
+    font-family:var(--mono);font-size:11px;font-weight:700;
+    letter-spacing:.16em;text-transform:uppercase;
+    padding:12px 22px 13px;color:#0A0710;background:var(--gold);
+    border:1px solid #FFE39A;border-radius:2px;
+  }
+  .btn:hover{background:#F5D689}
+  .btn.alt{background:transparent;color:var(--dim);border-color:var(--line-hot)}
+  .btn.alt:hover{color:var(--text);border-color:var(--gold)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+  .rows{
+    display:grid;gap:6px;margin:0 0 18px;max-width:520px;
+  }
+  .row-l{
+    display:flex;justify-content:space-between;gap:16px;
+    padding:7px 10px;border:1px solid var(--line);border-radius:2px;background:var(--panel);
+    font-family:var(--mono);font-size:12px;color:var(--dim);
+  }
+  .row-l b{font-family:var(--display);font-size:18px;color:var(--text);letter-spacing:.02em}
+  .row-l.bad b{color:var(--bad)}
+  .row-l.good b{color:var(--good)}
+
+  .backlink{
+    position:fixed;bottom:12px;left:14px;z-index:70;
+    font-family:var(--mono);font-size:10px;font-weight:600;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--dimmer);
+    background:rgba(21,15,34,.9);border:1px solid var(--line);
+    border-radius:2px;padding:6px 11px 7px;text-decoration:none;
+  }
+  .backlink:hover{color:var(--gold);border-color:var(--line-hot)}
+
+  .note{
+    margin-top:16px;padding-top:12px;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:10.5px;line-height:1.9;color:var(--dimmer);max-width:70ch;
+  }
+  .note b{color:var(--dim)}
+</style>
+</head>
+<body>
+
+<div class="lights" aria-hidden="true"></div>
+<div class="scan" aria-hidden="true"></div>
+
+<div class="stage">
+
+  <div class="top">
+    <div class="brand">
+      <span class="brand-t" id="bossName">Nek'zali the Soulcoiler</span>
+      <span class="brand-s" id="bossSub">The Venomous Abyss</span>
+      <span id="diffTag">Normal</span>
+    </div>
+    <div class="stats">
+      <div class="stat" style="--c:var(--jade)"><b id="sTime">0:00</b><span>Alive</span></div>
+      <div class="stat" style="--c:var(--rose)"><b id="sHits">0</b><span>Hits taken</span></div>
+      <div class="stat" style="--c:var(--gold)"><b id="sBest">-</b><span>Best</span></div>
+    </div>
+  </div>
+
+  <div class="field">
+    <div class="arena" id="arena">
+      <canvas id="cv"></canvas>
+
+      <div class="bossbar">
+        <div class="bb-row"><span class="bb-n" id="bbName">Nek'zali</span><span class="bb-p" id="bbPct">100%</span></div>
+        <div class="bb-t"><i class="bb-f" id="bbFill"></i></div>
+      </div>
+
+      <div class="castwrap">
+        <div class="cast" id="cast">
+          <div class="cast-r"><span class="cast-n" id="castN">Coil Slam</span><span class="cast-h" id="castH">move out</span></div>
+          <div class="cast-t"><i class="cast-f" id="castF"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div class="panel">
+        <h3>Your health</h3>
+        <div class="hp"><i id="hpFill"></i></div>
+        <div class="hpn"><span id="hpNum">100 / 100</span><span id="hpDeaths">wipes 0</span></div>
+      </div>
+      <div class="panel" style="flex:1 1 auto;display:flex;flex-direction:column;min-height:0">
+        <h3>Coming up</h3>
+        <div class="tl" id="tl"></div>
+      </div>
+      <div class="panel">
+        <h3>Keys</h3>
+        <div class="keys">
+          <b>W A S D</b> or arrows to move<br>
+          <b>Shift</b> to dash, 3s<br>
+          <b>Space</b> to pause<br>
+          <b>R</b> to pull again
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<a class="backlink" href="/">&larr; shaiyex.com</a>
+
+<!-- ---------- the pull screen ---------- -->
+<div class="over" id="gate">
+  <div class="over-in">
+    <p class="ov-k">The Venomous Abyss &middot; training</p>
+    <p class="ov-t">Learn It Here</p>
+    <p class="ov-s">Every boss below is a real encounter from the current tier. What you are dodging are the shapes: <b>swirls, cones, donuts, soaks, beams, expanding rings, fixates.</b> Learn to read those and a first pull stops being a surprise. Nothing here costs anyone a lockout.</p>
+
+    <div class="diffs">
+      <button class="diff on" id="dNorm" type="button" style="--c:var(--jade)">
+        <b>Normal</b><span>Fair windows &middot; one thing at a time</span>
+      </button>
+      <button class="diff" id="dHeroic" type="button" style="--c:var(--rose)">
+        <b>Heroic</b><span>Tighter, and they overlap</span>
+      </button>
+    </div>
+
+    <div class="bosses" id="bossList"></div>
+
+    <div class="row">
+      <button class="btn" id="pull" type="button">Pull</button>
+      <button class="btn alt" id="howBtn" type="button">What the shapes mean</button>
+    </div>
+
+    <div class="note" id="note">
+      <b>On the mechanics:</b> the timings and shapes here are the standard raid archetypes, not a
+      frame by frame copy of each encounter. Tell me what a boss actually does and it goes in the
+      script, which is one line per cast.
+    </div>
+  </div>
+</div>
+
+<!-- ---------- the legend ---------- -->
+<div class="over gone" id="how">
+  <div class="over-in">
+    <p class="ov-k">Reading the floor</p>
+    <p class="ov-t">The Shapes</p>
+    <div class="rows" id="howRows" style="max-width:720px"></div>
+    <button class="btn" id="howBack" type="button">Got it</button>
+  </div>
+</div>
+
+<!-- ---------- the result ---------- -->
+<div class="over gone" id="result">
+  <div class="over-in">
+    <p class="ov-k" id="rk">Wiped</p>
+    <p class="ov-t" id="rt">Killed By</p>
+    <div class="rows" id="rrows"></div>
+    <p class="ov-s" id="rline"></p>
+    <div class="row">
+      <button class="btn" id="again" type="button">Pull again</button>
+      <button class="btn alt" id="home" type="button">Pick another boss</button>
+    </div>
+  </div>
+</div>
+
+<!-- ---------- paused ---------- -->
+<div class="over gone" id="pause">
+  <div class="over-in" style="text-align:center">
+    <p class="ov-k">Held</p>
+    <p class="ov-t">Paused</p>
+    <div class="row" style="justify-content:center">
+      <button class="btn" id="resume" type="button">Back in</button>
+      <button class="btn alt" id="quit" type="button">Leave the pull</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ==================================================================
+     THE SHAPES
+     Every mechanic in a raid is one of a handful of shapes with a
+     timer on it. The whole game is those shapes, so a boss script is
+     just a list of which shape happens when.
+     ================================================================== */
+  var SHAPES = [
+    ['swirl',  'Swirl',        'A circle on the floor. Be somewhere else when it fills.'],
+    ['cone',   'Frontal',      'A wedge pointed where somebody is standing. Go round the side.'],
+    ['donut',  'Donut',        'Safe close to the boss, dead at range. Run in.'],
+    ['melee',  'Melee blast',  'The opposite. Everything near the boss dies. Run out.'],
+    ['soak',   'Soak',         'Circles that have to be stood in. Miss one and it hurts.'],
+    ['beam',   'Sweep',        'A beam that turns. Move with it, not against it.'],
+    ['wave',   'Ring',         'An expanding ring. Outrun it or slip inside it.'],
+    ['fixate', 'Fixate',       'It follows you and only you. Keep walking, do not turn into it.']
+  ];
+
+  /* ==================================================================
+     THE BOSSES
+     A script is a flat list of casts: { at, type, name, hint, ... }.
+     `rep(from, gap, until, make)` writes the repeats so a phase is one
+     line rather than twenty.
+     ================================================================== */
+  function rep(from, gap, until, make){
+    var out = [];
+    for (var t = from; t <= until; t += gap) out.push(make(t));
+    return out;
+  }
+  function cast(at, type, name, hint, o){
+    var c = { at: at, type: type, name: name, hint: hint };
+    for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) c[k] = o[k];
+    return c;
+  }
+
+  var BOSSES = [
+    {
+      id: 'nek', name: "Nek'zali the Soulcoiler", short: "Nek'zali",
+      c: '#7FE8AC', len: 70,
+      teach: 'Swirls and a frontal. The first boss is where you learn to keep moving.',
+      script: []
+        .concat(rep(5, 9, 66, function(t){
+          return cast(t, 'swirl', 'Venom Spit', 'move out of the pools',
+                      { n: 4, r: 62, warn: 1.7 });
+        }))
+        .concat(rep(9.5, 13, 66, function(t){
+          return cast(t, 'cone', 'Coil Slam', 'go round the side',
+                      { deg: 66, warn: 2.1, len: 460 });
+        }))
+        .concat(rep(20, 20, 66, function(t){
+          return cast(t, 'wave', 'Soul Pulse', 'outrun it',
+                      { warn: 1.9, speed: 210, band: 42 });
+        }))
+    },
+    {
+      id: 'sent', name: 'Entombed Sentinels', short: 'Sentinels',
+      c: '#E8C468', len: 78,
+      teach: 'Two statues that wake in turn. Donuts and a melee blast, so you are in and out all fight.',
+      script: []
+        .concat(rep(6, 12, 74, function(t){
+          return cast(t, 'donut', 'Grave Ward', 'get close to it',
+                      { warn: 2.2, r: 150 });
+        }))
+        .concat(rep(12, 12, 74, function(t){
+          return cast(t, 'melee', 'Stone Fist', 'get away from it',
+                      { warn: 2.0, r: 175 });
+        }))
+        .concat(rep(9, 11, 74, function(t){
+          return cast(t, 'swirl', 'Falling Masonry', 'watch the floor',
+                      { n: 5, r: 56, warn: 1.6 });
+        }))
+    },
+    {
+      id: 'expl', name: 'The Lost Explorers', short: 'Explorers',
+      c: '#2FD8C3', len: 82,
+      teach: 'Three of them, all doing something different. Soaks, and something that follows you.',
+      script: []
+        .concat(rep(7, 14, 78, function(t){
+          return cast(t, 'soak', 'Signal Flare', 'stand in one',
+                      { n: 3, r: 74, warn: 2.6 });
+        }))
+        .concat(rep(11, 16, 78, function(t){
+          return cast(t, 'fixate', "Trapper's Mark", 'keep walking',
+                      { warn: 1.4, life: 8, speed: 118 });
+        }))
+        .concat(rep(5, 10, 78, function(t){
+          return cast(t, 'swirl', 'Blasting Charge', 'off the circles',
+                      { n: 4, r: 58, warn: 1.5 });
+        }))
+    },
+    {
+      id: 'vash', name: 'Vashnik the Malignant', short: 'Vashnik',
+      c: '#A96CFF', len: 86,
+      teach: 'A beam that sweeps the room while everything else carries on.',
+      script: []
+        .concat(rep(8, 18, 82, function(t){
+          return cast(t, 'beam', 'Withering Gaze', 'move with it',
+                      { warn: 2.2, dur: 6.5, arc: 200, w: 46 });
+        }))
+        .concat(rep(6, 11, 82, function(t){
+          return cast(t, 'swirl', 'Blight Spatter', 'off the circles',
+                      { n: 5, r: 58, warn: 1.5 });
+        }))
+        .concat(rep(14, 17, 82, function(t){
+          return cast(t, 'cone', 'Rotting Breath', 'round the side',
+                      { deg: 78, warn: 1.9, len: 480 });
+        }))
+    },
+    {
+      id: 'sszo', name: 'Sszorak', short: 'Sszorak',
+      c: '#FF3FA4', len: 90,
+      teach: 'Rings out from the middle with swirls landing between them. Read both.',
+      script: []
+        .concat(rep(6, 12, 86, function(t){
+          return cast(t, 'wave', 'Abyssal Wave', 'outrun it',
+                      { warn: 1.8, speed: 230, band: 46 });
+        }))
+        .concat(rep(10, 12, 86, function(t){
+          return cast(t, 'swirl', 'Venom Rain', 'watch the floor',
+                      { n: 6, r: 54, warn: 1.4 });
+        }))
+        .concat(rep(16, 22, 86, function(t){
+          return cast(t, 'donut', 'Constrict', 'get close',
+                      { warn: 2.1, r: 140 });
+        }))
+    },
+    {
+      id: 'twin', name: 'The Twin Fangs', short: 'Twin Fangs',
+      c: '#FF4B4B', len: 92,
+      teach: 'Two frontals from two directions, and soaks you cannot take with one person.',
+      script: []
+        .concat(rep(7, 10, 88, function(t){
+          return cast(t, 'cone', 'Left Fang', 'round the side',
+                      { deg: 60, warn: 1.8, len: 500 });
+        }))
+        .concat(rep(11.5, 10, 88, function(t){
+          return cast(t, 'cone', 'Right Fang', 'and the other one',
+                      { deg: 60, warn: 1.8, len: 500 });
+        }))
+        .concat(rep(15, 16, 88, function(t){
+          return cast(t, 'soak', 'Envenom', 'stand in one',
+                      { n: 2, r: 70, warn: 2.4 });
+        }))
+        .concat(rep(9, 13, 88, function(t){
+          return cast(t, 'swirl', 'Spitting Coil', 'off the circles',
+                      { n: 5, r: 56, warn: 1.4 });
+        }))
+    },
+    {
+      id: 'altar', name: 'The Coiled Altar', short: 'Coiled Altar',
+      c: '#E8C468', len: 96,
+      teach: 'The room itself. A sweep, a donut and rings, all on top of each other.',
+      script: []
+        .concat(rep(8, 15, 92, function(t){
+          return cast(t, 'beam', 'Altar Sweep', 'move with it',
+                      { warn: 2.0, dur: 7, arc: 260, w: 50 });
+        }))
+        .concat(rep(6, 13, 92, function(t){
+          return cast(t, 'donut', 'Coiling Dark', 'get close',
+                      { warn: 2.0, r: 145 });
+        }))
+        .concat(rep(12, 14, 92, function(t){
+          return cast(t, 'wave', 'Offering', 'outrun it',
+                      { warn: 1.7, speed: 240, band: 44 });
+        }))
+        .concat(rep(10, 9, 92, function(t){
+          return cast(t, 'swirl', 'Ritual Fire', 'watch the floor',
+                      { n: 5, r: 52, warn: 1.3 });
+        }))
+    },
+    {
+      id: 'ulat', name: "Ula'tek", short: "Ula'tek",
+      c: '#FF3FA4', len: 105,
+      teach: 'Everything the tier has taught you, at once. This is the one you are wiping to.',
+      script: []
+        .concat(rep(7, 16, 100, function(t){
+          return cast(t, 'beam', 'Gaze of the Abyss', 'move with it',
+                      { warn: 1.9, dur: 7.5, arc: 300, w: 48 });
+        }))
+        .concat(rep(6, 11, 100, function(t){
+          return cast(t, 'wave', 'Abyssal Roar', 'outrun it',
+                      { warn: 1.6, speed: 250, band: 48 });
+        }))
+        .concat(rep(11, 15, 100, function(t){
+          return cast(t, 'fixate', 'Hunger', 'keep walking',
+                      { warn: 1.2, life: 9, speed: 132 });
+        }))
+        .concat(rep(9, 8, 100, function(t){
+          return cast(t, 'swirl', 'Venom Storm', 'watch the floor',
+                      { n: 6, r: 52, warn: 1.3 });
+        }))
+        .concat(rep(18, 19, 100, function(t){
+          return cast(t, 'soak', 'Rite of the Coil', 'stand in one',
+                      { n: 3, r: 68, warn: 2.3 });
+        }))
+    }
+  ];
+  BOSSES.forEach(function(b){ b.script.sort(function(x, y){ return x.at - y.at; }); });
+
+  /* heroic squeezes the windows and lets things land together */
+  var DIFF = {
+    normal: { warn: 1,    dmg: 1,   speed: 1,    label: 'Normal' },
+    heroic: { warn: 0.72, dmg: 1.5, speed: 1.18, label: 'Heroic' }
+  };
+
+  /* ==================================================================
+     state
+     ================================================================== */
+  var cv = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+  var arena = document.getElementById('arena');
+
+  var W = 0, H = 0, DPR = 1;
+  var boss = BOSSES[0], diff = 'normal';
+  var state = 'idle';             /* idle | play | paused | over */
+  var t = 0, last = 0, raf = 0;
+  var player, bossPos, casts, live, hits, deaths = 0, killedBy = '';
+  var best = {};
+
+  try { best = JSON.parse(localStorage.getItem('raid.best') || '{}') || {}; } catch(e){ best = {}; }
+  function bestKey(){ return boss.id + '|' + diff; }
+  function saveBest(sec){
+    var k = bestKey();
+    if (!best[k] || sec > best[k]){ best[k] = sec; }
+    try { localStorage.setItem('raid.best', JSON.stringify(best)); } catch(e){}
+  }
+
+  function size(){
+    var r = arena.getBoundingClientRect();
+    DPR = Math.min(2, window.devicePixelRatio || 1);
+    W = Math.max(320, r.width);
+    H = Math.max(240, r.height);
+    cv.width = Math.round(W * DPR);
+    cv.height = Math.round(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  window.addEventListener('resize', function(){ size(); });
+
+  /* ==================================================================
+     input
+     ================================================================== */
+  var keys = {};
+  window.addEventListener('keydown', function(e){
+    var k = (e.key || '').toLowerCase();
+    if (k === ' ' || k === 'spacebar'){
+      e.preventDefault();
+      if (state === 'play') pause(); else if (state === 'paused') resume();
+      return;
+    }
+    if (k === 'r' && (state === 'play' || state === 'over')){ e.preventDefault(); pull(); return; }
+    if (k === 'escape' && state === 'play'){ pause(); return; }
+    if (['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright','shift'].indexOf(k) > -1){
+      e.preventDefault();
+      keys[k] = true;
+    }
+  });
+  window.addEventListener('keyup', function(e){
+    var k = (e.key || '').toLowerCase();
+    keys[k] = false;
+  });
+  window.addEventListener('blur', function(){ keys = {}; if (state === 'play') pause(); });
+
+  /* ==================================================================
+     a pull
+     ================================================================== */
+  function pull(){
+    size();
+    t = 0; hits = 0; killedBy = '';
+    player = {
+      x: W * 0.5, y: H * 0.68, r: 11,
+      hp: 100, max: 100,
+      dash: 0, dashCd: 0, ix: 0, iy: -1, iframe: 0
+    };
+    bossPos = { x: W * 0.5, y: H * 0.34, r: 30 };
+    casts = boss.script.map(function(c){
+      var o = {}; for (var k in c) o[k] = c[k];
+      o.done = false;
+      o.at = c.at;
+      return o;
+    });
+    live = [];
+    state = 'play';
+    hide('gate'); hide('result'); hide('pause');
+    paintHud();
+    last = performance.now();
+    if (!raf) raf = requestAnimationFrame(loop);
+  }
+
+  function pause(){
+    if (state !== 'play') return;
+    state = 'paused';
+    show('pause');
+  }
+  function resume(){
+    if (state !== 'paused') return;
+    state = 'play';
+    hide('pause');
+    last = performance.now();
+  }
+  function toMenu(){
+    state = 'idle';
+    hide('result'); hide('pause');
+    show('gate');
+  }
+
+  function finish(won){
+    if (state === 'over') return;
+    state = 'over';
+    var sec = t;
+    if (won) saveBest(boss.len); else { deaths++; saveBest(sec); }
+    document.getElementById('rk').textContent = won ? 'Down' : 'Wiped';
+    document.getElementById('rt').textContent = won ? boss.short + ' Dies' : (killedBy || 'Killed');
+    var rows = [
+      ['Survived', fmt(sec) + (won ? '' : ' of ' + fmt(boss.len)), won ? 'good' : ''],
+      ['Hits taken', String(hits), hits ? 'bad' : 'good'],
+      ['Difficulty', DIFF[diff].label, ''],
+      ['Best on this one', best[bestKey()] ? fmt(best[bestKey()]) : '-', '']
+    ];
+    document.getElementById('rrows').innerHTML = rows.map(function(r){
+      return '<div class="row-l ' + r[2] + '"><span>' + r[0] + '</span><b>' + r[1] + '</b></div>';
+    }).join('');
+    document.getElementById('rline').textContent = won
+      ? 'That is the whole script survived without dying. Try it on heroic, where they land on top of each other.'
+      : (killedBy ? killedBy + ' is the one that got you. Watch for it next pull.' : 'Keep moving.');
+    show('result');
+    paintHud();
+  }
+
+  function fmt(sec){
+    var s = Math.max(0, Math.floor(sec));
+    return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2);
+  }
+
+  /* ==================================================================
+     the loop
+     ================================================================== */
+  function loop(now){
+    raf = requestAnimationFrame(loop);
+    var dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    if (state === 'play'){ step(dt); }
+    draw();
+  }
+
+  function step(dt){
+    var d = DIFF[diff];
+    t += dt;
+
+    /* the boss walks a slow figure so frontals are not always the same */
+    bossPos.x = W * 0.5 + Math.sin(t * 0.32) * Math.min(150, W * 0.16);
+    bossPos.y = H * 0.34 + Math.cos(t * 0.21) * Math.min(60, H * 0.08);
+
+    movePlayer(dt);
+
+    /* start anything that is due */
+    for (var i = 0; i < casts.length; i++){
+      var c = casts[i];
+      if (!c.done && t >= c.at){ c.done = true; begin(c, d); }
+    }
+
+    /* run everything in flight */
+    for (var j = live.length - 1; j >= 0; j--){
+      var m = live[j];
+      m.age += dt;
+      if (m.tick) m.tick(m, dt);
+      if (!m.fired && m.age >= m.warn){
+        m.fired = true;
+        if (m.fire) m.fire(m);
+      }
+      if (m.age >= m.life) live.splice(j, 1);
+    }
+
+    if (player.iframe > 0) player.iframe -= dt;
+    if (player.dashCd > 0) player.dashCd -= dt;
+
+    if (player.hp <= 0){ finish(false); return; }
+    if (t >= boss.len){ finish(true); return; }
+    paintHud();
+  }
+
+  function movePlayer(dt){
+    var sx = 0, sy = 0;
+    if (keys['a'] || keys['arrowleft'])  sx -= 1;
+    if (keys['d'] || keys['arrowright']) sx += 1;
+    if (keys['w'] || keys['arrowup'])    sy -= 1;
+    if (keys['s'] || keys['arrowdown'])  sy += 1;
+    var len = Math.hypot(sx, sy);
+    if (len > 0){ sx /= len; sy /= len; player.ix = sx; player.iy = sy; }
+
+    if (keys['shift'] && player.dashCd <= 0 && len > 0){
+      player.dash = 0.16;
+      player.dashCd = 3;
+      player.iframe = 0.16;
+    }
+
+    var sp = 250;
+    if (player.dash > 0){ sp = 760; player.dash -= dt; }
+    player.x += sx * sp * dt;
+    player.y += sy * sp * dt;
+
+    var pad = player.r + 4;
+    player.x = Math.max(pad, Math.min(W - pad, player.x));
+    player.y = Math.max(pad, Math.min(H - pad, player.y));
+  }
+
+  var GOD = false;
+  function hurt(amount, name){
+    if (GOD) return;
+    if (player.iframe > 0) return;
+    player.hp -= amount * DIFF[diff].dmg;
+    hits++;
+    killedBy = name;
+    player.iframe = 0.55;
+    if (player.hp < 0) player.hp = 0;
+  }
+
+  function inside(x, y, r){
+    return Math.hypot(player.x - x, player.y - y) < r + player.r * 0.55;
+  }
+
+  /* ==================================================================
+     the shapes, each one a small object with a warn and a fire
+     ================================================================== */
+  var seen = [];
+  function begin(c, d){
+    seen.push(c.type);
+    var warn = c.warn * d.warn;
+    if (c.type === 'swirl'){
+      var pts = [];
+      for (var i = 0; i < c.n; i++){
+        /* one of them always lands where you are, the rest are scattered */
+        if (i === 0) pts.push({ x: player.x, y: player.y });
+        else pts.push({ x: 40 + Math.random() * (W - 80), y: 40 + Math.random() * (H - 80) });
+      }
+      live.push({
+        kind: 'swirl', name: c.name, hint: c.hint, pts: pts, r: c.r,
+        age: 0, warn: warn, life: warn + 0.45, fired: false,
+        fire: function(m){
+          for (var k = 0; k < m.pts.length; k++){
+            if (inside(m.pts[k].x, m.pts[k].y, m.r)) { hurt(24, m.name); break; }
+          }
+        }
+      });
+    }
+
+    else if (c.type === 'cone'){
+      var ang = Math.atan2(player.y - bossPos.y, player.x - bossPos.x);
+      live.push({
+        kind: 'cone', name: c.name, hint: c.hint, ang: ang,
+        deg: c.deg * Math.PI / 180, len: c.len,
+        age: 0, warn: warn, life: warn + 0.4, fired: false,
+        fire: function(m){
+          var dx = player.x - bossPos.x, dy = player.y - bossPos.y;
+          var dist = Math.hypot(dx, dy);
+          if (dist > m.len) return;
+          var a = Math.atan2(dy, dx) - m.ang;
+          while (a > Math.PI) a -= Math.PI * 2;
+          while (a < -Math.PI) a += Math.PI * 2;
+          if (Math.abs(a) < m.deg / 2) hurt(28, m.name);
+        }
+      });
+    }
+
+    else if (c.type === 'donut'){
+      live.push({
+        kind: 'donut', name: c.name, hint: c.hint, r: c.r,
+        age: 0, warn: warn, life: warn + 0.4, fired: false,
+        fire: function(m){
+          if (!inside(bossPos.x, bossPos.y, m.r)) hurt(26, m.name);
+        }
+      });
+    }
+
+    else if (c.type === 'melee'){
+      live.push({
+        kind: 'melee', name: c.name, hint: c.hint, r: c.r,
+        age: 0, warn: warn, life: warn + 0.4, fired: false,
+        fire: function(m){
+          if (inside(bossPos.x, bossPos.y, m.r)) hurt(26, m.name);
+        }
+      });
+    }
+
+    else if (c.type === 'soak'){
+      var sp = [];
+      for (var s = 0; s < c.n; s++){
+        sp.push({
+          x: 90 + Math.random() * (W - 180),
+          y: 90 + Math.random() * (H - 180)
+        });
+      }
+      live.push({
+        kind: 'soak', name: c.name, hint: c.hint, pts: sp, r: c.r,
+        age: 0, warn: warn, life: warn + 0.5, fired: false,
+        fire: function(m){
+          for (var k = 0; k < m.pts.length; k++){
+            if (inside(m.pts[k].x, m.pts[k].y, m.r)) return;   /* one is enough */
+          }
+          hurt(22, m.name);
+        }
+      });
+    }
+
+    else if (c.type === 'beam'){
+      var dir = Math.random() < 0.5 ? 1 : -1;
+      live.push({
+        kind: 'beam', name: c.name, hint: c.hint,
+        ang: Math.atan2(player.y - bossPos.y, player.x - bossPos.x),
+        arc: c.arc * Math.PI / 180, w: c.w, dir: dir,
+        age: 0, warn: warn, life: warn + c.dur, fired: false, dur: c.dur,
+        tick: function(m, dt2){
+          if (m.age < m.warn) return;
+          var k = (m.age - m.warn) / m.dur;
+          m.cur = m.ang + m.dir * m.arc * k;
+          /* the sweep hurts continuously while it is on you */
+          var dx = player.x - bossPos.x, dy = player.y - bossPos.y;
+          var a = Math.atan2(dy, dx) - m.cur;
+          while (a > Math.PI) a -= Math.PI * 2;
+          while (a < -Math.PI) a += Math.PI * 2;
+          var dist = Math.hypot(dx, dy);
+          var off = Math.abs(Math.sin(a)) * dist;
+          if (Math.cos(a) > 0 && off < m.w / 2) hurt(15 * dt2 * 6, m.name);
+        }
+      });
+    }
+
+    else if (c.type === 'wave'){
+      live.push({
+        kind: 'wave', name: c.name, hint: c.hint,
+        rad: 0, speed: c.speed * d.speed, band: c.band,
+        age: 0, warn: warn, life: warn + 4.5, fired: false,
+        tick: function(m, dt2){
+          if (m.age < m.warn) return;
+          m.rad += m.speed * dt2;
+          var dist = Math.hypot(player.x - bossPos.x, player.y - bossPos.y);
+          if (!m.hit && Math.abs(dist - m.rad) < m.band / 2 + player.r * 0.5){
+            m.hit = true;
+            hurt(26, m.name);
+          }
+        }
+      });
+    }
+
+    else if (c.type === 'fixate'){
+      live.push({
+        kind: 'fixate', name: c.name, hint: c.hint,
+        x: bossPos.x, y: bossPos.y, r: 14,
+        speed: c.speed * d.speed,
+        age: 0, warn: warn, life: warn + c.life, fired: false,
+        tick: function(m, dt2){
+          if (m.age < m.warn) return;
+          var dx = player.x - m.x, dy = player.y - m.y;
+          var dd = Math.hypot(dx, dy) || 1;
+          m.x += (dx / dd) * m.speed * dt2;
+          m.y += (dy / dd) * m.speed * dt2;
+          if (dd < m.r + player.r) hurt(18 * dt2 * 4, m.name);
+        }
+      });
+    }
+  }
+
+  /* ==================================================================
+     drawing
+     ================================================================== */
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+
+    /* floor */
+    var g = ctx.createRadialGradient(W/2, H/2, 10, W/2, H/2, Math.max(W, H) * 0.7);
+    g.addColorStop(0, 'rgba(169,108,255,.07)');
+    g.addColorStop(1, 'rgba(10,7,16,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.strokeStyle = 'rgba(255,255,255,.035)';
+    ctx.lineWidth = 1;
+    for (var gx = 60; gx < W; gx += 60){
+      ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke();
+    }
+    for (var gy = 60; gy < H; gy += 60){
+      ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke();
+    }
+
+    if (state === 'idle'){ return; }
+
+    for (var i = 0; i < live.length; i++) drawShape(live[i]);
+
+    /* the boss */
+    ctx.save();
+    ctx.shadowColor = boss.c; ctx.shadowBlur = 22;
+    ctx.fillStyle = '#1C1430';
+    ctx.strokeStyle = boss.c;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(bossPos.x, bossPos.y, bossPos.r, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+    ctx.restore();
+
+    /* you */
+    var flick = player.iframe > 0 && Math.floor(player.iframe * 20) % 2 === 0;
+    ctx.save();
+    ctx.globalAlpha = flick ? 0.4 : 1;
+    ctx.shadowColor = '#7FE8AC'; ctx.shadowBlur = 14;
+    ctx.fillStyle = '#7FE8AC';
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    /* dash charge, a small tick under you */
+    if (player.dashCd > 0){
+      ctx.strokeStyle = 'rgba(232,196,104,.6)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(player.x, player.y, player.r + 6, -Math.PI/2,
+              -Math.PI/2 + (1 - player.dashCd / 3) * Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+
+  function tele(m){ return Math.min(1, m.age / m.warn); }
+
+  function drawShape(m){
+    var k = tele(m);
+    var pulsing = 0.25 + 0.55 * k;
+
+    if (m.kind === 'swirl' || m.kind === 'soak'){
+      var soak = m.kind === 'soak';
+      for (var i = 0; i < m.pts.length; i++){
+        var p = m.pts[i];
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, m.r, 0, Math.PI * 2);
+        ctx.fillStyle = soak ? 'rgba(47,216,195,' + (0.10 + 0.22 * k) + ')'
+                             : 'rgba(255,75,75,' + (0.10 + 0.26 * k) + ')';
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = soak ? 'rgba(47,216,195,' + pulsing + ')'
+                               : 'rgba(255,75,75,' + pulsing + ')';
+        ctx.stroke();
+        /* the filling sweep, so you can see how long is left */
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.arc(p.x, p.y, m.r, -Math.PI/2, -Math.PI/2 + k * Math.PI * 2);
+        ctx.closePath();
+        ctx.fillStyle = soak ? 'rgba(47,216,195,.18)' : 'rgba(255,75,75,.2)';
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    else if (m.kind === 'cone'){
+      ctx.save();
+      ctx.translate(bossPos.x, bossPos.y);
+      ctx.rotate(m.ang);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, m.len, -m.deg / 2, m.deg / 2);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(255,63,164,' + (0.09 + 0.22 * k) + ')';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(255,63,164,' + pulsing + ')';
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    else if (m.kind === 'donut'){
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, 0, W, H);
+      ctx.arc(bossPos.x, bossPos.y, m.r, 0, Math.PI * 2, true);
+      ctx.fillStyle = 'rgba(255,75,75,' + (0.07 + 0.17 * k) + ')';
+      ctx.fill('evenodd');
+      ctx.beginPath();
+      ctx.arc(bossPos.x, bossPos.y, m.r, 0, Math.PI * 2);
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = 'rgba(127,232,172,' + (0.4 + 0.5 * k) + ')';
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    else if (m.kind === 'melee'){
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(bossPos.x, bossPos.y, m.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,75,75,' + (0.10 + 0.26 * k) + ')';
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = 'rgba(255,75,75,' + pulsing + ')';
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    else if (m.kind === 'beam'){
+      var a = (m.age < m.warn) ? m.ang : (m.cur === undefined ? m.ang : m.cur);
+      var live2 = m.age >= m.warn;
+      ctx.save();
+      ctx.translate(bossPos.x, bossPos.y);
+      ctx.rotate(a);
+      ctx.beginPath();
+      ctx.rect(0, -m.w / 2, Math.max(W, H) * 1.2, m.w);
+      ctx.fillStyle = live2 ? 'rgba(232,196,104,.30)' : 'rgba(232,196,104,' + (0.06 + 0.16 * k) + ')';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = live2 ? 'rgba(255,240,192,.9)' : 'rgba(232,196,104,' + pulsing + ')';
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    else if (m.kind === 'wave'){
+      if (m.age < m.warn){
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(bossPos.x, bossPos.y, bossPos.r + 14, 0, Math.PI * 2);
+        ctx.lineWidth = 2 + 4 * k;
+        ctx.strokeStyle = 'rgba(169,108,255,' + pulsing + ')';
+        ctx.stroke();
+        ctx.restore();
+      } else {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(bossPos.x, bossPos.y, Math.max(1, m.rad), 0, Math.PI * 2);
+        ctx.lineWidth = m.band;
+        ctx.strokeStyle = 'rgba(169,108,255,.42)';
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(bossPos.x, bossPos.y, Math.max(1, m.rad), 0, Math.PI * 2);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(214,180,255,.9)';
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    else if (m.kind === 'fixate'){
+      ctx.save();
+      if (m.age < m.warn){
+        ctx.globalAlpha = 0.3 + 0.6 * k;
+      }
+      ctx.beginPath();
+      ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,63,164,.75)';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#FF9CD0';
+      ctx.stroke();
+      /* the tether, so it is obvious it is on you */
+      ctx.beginPath();
+      ctx.moveTo(m.x, m.y);
+      ctx.lineTo(player.x, player.y);
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([5, 6]);
+      ctx.strokeStyle = 'rgba(255,63,164,.5)';
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  /* ==================================================================
+     the panels
+     ================================================================== */
+  var elTime = document.getElementById('sTime');
+  var elHits = document.getElementById('sHits');
+  var elBest = document.getElementById('sBest');
+  var elHp = document.getElementById('hpFill');
+  var elHpN = document.getElementById('hpNum');
+  var elHpD = document.getElementById('hpDeaths');
+  var elBB = document.getElementById('bbFill');
+  var elBP = document.getElementById('bbPct');
+  var elCast = document.getElementById('cast');
+  var elCastN = document.getElementById('castN');
+  var elCastH = document.getElementById('castH');
+  var elCastF = document.getElementById('castF');
+  var elTl = document.getElementById('tl');
+
+  function paintHud(){
+    elTime.textContent = fmt(t);
+    elHits.textContent = String(hits);
+    elBest.textContent = best[bestKey()] ? fmt(best[bestKey()]) : '-';
+    var pct = Math.max(0, player.hp / player.max);
+    elHp.style.width = (pct * 100).toFixed(1) + '%';
+    elHpN.textContent = Math.ceil(player.hp) + ' / ' + player.max;
+    elHpD.textContent = 'wipes ' + deaths;
+
+    var bp = Math.max(0, 1 - t / boss.len);
+    elBB.style.width = (bp * 100).toFixed(1) + '%';
+    elBP.textContent = Math.ceil(bp * 100) + '%';
+
+    /* the cast bar shows whatever is closest to going off */
+    var soonest = null;
+    for (var i = 0; i < live.length; i++){
+      var m = live[i];
+      if (m.age < m.warn && (!soonest || (m.warn - m.age) < (soonest.warn - soonest.age))) soonest = m;
+    }
+    if (soonest){
+      elCast.classList.add('on');
+      elCastN.textContent = soonest.name;
+      elCastH.textContent = soonest.hint;
+      elCastF.style.width = (tele(soonest) * 100).toFixed(1) + '%';
+    } else {
+      elCast.classList.remove('on');
+    }
+
+    /* and the list of what is on the way */
+    var up = [];
+    for (var j = 0; j < casts.length && up.length < 7; j++){
+      var c = casts[j];
+      if (c.at >= t - 0.2) up.push(c);
+    }
+    elTl.innerHTML = up.map(function(c){
+      var dt2 = c.at - t;
+      var soon = dt2 < 2.5;
+      return '<div class="tl-r' + (soon ? ' now' : '') + '" style="--c:' + colOf(c.type) + '">' +
+             '<span class="tl-t">' + (dt2 <= 0 ? 'now' : dt2.toFixed(1) + 's') + '</span>' +
+             '<span>' + c.name + '</span></div>';
+    }).join('');
+  }
+
+  function colOf(type){
+    if (type === 'soak') return 'var(--jade)';
+    if (type === 'cone' || type === 'fixate') return 'var(--rose)';
+    if (type === 'beam') return 'var(--gold)';
+    if (type === 'wave') return 'var(--violet)';
+    return 'var(--bad)';
+  }
+
+  /* ==================================================================
+     menus
+     ================================================================== */
+  function show(id){ document.getElementById(id).classList.remove('gone'); }
+  function hide(id){ document.getElementById(id).classList.add('gone'); }
+
+  var list = document.getElementById('bossList');
+  function paintList(){
+    list.innerHTML = BOSSES.map(function(b, i){
+      var k = b.id + '|' + diff;
+      var bst = best[k] ? ('best ' + fmt(best[k])) : 'not pulled';
+      return '<button class="boss' + (b.id === boss.id ? ' on' : '') + '" type="button" ' +
+             'data-i="' + i + '" style="--c:' + b.c + '">' +
+             '<span class="boss-n">' + b.name + '</span>' +
+             '<span class="boss-d">' + (i + 1) + ' of 8 &middot; ' + b.len + 's &middot; ' + bst + '</span>' +
+             '<span class="boss-m">' + b.teach + '</span>' +
+             '</button>';
+    }).join('');
+  }
+  list.addEventListener('click', function(e){
+    var b = e.target.closest('.boss');
+    if (!b) return;
+    boss = BOSSES[Number(b.getAttribute('data-i'))];
+    paintList();
+    paintTitles();
+  });
+
+  function paintTitles(){
+    document.getElementById('bossName').textContent = boss.name;
+    document.getElementById('bbName').textContent = boss.short;
+    document.getElementById('diffTag').textContent = DIFF[diff].label;
+  }
+
+  var dN = document.getElementById('dNorm'), dH = document.getElementById('dHeroic');
+  dN.addEventListener('click', function(){ diff = 'normal'; dN.classList.add('on'); dH.classList.remove('on'); paintList(); paintTitles(); });
+  dH.addEventListener('click', function(){ diff = 'heroic'; dH.classList.add('on'); dN.classList.remove('on'); paintList(); paintTitles(); });
+
+  document.getElementById('pull').addEventListener('click', pull);
+  document.getElementById('again').addEventListener('click', pull);
+  document.getElementById('home').addEventListener('click', toMenu);
+  document.getElementById('resume').addEventListener('click', resume);
+  document.getElementById('quit').addEventListener('click', toMenu);
+  document.getElementById('howBtn').addEventListener('click', function(){ show('how'); });
+  document.getElementById('howBack').addEventListener('click', function(){ hide('how'); });
+
+  document.getElementById('howRows').innerHTML = SHAPES.map(function(s){
+    return '<div class="row-l"><span style="color:var(--text);font-weight:600">' + s[1] +
+           '</span><span style="text-align:right;max-width:52ch">' + s[2] + '</span></div>';
+  }).join('');
+
+  /* ==================================================================
+     go
+     ================================================================== */
+  size();
+  paintList();
+  paintTitles();
+  player = { x: W/2, y: H/2, r: 11, hp: 100, max: 100, dash: 0, dashCd: 0, iframe: 0 };
+  bossPos = { x: W/2, y: H*0.34, r: 30 };
+  casts = []; live = []; hits = 0; t = 0;
+  paintHud();
+  raf = requestAnimationFrame(loop);
+
+  /* so a test can drive it */
+  window.__raid = {
+    pull: pull,
+    /* the loop is driven by requestAnimationFrame, which a headless
+       browser throttles, so a test drives the simulation directly */
+    step: function(dt){ if (state === 'play') step(dt); },
+    seen: function(){ return seen.slice(); },
+    clearSeen: function(){ seen = []; },
+    setDiff: function(d){ diff = d; },
+    god: function(v){ GOD = !!v; },
+    move: function(dx, dy){ player.x += dx; player.y += dy; },
+    pos: function(){ return { x: player.x, y: player.y, bx: bossPos.x, by: bossPos.y }; },
+    state: function(){ return state; },
+    t: function(){ return t; },
+    hp: function(){ return player.hp; },
+    live: function(){ return live.length; },
+    hits: function(){ return hits; },
+    setBoss: function(id){ for (var i=0;i<BOSSES.length;i++) if (BOSSES[i].id===id) boss=BOSSES[i]; paintTitles(); },
+    key: function(k, down){ keys[k] = !!down; }
+  };
+})();
+</script>
+</body>
+</html>
