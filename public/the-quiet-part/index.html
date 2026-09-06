@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0B0B0C">
+<title>The Quiet Part</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+
+<style>
+  :root{
+    --ink:#0B0B0C;
+    --paper:#12110F;
+    --line:#26241F;
+    --line-hot:#3D392F;
+    --text:#E8E2D2;
+    --dim:#9A9384;
+    --dimmer:#6B6558;
+    --lamp:#D9A441;
+    --serif:"EB Garamond",Georgia,"Times New Roman",serif;
+    --mono:"JetBrains Mono",Consolas,ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:
+      radial-gradient(58% 40% at 50% -6%, rgba(217,164,65,.10), rgba(217,164,65,0) 70%),
+      var(--ink);
+    background-attachment:fixed;
+    color:var(--text);
+    font-family:var(--serif);
+    font-size:19px;line-height:1.68;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* one lamp, and it does not move. nothing on this page does. */
+  .lamp{
+    position:fixed;left:50%;top:-38vh;width:110vw;height:80vh;margin-left:-55vw;
+    z-index:0;pointer-events:none;
+    background:radial-gradient(closest-side, rgba(217,164,65,.16) 0%, rgba(217,164,65,.05) 42%, rgba(217,164,65,0) 74%);
+  }
+
+  .page{
+    position:relative;z-index:1;
+    max-width:60ch;margin:0 auto;
+    padding:clamp(48px,10vw,110px) clamp(20px,5vw,28px) 110px;
+  }
+
+  .k{
+    margin:0;font-family:var(--mono);font-size:10px;font-weight:600;
+    letter-spacing:.26em;text-transform:uppercase;color:var(--dimmer);
+  }
+  h1{
+    margin:.3em 0 .1em;
+    font-weight:500;font-size:clamp(38px,7.5vw,62px);
+    line-height:1.02;letter-spacing:-.01em;color:var(--text);
+  }
+  .sub{margin:0 0 2.2em;color:var(--dim);font-style:italic}
+
+  p{margin:0 0 1.15em;color:var(--dim)}
+  p b{color:var(--text);font-weight:500}
+  em{color:var(--text)}
+
+  .rule{height:1px;background:var(--line);margin:2.6em 0}
+
+  h2{
+    margin:0 0 .2em;font-weight:500;font-size:clamp(24px,4vw,31px);
+    letter-spacing:-.01em;color:var(--text);
+  }
+  .h2s{margin:0 0 1.6em;font-family:var(--mono);font-size:10.5px;
+       letter-spacing:.16em;text-transform:uppercase;color:var(--dimmer)}
+
+  /* ---------- the book ---------- */
+  .book{display:flex;flex-direction:column;gap:1px;margin-bottom:26px}
+  .sig{
+    padding:13px 15px 14px;
+    background:linear-gradient(180deg, rgba(255,255,255,.018), rgba(255,255,255,0)), var(--paper);
+    border:1px solid var(--line);border-left:2px solid var(--line-hot);
+  }
+  .sig-l{margin:0;color:var(--text);font-size:18px;line-height:1.55}
+  .sig-m{
+    margin:6px 0 0;font-family:var(--mono);font-size:10px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--dimmer);
+  }
+  .sig-m b{color:var(--lamp);font-weight:600}
+  .sig.mine{border-left-color:var(--lamp)}
+  .empty{
+    padding:20px 16px;border:1px dashed var(--line-hot);
+    color:var(--dimmer);font-style:italic;
+  }
+
+  /* ---------- signing it ---------- */
+  .form{
+    border:1px solid var(--line);border-top:2px solid var(--lamp);
+    background:var(--paper);padding:16px 16px 18px;
+  }
+  .form label{
+    display:block;margin:0 0 5px;
+    font-family:var(--mono);font-size:9.5px;font-weight:600;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--dimmer);
+  }
+  .form input, .form textarea{
+    width:100%;font:inherit;font-size:17px;
+    color:var(--text);background:#0B0B0C;
+    border:1px solid var(--line-hot);border-radius:2px;
+    padding:9px 11px;margin-bottom:12px;
+    font-family:var(--serif);
+  }
+  .form textarea{resize:vertical;min-height:74px;line-height:1.5}
+  .form input:focus, .form textarea:focus{outline:none;border-color:var(--lamp)}
+  .frow{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .btn{
+    font:inherit;cursor:pointer;
+    font-family:var(--mono);font-size:10.5px;font-weight:600;
+    letter-spacing:.16em;text-transform:uppercase;
+    padding:11px 20px 12px;color:#0B0B0C;background:var(--lamp);
+    border:1px solid #F0C271;border-radius:2px;
+  }
+  .btn:hover{background:#E8B65B}
+  .btn[disabled]{opacity:.5;cursor:default}
+  .note{font-family:var(--mono);font-size:10.5px;color:var(--dimmer);letter-spacing:.04em}
+  .note.bad{color:#D06A5E}
+  .note.good{color:#8FBF86}
+  .count{font-family:var(--mono);font-size:10px;color:var(--dimmer)}
+
+  footer{
+    margin-top:3.2em;padding-top:1.4em;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:10.5px;line-height:2;
+    letter-spacing:.06em;color:var(--dimmer);
+  }
+  footer a{color:var(--dim);text-decoration:none;border-bottom:1px solid var(--line-hot)}
+  footer a:hover{color:var(--lamp);border-color:var(--lamp)}
+</style>
+</head>
+<body>
+
+<div class="lamp" aria-hidden="true"></div>
+
+<div class="page">
+
+  <p class="k">Unlisted &middot; you were given this</p>
+  <h1>The Quiet Part</h1>
+  <p class="sub">Not linked from anywhere on the site. There is no way to arrive here by accident.</p>
+
+  <p>The front of this site has two faces and both of them are performances. One is polite about the group and grateful for the invite. The other decides who lives. <b>Neither is the whole thing</b>, which is roughly how it goes for everybody who has ever written an About page.</p>
+
+  <p>So this is the version with nothing to sell. I heal because being the reason five people got through something is a better feeling than any number on a meter. I get irritated when somebody stands in the obvious thing four times, and then I remember I have done exactly that on a class I did not know. <em>Most bad players are just people who have not learned the fight yet.</em> That is the entire idea behind the trainers on this site.</p>
+
+  <p>The rest of it, the chains and the shrine and the upside down cross, is because building something is more fun when it is allowed to be strange.</p>
+
+  <div class="rule"></div>
+
+  <h2>Sign the book</h2>
+  <p class="h2s">Whoever has the link</p>
+  <p>If you got here, somebody sent it to you. Leave a line. One per name, and signing again replaces what you wrote.</p>
+
+  <div class="book" id="book">
+    <div class="empty">Fetching the page&hellip;</div>
+  </div>
+
+  <form class="form" id="form" autocomplete="off">
+    <label for="n">Your name</label>
+    <input id="n" name="n" maxlength="16" placeholder="Who is signing" spellcheck="false">
+    <label for="l">Your line</label>
+    <textarea id="l" name="l" maxlength="140" placeholder="Anything, up to 140 characters"></textarea>
+    <div class="frow">
+      <button class="btn" id="sign" type="submit">Sign it</button>
+      <span class="count" id="count">140 left</span>
+      <span class="note" id="note"></span>
+    </div>
+  </form>
+
+  <footer>
+    <div>You can keep this link or pass it on. It is not indexed and nothing on the site points at it.</div>
+    <div><a href="/">shaiyex.com</a></div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var bookEl = document.getElementById('book');
+  var form   = document.getElementById('form');
+  var elN    = document.getElementById('n');
+  var elL    = document.getElementById('l');
+  var elNote = document.getElementById('note');
+  var elCnt  = document.getElementById('count');
+  var elBtn  = document.getElementById('sign');
+  var mine   = '';
+
+  try { mine = localStorage.getItem('quiet.name') || ''; } catch(e){}
+  if (mine) elN.value = mine;
+
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+  function say(msg, kind){
+    elNote.textContent = msg || '';
+    elNote.className = 'note' + (kind ? ' ' + kind : '');
+  }
+  function count(){
+    elCnt.textContent = (140 - elL.value.length) + ' left';
+  }
+  elL.addEventListener('input', count);
+  count();
+
+  function paint(book){
+    if (!book || !book.length){
+      bookEl.innerHTML = '<div class="empty">Nobody has signed it yet. That is a bit bleak, go on.</div>';
+      return;
+    }
+    var me = (mine || '').toLowerCase();
+    bookEl.innerHTML = book.map(function(e){
+      var isMe = me && e.n.toLowerCase() === me;
+      return '<div class="sig' + (isMe ? ' mine' : '') + '">' +
+             '<p class="sig-l">' + esc(e.l) + '</p>' +
+             '<p class="sig-m"><b>' + esc(e.n) + '</b> &middot; ' + esc(e.t) + '</p>' +
+             '</div>';
+    }).join('');
+  }
+
+  function load(){
+    fetch('/api/vault').then(function(r){
+      if (!r.ok) throw new Error(r.status);
+      return r.json();
+    }).then(function(j){
+      paint(j.book || []);
+    }).catch(function(){
+      bookEl.innerHTML = '<div class="empty">The book is shut. Whatever it is stored in is not answering, ' +
+                         'so nothing can be read or written just now.</div>';
+      elBtn.disabled = true;
+    });
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var n = elN.value.trim(), l = elL.value.trim();
+    if (!n){ say('A name first.', 'bad'); elN.focus(); return; }
+    if (!l){ say('And something to say.', 'bad'); elL.focus(); return; }
+
+    elBtn.disabled = true;
+    say('Writing…');
+    fetch('/api/vault', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ n: n, l: l })
+    }).then(function(r){
+      if (!r.ok) throw new Error(r.status);
+      return r.json();
+    }).then(function(j){
+      mine = n;
+      try { localStorage.setItem('quiet.name', n); } catch(e2){}
+      paint(j.book || []);
+      say('Signed.', 'good');
+      elBtn.disabled = false;
+    }).catch(function(){
+      say('That did not take. Try again in a moment.', 'bad');
+      elBtn.disabled = false;
+    });
+  });
+
+  load();
+})();
+</script>
+</body>
+</html>
