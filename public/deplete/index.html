@@ -511,7 +511,7 @@
 
 <script>
 (function(){
-  var DEPLETED  = 0;
+  var DEPLETED  = 16;
   var BLACKLIST = [];
 
   var listEl  = document.getElementById('avList');
@@ -525,7 +525,7 @@
   };
 
   /* the level and dungeon come from the link, e.g. ?lvl=15&d=KR */
-  var lvl = 15, dgn = '';
+  var lvl = 16, dgn = '';
   try {
     var q = new URLSearchParams(location.search);
     var n = parseInt(q.get('lvl'), 10);
