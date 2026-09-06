@@ -852,6 +852,93 @@
   }
   .logcard:hover::before,.cls:hover::before{opacity:1}
 
+  /* ---------- the alcove: the actual character, drawn live ---------- */
+  .stage{
+    border:1px solid var(--line);
+    background:var(--panel);
+    box-shadow:0 1px 0 rgba(255,255,255,.5) inset, 0 10px 30px rgba(0,0,0,.05);
+  }
+  body.tekk .stage{
+    box-shadow:0 0 0 1px rgba(194,26,18,.12) inset, 0 14px 44px rgba(0,0,0,.5);
+  }
+
+  /* the niche is dark on both sides. the renderer paints an opaque canvas and
+     a lit stone recess is the one frame that survives either theme. */
+  .frame{
+    position:relative;
+    height:clamp(340px,54vw,520px);
+    overflow:hidden;
+    background:
+      radial-gradient(62% 46% at 50% 8%, rgba(240,200,104,.16), rgba(240,200,104,0) 72%),
+      radial-gradient(90% 70% at 50% 116%, rgba(240,200,104,.07), rgba(240,200,104,0) 70%),
+      linear-gradient(180deg,#14130F 0%, #0B0B0A 62%, #070707 100%);
+    box-shadow:inset 0 0 0 1px rgba(240,200,104,.16), inset 0 26px 60px rgba(0,0,0,.6);
+  }
+  body.tekk .frame{
+    background:
+      radial-gradient(62% 46% at 50% 8%, rgba(194,26,18,.20), rgba(194,26,18,0) 72%),
+      radial-gradient(90% 70% at 50% 116%, rgba(90,6,6,.32), rgba(90,6,6,0) 70%),
+      linear-gradient(180deg,#0C0709 0%, #070609 62%, #050406 100%);
+    box-shadow:inset 0 0 0 1px rgba(194,26,18,.24), inset 0 26px 60px rgba(0,0,0,.72);
+  }
+
+  .rig{position:absolute;inset:0}
+  .rig canvas{display:block;width:100% !important;height:100% !important}
+
+  .summon{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+    width:100%;border:0;cursor:pointer;
+    background:transparent;color:#EEE6D2;
+    font-family:var(--body);
+  }
+  .summon span{
+    font-family:var(--mono);font-size:11px;font-weight:600;
+    letter-spacing:.2em;text-transform:uppercase;
+    padding:12px 22px;
+    border:1px solid rgba(240,200,104,.5);
+    color:#F0C868;
+    transition:background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .summon:hover span{background:rgba(240,200,104,.12);border-color:rgba(240,200,104,.9)}
+  .summon small{font-size:11.5px;color:#8B8478;letter-spacing:.02em}
+  body.tekk .summon span{border-color:rgba(194,26,18,.55);color:#E5443A}
+  body.tekk .summon:hover span{background:rgba(194,26,18,.14);border-color:#E5443A}
+
+  .stage-msg{
+    position:absolute;left:0;right:0;bottom:14px;margin:0;
+    text-align:center;font-family:var(--mono);font-size:11px;
+    letter-spacing:.08em;color:#8B8478;
+  }
+
+  .bar{
+    display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;
+    padding:12px 14px;border-top:1px solid var(--line);
+  }
+  .anims{display:flex;flex-wrap:wrap;gap:6px}
+  .anims button{
+    font-family:var(--mono);font-size:10px;font-weight:600;
+    letter-spacing:.14em;text-transform:uppercase;
+    padding:7px 12px;cursor:pointer;
+    color:var(--dim);background:var(--panel-2);
+    border:1px solid var(--line);
+    transition:color .18s ease, border-color .18s ease, background .18s ease;
+  }
+  .anims button:hover{color:var(--text);border-color:var(--line-hot)}
+  .anims button[aria-pressed="true"]{
+    color:var(--gold-hot);border-color:var(--gold);background:rgba(240,200,104,.10);
+  }
+  body.tekk .anims button[aria-pressed="true"]{
+    color:#F0342A;border-color:var(--gold);background:rgba(194,26,18,.12);
+  }
+  .worn{
+    margin:0 0 0 auto;font-family:var(--mono);font-size:10.5px;
+    letter-spacing:.06em;color:var(--dimmer);
+  }
+  @media (max-width:560px){
+    .worn{margin-left:0}
+  }
+
   /* the pitch */
 
   @media (prefers-reduced-motion:reduce){
@@ -943,6 +1030,30 @@
           <span class="ms-l">The Venomous Abyss<br>1/1 H Tidebound Grotto</span>
         </div>
         <span class="ms-live">Raider.IO · 5 Sep 2026</span>
+      </div>
+    </div>
+  </section>
+
+
+
+  <section id="alcove">
+    <div class="sec-head">
+      <p class="eyebrow" data-t="In the flesh">The character</p>
+      <h2 data-t="The thing that turns up">What actually turns up</h2>
+    </div>
+
+    <div class="stage">
+      <div class="frame">
+        <div class="rig" id="model3d"></div>
+        <button class="summon" id="summon" type="button">
+          <span>Summon the model</span>
+          <small>about a megabyte, drawn live from Wowhead</small>
+        </button>
+        <p class="stage-msg" id="stagemsg" hidden></p>
+      </div>
+      <div class="bar">
+        <div class="anims" id="anims"></div>
+        <p class="worn" id="worn">Drag to turn</p>
       </div>
     </div>
   </section>
@@ -1402,6 +1513,112 @@
 </script>
 
 <script src="/holy.js" defer></script>
+
+<script src="/model/wmv.js"></script>
+<script>
+/* the alcove. nothing downloads until it is on screen, or until it is asked
+   for on a connection that would rather not. */
+(function(){
+  "use strict";
+
+  var rig  = document.getElementById('model3d');
+  var btn  = document.getElementById('summon');
+  var msg  = document.getElementById('stagemsg');
+  var bar  = document.getElementById('anims');
+  var worn = document.getElementById('worn');
+  if (!rig || !btn) return;
+
+  var reduce = window.matchMedia &&
+               window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var thrifty = false;
+  try {
+    var conn = navigator.connection;
+    thrifty = !!(conn && (conn.saveData || /2g/.test(conn.effectiveType || '')));
+  } catch(e){}
+
+  /* label, and what the renderer calls it. only the ones the model has
+     actually got get a button. */
+  var WANT = [
+    ['Dance',  'EmoteDance'],
+    ['Stand',  'Stand'],
+    ['Guard',  'Ready1H'],
+    ['Kneel',  'EmoteKneel'],
+    ['Salute', 'EmoteSalute'],
+    ['Cheer',  'EmoteCheer']
+  ];
+  var DEFAULT = reduce ? 'Stand' : 'EmoteDance';
+
+  var started = false;
+
+  function say(text){
+    if (!text){ msg.hidden = true; return; }
+    msg.textContent = text;
+    msg.hidden = false;
+  }
+
+  function press(name){
+    [].slice.call(bar.children).forEach(function(b){
+      b.setAttribute('aria-pressed', b.getAttribute('data-anim') === name ? 'true' : 'false');
+    });
+  }
+
+  function buttons(view){
+    var have = view.wmv.animations;
+    WANT.filter(function(w){
+      return !have.length || have.indexOf(w[1]) > -1;
+    }).forEach(function(w){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = w[0];
+      b.setAttribute('data-anim', w[1]);
+      b.setAttribute('aria-pressed', 'false');
+      b.addEventListener('click', function(){
+        if (view.wmv.play(w[1])) press(w[1]);
+      });
+      bar.appendChild(b);
+    });
+  }
+
+  function go(){
+    if (started || !window.WMV) return;
+    started = true;
+    btn.disabled = true;
+    say('Loading the model');
+
+    window.WMV.summon({
+      container: rig,
+      char: '/model/char.json',
+      animation: DEFAULT
+    }).then(function(view){
+      btn.remove();
+      say('');
+      var c = view.wmv.character;
+      worn.textContent = c.name + ' \u00b7 ' + c.ilvl + ' equipped \u00b7 drag to turn';
+      buttons(view);
+      var have = view.wmv.animations;
+      press(have.indexOf(DEFAULT) > -1 || !have.length ? DEFAULT
+            : (bar.firstChild ? bar.firstChild.getAttribute('data-anim') : ''));
+    }).catch(function(err){
+      started = false;
+      btn.disabled = false;
+      say('Wowhead would not hand the model over. The portrait up top will have to do.');
+      if (window.console) console.warn('model:', err);
+    });
+  }
+
+  btn.addEventListener('click', go);
+
+  /* auto on anything that is not counting bytes */
+  if (!thrifty && 'IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      for (var i = 0; i < entries.length; i++){
+        if (entries[i].isIntersecting){ io.disconnect(); go(); return; }
+      }
+    }, { rootMargin: '200px' });
+    io.observe(rig);
+  }
+})();
+</script>
 
 </body>
 </html>

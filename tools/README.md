@@ -38,3 +38,35 @@ from the map, and the pull list, then
 ## Checking a build
 
     python tools/outdiff.py    # what changed outside the generated block
+
+---
+
+# The character in /about/
+
+The alcove on the about page draws the live model. Three moving parts:
+
+    public/model/char.json    what the character is wearing, generated
+    public/model/wmv.js       loads Wowhead's renderer and feeds it char.json
+    public/model/jquery.js    the renderer will not start without it
+    functions/mv/[[path]].js  proxy, because zamimg 403s anything with an Origin
+
+## Refreshing the gear
+
+    python tools/build_char.py
+
+Raider.IO gives the equipped item ids, wago.tools turns each one into a display
+id, and every display id is checked against Wowhead's own meta files before it
+is written. A slot that would render as a hole is reported and left out rather
+than shipped.
+
+Face, hair and horns are not in any public API, so the customisation indexes in
+char.json are set by hand. They are indexes into
+
+    /mv/live/meta/charactercustomization/60.json
+
+where 60 is race * 2 - 1 + gender. Change a number, reload, look.
+
+## Animations
+
+The renderer names them the way the game files do: the dance is `EmoteDance`,
+not `Dance`. The full list for a loaded model is `view.wmv.animations`.
