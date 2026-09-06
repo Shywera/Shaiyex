@@ -50,14 +50,23 @@ The alcove on the about page draws the live model. Three moving parts:
     public/model/jquery.js    the renderer will not start without it
     functions/mv/[[path]].js  proxy, because zamimg 403s anything with an Origin
 
-## Refreshing the gear
+## Refreshing the look
 
     python tools/build_char.py
 
-Raider.IO gives the equipped item ids, wago.tools turns each one into a display
-id, and every display id is checked against Wowhead's own meta files before it
-is written. A slot that would render as a hole is reported and left out rather
-than shipped.
+What is equipped is not what anybody sees, so the transmog wins wherever there
+is one. The only public place it appears is the blob the Armory ships inside
+its own page, in a `<script id="model">` tag, where every gear slot carries a
+`transmog` object naming the item whose appearance is worn.
+
+From there wago.tools turns each item id into a display id, and into an
+InventoryType, which matters more than it looks: a robe is not a chest, and
+sent as a chest it renders with the skirt missing. Every display id is checked
+against Wowhead's own meta files before it is written, so a slot that would
+render as a hole is reported and left out rather than shipped.
+
+Weapons and the off hand are always left off, in `HANDS`. A slot transmogged to
+one of the Hidden items is left empty, which is what those items are for.
 
 Face, hair and horns are not in any public API, so the customisation indexes in
 char.json are set by hand. They are indexes into
