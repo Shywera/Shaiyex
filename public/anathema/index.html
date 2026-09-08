@@ -440,15 +440,21 @@
     var armY = top + S * 0.30, armW = S * 0.185;
 
     /* how bright, and in what */
+    /* This is a still shape drawn additively on top of motion trails, so
+       whatever alpha it gets is not what you see: the frame only fades by
+       about a third each time, and the rest piles up. Draw it at the
+       brightness you want and it settles at three times that, clips to flat
+       white, and the soft edge turns into a cut. So these are the target
+       divided by the fade. */
     var a, core, edge, blur;
     if (warm < 0.5){
       var flick = 0.80 + Math.sin(now8 * 41) * 0.10 + Math.sin(now8 * 13.7) * 0.10;
-      a = (1 - warm) * hush * (0.30 + heat * 0.75 + bump * 0.30) * flick;
+      a = (1 - warm) * hush * (0.085 + heat * 0.265 + bump * 0.135) * flick;
       core = mix(RED_HOT, [255, 210, 180], heat * 0.5 + bump * 0.3);
       edge = RED;
       blur = 14 + heat * 40 + bump * 40;
     } else {
-      a = warm * (0.62 + bump * 0.25 + burst * 0.4);
+      a = warm * (0.185 + bump * 0.085 + burst * 0.18);
       core = WHITE;
       edge = GOLD;
       blur = 22 + bump * 44 + burst * 80;
@@ -463,8 +469,11 @@
     ctx.shadowColor = rgba(edge, 0.8);
     ctx.shadowBlur = blur;
 
-    /* the shaft, soft at both sides */
+    /* The shaft. The gradient softens the two long sides, and the shape comes
+       to a point at each end, because a bar drawn as a rectangle ends in a
+       flat cut and reads as a plank rather than a shaft of light. */
     var w = barW * 2.6;
+    var tp = (bot - top) * 0.17;
     var sg = ctx.createLinearGradient(-w, 0, w, 0);
     sg.addColorStop(0,    rgba(edge, 0));
     sg.addColorStop(0.32, rgba(edge, a * 0.55));
@@ -472,10 +481,19 @@
     sg.addColorStop(0.68, rgba(edge, a * 0.55));
     sg.addColorStop(1,    rgba(edge, 0));
     ctx.fillStyle = sg;
-    ctx.fillRect(-w, top, w * 2, bot - top);
+    ctx.beginPath();
+    ctx.moveTo(-w, top + tp);
+    ctx.lineTo(0, top);
+    ctx.lineTo(w, top + tp);
+    ctx.lineTo(w, bot - tp);
+    ctx.lineTo(0, bot);
+    ctx.lineTo(-w, bot - tp);
+    ctx.closePath();
+    ctx.fill();
 
     /* the arm, the same trick turned ninety degrees */
     var ah = barW * 2.6;
+    var ta = armW * 0.36;
     var ag = ctx.createLinearGradient(0, armY - ah, 0, armY + ah);
     ag.addColorStop(0,    rgba(edge, 0));
     ag.addColorStop(0.32, rgba(edge, a * 0.55));
@@ -483,20 +501,31 @@
     ag.addColorStop(0.68, rgba(edge, a * 0.55));
     ag.addColorStop(1,    rgba(edge, 0));
     ctx.fillStyle = ag;
-    ctx.fillRect(-armW, armY - ah, armW * 2, ah * 2);
+    ctx.beginPath();
+    ctx.moveTo(-armW, armY);
+    ctx.lineTo(-armW + ta, armY - ah);
+    ctx.lineTo(armW - ta, armY - ah);
+    ctx.lineTo(armW, armY);
+    ctx.lineTo(armW - ta, armY + ah);
+    ctx.lineTo(-armW + ta, armY + ah);
+    ctx.closePath();
+    ctx.fill();
     ctx.shadowBlur = 0;
 
     /* and once it is the holy one, the flare across the join */
     if (warm > 0.5){
-      var f = Math.min(0.95, 0.34 * warm + bump * 0.4 + burst * 0.6);
+      var f = Math.min(0.30, 0.095 * warm + bump * 0.12 + burst * 0.20);
       ctx.save();
       ctx.translate(0, armY);
-      ctx.scale(1, 0.14);
+      /* squashing the circle squashes its falloff too, so keep it gentle or
+         the top and bottom of the flare become a line */
+      ctx.scale(1, 0.24);
       var r = armW * 3.8;
       var fg = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
-      fg.addColorStop(0,   rgba(WHITE, f));
-      fg.addColorStop(0.4, rgba(GOLD_HOT, f * 0.5));
-      fg.addColorStop(1,   rgba(GOLD, 0));
+      fg.addColorStop(0,    rgba(WHITE, f));
+      fg.addColorStop(0.22, rgba(GOLD_HOT, f * 0.55));
+      fg.addColorStop(0.55, rgba(GOLD, f * 0.16));
+      fg.addColorStop(1,    rgba(GOLD, 0));
       ctx.fillStyle = fg;
       ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.fill();
       ctx.restore();
@@ -730,7 +759,7 @@
 
     /* ---------------- the curse ---------------- */
     if (warm < 0.999){
-      cross(cx, cy, Math.min(W, H) * 0.78, bump);
+      cross(cx, cy, Math.min(W, H) * 0.72, bump);
       shardRing(cx, cy, R, span, bump);
     }
 
@@ -739,7 +768,7 @@
       halo(cx, cy, R, bump);
       godRays(cx, cy, R, bump);
       rose(cx, cy, R, bump);
-      if (warm >= 0.999) cross(cx, cy, Math.min(W, H) * 0.78, bump);
+      if (warm >= 0.999) cross(cx, cy, Math.min(W, H) * 0.72, bump);
       lightRing(cx, cy, R, span, bump);
     }
 
