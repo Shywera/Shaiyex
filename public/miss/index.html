@@ -174,13 +174,14 @@
   "use strict";
 
   /* ------------------------------------------------------------------
-     Measured off the file that ships. The two that matter most fall on
-     beats 64 and 70 of the grid below, which is how you know the grid is
+     Measured off the file that ships. The impact and the leaving are both
+     beats of the grid below: 18 and 64. That is how you know the grid is
      right and not merely close.
      ------------------------------------------------------------------ */
   var T = {
-    her:     8.109,   /* she arrives. the highs open up */
-    gone:   34.410,   /* beat 64. the low end goes and does not come back */
+    her:     8.108,   /* beat 15. she comes in from off the edge */
+    hit:     9.719,   /* beat 18. the biggest arrival in the track */
+    gone:   34.410,   /* beat 64. she leaves, at speed, and does not stop */
     reach:  37.630,   /* beat 70. it starts again without her */
     small:  76.804,   /* it thins out. so does he */
     truth:  91.307,   /* full again, and it changes nothing */
@@ -277,52 +278,59 @@
     lastBeat = n;
     if (jump < 0 || jump > 8) return;
     beatAt = GRID.t0 + n * SPB;
-    /* no floor: through the twelve seconds of silence at the end there is
-       no energy, so there is no pulse, which is the point of them */
+    /* no floor, so the silence at the end really is silent */
     beatHard = Math.min(1, energy(1, 20) * 1.8);
 
-    /* he only reaches when there is something to reach for, and he reaches
-       harder the further in he gets */
-    if (t > T.reach && t < T.small && !reduce){
-      var into = (t - T.reach) / (T.small - T.reach);
-      if (n % 2 === 0 || Math.random() < into) sendReach(0.5 + into * 0.5);
-    }
-    /* and after he knows, once in a long while, anyway */
-    if (t > T.truth && !reduce && n % 8 === 0) sendReach(0.42);
+    if (t < T.reach || reduce) return;
+    /* He keeps sending. Less often the further out it gets, and what he
+       sends is weaker, and it gets less far. Nothing about that stops. */
+    var every = fade < 0.25 ? 2 : fade < 0.5 ? 3 : fade < 0.72 ? 5 : 8;
+    if (n % every === 0) sendReach();
   }
 
   /* ================= state ================= */
   function ease(x){ return x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x); }
 
-  var bond = 0,   /* how much of her is here */
-      away = 0,   /* she is not, and the shape she left is */
-      ache = 0,   /* the cold straight after */
-      numb = 0,   /* the retreat */
-      know = 0,   /* what he works out, which helps and does not help */
-      hold = 0,   /* the silence at the end, which he does not leave */
-      lit  = 0;   /* how much light he has, all told */
+  var bond = 0,   /* how much of her is on the screen */
+      tight = 0,  /* how close in the spiral has got */
+      boom = 0,   /* the impact */
+      flee = 0,   /* how long since she left, 0..1 over the flight out */
+      fade = 0,   /* and then it is only ever less */
+      numb = 0,   /* the stretch where it thins out even faster */
+      lit  = 0;   /* what he has left */
 
   function state(t){
-    bond = t < T.gone ? ease((t - T.her) / 3.4) : 0;
-    numb = t > T.small && t < T.truth
-      ? ease((t - T.small) / 3.5) * (1 - ease((t - (T.truth - 2)) / 2)) : 0;
-    know = ease((t - T.truth) / 6);
-    hold = ease((t - T.quiet) / 3.2);
-    away = ease((t - T.gone) / 1.2);
-    /* after numb and know, because it leans on both of them */
-    ache = t < T.gone ? 0 : ease((t - T.gone) / 1.1) * (1 - Math.max(numb, know) * 0.75);
+    boom = t >= T.hit && t < T.hit + 1.4 ? Math.pow(1 - (t - T.hit) / 1.4, 2.2) : 0;
 
-    /* alone he is dim. with her he is brighter than he has any business
-       being. then he spends it, and gets a little of it back on his own. */
-    var spent = t > T.reach
-      ? Math.min(0.22, ease((t - T.reach) / 34) * 0.22) : 0;
-    lit = 0.40
-        + bond * 0.62
-        - spent * (1 - know * 0.72)
-        - numb * 0.10
-        + know * 0.40
-        - hold * 0.10;
-    if (lit < 0.18) lit = 0.18;
+    if (t < T.her){ bond = 0; tight = 0; }
+    else if (t < T.hit){ bond = Math.min(1, (t - T.her) / (T.hit - T.her) * 2.2); tight = 0; }
+    else if (t < T.gone){
+      bond = 1;
+      tight = Math.pow((t - T.hit) / (T.gone - T.hit), 1.35);
+    } else { bond = 0; tight = 1; }
+
+    flee = t < T.gone ? 0 : Math.min(1, (t - T.gone) / 0.9);
+
+    /* one direction only, all the way to the end */
+    fade = t < T.gone ? 0 : ease((t - T.gone) / (T.stop - T.gone));
+    numb = t > T.small && t < T.truth
+      ? ease((t - T.small) / 3.5) * (1 - ease((t - (T.truth - 2)) / 2.4)) : 0;
+
+    /* Dim on his own, brighter the closer she gets, and then less and less
+       for the remaining seventy seven seconds. What she was giving him goes
+       in about half a second, which is a collapse rather than a cut, and
+       after that the slope never turns back up. */
+    var hers = t < T.gone
+      ? bond * (0.20 + tight * 0.52)
+      : 0.72 * Math.pow(1 - Math.min(1, (t - T.gone) / 0.55), 2);
+    lit = 0.34
+        + hers
+        + boom * 0.30
+        - fade * 0.28;
+    /* numb is deliberately not in here. it is a dip, and a dip has a far
+       side, and his light coming back up even a little would be a lie. it
+       thins the room out instead. */
+    if (lit < 0.040) lit = 0.040;
     if (lit > 1.05) lit = 1.05;
   }
 
@@ -335,41 +343,40 @@
   }
   var INK   = [7, 10, 18];
   var COLD  = [110, 134, 168];
-  var GREY  = [72, 82, 100];
+  var GREY  = [66, 76, 94];
   var HER   = [255, 137, 168];
-  var HER_HOT = [255, 226, 232];
+  var HER_HOT = [255, 232, 238];
   var WARM  = [255, 201, 168];
   var CREAM = [255, 240, 224];
 
   function hisColour(){
-    /* cold on his own, warm while she is here, grey while he is hiding,
-       and at the end something of his own that is neither */
-    var c = mix(COLD, mix(HER, WARM, 0.72), bond * 0.85);
-    c = mix(c, GREY, numb);
-    c = mix(c, CREAM, know * 0.55);
-    return c;
+    var c = mix(COLD, mix(HER, WARM, 0.72), bond * (0.35 + tight * 0.5));
+    return mix(c, GREY, fade * 0.72);
   }
 
-  /* ================= the reaches ================= */
+  /* ================= what he sends ================= */
   var reaches = [];
 
-  function sendReach(power){
-    if (reaches.length > 14) return;
-    reaches.push({ p: 0, power: power, v: 0.55 + Math.random() * 0.35,
-                   /* how far along it gets before it comes apart. never all
-                      the way, and it does not matter when it does. */
-                   far: 0.42 + Math.random() * 0.46 + power * 0.12,
-                   wob: Math.random() * TAU });
+  function sendReach(){
+    if (reaches.length > 12) return;
+    reaches.push({
+      p: 0,
+      v: 0.5 + Math.random() * 0.3,
+      power: 1 - fade * 0.7,
+      /* it comes apart short of the other side, and shorter every time */
+      far: (0.80 - fade * 0.46) * (0.75 + Math.random() * 0.35),
+      wob: Math.random() * TAU
+    });
   }
 
   /* ================= motes ================= */
   var motes = [];
 
-  function mote(){
-    var cap = (reduce ? 40 : 170) * (1 - slow * 0.6);
+  function mote(kind){
+    var cap = (reduce ? 40 : 150) * (1 - slow * 0.6);
     if (motes.length > cap) return;
     var a = Math.random() * TAU;
-    var r = Math.min(W, H) * (0.12 + Math.random() * 0.55);
+    var r = Math.min(W, H) * (0.10 + Math.random() * 0.55);
     motes.push({
       x: W / 2 + Math.cos(a) * r * (W > H ? 1.5 : 1),
       y: H * 0.5 + Math.sin(a) * r,
@@ -377,7 +384,7 @@
       vy: -1.5 - Math.random() * 5,
       life: 1, decay: 0.13 + Math.random() * 0.14,
       size: 0.5 + Math.random() * 1.5,
-      her: bond > 0.4 && Math.random() < bond * 0.7
+      her: !!kind
     });
   }
 
@@ -394,7 +401,6 @@
   }
   window.addEventListener('resize', size);
 
-  /* an orb: one gradient, bounded to its own square */
   function orb(x, y, r, c, hotc, a){
     if (a <= 0.004 || r <= 0.5) return;
     var g = ctx.createRadialGradient(x, y, 0, x, y, r);
@@ -406,7 +412,10 @@
     ctx.fillRect(x - r, y - r, r * 2, r * 2);
   }
 
-  var spin = 0, last = 0, now8 = 0;
+  /* she has an angle of her own and it speeds up as she comes in */
+  var herA = -2.35, last = 0, now8 = 0, hisA = 0;
+  var goneAt = { x: 0, y: 0, vx: 0, vy: 0, r: 0 };
+  var caught = false;
 
   function frame(ms){
     requestAnimationFrame(frame);
@@ -423,80 +432,124 @@
 
     var cx = W / 2, cy = H * 0.5;
     var M = Math.min(W, H);
+    var RCAP = M * 0.40;      /* where his gravity takes hold of her */
+    var RMIN = M * 0.055;     /* and how close it gets before she goes */
 
     var since = t - beatAt;
     var pulse = since >= 0 && since < 0.62
-      ? Math.pow(1 - since / 0.62, 2.6) * beatHard : 0;
+      ? Math.pow(1 - since / 0.62, 2.6) * beatHard * (1 - fade * 0.78) : 0;
 
-    /* ---- the ground ----
-       the weather. it warms while she is here and it never quite gets back
-       to the same cold afterwards, it gets a colder one. */
-    var field = mix(INK, [26, 14, 22], bond * 0.9);
-    field = mix(field, [12, 14, 22], ache * 0.7);
-    field = mix(field, [11, 12, 15], numb);
-    field = mix(field, [16, 16, 22], know * 0.5);
-    field = mix(field, INK, hold * 0.85);
-    var fade = 0.20 + hold * 0.30 + numb * 0.10;
+    /* ---- the ground ---- */
+    var field = mix(INK, [30, 15, 24], bond * (0.35 + tight * 0.75));
+    field = mix(field, [10, 11, 16], fade * 0.8);
+    field = mix(field, [9, 10, 13], numb);
+    var ff = 0.20 + fade * 0.16 + numb * 0.08;
     var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.78);
-    g.addColorStop(0, rgba(field, fade));
-    g.addColorStop(0.42, rgba(mix(field, INK, 0.55), fade * 0.98));
-    g.addColorStop(1, rgba(INK, Math.min(1, fade + 0.34 + numb * 0.2)));
+    g.addColorStop(0, rgba(field, ff));
+    g.addColorStop(0.42, rgba(mix(field, INK, 0.55), ff * 0.98));
+    g.addColorStop(1, rgba(INK, Math.min(1, ff + 0.34 + fade * 0.2)));
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
 
-    /* ---- the orbit ----
-       while she is here it is the thing they go round. after she is gone it
-       is a shape with nothing on the other side of it, and he stays on it. */
-    /* full while she is on it, still full when she is not, small while he
-       is hiding, and back out again at the end */
-    var Ro = M * (0.055 + bond * 0.20 + away * 0.19 - numb * 0.145 + know * 0.03);
-    spin += dt * (0.10 + bond * 0.28 - numb * 0.05 + pulse * 0.05 - hold * 0.086);
+    /* ---- where the two of them are ----
+       She falls in, gets caught, and from then on the circle only ever gets
+       smaller and quicker. He is pulled the other way by a fraction of it,
+       because she is the one doing the moving. */
+    var herR, hx, hy, qx, qy;
 
-    var his = spin;
-    var hers = spin + Math.PI;
-    var hx = cx + Math.cos(his) * Ro, hy = cy + Math.sin(his) * Ro * 0.86;
-    var qx = cx + Math.cos(hers) * Ro, qy = cy + Math.sin(hers) * Ro * 0.86;
+    if (t < T.hit){
+      var k = t < T.her ? 0 : (t - T.her) / (T.hit - T.her);
+      herR = M * 1.35 + (RCAP - M * 1.35) * (k * k);
+      herA += dt * (0.30 + k * 1.1);
+      caught = false;
+    } else if (t < T.gone){
+      herR = RCAP + (RMIN - RCAP) * tight;
+      /* closer is faster, which is what makes it a whirlwind and not a waltz */
+      herA += dt * (0.55 + Math.pow(1 - herR / RCAP, 1.6) * 5.2);
+      caught = true;
+    } else {
+      herR = RMIN;
+    }
+
+    var mu = 0.20;
+    qx = cx + Math.cos(herA) * herR;
+    qy = cy + Math.sin(herA) * herR * 0.86;
+    hx = cx - Math.cos(herA) * herR * mu;
+    hy = cy - Math.sin(herA) * herR * 0.86 * mu;
+
+    if (t < T.gone){
+      /* remember the state she left in, so the leaving is the same motion
+         carried on rather than a cut to something else */
+      goneAt.x = qx; goneAt.y = qy;
+      goneAt.vx = -Math.sin(herA); goneAt.vy = Math.cos(herA) * 0.86;
+      goneAt.hx = hx; goneAt.hy = hy;
+    } else {
+      /* he is left where he was and drifts back to the middle */
+      var settle = ease((t - T.gone) / 4.5);
+      hisA += dt * (0.32 - fade * 0.24);
+      var own = M * (0.028 + fade * 0.020);
+      hx = goneAt.hx + (cx + Math.cos(hisA) * own - goneAt.hx) * settle;
+      hy = goneAt.hy + (cy + Math.sin(hisA) * own * 0.86 - goneAt.hy) * settle;
+    }
 
     var hc = hisColour();
-
     ctx.globalCompositeOperation = 'lighter';
 
-    /* the path itself. faint, except for the moment he sees it whole. */
-    var seen = know > 0 ? Math.pow(1 - Math.min(1, Math.abs(know - 0.5) / 0.5), 2) : 0;
-    var pathA = 0.05 + bond * 0.10 + know * 0.06 + seen * 0.30;
-    if (pathA > 0.01 && Ro > 2){
-      ctx.strokeStyle = rgba(mix(hc, HER, 0.4 * (1 - know)), 1);
-      ctx.globalAlpha = pathA;
+    /* ---- the ring she was on ----
+       after she goes it is his, not hers, and the distance grows on its own */
+    var Rghost = RMIN + fade * (M * 0.30 - RMIN);
+    var ring = t < T.gone ? herR : Rghost;
+    var ringA = t < T.gone
+      ? (0.04 + bond * 0.09)
+      /* as everything else dims, the shape is what is left to look at */
+      : (0.05 + fade * 0.10);
+    if (ringA > 0.008 && ring > 3){
+      ctx.strokeStyle = rgba(mix(hc, HER, 0.35 * (1 - fade)), 1);
+      ctx.globalAlpha = ringA;
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.ellipse(cx, cy, Ro, Ro * 0.86, 0, 0, TAU);
+      ctx.ellipse(cx, cy, ring, ring * 0.86, 0, 0, TAU);
       ctx.stroke();
-      /* and when he sees it, he sees the gap in it: it was never joined */
-      if (seen > 0.02){
-        ctx.globalAlpha = seen * 0.85;
-        ctx.strokeStyle = rgba(INK, 1);
+      /* and once it is dim enough to look at, there is a piece missing */
+      if (t > T.truth){
+        var gap = ease((t - T.truth) / 5) * 0.85;
         ctx.globalCompositeOperation = 'source-over';
+        ctx.globalAlpha = gap * ringA * 9;
+        ctx.strokeStyle = rgba(INK, 1);
         ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.ellipse(cx, cy, Ro, Ro * 0.86, 0, hers - 0.42, hers + 0.42);
+        ctx.ellipse(cx, cy, ring, ring * 0.86, 0, -0.5, 0.5);
         ctx.stroke();
         ctx.globalCompositeOperation = 'lighter';
       }
     }
     ctx.globalAlpha = 1;
 
-    /* ---- the tether ----
-       what looked like the two of them being attached to each other */
-    if (bond > 0.02){
-      ctx.globalAlpha = bond * (0.30 + pulse * 0.25);
+    /* ---- the tether ---- */
+    if (bond > 0.02 && t < T.gone){
+      ctx.globalAlpha = bond * (0.18 + tight * 0.34 + pulse * 0.2);
       var tg = ctx.createLinearGradient(hx, hy, qx, qy);
       tg.addColorStop(0, rgba(hc, 0.9));
-      tg.addColorStop(0.5, rgba(HER_HOT, 0.5));
+      tg.addColorStop(0.5, rgba(HER_HOT, 0.55));
       tg.addColorStop(1, rgba(HER, 0.9));
       ctx.strokeStyle = tg;
-      ctx.lineWidth = 1 + bond * 1.4;
+      ctx.lineWidth = 1 + tight * 1.6;
       ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(qx, qy); ctx.stroke();
       ctx.globalAlpha = 1;
+    }
+
+    /* ---- the impact ---- */
+    if (boom > 0.002){
+      var br = M * (0.06 + (1 - boom) * 0.95);
+      ctx.globalAlpha = boom * boom * 0.5;
+      ctx.strokeStyle = rgba(mix(HER_HOT, WARM, 0.3), 1);
+      ctx.lineWidth = 1 + boom * 5;
+      ctx.beginPath(); ctx.ellipse(cx, cy, br, br * 0.86, 0, 0, TAU); ctx.stroke();
+      ctx.globalAlpha = boom * 0.16;
+      ctx.fillStyle = rgba(HER_HOT, 1);
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalAlpha = 1;
+      if (Math.random() < boom * 3) { mote(1); mote(1); }
     }
 
     /* ---- what he sends, and where it gets to ---- */
@@ -504,52 +557,76 @@
       var rr = reaches[i];
       rr.p += dt * rr.v;
       if (rr.p >= 1){ reaches.splice(i, 1); continue; }
-      /* it comes apart somewhere short of the other side, every time */
       var alive = rr.p < rr.far ? 1 : Math.pow(1 - (rr.p - rr.far) / (1 - rr.far), 1.4);
       if (alive <= 0.01) continue;
-      var ang = his + rr.p * Math.PI;
+      var ang = hisA + rr.p * Math.PI;
       var wob = Math.sin(rr.p * 7 + rr.wob) * M * 0.012 * (1 - rr.p);
-      var rx = cx + Math.cos(ang) * (Ro + wob);
-      var ry = cy + Math.sin(ang) * (Ro + wob) * 0.86;
-      ctx.globalAlpha = alive * (0.16 + rr.power * 0.30);
-      ctx.fillStyle = rgba(mix(hc, HER, 0.45), 1);
+      var rx = cx + Math.cos(ang) * (ring + wob);
+      var ry = cy + Math.sin(ang) * (ring + wob) * 0.86;
+      ctx.globalAlpha = alive * (0.10 + rr.power * 0.26);
+      ctx.fillStyle = rgba(mix(hc, HER, 0.4), 1);
       ctx.beginPath();
-      ctx.arc(rx, ry, (1.1 + rr.power * 1.7) * alive, 0, TAU);
+      ctx.arc(rx, ry, (0.9 + rr.power * 1.6) * alive, 0, TAU);
       ctx.fill();
     }
     ctx.globalAlpha = 1;
 
-    /* ---- her ----
-       brighter than him and never quite steady, and then not there */
-    if (bond > 0.01){
-      var flick = 0.72 + Math.sin(now8 * 2.7) * 0.16 + Math.sin(now8 * 6.1) * 0.12;
-      orb(qx, qy, M * (0.10 + bond * 0.05) * (1 + pulse * 0.12),
-          HER, HER_HOT, bond * flick * (0.5 + pulse * 0.35));
+    /* ---- her ---- */
+    if (t < T.gone && bond > 0.01){
+      var flick = 0.74 + Math.sin(now8 * 2.7) * 0.15 + Math.sin(now8 * 6.1) * 0.11;
+      orb(qx, qy, M * (0.055 + bond * 0.05 + tight * 0.03) * (1 + pulse * 0.12),
+          HER, HER_HOT, bond * flick * (0.42 + tight * 0.30 + pulse * 0.28));
+      if (Math.random() < 0.25 + tight * 0.8) mote(1);
     }
 
-    /* ---- her place, once she is not in it ----
-       nothing for a long time. and then, in the silence, something. */
+    /* ---- her leaving ----
+       the same motion carried straight on, faster every frame, and then the
+       screen does not have her on it any more */
+    if (flee > 0 && flee < 1){
+      var gsec = t - T.gone;
+      var d = M * (2.4 * gsec + 8.5 * gsec * gsec);
+      var fx = goneAt.x + goneAt.vx * d;
+      var fy = goneAt.y + goneAt.vy * d;
+      var px = goneAt.x + goneAt.vx * Math.max(0, d - M * 0.34);
+      var py = goneAt.y + goneAt.vy * Math.max(0, d - M * 0.34);
+      ctx.globalAlpha = (1 - flee) * 0.7;
+      var sg = ctx.createLinearGradient(px, py, fx, fy);
+      sg.addColorStop(0, rgba(HER, 0));
+      sg.addColorStop(1, rgba(HER_HOT, 0.9));
+      ctx.strokeStyle = sg;
+      ctx.lineWidth = 2.4;
+      ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(fx, fy); ctx.stroke();
+      ctx.lineCap = 'butt';
+      ctx.globalAlpha = 1;
+      orb(fx, fy, M * 0.07, HER, HER_HOT, (1 - flee) * 0.6);
+    }
+
+    /* ---- her place, once the track has stopped and nothing is happening ---- */
+    var hold = ease((t - T.quiet) / 3.2);
     if (hold > 0.01){
-      orb(qx, qy, M * 0.075 * (0.6 + hold * 0.4), HER, HER_HOT, hold * 0.22);
+      var wx = cx + Math.cos(hisA + Math.PI) * ring;
+      var wy = cy + Math.sin(hisA + Math.PI) * ring * 0.86;
+      orb(wx, wy, M * 0.075, HER, HER_HOT, hold * 0.20);
     }
 
     /* ---- him ---- */
-    orb(hx, hy, M * (0.070 + lit * 0.070) * (1 + pulse * 0.10),
-        hc, mix(hc, CREAM, 0.6), (0.22 + lit * 0.52) * (0.82 + pulse * 0.34));
+    orb(hx, hy, M * (0.055 + lit * 0.075) * (1 + pulse * 0.10),
+        hc, mix(hc, CREAM, 0.6), (0.10 + lit * 0.55) * (0.84 + pulse * 0.30));
 
-    /* the sound of it, wrapped round him. gentle. it is a slow song. */
+    /* the sound of it, wrapped round him, and it goes quiet too */
     if (analyser && N){
-      ctx.globalAlpha = 0.10 + lit * 0.16;
+      ctx.globalAlpha = (0.05 + lit * 0.18) * (1 - fade * 0.55);
       ctx.strokeStyle = rgba(mix(hc, CREAM, 0.3), 1);
       ctx.lineWidth = 1;
       ctx.beginPath();
-      var Rb = M * (0.055 + lit * 0.030);
-      for (var k = 0; k <= N; k++){
-        var v = level[k % N];
-        var a2 = -spin * 0.5 + (k / N) * TAU;
-        var r2 = Rb + v * M * 0.030 * (0.4 + lit * 0.6);
-        var px = hx + Math.cos(a2) * r2, py = hy + Math.sin(a2) * r2;
-        if (k === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      var Rb = M * (0.042 + lit * 0.030);
+      for (var k2 = 0; k2 <= N; k2++){
+        var v = level[k2 % N];
+        var a2 = -hisA * 0.5 + (k2 / N) * TAU;
+        var r2 = Rb + v * M * 0.028 * (0.4 + lit * 0.6) * (1 - fade * 0.6);
+        var mx = hx + Math.cos(a2) * r2, my = hy + Math.sin(a2) * r2;
+        if (k2 === 0) ctx.moveTo(mx, my); else ctx.lineTo(mx, my);
       }
       ctx.closePath();
       ctx.stroke();
@@ -557,15 +634,16 @@
     }
 
     /* ---- motes ---- */
-    var want = (0.07 + bond * 1.15 + know * 0.30) * (1 - numb * 0.85) * (1 - hold * 0.75);
-    if (Math.random() < want) mote();
-    if (Math.random() < want * 0.5) mote();
+    var want = (0.07 + bond * (0.5 + tight * 1.1)) * (1 - fade * 0.9) * (1 - numb * 0.7);
+    if (Math.random() < want) mote(0);
     for (i = motes.length - 1; i >= 0; i--){
       var mo = motes[i];
+      /* nothing of hers outlives her by more than a moment */
+      if (mo.her && t >= T.gone){ mo.life -= dt * 3.5; }
       mo.x += mo.vx * dt; mo.y += mo.vy * dt;
       mo.life -= mo.decay * dt;
       if (mo.life <= 0){ motes.splice(i, 1); continue; }
-      ctx.globalAlpha = mo.life * (0.16 + bond * 0.24 + know * 0.10);
+      ctx.globalAlpha = mo.life * (0.14 + bond * 0.26) * (1 - fade * 0.85);
       ctx.fillStyle = rgba(mo.her ? HER : mix(hc, CREAM, 0.35), 1);
       ctx.beginPath(); ctx.arc(mo.x, mo.y, mo.size, 0, TAU); ctx.fill();
     }
@@ -592,6 +670,7 @@
   function jumped(){
     lastBeat = -1e9; beatAt = -9; beatHard = 0;
     reaches.length = 0; motes.length = 0;
+    herA = -2.35; hisA = 0;
   }
 
   bar.addEventListener('click', function(e){
@@ -643,9 +722,9 @@
     T: T, grid: GRID,
     at: function(t){
       state(t);
-      return { bond: +bond.toFixed(3), ache: +ache.toFixed(3),
-               numb: +numb.toFixed(3),
-               know: +know.toFixed(3), hold: +hold.toFixed(3),
+      return { bond: +bond.toFixed(3), tight: +tight.toFixed(3),
+               boom: +boom.toFixed(3), flee: +flee.toFixed(3),
+               fade: +fade.toFixed(3), numb: +numb.toFixed(3),
                lit: +lit.toFixed(3), reaches: reaches.length };
     }
   };
