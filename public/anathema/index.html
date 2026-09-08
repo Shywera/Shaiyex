@@ -186,15 +186,35 @@
 (function(){
   "use strict";
 
-  /* Measured off the file that ships. Re-encode the track and these move. */
+  /* Measured off the file that ships. Re-encode the track and these move.
+     Every one of these is a beat of the grid below. */
   var T = {
+    lift:    12.013,  /* the first section arrives */
+    beat:    44.413,  /* the beat proper walks in. rms doubles on this line */
+    ease:    53.413,  /* and steps back out */
     drop:    63.013,  /* the hardcore lands, centroid falls off a cliff */
-    cut:     85.69,   /* everything stops. four seconds of actual nothing */
+    cut:     85.689,  /* everything stops. four seconds of actual nothing */
     back:    89.90,   /* it creeps back */
     bright: 113.413,  /* the turn. the whole reason for the page */
+    hyper:  137.413,  /* and then it stops being polite about it */
     outro:  186.33,
     dur:    202.57
   };
+
+  /* How much of everything, section by section. 0 is nothing, 4 is hyper.
+     This is the shape of the track, not a guess: each mark is where the low
+     band actually steps up or down. */
+  var ARC = [
+    [0,        0],
+    [T.lift,   1],
+    [T.beat,   3],
+    [T.ease,   1],
+    [T.drop,   4],
+    [T.cut,    0],
+    [T.bright, 2],
+    [T.hyper,  4],
+    [T.outro,  1]
+  ];
 
   var audio  = document.getElementById('track');
   var canvas = document.getElementById('viz');
@@ -296,7 +316,7 @@
   var SPB = 60 / GRID.bpm;
   var BAR = 2;
 
-  var lastBeat = -1e9, kickAt = -9, kickHard = 0;
+  var lastBeat = -1e9, kickAt = -9, kickHard = 0, tearAt = -9;
 
   function beats(t){
     var n = Math.floor((t - GRID.t0) / SPB);
@@ -310,21 +330,35 @@
 
     /* the grid says when, the track still says how hard */
     kickAt = GRID.t0 + n * SPB;
-    kickHard = Math.min(1, (0.26 + energy(1, 8) * 1.45) * (half ? 1 : 0.62));
+    kickHard = Math.min(1, (0.24 + energy(1, 8) * 1.5) * (half ? 1 : 0.66 + lvl * 0.07))
+             * (0.22 + Math.min(1, lvl / 2) * 0.78);   /* a quiet stretch still breathes */
 
-    if (hush < 0.25) return;
-    if (half){
-      waves.push({ r: 0, life: 1, hard: down ? kickHard : kickHard * 0.6,
-                   bar: down });
-      if (waves.length > 14) waves.shift();
+    if (hush < 0.25 || lvl < 0.5) return;
+
+    /* how often a ring goes out, and how big it is when it does. once the
+       beat has properly arrived every single one of them is a big one. */
+    var fire = lvl >= 2.5 ? true : lvl >= 1.5 ? half : down;
+    if (fire){
+      waves.push({ r: 0, life: 1, hard: kickHard, bar: lvl >= 2.5 || down });
+      if (waves.length > 20) waves.shift();
     }
     if (warm > 0.35 && !reduce) hit();
+
+    if (down && lvl >= 2.5 && warm < 0.5 && !reduce) tearAt = kickAt;
+
+    if (lvl >= 3.4 && !reduce){
+      rain(down ? 3 : 1);
+      if (down) flashes.push({ t: kickAt, dur: 0.26, power: 0.30,
+                               c: warm > 0.5 ? GOLD_HOT : RED_HOT });
+    }
   }
 
   /* ================= state ================= */
   var warm = 0,    /* 0 the curse, 1 the light */
       hush = 1,    /* the cut */
-      heat = 0,    /* the drop */
+      heat = 0,    /* how much violence the first half is doing */
+      lvl = 0,     /* where the arc is, smoothed */
+      lvlT = 0,    /* and where it is heading */
       phase = '',
       idle = false;
 
@@ -340,8 +374,13 @@
     if (t < when - 0.5 || t > when + 4) fired[key] = false;
   }
 
-  function state(t){
+  function state(t, dt){
     warm = ease((t - T.bright) / 4.6);
+
+    lvlT = 0;
+    for (var q = 0; q < ARC.length; q++) if (t >= ARC[q][0]) lvlT = ARC[q][1];
+    /* no dt means somebody is probing a moment rather than playing it */
+    lvl += (lvlT - lvl) * (dt ? Math.min(1, dt * 7) : 1);
 
     hush = 1;
     if (t > T.cut - 0.1 && t < T.back + 1.0){
@@ -349,13 +388,15 @@
       if (t > T.back) hush = ease((t - T.back) / 1.0);
     }
 
-    heat = (t >= T.drop && t < T.cut) ? ease((t - T.drop) / 1.0) : 0;
+    /* the first half only, and only once the arc is past medium */
+    heat = (1 - Math.min(1, warm * 2)) * Math.max(0, Math.min(1, (lvl - 2) / 2));
 
     once('drop', t, T.drop, function(){
       flashes.push({ t: t, dur: 1.1, power: 1.5, c: [255, 60, 40] });
     });
     once('cut', t, T.cut, function(){
       flashes.length = 0; waves.length = 0; circles.length = 0; dust.length = 0;
+      swords.length = 0; lands.length = 0;
       blackout = 1;
     });
     once('turn', t, T.bright, function(){
@@ -388,7 +429,7 @@
   var INK = [5, 4, 10], INK_WARM = [10, 8, 5];
 
   /* ================= transient things ================= */
-  var waves = [], circles = [], dust = [], shards = [];
+  var waves = [], circles = [], dust = [], shards = [], swords = [], lands = [];
   var blackout = 0;
 
   function hit(){
@@ -400,6 +441,64 @@
       y: Math.max(52, Math.min(H - 110, H * 0.46 + Math.sin(ang) * rad)),
       t: 0, dur: 0.6, pop: 0
     });
+  }
+
+  /* Swords, for when it goes hyper. They come down either side of the cross
+     and never through it, so the middle stays readable. */
+  function rain(k){
+    for (var i = 0; i < k && swords.length < 20; i++){
+      var side = Math.random() < 0.5 ? -1 : 1;
+      swords.push({
+        x: W / 2 + side * W * (0.15 + Math.random() * 0.35),
+        y: -H * (0.15 + Math.random() * 0.55),
+        v: H * (1.05 + Math.random() * 1.0),
+        len: Math.min(W, H) * (0.11 + Math.random() * 0.09),
+        tilt: (Math.random() - 0.5) * 0.20,
+        land: H * (0.60 + Math.random() * 0.32)
+      });
+    }
+  }
+
+  function blade(s){
+    var core = mix([255, 140, 96], GOLD_HOT, warm);
+    var edge = mix(RED_HOT, GOLD, warm);
+    var L = s.len, w = L * 0.052;
+
+    ctx.save();
+    ctx.translate(s.x, s.y);
+    ctx.rotate(s.tilt);
+    ctx.globalCompositeOperation = 'lighter';
+
+    /* the air it has already come through */
+    var tg = ctx.createLinearGradient(0, -L * 1.9, 0, -L * 0.6);
+    tg.addColorStop(0, rgba(edge, 0));
+    tg.addColorStop(1, rgba(edge, 0.13));
+    ctx.fillStyle = tg;
+    ctx.fillRect(-w * 0.55, -L * 1.9, w * 1.1, L * 1.3);
+
+    ctx.fillStyle = rgba(core, 0.62);
+    ctx.shadowColor = rgba(edge, 0.9);
+    ctx.shadowBlur = 10;
+
+    /* blade, down to a point */
+    ctx.beginPath();
+    ctx.moveTo(-w, -L * 0.60);
+    ctx.lineTo(w, -L * 0.60);
+    ctx.lineTo(w * 0.6, L * 0.28);
+    ctx.lineTo(0, L * 0.50);
+    ctx.lineTo(-w * 0.6, L * 0.28);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillRect(-L * 0.15, -L * 0.66, L * 0.30, w * 1.0);   /* crossguard */
+    ctx.fillRect(-w * 0.55, -L * 0.84, w * 1.1, L * 0.20);   /* grip */
+    ctx.beginPath();
+    ctx.arc(0, -L * 0.86, w * 0.95, 0, TAU);
+    ctx.fill();                                              /* pommel */
+
+    ctx.shadowBlur = 0;
+    ctx.restore();
+    ctx.globalCompositeOperation = 'source-over';
   }
 
   function shard(cx, cy, R){
@@ -707,7 +806,7 @@
     for (var i = 0; i < n; i++){
       var y = Math.random() * H;
       var h = 5 + Math.random() * 46;
-      var dx = (Math.random() - 0.5) * 130 * power;
+      var dx = (Math.random() - 0.5) * 95 * power;
       ctx.drawImage(canvas,
         0, y * dpr, canvas.width, h * dpr,
         dx, y, W, h);
@@ -746,7 +845,7 @@
     last = now8;
 
     var t = audio.currentTime;
-    state(t);
+    state(t, dt);
     readBands();
     beats(t);
 
@@ -804,10 +903,10 @@
     for (i = waves.length - 1; i >= 0; i--){
       s = waves[i];
       s.r += dt * Math.min(W, H) * (s.holy ? 2.4 : (s.bar ? 0.62 : 0.92) + s.hard * 0.5);
-      s.life -= dt * (s.holy ? 0.55 : (s.bar ? 0.95 : 1.7));
+      s.life -= dt * (s.holy ? 0.55 : (s.bar ? 1.3 : 1.8));
       if (s.life <= 0){ waves.splice(i, 1); continue; }
       ctx.globalCompositeOperation = warm > 0.5 || s.holy ? 'lighter' : 'source-over';
-      ctx.globalAlpha = s.life * s.life * (s.holy ? 0.7 : s.bar ? 0.62 : 0.34) * hush;
+      ctx.globalAlpha = s.life * s.life * (s.holy ? 0.7 : s.bar ? 0.5 : 0.32) * hush;
       ctx.strokeStyle = rgba(s.holy ? GOLD_HOT : mix(RED_HOT, GOLD, warm), 1);
       ctx.lineWidth = s.holy ? 3
         : ((1 - warm) * (1 + s.hard * 3.4) + warm * 1.1) * (s.bar ? 1.5 : 0.7);
@@ -839,6 +938,41 @@
       }
       ctx.globalCompositeOperation = 'source-over';
     }
+    ctx.globalAlpha = 1;
+
+    /* the rain, and what it does when it arrives */
+    for (i = swords.length - 1; i >= 0; i--){
+      var sw = swords[i];
+      sw.y += sw.v * dt;
+      if (sw.y >= sw.land){
+        lands.push({ x: sw.x, y: sw.land, r: 0, life: 1 });
+        swords.splice(i, 1);
+        continue;
+      }
+      blade(sw);
+    }
+    ctx.globalCompositeOperation = 'lighter';
+    for (i = lands.length - 1; i >= 0; i--){
+      var ld = lands[i];
+      ld.r += dt * Math.min(W, H) * 1.15;
+      ld.life -= dt * 2.6;
+      if (ld.life <= 0){ lands.splice(i, 1); continue; }
+      var lc = mix(RED_HOT, GOLD_HOT, warm);
+      ctx.globalAlpha = ld.life * ld.life * 0.75;
+      ctx.strokeStyle = rgba(lc, 1);
+      ctx.lineWidth = 2.2 * ld.life;
+      ctx.beginPath();
+      ctx.ellipse(ld.x, ld.y, ld.r, ld.r * 0.26, 0, 0, TAU);
+      ctx.stroke();
+      /* and the column of light it leaves standing for a moment */
+      var cg = ctx.createLinearGradient(ld.x, ld.y - Math.min(W, H) * 0.26, ld.x, ld.y);
+      cg.addColorStop(0, rgba(lc, 0));
+      cg.addColorStop(1, rgba(lc, 0.5 * ld.life));
+      ctx.fillStyle = cg;
+      ctx.fillRect(ld.x - 5 * ld.life, ld.y - Math.min(W, H) * 0.26,
+                   10 * ld.life, Math.min(W, H) * 0.26);
+    }
+    ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = 1;
 
     /* shrapnel off the hard kicks in the drop */
@@ -897,7 +1031,7 @@
       ctx.globalAlpha = 1;
     }
 
-    if (heat > 0.3 && bump > 0.5 && !reduce) tear(bump * heat);
+    if (t - tearAt >= 0 && t - tearAt < 0.13) tear(0.5 + heat * 0.5);
 
     vignette(bump);
 
@@ -941,8 +1075,9 @@
 
   function jumped(){
     lastBeat = -1e9;
-    kickAt = -9; kickHard = 0;
+    kickAt = -9; kickHard = 0; tearAt = -9;
     waves.length = circles.length = dust.length = shards.length = 0;
+    swords.length = lands.length = 0;
     flashes.length = 0;
     burst = 0;
     fired = {};
@@ -1001,8 +1136,9 @@
     at: function(t){
       state(t);
       return { phase: phase, warm: +warm.toFixed(3), hush: +hush.toFixed(3),
-               heat: +heat.toFixed(3), burst: +burst.toFixed(3),
-               flashes: flashes.length };
+               heat: +heat.toFixed(3), lvl: +lvl.toFixed(2),
+               burst: +burst.toFixed(3), flashes: flashes.length,
+               swords: swords.length };
     }
   };
 
