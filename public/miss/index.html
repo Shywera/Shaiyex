@@ -71,6 +71,7 @@
   .bar-her{background:rgba(255,137,168,.30)}
   .bar-after{background:rgba(110,134,168,.20)}
   .bar-quiet{background:rgba(255,255,255,.03)}
+  .bar-dip{background:rgba(7,10,18,.85)}
   .bar-fill{position:absolute;left:0;top:0;bottom:0;width:0;
             background:var(--cold);box-shadow:0 0 10px rgba(110,134,168,.7)}
   .bar-head{position:absolute;top:50%;width:2px;height:13px;margin-top:-6.5px;
@@ -181,14 +182,24 @@
   var T = {
     her:     8.108,   /* beat 15. she comes in from off the edge */
     hit:     9.719,   /* beat 18. the biggest arrival in the track */
-    gone:   34.410,   /* beat 64. she leaves, at speed, and does not stop */
-    reach:  37.630,   /* beat 70. it starts again without her */
-    small:  76.804,   /* it thins out. so does he */
-    truth:  91.307,   /* full again, and it changes nothing */
+    gone:   76.804,   /* beat 143. the track thins out and so does she */
+    reach:  78.414,   /* beat 146. he starts sending */
     stop:  111.704,   /* the last of it */
     quiet: 114.500,   /* and then twelve seconds of actual silence */
     dur:   126.247
   };
+
+  /* She does not simply get closer for a minute. She pulls out and comes
+     back, and the first one is the only one that is really in the track:
+     between beats 64 and 70 the low end drops to nothing and then returns,
+     which is the whole band stopping and starting again. The other two are
+     smaller and sit in the sag the track has through the fifties and
+     sixties. Out quickly, back slowly, every time. */
+  var PULLS = [
+    { a: 34.410, b: 37.630, out: 0.92 },   /* beats 64 to 70 */
+    { a: 52.660, b: 56.417, out: 0.45 },   /* beats 98 to 105 */
+    { a: 62.850, b: 66.608, out: 0.62 }    /* beats 117 to 124 */
+  ];
 
   /* 111.781 bpm. the phase the three sections each land on agrees to
      within 28 ms across a hundred seconds, and grid lines carry fifteen
@@ -219,6 +230,15 @@
     h.style.left = at(T.her);    h.style.width = pct(T.her, T.gone);
     a.style.left = at(T.gone);   a.style.width = pct(T.gone, T.stop);
     q.style.left = at(T.stop);   q.style.width = pct(T.stop, T.dur);
+    /* the dips she comes back from, marked so the bar has the shape too */
+    var track = h.parentNode;
+    for (var i = 0; i < PULLS.length; i++){
+      var d = document.createElement('i');
+      d.className = 'bar-act bar-dip';
+      d.style.left = at(PULLS[i].a);
+      d.style.width = pct(PULLS[i].a, PULLS[i].b);
+      track.insertBefore(d, document.getElementById('fill'));
+    }
   })();
 
   /* ================= audio ================= */
@@ -293,14 +313,26 @@
 
   var bond = 0,   /* how much of her is on the screen */
       tight = 0,  /* how close in the spiral has got */
+      pull = 0,   /* and how far back out she is at this exact moment */
       boom = 0,   /* the impact */
       flee = 0,   /* how long since she left, 0..1 over the flight out */
       fade = 0,   /* and then it is only ever less */
-      numb = 0,   /* the stretch where it thins out even faster */
       lit  = 0;   /* what he has left */
+
+  var FLIGHT = 2.8;   /* how long she takes to go. it is not quick. */
 
   function state(t){
     boom = t >= T.hit && t < T.hit + 1.4 ? Math.pow(1 - (t - T.hit) / 1.4, 2.2) : 0;
+
+    pull = 0;
+    for (var i = 0; i < PULLS.length; i++){
+      var q = PULLS[i];
+      if (t <= q.a || t >= q.b) continue;
+      var k = (t - q.a) / (q.b - q.a);
+      /* out fast, back slowly */
+      pull = Math.max(pull, q.out *
+        (k < 0.26 ? ease(k / 0.26) : Math.pow(1 - (k - 0.26) / 0.74, 1.5)));
+    }
 
     if (t < T.her){ bond = 0; tight = 0; }
     else if (t < T.hit){ bond = Math.min(1, (t - T.her) / (T.hit - T.her) * 2.2); tight = 0; }
@@ -309,27 +341,28 @@
       tight = Math.pow((t - T.hit) / (T.gone - T.hit), 1.35);
     } else { bond = 0; tight = 1; }
 
-    flee = t < T.gone ? 0 : Math.min(1, (t - T.gone) / 0.9);
+    flee = t < T.gone ? 0 : Math.min(1, (t - T.gone) / FLIGHT);
 
     /* one direction only, all the way to the end */
     fade = t < T.gone ? 0 : ease((t - T.gone) / (T.stop - T.gone));
-    numb = t > T.small && t < T.truth
-      ? ease((t - T.small) / 3.5) * (1 - ease((t - (T.truth - 2)) / 2.4)) : 0;
 
     /* Dim on his own, brighter the closer she gets, and then less and less
        for the remaining seventy seven seconds. What she was giving him goes
        in about half a second, which is a collapse rather than a cut, and
        after that the slope never turns back up. */
+    /* how much of his light is hers. it dips every time she pulls out, and
+       when she finally goes it drains over the whole time she is leaving,
+       not in one frame. */
     var hers = t < T.gone
-      ? bond * (0.20 + tight * 0.52)
-      : 0.72 * Math.pow(1 - Math.min(1, (t - T.gone) / 0.55), 2);
+      ? bond * (0.20 + tight * 0.52) * (1 - pull * 0.80)
+      : 0.72 * Math.pow(1 - Math.min(1, (t - T.gone) / (FLIGHT * 0.75)), 2);
     lit = 0.34
         + hers
         + boom * 0.30
-        - fade * 0.28;
-    /* numb is deliberately not in here. it is a dip, and a dip has a far
-       side, and his light coming back up even a little would be a lie. it
-       thins the room out instead. */
+        - fade * 0.30;
+    /* Nothing in here has a far side. The pulls dip it while she is still
+       around, because she comes back from those. Once she has gone, the
+       only term left moving is fade, and fade only goes one way. */
     if (lit < 0.040) lit = 0.040;
     if (lit > 1.05) lit = 1.05;
   }
@@ -440,10 +473,9 @@
       ? Math.pow(1 - since / 0.62, 2.6) * beatHard * (1 - fade * 0.78) : 0;
 
     /* ---- the ground ---- */
-    var field = mix(INK, [30, 15, 24], bond * (0.35 + tight * 0.75));
+    var field = mix(INK, [30, 15, 24], bond * (0.35 + tight * 0.75) * (1 - pull * 0.85));
     field = mix(field, [10, 11, 16], fade * 0.8);
-    field = mix(field, [9, 10, 13], numb);
-    var ff = 0.20 + fade * 0.16 + numb * 0.08;
+    var ff = 0.20 + fade * 0.16 + pull * 0.06;
     var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.78);
     g.addColorStop(0, rgba(field, ff));
     g.addColorStop(0.42, rgba(mix(field, INK, 0.55), ff * 0.98));
@@ -463,9 +495,12 @@
       herA += dt * (0.30 + k * 1.1);
       caught = false;
     } else if (t < T.gone){
-      herR = RCAP + (RMIN - RCAP) * tight;
-      /* closer is faster, which is what makes it a whirlwind and not a waltz */
-      herA += dt * (0.55 + Math.pow(1 - herR / RCAP, 1.6) * 5.2);
+      /* the spiral, and then whatever she is doing this minute on top of it */
+      var base = RCAP + (RMIN - RCAP) * tight;
+      herR = base + (RCAP * 1.12 - base) * pull;
+      /* closer is faster, which is what makes it a whirlwind and not a waltz,
+         and it also means she slows right down every time she backs off */
+      herA += dt * (0.55 + Math.pow(Math.max(0, 1 - herR / RCAP), 1.6) * 5.2);
       caught = true;
     } else {
       herR = RMIN;
@@ -511,8 +546,8 @@
       ctx.ellipse(cx, cy, ring, ring * 0.86, 0, 0, TAU);
       ctx.stroke();
       /* and once it is dim enough to look at, there is a piece missing */
-      if (t > T.truth){
-        var gap = ease((t - T.truth) / 5) * 0.85;
+      if (t > T.gone + 14){
+        var gap = ease((t - (T.gone + 14)) / 6) * 0.85;
         ctx.globalCompositeOperation = 'source-over';
         ctx.globalAlpha = gap * ringA * 9;
         ctx.strokeStyle = rgba(INK, 1);
@@ -527,13 +562,14 @@
 
     /* ---- the tether ---- */
     if (bond > 0.02 && t < T.gone){
-      ctx.globalAlpha = bond * (0.18 + tight * 0.34 + pulse * 0.2);
+      /* the thread between them goes thin and faint every time she backs off */
+      ctx.globalAlpha = bond * (0.18 + tight * 0.34 + pulse * 0.2) * (1 - pull * 0.8);
       var tg = ctx.createLinearGradient(hx, hy, qx, qy);
       tg.addColorStop(0, rgba(hc, 0.9));
       tg.addColorStop(0.5, rgba(HER_HOT, 0.55));
       tg.addColorStop(1, rgba(HER, 0.9));
       ctx.strokeStyle = tg;
-      ctx.lineWidth = 1 + tight * 1.6;
+      ctx.lineWidth = (1 + tight * 1.6) * (1 - pull * 0.55);
       ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(qx, qy); ctx.stroke();
       ctx.globalAlpha = 1;
     }
@@ -575,21 +611,26 @@
     if (t < T.gone && bond > 0.01){
       var flick = 0.74 + Math.sin(now8 * 2.7) * 0.15 + Math.sin(now8 * 6.1) * 0.11;
       orb(qx, qy, M * (0.055 + bond * 0.05 + tight * 0.03) * (1 + pulse * 0.12),
-          HER, HER_HOT, bond * flick * (0.42 + tight * 0.30 + pulse * 0.28));
-      if (Math.random() < 0.25 + tight * 0.8) mote(1);
+          HER, HER_HOT,
+          bond * flick * (0.42 + tight * 0.30 + pulse * 0.28) * (1 - pull * 0.45));
+      if (Math.random() < (0.25 + tight * 0.8) * (1 - pull * 0.8)) mote(1);
     }
 
     /* ---- her leaving ----
        the same motion carried straight on, faster every frame, and then the
        screen does not have her on it any more */
     if (flee > 0 && flee < 1){
+      /* She drifts at first, which is indistinguishable from the other times
+         she pulled away, and by the time it is obviously not that she is
+         already too far out to come back. */
       var gsec = t - T.gone;
-      var d = M * (2.4 * gsec + 8.5 * gsec * gsec);
+      var d = M * (0.40 * gsec + 0.085 * Math.pow(gsec, 3.4));
       var fx = goneAt.x + goneAt.vx * d;
       var fy = goneAt.y + goneAt.vy * d;
-      var px = goneAt.x + goneAt.vx * Math.max(0, d - M * 0.34);
-      var py = goneAt.y + goneAt.vy * Math.max(0, d - M * 0.34);
-      ctx.globalAlpha = (1 - flee) * 0.7;
+      var tail = M * (0.06 + 0.5 * Math.min(1, gsec / 2));
+      var px = goneAt.x + goneAt.vx * Math.max(0, d - tail);
+      var py = goneAt.y + goneAt.vy * Math.max(0, d - tail);
+      ctx.globalAlpha = Math.min(1, (1 - flee) * 1.3) * 0.7;
       var sg = ctx.createLinearGradient(px, py, fx, fy);
       sg.addColorStop(0, rgba(HER, 0));
       sg.addColorStop(1, rgba(HER_HOT, 0.9));
@@ -599,7 +640,7 @@
       ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(fx, fy); ctx.stroke();
       ctx.lineCap = 'butt';
       ctx.globalAlpha = 1;
-      orb(fx, fy, M * 0.07, HER, HER_HOT, (1 - flee) * 0.6);
+      orb(fx, fy, M * 0.075, HER, HER_HOT, Math.min(1, (1 - flee) * 1.4) * 0.6);
     }
 
     /* ---- her place, once the track has stopped and nothing is happening ---- */
@@ -634,7 +675,7 @@
     }
 
     /* ---- motes ---- */
-    var want = (0.07 + bond * (0.5 + tight * 1.1)) * (1 - fade * 0.9) * (1 - numb * 0.7);
+    var want = (0.07 + bond * (0.5 + tight * 1.1) * (1 - pull * 0.8)) * (1 - fade * 0.9);
     if (Math.random() < want) mote(0);
     for (i = motes.length - 1; i >= 0; i--){
       var mo = motes[i];
@@ -643,7 +684,7 @@
       mo.x += mo.vx * dt; mo.y += mo.vy * dt;
       mo.life -= mo.decay * dt;
       if (mo.life <= 0){ motes.splice(i, 1); continue; }
-      ctx.globalAlpha = mo.life * (0.14 + bond * 0.26) * (1 - fade * 0.85);
+      ctx.globalAlpha = mo.life * (0.14 + bond * 0.26 * (1 - pull * 0.7)) * (1 - fade * 0.85);
       ctx.fillStyle = rgba(mo.her ? HER : mix(hc, CREAM, 0.35), 1);
       ctx.beginPath(); ctx.arc(mo.x, mo.y, mo.size, 0, TAU); ctx.fill();
     }
@@ -723,8 +764,8 @@
     at: function(t){
       state(t);
       return { bond: +bond.toFixed(3), tight: +tight.toFixed(3),
-               boom: +boom.toFixed(3), flee: +flee.toFixed(3),
-               fade: +fade.toFixed(3), numb: +numb.toFixed(3),
+               pull: +pull.toFixed(3), boom: +boom.toFixed(3),
+               flee: +flee.toFixed(3), fade: +fade.toFixed(3),
                lit: +lit.toFixed(3), reaches: reaches.length };
     }
   };
