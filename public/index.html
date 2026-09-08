@@ -1136,6 +1136,19 @@
   body.tekk .wip-b:hover{border-color:#2FD8C3;box-shadow:0 0 34px rgba(47,216,195,.3), 0 16px 40px rgba(0,0,0,.8)}
   body.tekk .wip-b:hover .wip-s{color:#A8F0E6}
 
+  /* the third hangs lowest and furthest out, and it is gold, because that is
+     where the track it plays ends up */
+  body.tekk .wip-c{
+    margin:70px auto 0 3%;
+    --tilt:-1.15deg;
+    --hd:.17s;
+    --hdir:-1;
+  }
+  body.tekk .wip-c .wip-tag{background:#F0C868;color:#120C02}
+  body.tekk .wip-c .wip-s{color:#B08A3C}
+  body.tekk .wip-c:hover{border-color:#F0C868;box-shadow:0 0 34px rgba(240,200,104,.3), 0 16px 40px rgba(0,0,0,.8)}
+  body.tekk .wip-c:hover .wip-s{color:#FFE9B0}
+
   body.tekk .wip-tag{background:#8E0F0F;color:#040203}
   /* the blacklist hangs lower and swings wider, like a sign outside a door */
   body.tekk .blbar.dropping{z-index:1}
@@ -1713,6 +1726,15 @@
         <span class="wip-s" data-t="Before it learns you">Raid trainer</span>
       </span>
       <span class="wip-tag">NEW</span>
+      <span class="drip" aria-hidden="true"></span>
+    </a>
+
+    <a class="wip wip-c" href="/anathema/" data-go="swing-right" data-hush>
+      <span>
+        <span class="wip-t" data-t="Anathema">Anathema</span>
+        <span class="wip-s" data-t="The sentence, read out in full">Three minutes, and it does not stay like this</span>
+      </span>
+      <span class="wip-tag">LOUD</span>
       <span class="drip" aria-hidden="true"></span>
     </a>
 
