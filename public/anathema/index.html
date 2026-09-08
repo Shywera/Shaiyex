@@ -318,6 +318,14 @@
 
   var lastBeat = -1e9, kickAt = -9, kickHard = 0, tearAt = -9;
 
+  /* The phrase, for the accents rather than the pulse. 32 beats is what this
+     track actually repeats on, measured over the hyper section, and 16 is the
+     half of it that still reads as structure without being rare. Counting
+     from the beat the section starts on means the first accent lands exactly
+     on the section start rather than wherever the bar count happened to be. */
+  var PHRASE = 16;
+  var HY = Math.round((T.hyper - GRID.t0) / SPB);
+
   function beats(t){
     var n = Math.floor((t - GRID.t0) / SPB);
     if (n === lastBeat) return;
@@ -348,7 +356,15 @@
 
     if (lvl >= 3.4 && !reduce){
       /* swords belong to the half with a paladin in it */
-      if (warm > 0.5){ slash(); if (down) slash(); }
+      if (warm > 0.5){
+        slash();
+        /* and at the top of a phrase, two of them, crossing near the middle */
+        if (((n - HY) % PHRASE + PHRASE) % PHRASE === 0){
+          var a0 = Math.random() * TAU;
+          slash(a0, true);
+          slash(a0 + Math.PI / 2 + (Math.random() - 0.5) * 0.5, true);
+        }
+      }
       if (down) flashes.push({ t: kickAt, dur: 0.26, power: 0.30,
                                c: warm > 0.5 ? GOLD_HOT : RED_HOT });
     }
@@ -365,6 +381,7 @@
 
   var flashes = [];   /* {t, dur, power, c} in audio seconds */
   var burst = 0;      /* the god rays punching out at the turn */
+  var swell = -9;     /* the turn itself, which is a ball before it is a wall */
   var fired = {};
 
   function ease(x){ return x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x); }
@@ -401,7 +418,7 @@
       blackout = 1;
     });
     once('turn', t, T.bright, function(){
-      flashes.push({ t: t, dur: 1.7, power: 3.6, c: [255, 250, 238] });
+      swell = t;
       burst = 1;
       waves.push({ r: 0, life: 1, hard: 1, holy: 1 });
     });
@@ -449,10 +466,10 @@
      which is the same trick the beams on /why/ use and costs about the same
      as nothing. Hyper only, and only in the half that has any business
      swinging a sword. */
-  function slash(){
+  function slash(a, tight){
     if (slashes.length > 6) return;
-    var a = Math.random() * TAU;
-    var off = (Math.random() - 0.5) * Math.min(W, H) * 0.8;
+    if (a === undefined) a = Math.random() * TAU;
+    var off = (Math.random() - 0.5) * Math.min(W, H) * (tight ? 0.22 : 0.8);
     slashes.push({
       a: a,
       px: W / 2 - Math.sin(a) * off,
@@ -914,15 +931,15 @@
       lightRing(cx, cy, R, span, bump);
     }
 
-    /* four seconds of nothing, with one thing in it. the first gold on the
-       page turns up here, half a minute before the turn does. */
+    /* four seconds of nothing, with one thing in it. still the old colour:
+       nothing has turned yet. */
     if (hush < 0.6 && t > T.cut && t < T.back + 1.4){
       var seed = (1 - hush) * ease((t - T.cut) / 2.4);
       ctx.globalCompositeOperation = 'lighter';
       var sd = ctx.createRadialGradient(cx, cy, 0, cx, cy, 7 + seed * 110);
-      sd.addColorStop(0,    rgba(GOLD_HOT, 0.85 * seed));
-      sd.addColorStop(0.18, rgba(GOLD, 0.20 * seed));
-      sd.addColorStop(1,    rgba(GOLD, 0));
+      sd.addColorStop(0,    rgba([255, 214, 200], 0.85 * seed));
+      sd.addColorStop(0.18, rgba(RED_HOT, 0.22 * seed));
+      sd.addColorStop(1,    rgba(RED, 0));
       ctx.fillStyle = sd;
       ctx.fillRect(0, 0, W, H);
       ctx.globalCompositeOperation = 'source-over';
@@ -1046,6 +1063,25 @@
       ctx.globalCompositeOperation = 'source-over';
       ctx.globalAlpha = 1;
     }
+    /* The turn. It does not simply go white: a ball of gold opens at the
+       middle, gets to the corners in about four tenths of a second, and by
+       then it has washed out to white. Then it lets go. */
+    var sw = t - swell;
+    if (sw >= 0 && sw < 2.1){
+      var grow = Math.min(1, Math.pow(sw / 0.42, 0.72));
+      var rad = Math.min(W, H) * 0.10 + grow * Math.max(W, H) * 1.2;
+      var hold = sw < 0.42 ? 1 : Math.pow(1 - (sw - 0.42) / 1.68, 2.0);
+      ctx.globalCompositeOperation = 'lighter';
+      var sg = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
+      sg.addColorStop(0,    rgba(WHITE, hold));
+      sg.addColorStop(0.42, rgba(GOLD_HOT, 0.92 * hold));
+      sg.addColorStop(0.78, rgba(GOLD, 0.42 * hold));
+      sg.addColorStop(1,    rgba(GOLD, 0));
+      ctx.fillStyle = sg;
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
     for (i = flashes.length - 1; i >= 0; i--){
       var fl = flashes[i];
       var k2 = (t - fl.t) / fl.dur;
@@ -1081,7 +1117,7 @@
     waves.length = circles.length = dust.length = shards.length = 0;
     slashes.length = 0;
     flashes.length = 0;
-    burst = 0;
+    burst = 0; swell = -9;
     fired = {};
   }
 

@@ -396,6 +396,16 @@
     50%{opacity:.5}
   }
   @media (max-width:880px){
+    body.tekk .vrack{
+      margin:70px auto 0;
+      align-items:center;
+      text-align:center;
+      padding-top:104px;
+    }
+    body.tekk .vrack-sign{
+      right:auto;left:50%;transform:translateX(-50%);
+      white-space:normal;
+    }
     .wip{
       position:static;
       transform:none;
@@ -1136,10 +1146,51 @@
   body.tekk .wip-b:hover{border-color:#2FD8C3;box-shadow:0 0 34px rgba(47,216,195,.3), 0 16px 40px rgba(0,0,0,.8)}
   body.tekk .wip-b:hover .wip-s{color:#A8F0E6}
 
-  /* the third hangs lowest and furthest out, and it is gold, because that is
-     where the track it plays ends up */
+  /* ---------- the visualiser wall, over on the right ----------
+     A sign on the wall with things hanging under it, so there is somewhere
+     obvious to hang the next one. */
+  body:not(.tekk) .vrack{display:none}
+  body.tekk .vrack{
+    position:relative;
+    width:fit-content;
+    margin:118px 4% 0 auto;
+    padding-top:112px;   /* the sign hangs above the first plate, not under it */
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:76px;                 /* the next one hangs in here */
+    text-align:right;
+  }
+  body.tekk .vrack-sign{
+    position:absolute;
+    right:0;
+    top:-4px;
+    z-index:0;
+    pointer-events:none;
+    font-family:"Grenze Gotisch","Pirata One",serif;
+    font-weight:800;
+    font-size:clamp(26px,4.6vw,58px);
+    line-height:.86;
+    letter-spacing:.015em;
+    white-space:nowrap;
+    color:#41100C;
+    animation:sign 11s steps(1) infinite;
+  }
+  /* a tube with a loose connection somewhere behind the wall */
+  @keyframes sign{
+    0%,38%   {opacity:.62; text-shadow:0 0 24px rgba(194,26,18,.26)}
+    39%      {opacity:.16; text-shadow:none}
+    40%      {opacity:.70; text-shadow:0 0 34px rgba(194,26,18,.38)}
+    41%      {opacity:.18; text-shadow:none}
+    42%,69%  {opacity:.58; text-shadow:0 0 22px rgba(194,26,18,.24)}
+    70%      {opacity:.88; text-shadow:0 0 40px rgba(240,200,104,.30)}
+    71%      {opacity:.20; text-shadow:none}
+    72%,100% {opacity:.62; text-shadow:0 0 24px rgba(194,26,18,.26)}
+  }
+  body.tekk .vrack .wip{margin:0}
+
+  /* it is gold, because that is where the track it plays ends up */
   body.tekk .wip-c{
-    margin:70px auto 0 3%;
     --tilt:-1.15deg;
     --hd:.17s;
     --hdir:-1;
@@ -1729,14 +1780,18 @@
       <span class="drip" aria-hidden="true"></span>
     </a>
 
-    <a class="wip wip-c" href="/anathema/" data-go="swing-right" data-hush>
-      <span>
-        <span class="wip-t" data-t="Anathema">Anathema</span>
-        <span class="wip-s" data-t="The sentence, read out in full">Three minutes, and it does not stay like this</span>
-      </span>
-      <span class="wip-tag">LOUD</span>
-      <span class="drip" aria-hidden="true"></span>
-    </a>
+    <div class="vrack">
+      <span class="vrack-sign" aria-hidden="true">Music<br>visualisers</span>
+
+      <a class="wip wip-c" href="/anathema/" data-go="swing-right" data-hush>
+        <span>
+          <span class="wip-t" data-t="Anathema">Anathema</span>
+          <span class="wip-s" data-t="The sentence, read out in full">Three minutes, and it does not stay like this</span>
+        </span>
+        <span class="wip-tag">LOUD</span>
+        <span class="drip" aria-hidden="true"></span>
+      </a>
+    </div>
 
     <a class="blbar" href="/deplete/" data-go="drop" data-hush>
       <span class="bl-t" data-t="Blacklist">Blacklist</span>
