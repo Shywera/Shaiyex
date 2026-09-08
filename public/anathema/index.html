@@ -347,7 +347,8 @@
     if (down && lvl >= 2.5 && warm < 0.5 && !reduce) tearAt = kickAt;
 
     if (lvl >= 3.4 && !reduce){
-      rain(down ? 3 : 1);
+      /* swords belong to the half with a paladin in it */
+      if (warm > 0.5){ slash(); if (down) slash(); }
       if (down) flashes.push({ t: kickAt, dur: 0.26, power: 0.30,
                                c: warm > 0.5 ? GOLD_HOT : RED_HOT });
     }
@@ -396,7 +397,7 @@
     });
     once('cut', t, T.cut, function(){
       flashes.length = 0; waves.length = 0; circles.length = 0; dust.length = 0;
-      swords.length = 0; lands.length = 0;
+      slashes.length = 0;
       blackout = 1;
     });
     once('turn', t, T.bright, function(){
@@ -429,7 +430,7 @@
   var INK = [5, 4, 10], INK_WARM = [10, 8, 5];
 
   /* ================= transient things ================= */
-  var waves = [], circles = [], dust = [], shards = [], swords = [], lands = [];
+  var waves = [], circles = [], dust = [], shards = [], slashes = [];
   var blackout = 0;
 
   function hit(){
@@ -443,61 +444,73 @@
     });
   }
 
-  /* Swords, for when it goes hyper. They come down either side of the cross
-     and never through it, so the middle stays readable. */
-  function rain(k){
-    for (var i = 0; i < k && swords.length < 20; i++){
-      var side = Math.random() < 0.5 ? -1 : 1;
-      swords.push({
-        x: W / 2 + side * W * (0.15 + Math.random() * 0.35),
-        y: -H * (0.15 + Math.random() * 0.55),
-        v: H * (1.05 + Math.random() * 1.0),
-        len: Math.min(W, H) * (0.11 + Math.random() * 0.09),
-        tilt: (Math.random() - 0.5) * 0.20,
-        land: H * (0.60 + Math.random() * 0.32)
-      });
-    }
+  /* A slash. It is a cut drawn across the whole screen with a blade riding
+     the leading edge, and it is built out of three strokes of a gradient,
+     which is the same trick the beams on /why/ use and costs about the same
+     as nothing. Hyper only, and only in the half that has any business
+     swinging a sword. */
+  function slash(){
+    if (slashes.length > 6) return;
+    var a = Math.random() * TAU;
+    var off = (Math.random() - 0.5) * Math.min(W, H) * 0.8;
+    slashes.push({
+      a: a,
+      px: W / 2 - Math.sin(a) * off,
+      py: H * 0.46 + Math.cos(a) * off,
+      L: Math.sqrt(W * W + H * H) * 0.62,
+      t: 0, swing: 0.10, dur: 0.66
+    });
   }
 
-  function blade(s){
-    var core = mix([255, 140, 96], GOLD_HOT, warm);
-    var edge = mix(RED_HOT, GOLD, warm);
-    var L = s.len, w = L * 0.052;
+  function drawSlash(s){
+    var p = Math.min(1, s.t / s.swing);
+    var k = s.t / s.dur;
+    var fade = k < 0.16 ? 1 : Math.pow(1 - (k - 0.16) / 0.84, 1.7);
+    if (fade <= 0.01) return;
 
-    ctx.save();
-    ctx.translate(s.x, s.y);
-    ctx.rotate(s.tilt);
+    var ca = Math.cos(s.a), sa = Math.sin(s.a);
+    var x0 = s.px - ca * s.L, y0 = s.py - sa * s.L;
+    var head = -s.L + p * 2 * s.L;
+    var x1 = s.px + ca * head, y1 = s.py + sa * head;
+
     ctx.globalCompositeOperation = 'lighter';
-
-    /* the air it has already come through */
-    var tg = ctx.createLinearGradient(0, -L * 1.9, 0, -L * 0.6);
-    tg.addColorStop(0, rgba(edge, 0));
-    tg.addColorStop(1, rgba(edge, 0.13));
-    ctx.fillStyle = tg;
-    ctx.fillRect(-w * 0.55, -L * 1.9, w * 1.1, L * 1.3);
-
-    ctx.fillStyle = rgba(core, 0.62);
-    ctx.shadowColor = rgba(edge, 0.9);
-    ctx.shadowBlur = 10;
-
-    /* blade, down to a point */
+    var g = ctx.createLinearGradient(x0, y0, x1, y1);
+    g.addColorStop(0,    rgba(GOLD, 0));
+    g.addColorStop(0.4,  rgba(GOLD_HOT, 0.45));
+    g.addColorStop(1,    rgba(WHITE, 0.95));
+    ctx.strokeStyle = g;
+    ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.moveTo(-w, -L * 0.60);
-    ctx.lineTo(w, -L * 0.60);
-    ctx.lineTo(w * 0.6, L * 0.28);
-    ctx.lineTo(0, L * 0.50);
-    ctx.lineTo(-w * 0.6, L * 0.28);
-    ctx.closePath();
-    ctx.fill();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y1);
 
-    ctx.fillRect(-L * 0.15, -L * 0.66, L * 0.30, w * 1.0);   /* crossguard */
-    ctx.fillRect(-w * 0.55, -L * 0.84, w * 1.1, L * 0.20);   /* grip */
-    ctx.beginPath();
-    ctx.arc(0, -L * 0.86, w * 0.95, 0, TAU);
-    ctx.fill();                                              /* pommel */
+    ctx.globalAlpha = 0.12 * fade;  ctx.lineWidth = 22; ctx.stroke();
+    ctx.globalAlpha = 0.26 * fade;  ctx.lineWidth = 7;  ctx.stroke();
+    ctx.globalAlpha = 0.95 * fade;  ctx.lineWidth = 2;  ctx.stroke();
 
-    ctx.shadowBlur = 0;
-    ctx.restore();
+    /* the blade making the cut, only while it is still travelling */
+    if (p < 1){
+      var L = Math.min(W, H) * 0.13, w = L * 0.05;
+      ctx.save();
+      ctx.translate(x1, y1);
+      ctx.rotate(s.a - Math.PI / 2);
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = rgba(GOLD_HOT, 1);
+      ctx.beginPath();
+      ctx.moveTo(-w, -L * 0.60);
+      ctx.lineTo(w, -L * 0.60);
+      ctx.lineTo(w * 0.6, L * 0.28);
+      ctx.lineTo(0, L * 0.50);
+      ctx.lineTo(-w * 0.6, L * 0.28);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillRect(-L * 0.15, -L * 0.66, L * 0.30, w);
+      ctx.fillRect(-w * 0.55, -L * 0.84, w * 1.1, L * 0.20);
+      ctx.restore();
+    }
+
+    ctx.globalAlpha = 1;
+    ctx.lineCap = 'butt';
     ctx.globalCompositeOperation = 'source-over';
   }
 
@@ -513,7 +526,7 @@
   }
 
   function speck(){
-    if (dust.length > (reduce ? 50 : 210)) return;
+    if (dust.length > (reduce ? 50 : 210) * (1 - slow * 0.65)) return;
     if (warm > 0.5){
       dust.push({ x: Math.random() * W, y: H + 12,
                   vx: (Math.random() - 0.5) * 12, vy: -16 - Math.random() * 34,
@@ -531,7 +544,7 @@
   var W = 0, H = 0, dpr = 1;
 
   function size(){
-    dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     W = window.innerWidth; H = window.innerHeight;
     canvas.width  = Math.round(W * dpr);
     canvas.height = Math.round(H * dpr);
@@ -564,12 +577,12 @@
       a = (1 - warm) * hush * (0.085 + heat * 0.265 + bump * 0.135) * flick;
       core = mix(RED_HOT, [255, 210, 180], heat * 0.5 + bump * 0.3);
       edge = RED;
-      blur = 14 + heat * 40 + bump * 40;
+      blur = 0.9 + heat * 1.5 + bump * 1.3;
     } else {
       a = warm * (0.185 + bump * 0.085 + burst * 0.18);
       core = WHITE;
       edge = GOLD;
-      blur = 22 + bump * 44 + burst * 80;
+      blur = 1.5 + bump * 2.0 + burst * 3.2;
     }
     if (a <= 0.002) return;
     if (a > 1) a = 1;
@@ -578,8 +591,18 @@
     ctx.translate(cx, cy);
     ctx.rotate(rot);
     ctx.globalCompositeOperation = 'lighter';
-    ctx.shadowColor = rgba(edge, 0.8);
-    ctx.shadowBlur = blur;
+
+    /* The bloom. This used to be a shadowBlur on two large fills, which on its
+       own cost more than everything else on the page put together: 11.7 fps
+       became 58.7 the moment it was switched off. One radial gradient does
+       the same job for nothing. */
+    var gr = S * 0.34 * (0.7 + blur * 0.16);
+    var bg = ctx.createRadialGradient(0, 0, 0, 0, 0, gr);
+    bg.addColorStop(0,    rgba(core, a * 0.30 * Math.min(1.4, blur)));
+    bg.addColorStop(0.35, rgba(edge, a * 0.16 * Math.min(1.4, blur)));
+    bg.addColorStop(1,    rgba(edge, 0));
+    ctx.fillStyle = bg;
+    ctx.beginPath(); ctx.arc(0, 0, gr, 0, TAU); ctx.fill();
 
     /* The shaft. The gradient softens the two long sides, and the shape comes
        to a point at each end, because a bar drawn as a rectangle ends in a
@@ -622,7 +645,6 @@
     ctx.lineTo(-armW + ta, armY + ah);
     ctx.closePath();
     ctx.fill();
-    ctx.shadowBlur = 0;
 
     /* and once it is the holy one, the flare across the join */
     if (warm > 0.5){
@@ -689,11 +711,12 @@
   function godRays(cx, cy, R, bump){
     ctx.globalCompositeOperation = 'lighter';
     var reach = Math.max(W, H) * (0.62 + burst * 0.7);
-    for (var i = 0; i < RAYS; i++){
+    var rays = RAYS - ((slow * 14) | 0);
+    for (var i = 0; i < rays; i++){
       var v = soft[(i * 3) % N];
-      var a = rayspin + (i / RAYS) * TAU;
+      var a = rayspin + (i / rays) * TAU;
       var len = R * 0.9 + (v * 0.75 + bump * 0.3 + burst * 0.9) * reach;
-      var w = (TAU / RAYS) * (0.20 + v * 0.30);
+      var w = (TAU / rays) * (0.20 + v * 0.30);
       ctx.fillStyle = rgba(mix(GOLD, GOLD_HOT, v * 0.6 + burst * 0.4),
                            0.026 + v * 0.055 + burst * 0.05);
       ctx.beginPath();
@@ -708,13 +731,15 @@
 
   function halo(cx, cy, R, bump){
     ctx.globalCompositeOperation = 'lighter';
-    var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * (2.1 + burst * 1.6));
+    var reach = R * (2.1 + burst * 1.6);
+    var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, reach);
     var p = 0.16 + bump * 0.16 + burst * 0.5;
     g.addColorStop(0,    rgba(GOLD_HOT, p * warm));
     g.addColorStop(0.24, rgba(GOLD, p * 0.5 * warm));
     g.addColorStop(1,    rgba(GOLD, 0));
     ctx.fillStyle = g;
-    ctx.fillRect(0, 0, W, H);
+    /* it is zero past `reach`, so there is no reason to fill the whole page */
+    ctx.fillRect(cx - reach, cy - reach, reach * 2, reach * 2);
     ctx.globalCompositeOperation = 'source-over';
   }
 
@@ -775,12 +800,16 @@
       else ctx.lineTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
     }
     ctx.closePath();
-    ctx.strokeStyle = rgba(mix(GOLD, GOLD_HOT, 0.6), 0.98);
-    ctx.lineWidth = 2.3;
-    ctx.shadowColor = rgba(GOLD_HOT, 1);
-    ctx.shadowBlur = 16 + bump * 26 + burst * 40;
-    ctx.stroke();
-    ctx.shadowBlur = 0;
+    /* three passes of the same path, widest and faintest first. a blurred
+       stroke looks marginally softer and costs about forty times as much. */
+    var wide = 1 + bump * 1.5 + burst * 2.4;
+    ctx.strokeStyle = rgba(mix(GOLD, GOLD_HOT, 0.6), 1);
+    ctx.globalAlpha = warm * hush * 0.13;
+    ctx.lineWidth = 11 * wide; ctx.stroke();
+    ctx.globalAlpha = warm * hush * 0.22;
+    ctx.lineWidth = 4.5 * wide; ctx.stroke();
+    ctx.globalAlpha = warm * hush;
+    ctx.lineWidth = 2.3; ctx.stroke();
 
     ctx.globalAlpha = warm * hush * 0.4;
     ctx.beginPath();
@@ -816,33 +845,34 @@
   function ground(alpha){
     var cx = W / 2, cy = H * 0.46;
     var core = mix(mix([30, 5, 6], [70, 10, 8], heat), [16, 12, 5], warm);
+    /* the fade and the vignette in one pass. they were two full screen
+       gradients doing the same fill twice. */
+    var edge = mix(INK, INK_WARM, warm);
+    var dark = Math.min(1, alpha + 0.30 + heat * 0.34 - warm * 0.24);
     var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.8);
     g.addColorStop(0, rgba(core, alpha));
-    g.addColorStop(0.4, rgba(mix(INK, INK_WARM, warm), alpha * 0.97));
-    g.addColorStop(1, rgba(mix(INK, INK_WARM, warm), alpha));
+    g.addColorStop(0.34, rgba(edge, alpha * 0.97));
+    g.addColorStop(1, rgba(edge, dark));
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
   }
 
-  function vignette(bump){
-    var cx = W / 2, cy = H * 0.46;
-    var g = ctx.createRadialGradient(cx, cy, Math.min(W, H) * 0.30,
-                                     cx, cy, Math.max(W, H) * 0.78);
-    var dark = 0.34 + heat * 0.42 - warm * 0.30;
-    g.addColorStop(0, 'rgba(0,0,0,0)');
-    g.addColorStop(1, 'rgba(0,0,0,' + Math.max(0, dark).toFixed(3) + ')');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, W, H);
-  }
+
 
   /* ================= the loop ================= */
   var last = 0, spin = 0, rayspin = 0, now8 = 0;
+
+  /* if a machine cannot keep up, take things away from it rather than
+     letting the whole thing crawl */
+  var ema = 0.016, slow = 0;
 
   function frame(ms){
     requestAnimationFrame(frame);
     now8 = ms / 1000;
     var dt = last ? Math.min(now8 - last, 0.05) : 0.016;
     last = now8;
+    ema = ema * 0.94 + dt * 0.06;
+    slow = ema > 0.026 ? Math.min(1, slow + dt * 0.6) : Math.max(0, slow - dt * 0.25);
 
     var t = audio.currentTime;
     state(t, dt);
@@ -940,40 +970,13 @@
     }
     ctx.globalAlpha = 1;
 
-    /* the rain, and what it does when it arrives */
-    for (i = swords.length - 1; i >= 0; i--){
-      var sw = swords[i];
-      sw.y += sw.v * dt;
-      if (sw.y >= sw.land){
-        lands.push({ x: sw.x, y: sw.land, r: 0, life: 1 });
-        swords.splice(i, 1);
-        continue;
-      }
-      blade(sw);
+    /* the cuts */
+    for (i = slashes.length - 1; i >= 0; i--){
+      var sl = slashes[i];
+      sl.t += dt;
+      if (sl.t >= sl.dur){ slashes.splice(i, 1); continue; }
+      drawSlash(sl);
     }
-    ctx.globalCompositeOperation = 'lighter';
-    for (i = lands.length - 1; i >= 0; i--){
-      var ld = lands[i];
-      ld.r += dt * Math.min(W, H) * 1.15;
-      ld.life -= dt * 2.6;
-      if (ld.life <= 0){ lands.splice(i, 1); continue; }
-      var lc = mix(RED_HOT, GOLD_HOT, warm);
-      ctx.globalAlpha = ld.life * ld.life * 0.75;
-      ctx.strokeStyle = rgba(lc, 1);
-      ctx.lineWidth = 2.2 * ld.life;
-      ctx.beginPath();
-      ctx.ellipse(ld.x, ld.y, ld.r, ld.r * 0.26, 0, 0, TAU);
-      ctx.stroke();
-      /* and the column of light it leaves standing for a moment */
-      var cg = ctx.createLinearGradient(ld.x, ld.y - Math.min(W, H) * 0.26, ld.x, ld.y);
-      cg.addColorStop(0, rgba(lc, 0));
-      cg.addColorStop(1, rgba(lc, 0.5 * ld.life));
-      ctx.fillStyle = cg;
-      ctx.fillRect(ld.x - 5 * ld.life, ld.y - Math.min(W, H) * 0.26,
-                   10 * ld.life, Math.min(W, H) * 0.26);
-    }
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.globalAlpha = 1;
 
     /* shrapnel off the hard kicks in the drop */
     if (heat > 0.4 && bump > 0.55 && !reduce){
@@ -1033,7 +1036,6 @@
 
     if (t - tearAt >= 0 && t - tearAt < 0.13) tear(0.5 + heat * 0.5);
 
-    vignette(bump);
 
     /* the flash off a kick, and the three that matter */
     if (bump > 0.02){
@@ -1077,7 +1079,7 @@
     lastBeat = -1e9;
     kickAt = -9; kickHard = 0; tearAt = -9;
     waves.length = circles.length = dust.length = shards.length = 0;
-    swords.length = lands.length = 0;
+    slashes.length = 0;
     flashes.length = 0;
     burst = 0;
     fired = {};
@@ -1138,7 +1140,7 @@
       return { phase: phase, warm: +warm.toFixed(3), hush: +hush.toFixed(3),
                heat: +heat.toFixed(3), lvl: +lvl.toFixed(2),
                burst: +burst.toFixed(3), flashes: flashes.length,
-               swords: swords.length };
+               slashes: slashes.length };
     }
   };
 
