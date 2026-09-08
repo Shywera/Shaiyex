@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="The sentence, read out in full. Three minutes and twenty two seconds, and it does not stay like this.">
-<meta name="theme-color" content="#07050A">
+<meta name="description" content="Three minutes and twenty two seconds. It does not stay like this.">
+<meta name="theme-color" content="#05040A">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Anathema">
-<meta property="og:description" content="A sentence read out in full, and what was still standing afterwards.">
+<meta property="og:description" content="It does not stay like this.">
 <meta property="og:url" content="https://shaiyex.com/anathema/">
 <meta name="twitter:card" content="summary">
 <title>Anathema</title>
@@ -16,258 +16,149 @@
 <link rel="apple-touch-icon" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700&family=Grenze+Gotisch:wght@600;800&family=JetBrains+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@800&family=JetBrains+Mono:wght@400;700&display=swap">
 
 <style>
   :root{
-    --ink:#07050A;
+    --ink:#05040A;
     --red:#C21A12;
-    --red-hot:#F0342A;
-    --bone:#E4D8CC;
-    --dim:#7C6F68;
+    --red-hot:#FF4335;
     --gold:#F0C868;
-    --gold-hot:#FFE9B0;
-    --cream:#FFF6E4;
+    --gold-hot:#FFF3D2;
+    --dim:#6E625C;
 
-    /* the page reads these. everything else is a transition off them. */
     --edge:#3A1210;
     --key:var(--red);
     --key-hot:var(--red-hot);
-    --say:var(--bone);
 
-    --display:"Grenze Gotisch","Pirata One",serif;
-    --body:"Archivo","Segoe UI",Helvetica,Arial,sans-serif;
     --mono:"JetBrains Mono",Consolas,ui-monospace,monospace;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0;overflow:hidden;
-    background:var(--ink);color:var(--say);
-    font-family:var(--body);
+    margin:0;overflow:hidden;background:#000;
+    color:var(--dim);font-family:var(--mono);
     -webkit-font-smoothing:antialiased;
-    /* every colour on the page moves together, and slowly */
-    transition:color 2.4s ease;
   }
-
-  /* the four states of the night. the canvas lerps on its own clock, this is
-     only for the things made of html. */
+  /* the html furniture follows the canvas, slowly */
   body.act2, body.outro{
-    --edge:#3B2A0C;
+    --edge:#4A3A12;
     --key:var(--gold);
     --key-hot:var(--gold-hot);
-    --say:var(--cream);
   }
 
   #viz{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0}
 
-  /* ---------- the words ---------- */
-  .words{
-    position:fixed;left:50%;top:44%;transform:translate(-50%,-50%);
-    z-index:2;width:min(92vw, 34rem);text-align:center;
-    pointer-events:none;
-  }
-  .say{
-    margin:0;
-    font-family:var(--display);
-    font-weight:600;font-size:clamp(23px,4.4vw,40px);
-    line-height:1.16;letter-spacing:.005em;
-    color:var(--say);
-    text-shadow:0 0 30px rgba(0,0,0,.9), 0 2px 0 rgba(0,0,0,.7);
-    opacity:0;
-    transition:opacity .34s ease, transform .34s ease;
-    transform:translateY(6px);
-  }
-  .say.on{opacity:1;transform:none}
-
-  /* small mono, for the parts that are stage directions */
-  .say.k{
-    font-family:var(--mono);font-weight:700;
-    font-size:clamp(10px,1.5vw,12.5px);
-    letter-spacing:.26em;text-transform:uppercase;
-    color:var(--key);
-    text-shadow:0 0 22px rgba(0,0,0,.9);
-  }
-  /* the one word the whole first half is walking towards */
-  .say.big{
-    font-weight:800;font-size:clamp(44px,12vw,124px);
-    line-height:.92;letter-spacing:.02em;
-    color:#FFF;
-    text-shadow:0 0 46px rgba(240,52,42,.75), 0 0 120px rgba(194,26,18,.6);
-  }
-  /* after the turn the lettering stops being a decree and starts being a person */
-  body.act2 .say, body.outro .say{
-    font-family:var(--body);font-weight:500;
-    font-size:clamp(21px,3.7vw,34px);line-height:1.3;
-    letter-spacing:-.005em;
-    text-shadow:0 0 34px rgba(0,0,0,.85);
-  }
-  body.act2 .say.k, body.outro .say.k{
-    font-family:var(--mono);font-weight:700;
-    font-size:clamp(10px,1.5vw,12.5px);letter-spacing:.26em;
-  }
-  body.outro .say.big{
-    font-family:var(--body);font-weight:700;
-    font-size:clamp(38px,9vw,86px);letter-spacing:.14em;
-    color:var(--cream);
-    text-shadow:0 0 44px rgba(240,200,104,.6), 0 0 130px rgba(240,200,104,.35);
-  }
-
-  /* ---------- the cross, which starts the wrong way up ---------- */
-  .cross{
-    position:fixed;left:50%;top:clamp(26px,7vh,64px);
-    z-index:2;width:3px;height:64px;margin-left:-1.5px;
-    background:var(--key);
-    box-shadow:0 0 16px var(--key);
-    transform:rotate(180deg);
-    transform-origin:50% 50%;
-    transition:transform 1.4s cubic-bezier(.22,1.15,.35,1),
-               background 2.4s ease, box-shadow 2.4s ease, opacity .8s ease;
-    opacity:.85;
-  }
-  .cross::before{
-    content:"";position:absolute;left:50%;top:17px;
-    margin-left:-14px;width:29px;height:3px;
-    background:inherit;box-shadow:inherit;
-  }
-  body.act2 .cross, body.outro .cross{transform:rotate(0deg);opacity:1}
-  body.cut .cross{opacity:.12}
-
-  /* ---------- the bar along the bottom ---------- */
+  /* ---------- bottom bar ---------- */
   .hud{
     position:fixed;left:0;right:0;bottom:0;z-index:3;
     display:flex;align-items:center;gap:12px;
     padding:12px clamp(12px,3vw,22px) 14px;
-    font-family:var(--mono);font-size:10px;font-weight:700;
-    letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
-    background:linear-gradient(180deg, rgba(7,5,10,0), rgba(7,5,10,.88) 46%);
+    font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+    background:linear-gradient(180deg, rgba(2,2,4,0), rgba(2,2,4,.9) 46%);
+    transition:opacity .5s ease;
   }
+  body.idle .hud{opacity:.12}
+  .hud:hover{opacity:1 !important}
   .pp{
     flex:0 0 auto;width:30px;height:30px;padding:0;cursor:pointer;
     background:transparent;border:1px solid var(--edge);border-radius:2px;
     color:var(--key);
     display:flex;align-items:center;justify-content:center;
-    transition:border-color .4s ease, color 2.4s ease, background .25s ease;
+    transition:border-color .6s ease, color 1.8s ease, background .25s ease;
   }
-  .pp:hover{background:rgba(255,255,255,.05);border-color:var(--key)}
+  .pp:hover{background:rgba(255,255,255,.06);border-color:var(--key)}
   .pp b{display:block;width:0;height:0;
         border-left:9px solid currentColor;border-top:6px solid transparent;
         border-bottom:6px solid transparent;margin-left:2px}
   body.going .pp b{
-    width:9px;height:11px;border:0;margin:0;
-    background:currentColor;
+    width:9px;height:11px;border:0;margin:0;background:currentColor;
     box-shadow:inset 3px 0 0 rgba(0,0,0,.85);
   }
 
-  .bar{
-    position:relative;flex:1 1 auto;height:20px;cursor:pointer;
-    display:flex;align-items:center;
-  }
-  .bar-track{
-    position:relative;width:100%;height:3px;
-    background:rgba(255,255,255,.09);overflow:hidden;
-  }
-  /* the two halves of the night, drawn to scale */
+  .bar{position:relative;flex:1 1 auto;height:20px;cursor:pointer;
+       display:flex;align-items:center}
+  .bar-track{position:relative;width:100%;height:3px;
+             background:rgba(255,255,255,.08);overflow:hidden}
   .bar-act{position:absolute;top:0;bottom:0}
-  .bar-a1{background:rgba(194,26,18,.34)}
-  .bar-a2{background:rgba(240,200,104,.28)}
-  .bar-gap{background:rgba(255,255,255,.05)}
-  .bar-fill{
-    position:absolute;left:0;top:0;bottom:0;width:0;
-    background:var(--key-hot);
-    box-shadow:0 0 12px var(--key-hot);
-  }
-  .bar-head{
-    position:absolute;top:50%;width:2px;height:13px;margin-top:-6.5px;
-    background:var(--say);opacity:.85;pointer-events:none;
-  }
+  .bar-a1{background:rgba(194,26,18,.4)}
+  .bar-a2{background:rgba(240,200,104,.3)}
+  .bar-gap{background:rgba(255,255,255,.04)}
+  .bar-fill{position:absolute;left:0;top:0;bottom:0;width:0;
+            background:var(--key-hot);box-shadow:0 0 12px var(--key-hot)}
+  .bar-head{position:absolute;top:50%;width:2px;height:13px;margin-top:-6.5px;
+            background:#FFF;opacity:.8;pointer-events:none}
   .t{flex:0 0 auto;font-variant-numeric:tabular-nums;letter-spacing:.1em}
 
   .backlink{
     position:fixed;top:14px;left:14px;z-index:4;
-    font-family:var(--mono);font-size:10px;font-weight:700;
-    letter-spacing:.14em;text-transform:uppercase;
+    font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
     color:var(--dim);text-decoration:none;
     padding:7px 11px 8px;border:1px solid var(--edge);border-radius:2px;
-    background:rgba(7,5,10,.72);
-    transition:color .25s ease, border-color .4s ease;
+    background:rgba(5,4,10,.7);
+    transition:color .25s ease, border-color .6s ease, opacity .5s ease;
   }
-  .backlink:hover{color:var(--say);border-color:var(--key)}
+  .backlink:hover{color:#FFF;border-color:var(--key)}
+  body.idle .backlink{opacity:.12}
+  .backlink:hover{opacity:1}
 
   .credit{
     position:fixed;top:16px;right:16px;z-index:4;text-align:right;
-    font-family:var(--mono);font-size:9.5px;font-weight:700;
-    letter-spacing:.18em;text-transform:uppercase;color:var(--dim);
-    line-height:1.9;pointer-events:none;
+    font-size:9.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--dim);line-height:1.9;pointer-events:none;
+    transition:opacity .5s ease;
   }
-  .credit b{color:var(--key);font-weight:700;transition:color 2.4s ease}
+  .credit b{color:var(--key);font-weight:700;transition:color 1.8s ease}
+  body.idle .credit{opacity:.14}
 
-  /* ---------- the seal you have to break ---------- */
+  /* ---------- the seal ---------- */
   .gate{
     position:fixed;inset:0;z-index:20;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:22px;padding:24px;text-align:center;
-    background:radial-gradient(70% 55% at 50% 42%, #140708, #07050A 74%);
-    transition:opacity .7s ease;
+    gap:26px;padding:24px;text-align:center;
+    background:radial-gradient(66% 52% at 50% 44%, #16070A, #05040A 76%);
+    transition:opacity .9s ease;
   }
   .gate.gone{opacity:0;pointer-events:none}
-  .gate .cross-still{
-    position:relative;width:3px;height:78px;background:var(--red);
-    box-shadow:0 0 22px rgba(194,26,18,.85);transform:rotate(180deg);
+  .gate .x{
+    position:relative;width:3px;height:82px;background:var(--red);
+    box-shadow:0 0 26px rgba(194,26,18,.9);transform:rotate(180deg);
   }
-  .gate .cross-still::before{
-    content:"";position:absolute;left:50%;top:21px;margin-left:-17px;
-    width:35px;height:3px;background:inherit;box-shadow:inherit;
+  .gate .x::before{
+    content:"";position:absolute;left:50%;top:22px;margin-left:-18px;
+    width:37px;height:3px;background:inherit;box-shadow:inherit;
   }
   .gate h1{
-    margin:0;font-family:var(--display);font-weight:800;
-    font-size:clamp(46px,13vw,132px);line-height:.9;letter-spacing:.03em;
-    color:#F2E6DA;
-    text-shadow:0 0 40px rgba(194,26,18,.55), 0 3px 0 #07050A;
+    margin:0;font-family:"Grenze Gotisch",serif;font-weight:800;
+    font-size:clamp(50px,14vw,150px);line-height:.88;letter-spacing:.03em;
+    color:#F4E8DC;text-shadow:0 0 46px rgba(194,26,18,.6), 0 3px 0 #05040A;
   }
-  .gate .sub{
-    margin:0;max-width:34rem;color:var(--dim);
-    font-size:15.5px;line-height:1.6;
-  }
-  .gate .sub b{color:var(--bone);font-weight:500}
-  .gate .meta{
-    margin:0;font-family:var(--mono);font-size:10px;font-weight:700;
-    letter-spacing:.24em;text-transform:uppercase;color:#6A5A55;
+  .gate p{
+    margin:0;font-size:10px;font-weight:700;letter-spacing:.26em;
+    text-transform:uppercase;color:#6A5A55;
   }
   .gate button{
-    margin-top:6px;cursor:pointer;
-    font-family:var(--mono);font-size:11px;font-weight:700;
-    letter-spacing:.2em;text-transform:uppercase;
-    color:#07050A;background:var(--red-hot);
-    border:1px solid #FF6A5E;border-radius:2px;
-    padding:14px 30px 15px;
+    margin-top:4px;cursor:pointer;font-family:var(--mono);
+    font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+    color:#05040A;background:var(--red-hot);border:1px solid #FF7A6E;
+    border-radius:2px;padding:14px 32px 15px;
     transition:background .2s ease, transform .1s ease;
   }
-  .gate button:hover{background:#FF5347}
+  .gate button:hover{background:#FF5C4E}
   .gate button:active{transform:translateY(2px)}
   .gate button:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
 
-  @media (max-width:560px){
-    .credit{display:none}
-    .words{top:42%;width:min(94vw,26rem)}
-  }
+  @media (max-width:560px){ .credit{display:none} }
 </style>
 </head>
 <body>
 
 <canvas id="viz" aria-hidden="true"></canvas>
 
-<i class="cross" id="cross" aria-hidden="true"></i>
-
-<div class="words">
-  <p class="say" id="say" aria-live="polite"></p>
-</div>
-
 <a class="backlink" href="/">&larr; shaiyex.com</a>
-
 <p class="credit">ANATHEMA<br><b>zdoobz</b></p>
 
-<div class="hud">
+<div class="hud" id="hud">
   <button class="pp" id="pp" type="button" aria-label="Play or pause"><b></b></button>
   <div class="bar" id="bar" role="slider" tabindex="0"
        aria-label="Position" aria-valuemin="0" aria-valuemax="202" aria-valuenow="0">
@@ -283,11 +174,9 @@
 </div>
 
 <div class="gate" id="gate">
-  <i class="cross-still" aria-hidden="true"></i>
+  <i class="x" aria-hidden="true"></i>
   <h1>Anathema</h1>
-  <p class="sub">A formal curse. The bit where the church writes your name down, reads it out, and takes the Light back off you in front of everybody.
-    <b>Three minutes and twenty two seconds.</b> It does not stay like this.</p>
-  <p class="meta">Headphones &middot; it gets loud once</p>
+  <p>Headphones &middot; it does not stay like this</p>
   <button id="start" type="button">Break the seal</button>
 </div>
 
@@ -297,65 +186,19 @@
 (function(){
   "use strict";
 
-  /* ------------------------------------------------------------------
-     Times measured off the file that ships, not off the download. If the
-     track is ever re-encoded these move, so they live in one place.
-     ------------------------------------------------------------------ */
+  /* Measured off the file that ships. Re-encode the track and these move. */
   var T = {
-    open:    12.02,   /* the first section arrives */
-    drop:    63.02,   /* the hardcore. centroid falls off a cliff here */
+    drop:    63.02,   /* the hardcore lands, centroid falls off a cliff */
     cut:     85.69,   /* everything stops. four seconds of actual nothing */
-    back:    89.90,   /* it comes back, quietly */
-    bright: 113.50,   /* the turn. this is the whole reason for the page */
+    back:    89.90,   /* it creeps back */
+    bright: 113.50,   /* the turn. the whole reason for the page */
     outro:  186.33,
-    end:    198.50,
     dur:    202.57
   };
 
-  /* time, text, kind. shown until the next one. */
-  var SCRIPT = [
-    [ 12.0, 'In the matter of the Holy Paladin', 'k'],
-    [ 16.4, 'The charge is heresy'],
-    [ 22.0, 'For healing people who had not earned it'],
-    [ 28.0, 'For interrupting what was not hers to interrupt'],
-    [ 34.0, 'For being right about the pull'],
-    [ 40.0, 'And for saying so'],
-    [ 46.0, 'The Light is withdrawn'],
-    [ 52.0, 'The name is struck from the roll'],
-    [ 57.4, 'The sentence is', 'k'],
-
-    [ 63.0, 'ANATHEMA', 'big'],
-    [ 68.2, 'Cast out'],
-    [ 72.4, 'Unnamed'],
-    [ 76.6, 'Unmourned'],
-    [ 80.8, 'Unmade'],
-    [ 84.4, '', 'none'],
-
-    [ 86.4, 'And then nothing happened'],
-
-    [ 90.6, 'No thunder. No hand out of the clouds.'],
-    [ 96.6, 'Just a Tuesday, and a group that needed a healer.'],
-    [103.0, 'So I went.'],
-    [109.6, 'Here is the part nobody warns you about', 'k'],
-
-    [114.2, 'The Light came anyway'],
-    [124.0, 'It was never theirs to take'],
-    [136.0, 'It answers to the hands'],
-    [144.0, 'Not to the roll'],
-    [154.0, 'You can put it in writing'],
-    [164.0, 'You can read it out'],
-    [174.0, 'Somebody still has to keep five people alive'],
-
-    [186.4, 'SHAIYEX', 'big'],
-    [191.6, 'Still healing. Still not sorry.'],
-    [197.6, '', 'none']
-  ];
-
   var audio  = document.getElementById('track');
   var canvas = document.getElementById('viz');
-  var sayEl  = document.getElementById('say');
   var gate   = document.getElementById('gate');
-  var start  = document.getElementById('start');
   var pp     = document.getElementById('pp');
   var bar    = document.getElementById('bar');
   var fill   = document.getElementById('fill');
@@ -366,20 +209,21 @@
   var reduce = window.matchMedia &&
                window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---------------- the bar knows the shape of the track ---------------- */
+  var TAU = Math.PI * 2;
+
   (function segments(){
-    var pct = function(a, b){ return ((b - a) / T.dur * 100) + '%'; };
     var at  = function(a){ return (a / T.dur * 100) + '%'; };
-    var a = document.getElementById('segA');
-    var g = document.getElementById('segG');
-    var b = document.getElementById('segB');
-    a.style.left = '0';           a.style.width = pct(0, T.cut);
-    g.style.left = at(T.cut);     g.style.width = pct(T.cut, T.bright);
-    b.style.left = at(T.bright);  b.style.width = pct(T.bright, T.dur);
+    var pct = function(a, b){ return ((b - a) / T.dur * 100) + '%'; };
+    var a = document.getElementById('segA'),
+        g = document.getElementById('segG'),
+        b = document.getElementById('segB');
+    a.style.left = '0';          a.style.width = pct(0, T.cut);
+    g.style.left = at(T.cut);    g.style.width = pct(T.cut, T.bright);
+    b.style.left = at(T.bright); b.style.width = pct(T.bright, T.dur);
   })();
 
-  /* ---------------- audio graph ---------------- */
-  var actx, analyser, freq, wave, srcNode;
+  /* ================= audio ================= */
+  var actx, analyser, freq, wave;
 
   function listen(){
     if (actx) return;
@@ -388,79 +232,73 @@
     actx = new AC();
     analyser = actx.createAnalyser();
     analyser.fftSize = 2048;
-    analyser.smoothingTimeConstant = 0.72;
+    analyser.smoothingTimeConstant = 0.7;
     freq = new Uint8Array(analyser.frequencyBinCount);
     wave = new Uint8Array(analyser.fftSize);
-    srcNode = actx.createMediaElementSource(audio);
-    srcNode.connect(analyser);
+    actx.createMediaElementSource(audio).connect(analyser);
     analyser.connect(actx.destination);
-    bands();   /* only now are there bins to split up */
+    bands();
   }
 
-  /* ---------------- bands ---------------- */
-  var N = 0, edges = [], level = [], peak = [], soft = [];
+  var N = 0, edges = [], level, peak, soft;
 
   function bands(){
-    N = window.innerWidth < 620 ? 64 : 104;
-    edges = [];
+    N = window.innerWidth < 620 ? 56 : 88;
     level = new Float32Array(N);
     peak  = new Float32Array(N);
     soft  = new Float32Array(N);
+    edges = [];
     if (!analyser) return;
-    /* log spaced from about 40 Hz to about 11 kHz */
-    var bins = analyser.frequencyBinCount;
-    var lo = 2, hi = Math.min(bins - 1, 512);
-    for (var i = 0; i <= N; i++){
-      edges.push(Math.round(lo * Math.pow(hi / lo, i / N)));
-    }
+    var lo = 2, hi = Math.min(analyser.frequencyBinCount - 1, 512);
+    for (var i = 0; i <= N; i++) edges.push(Math.round(lo * Math.pow(hi / lo, i / N)));
   }
 
   function readBands(){
-    if (!analyser) return;
-    analyser.getByteFrequencyData(freq);
-    for (var i = 0; i < N; i++){
+    if (!analyser || !edges.length) return;
+    var i;
+    for (i = 0; i < N; i++){
       var a = edges[i], b = Math.max(edges[i + 1], a + 1), m = 0;
       for (var j = a; j < b; j++) if (freq[j] > m) m = freq[j];
-      /* the top end is always quieter, so tilt it up, but not so far that
-         everything sits at the ceiling and the ring stops having a shape */
       var v = (m / 255) * (0.60 + 0.58 * (i / N));
       v = Math.pow(v > 1 ? 1 : v, 1.34);
-      level[i] += (v - level[i]) * 0.42;
-      peak[i] = Math.max(peak[i] * 0.94, level[i]);
+      level[i] += (v - level[i]) * 0.44;
+      peak[i] = Math.max(peak[i] * 0.93, level[i]);
     }
-    /* act two wants a curve, not a comb */
     for (i = 0; i < N; i++){
       soft[i] = (level[(i + N - 1) % N] + 2 * level[i] + level[(i + 1) % N]) * 0.25;
     }
   }
 
-  /* ---------------- the kick, watching the rise not the level ----------------
-     A limited master sits near the ceiling the whole time, so comparing the
-     low band against its own average finds nothing. The jump finds everything. */
+  function energy(a, b){
+    if (!analyser) return 0;
+    var s = 0;
+    for (var i = a; i < b; i++) s += freq[i];
+    return (s / (b - a)) / 255;
+  }
+
+  /* the master sits near the ceiling the whole way, so watch the rise */
   var lowPrev = 0, rise = 0, lastKick = -9, kickAt = -9, kickHard = 0;
   var fluxPrev = 0, fluxRise = 0, lastOnset = -9;
 
-  function energy(a, b){
-    if (!analyser) return 0;
-    var s = 0, n = 0;
-    for (var i = a; i < b; i++){ s += freq[i]; n++; }
-    return n ? (s / n) / 255 : 0;
-  }
-
   function transients(now){
-    var raw = energy(1, 8);                 /* about 20 to 170 Hz */
-    var d = raw - lowPrev; lowPrev = raw;
+    if (!analyser) return false;
+    analyser.getByteFrequencyData(freq);
+
+    var raw = energy(1, 8), d = raw - lowPrev;
+    lowPrev = raw;
     if (d < 0) d = 0;
     rise = rise * 0.94 + d * 0.06;
     if (d > Math.max(rise * 2.2, 0.010) && raw > 0.14 && now - lastKick > 0.20){
-      lastKick = now;
-      kickAt = now;
-      kickHard = Math.max(0.25, Math.min(1, d / Math.max(0.035, rise * 8)));
-      boom();
+      lastKick = kickAt = now;
+      kickHard = Math.max(0.3, Math.min(1, d / Math.max(0.035, rise * 8)));
+      if (hush > 0.2){
+        waves.push({ r: 0, life: 1, hard: kickHard });
+        if (waves.length > 16) waves.shift();
+      }
     }
 
-    var full = energy(8, 260);
-    var fd = full - fluxPrev; fluxPrev = full;
+    var full = energy(8, 260), fd = full - fluxPrev;
+    fluxPrev = full;
     if (fd < 0) fd = 0;
     fluxRise = fluxRise * 0.93 + fd * 0.07;
     if (fd > Math.max(fluxRise * 2.4, 0.012) && now - lastOnset > 0.16){
@@ -470,118 +308,118 @@
     return false;
   }
 
-  /* ---------------- things that live for a moment ---------------- */
-  var waves = [], circles = [], dust = [];
+  /* ================= state ================= */
+  var warm = 0,    /* 0 the curse, 1 the light */
+      hush = 1,    /* the cut */
+      heat = 0,    /* the drop */
+      phase = '',
+      idle = false;
 
-  function boom(){
-    if (hush < 0.2) return;
-    waves.push({ r: 0, life: 1, hard: kickHard });
-    if (waves.length > 14) waves.shift();
-  }
-
-  function hit(w, h){
-    if (circles.length > 7) return;
-    /* out at the edges, never over the words */
-    var ang = Math.random() * Math.PI * 2;
-    var rad = Math.min(w, h) * (0.34 + Math.random() * 0.16);
-    var x = w / 2 + Math.cos(ang) * rad * (w > h ? 1.5 : 1);
-    var y = h * 0.44 + Math.sin(ang) * rad;
-    circles.push({
-      x: Math.max(46, Math.min(w - 46, x)),
-      y: Math.max(46, Math.min(h - 110, y)),
-      t: 0, dur: 0.62, pop: 0
-    });
-  }
-
-  function speck(w, h, warm){
-    if (dust.length > (reduce ? 40 : 150)) return;
-    if (warm > 0.5){
-      dust.push({ x: Math.random() * w, y: h + 10,
-                  vx: (Math.random() - 0.5) * 10, vy: -14 - Math.random() * 26,
-                  life: 1, decay: 0.14 + Math.random() * 0.12,
-                  size: 0.8 + Math.random() * 1.9, warm: 1 });
-    } else {
-      dust.push({ x: w / 2 + (Math.random() - 0.5) * w * 0.9, y: h * 0.9,
-                  vx: (Math.random() - 0.5) * 26, vy: -30 - Math.random() * 70,
-                  life: 1, decay: 0.3 + Math.random() * 0.25,
-                  size: 0.9 + Math.random() * 1.6, warm: 0 });
-    }
-  }
-
-  /* ---------------- colour ---------------- */
-  function mix(a, b, t){
-    return [a[0] + (b[0] - a[0]) * t,
-            a[1] + (b[1] - a[1]) * t,
-            a[2] + (b[2] - a[2]) * t];
-  }
-  function rgba(c, a){
-    return 'rgba(' + (c[0] | 0) + ',' + (c[1] | 0) + ',' + (c[2] | 0) + ',' + a + ')';
-  }
-  var RED = [194, 26, 18], RED_HOT = [255, 120, 96];
-  var GOLD = [240, 200, 104], GOLD_HOT = [255, 244, 216];
-  var INK = [7, 5, 10], INK_WARM = [12, 9, 7];
-
-  /* ---------------- the state of the night ---------------- */
-  var warm = 0;   /* 0 red, 1 gold */
-  var hush = 1;   /* 1 alive, 0 the cut */
-  var heat = 0;   /* how hard the drop is hitting */
-  var cued = -1;
-  var phase = '';
+  var flashes = [];   /* {t, dur, power, c} in audio seconds */
+  var burst = 0;      /* the god rays punching out at the turn */
+  var fired = {};
 
   function ease(x){ return x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x); }
 
-  function clockOf(t){
-    /* the page has four moods and it is worth naming them */
-    if (t >= T.outro) return 'outro';
-    if (t >= T.bright) return 'act2';
-    if (t >= T.cut && t < T.back) return 'cut';
-    return 'act1';
+  function once(key, t, when, run){
+    /* fire when the clock crosses a mark, and never twice */
+    if (t >= when && t < when + 1.2 && !fired[key]){ fired[key] = true; run(); }
+    if (t < when - 0.5 || t > when + 4) fired[key] = false;
   }
 
   function state(t){
-    warm = ease((t - T.bright) / 7);
-    /* the four seconds of nothing, plus a beat either side */
-    hush = 1;
-    if (t > T.cut - 0.12 && t < T.back + 0.9){
-      hush = 1 - ease((t - (T.cut - 0.12)) / 0.5);
-      if (t > T.back) hush = ease((t - T.back) / 0.9);
-    }
-    heat = 0;
-    if (t >= T.drop && t < T.cut) heat = ease((t - T.drop) / 1.2);
+    warm = ease((t - T.bright) / 4.6);
 
-    var p = clockOf(t);
+    hush = 1;
+    if (t > T.cut - 0.1 && t < T.back + 1.0){
+      hush = 1 - ease((t - (T.cut - 0.1)) / 0.42);
+      if (t > T.back) hush = ease((t - T.back) / 1.0);
+    }
+
+    heat = (t >= T.drop && t < T.cut) ? ease((t - T.drop) / 1.0) : 0;
+
+    once('drop', t, T.drop, function(){
+      flashes.push({ t: t, dur: 1.1, power: 1.5, c: [255, 60, 40] });
+    });
+    once('cut', t, T.cut, function(){
+      flashes.length = 0; waves.length = 0; circles.length = 0; dust.length = 0;
+      blackout = 1;
+    });
+    once('turn', t, T.bright, function(){
+      flashes.push({ t: t, dur: 1.7, power: 3.6, c: [255, 250, 238] });
+      burst = 1;
+      waves.push({ r: 0, life: 1, hard: 1, holy: 1 });
+    });
+
+    burst *= 0.982;
+
+    var p = t >= T.outro ? 'outro'
+          : t >= T.bright ? 'act2'
+          : (t >= T.cut && t < T.back) ? 'cut' : 'act1';
     if (p !== phase){
       document.body.classList.remove('act1', 'cut', 'act2', 'outro');
       document.body.classList.add(p);
       phase = p;
     }
+  }
 
-    var i = -1;
-    for (var k = 0; k < SCRIPT.length; k++) if (t >= SCRIPT[k][0]) i = k;
-    if (i !== cued){
-      cued = i;
-      show(i < 0 ? null : SCRIPT[i]);
+  /* ================= colour ================= */
+  function mix(a, b, t){
+    return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+  }
+  function rgba(c, a){
+    return 'rgba(' + (c[0] | 0) + ',' + (c[1] | 0) + ',' + (c[2] | 0) + ',' + a + ')';
+  }
+  var RED = [194, 26, 18], RED_HOT = [255, 108, 76], EMBER = [255, 168, 96];
+  var GOLD = [240, 200, 104], GOLD_HOT = [255, 248, 226], WHITE = [255, 255, 255];
+  var INK = [5, 4, 10], INK_WARM = [10, 8, 5];
+
+  /* ================= transient things ================= */
+  var waves = [], circles = [], dust = [], shards = [];
+  var blackout = 0;
+
+  function hit(){
+    if (circles.length > 8) return;
+    var ang = Math.random() * TAU;
+    var rad = Math.min(W, H) * (0.36 + Math.random() * 0.17);
+    circles.push({
+      x: Math.max(52, Math.min(W - 52, W / 2 + Math.cos(ang) * rad * (W > H ? 1.55 : 1))),
+      y: Math.max(52, Math.min(H - 110, H * 0.46 + Math.sin(ang) * rad)),
+      t: 0, dur: 0.6, pop: 0
+    });
+  }
+
+  function shard(cx, cy, R){
+    if (shards.length > 90) return;
+    var a = Math.random() * TAU, sp = 180 + Math.random() * 620;
+    shards.push({
+      x: cx + Math.cos(a) * R, y: cy + Math.sin(a) * R,
+      vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 40,
+      a: Math.random() * TAU, va: (Math.random() - 0.5) * 9,
+      len: 5 + Math.random() * 20, life: 1, decay: 0.5 + Math.random() * 0.6
+    });
+  }
+
+  function speck(){
+    if (dust.length > (reduce ? 50 : 210)) return;
+    if (warm > 0.5){
+      dust.push({ x: Math.random() * W, y: H + 12,
+                  vx: (Math.random() - 0.5) * 12, vy: -16 - Math.random() * 34,
+                  life: 1, decay: 0.13 + Math.random() * 0.12,
+                  size: 0.5 + Math.random() * 1.3, warm: 1 });
+    } else {
+      dust.push({ x: W / 2 + (Math.random() - 0.5) * W, y: H * 0.94,
+                  vx: (Math.random() - 0.5) * 30, vy: -40 - Math.random() * 90,
+                  life: 1, decay: 0.3 + Math.random() * 0.28,
+                  size: 0.8 + Math.random() * 1.8, warm: 0 });
     }
   }
 
-  var swapping = 0;
-  function show(line){
-    clearTimeout(swapping);
-    sayEl.classList.remove('on');
-    swapping = setTimeout(function(){
-      if (!line || line[2] === 'none'){ sayEl.textContent = ''; return; }
-      sayEl.textContent = line[1];
-      sayEl.className = 'say' + (line[2] ? ' ' + line[2] : '');
-      /* one frame off, so the transition has something to go from */
-      requestAnimationFrame(function(){ sayEl.classList.add('on'); });
-    }, 300);
-  }
-
-  /* ---------------- canvas ---------------- */
+  /* ================= canvas ================= */
   var W = 0, H = 0, dpr = 1;
 
   function size(){
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dpr = Math.min(window.devicePixelRatio || 1, 1.75);
     W = window.innerWidth; H = window.innerHeight;
     canvas.width  = Math.round(W * dpr);
     canvas.height = Math.round(H * dpr);
@@ -590,188 +428,420 @@
   }
   window.addEventListener('resize', size);
 
-  var last = 0, spin = 0;
+  /* ---- the cross. one shape, and it physically turns over at the change.
+     Drawn out of gradients rather than blocks, because a solid bar reads as a
+     bar and the whole point is that it is made of light. ---- */
+  function cross(cx, cy, S, bump){
+    /* the palette turns first and the cross holds out, then it goes over
+       all at once, which is the whole moment */
+    var rot = (1 - Math.pow(warm, 2.6)) * Math.PI;
+    var barW = S * 0.026;
+    var top  = -S * 0.52, bot = S * 0.48;
+    var armY = top + S * 0.30, armW = S * 0.185;
+
+    /* how bright, and in what */
+    var a, core, edge, blur;
+    if (warm < 0.5){
+      var flick = 0.80 + Math.sin(now8 * 41) * 0.10 + Math.sin(now8 * 13.7) * 0.10;
+      a = (1 - warm) * hush * (0.30 + heat * 0.75 + bump * 0.30) * flick;
+      core = mix(RED_HOT, [255, 210, 180], heat * 0.5 + bump * 0.3);
+      edge = RED;
+      blur = 14 + heat * 40 + bump * 40;
+    } else {
+      a = warm * (0.62 + bump * 0.25 + burst * 0.4);
+      core = WHITE;
+      edge = GOLD;
+      blur = 22 + bump * 44 + burst * 80;
+    }
+    if (a <= 0.002) return;
+    if (a > 1) a = 1;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rot);
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.shadowColor = rgba(edge, 0.8);
+    ctx.shadowBlur = blur;
+
+    /* the shaft, soft at both sides */
+    var w = barW * 2.6;
+    var sg = ctx.createLinearGradient(-w, 0, w, 0);
+    sg.addColorStop(0,    rgba(edge, 0));
+    sg.addColorStop(0.32, rgba(edge, a * 0.55));
+    sg.addColorStop(0.5,  rgba(core, a));
+    sg.addColorStop(0.68, rgba(edge, a * 0.55));
+    sg.addColorStop(1,    rgba(edge, 0));
+    ctx.fillStyle = sg;
+    ctx.fillRect(-w, top, w * 2, bot - top);
+
+    /* the arm, the same trick turned ninety degrees */
+    var ah = barW * 2.6;
+    var ag = ctx.createLinearGradient(0, armY - ah, 0, armY + ah);
+    ag.addColorStop(0,    rgba(edge, 0));
+    ag.addColorStop(0.32, rgba(edge, a * 0.55));
+    ag.addColorStop(0.5,  rgba(core, a));
+    ag.addColorStop(0.68, rgba(edge, a * 0.55));
+    ag.addColorStop(1,    rgba(edge, 0));
+    ctx.fillStyle = ag;
+    ctx.fillRect(-armW, armY - ah, armW * 2, ah * 2);
+    ctx.shadowBlur = 0;
+
+    /* and once it is the holy one, the flare across the join */
+    if (warm > 0.5){
+      var f = Math.min(0.95, 0.34 * warm + bump * 0.4 + burst * 0.6);
+      ctx.save();
+      ctx.translate(0, armY);
+      ctx.scale(1, 0.14);
+      var r = armW * 3.8;
+      var fg = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
+      fg.addColorStop(0,   rgba(WHITE, f));
+      fg.addColorStop(0.4, rgba(GOLD_HOT, f * 0.5));
+      fg.addColorStop(1,   rgba(GOLD, 0));
+      ctx.fillStyle = fg;
+      ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.fill();
+      ctx.restore();
+    }
+
+    ctx.restore();
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  /* ---- act one: teeth ---- */
+  function shardRing(cx, cy, R, span, bump){
+    ctx.globalAlpha = (1 - warm) * hush;
+    var key = RED, hot = mix(RED_HOT, [255, 230, 210], heat * 0.5);
+    for (var i = 0; i < N; i++){
+      var v = level[i];
+      var a = spin + (i / N) * TAU;
+      var jit = heat * kickHard * bump * 0.5;
+      var r2 = R + v * span * (1 + bump * 0.7 + jit);
+      var wdt = (TAU / N) * 0.34 * (0.5 + v * 0.8);
+      var ca = Math.cos(a), sa = Math.sin(a);
+
+      ctx.fillStyle = rgba(mix(key, hot, v * v), 0.30 + v * 0.7);
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(a - wdt) * R, cy + Math.sin(a - wdt) * R);
+      ctx.lineTo(cx + ca * r2, cy + sa * r2);
+      ctx.lineTo(cx + Math.cos(a + wdt) * R, cy + Math.sin(a + wdt) * R);
+      ctx.closePath();
+      ctx.fill();
+
+      /* teeth pointing back in */
+      if (heat > 0.02){
+        var r3 = R - v * span * 0.34 * heat;
+        ctx.globalAlpha = (1 - warm) * hush * heat * 0.55;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(a - wdt * 0.6) * R, cy + Math.sin(a - wdt * 0.6) * R);
+        ctx.lineTo(cx + ca * r3, cy + sa * r3);
+        ctx.lineTo(cx + Math.cos(a + wdt * 0.6) * R, cy + Math.sin(a + wdt * 0.6) * R);
+        ctx.closePath();
+        ctx.fill();
+        ctx.globalAlpha = (1 - warm) * hush;
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  /* ---- act two: everything is made of light ---- */
+  var RAYS = 30;
+
+  function godRays(cx, cy, R, bump){
+    ctx.globalCompositeOperation = 'lighter';
+    var reach = Math.max(W, H) * (0.62 + burst * 0.7);
+    for (var i = 0; i < RAYS; i++){
+      var v = soft[(i * 3) % N];
+      var a = rayspin + (i / RAYS) * TAU;
+      var len = R * 0.9 + (v * 0.75 + bump * 0.3 + burst * 0.9) * reach;
+      var w = (TAU / RAYS) * (0.20 + v * 0.30);
+      ctx.fillStyle = rgba(mix(GOLD, GOLD_HOT, v * 0.6 + burst * 0.4),
+                           0.026 + v * 0.055 + burst * 0.05);
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(a - w) * R * 0.62, cy + Math.sin(a - w) * R * 0.62);
+      ctx.lineTo(cx + Math.cos(a) * len, cy + Math.sin(a) * len);
+      ctx.lineTo(cx + Math.cos(a + w) * R * 0.62, cy + Math.sin(a + w) * R * 0.62);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  function halo(cx, cy, R, bump){
+    ctx.globalCompositeOperation = 'lighter';
+    var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * (2.1 + burst * 1.6));
+    var p = 0.16 + bump * 0.16 + burst * 0.5;
+    g.addColorStop(0,    rgba(GOLD_HOT, p * warm));
+    g.addColorStop(0.24, rgba(GOLD, p * 0.5 * warm));
+    g.addColorStop(1,    rgba(GOLD, 0));
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  /* a rose window, which is the most holy shape there is */
+  function rose(cx, cy, R, bump){
+    var lo = 0, mid = 0, i;
+    for (i = 0; i < N; i++){ if (i < N * 0.3) lo += soft[i]; else mid += soft[i]; }
+    lo /= N * 0.3; mid /= N * 0.7;
+
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = warm;
+
+    var PET = 12, Rr = R * (1.38 + lo * 0.16 + bump * 0.05) * (1 + burst * 1.9);
+    ctx.strokeStyle = rgba(GOLD, 0.30 + mid * 0.4);
+    ctx.lineWidth = 1.1;
+    for (i = 0; i < PET; i++){
+      var a = -rayspin * 0.55 + (i / PET) * TAU;
+      var px = cx + Math.cos(a) * Rr, py = cy + Math.sin(a) * Rr;
+      ctx.beginPath();
+      ctx.arc(px, py, R * (0.30 + mid * 0.10), 0, TAU);
+      ctx.stroke();
+    }
+
+    /* the tracery */
+    ctx.strokeStyle = rgba(GOLD_HOT, 0.16 + lo * 0.34);
+    ctx.lineWidth = 1;
+    for (i = 0; i < PET * 2; i++){
+      var b = -rayspin * 0.55 + (i / (PET * 2)) * TAU;
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(b) * R * 1.06, cy + Math.sin(b) * R * 1.06);
+      ctx.lineTo(cx + Math.cos(b) * (Rr + R * 0.32), cy + Math.sin(b) * (Rr + R * 0.32));
+      ctx.stroke();
+    }
+
+    var rings = [1.06, 1.72, 2.05];
+    for (i = 0; i < rings.length; i++){
+      ctx.globalAlpha = warm * (0.36 - i * 0.09 + mid * 0.3);
+      ctx.beginPath();
+      ctx.arc(cx, cy, R * rings[i] * (1 + bump * 0.02), 0, TAU);
+      ctx.stroke();
+    }
+
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  function lightRing(cx, cy, R, span, bump){
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = warm * hush;
+    var i, v, a, r1;
+
+    ctx.beginPath();
+    for (i = 0; i <= N; i++){
+      v = soft[i % N];
+      a = -spin * 0.6 + (i / N) * TAU;
+      r1 = R + v * span * 0.95;
+      if (i === 0) ctx.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
+      else ctx.lineTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = rgba(mix(GOLD, GOLD_HOT, 0.6), 0.98);
+    ctx.lineWidth = 2.3;
+    ctx.shadowColor = rgba(GOLD_HOT, 1);
+    ctx.shadowBlur = 16 + bump * 26 + burst * 40;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    ctx.globalAlpha = warm * hush * 0.4;
+    ctx.beginPath();
+    for (i = 0; i <= N; i++){
+      v = soft[i % N];
+      a = -spin * 0.6 + (i / N) * TAU;
+      r1 = R - v * span * 0.42;
+      if (i === 0) ctx.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
+      else ctx.lineTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = rgba(GOLD_HOT, 0.9);
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  /* ---- act one only: the picture comes apart on a hard kick ---- */
+  function tear(power){
+    var n = 2 + (power * 5) | 0;
+    for (var i = 0; i < n; i++){
+      var y = Math.random() * H;
+      var h = 5 + Math.random() * 46;
+      var dx = (Math.random() - 0.5) * 130 * power;
+      ctx.drawImage(canvas,
+        0, y * dpr, canvas.width, h * dpr,
+        dx, y, W, h);
+    }
+  }
 
   function ground(alpha){
-    var cx = W / 2, cy = H * 0.44;
-    var core = mix([26, 6, 8], [17, 12, 4], warm);
-    var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.78);
-    g.addColorStop(0, rgba(mix(core, mix(core, [90, 20, 14], heat), 1), alpha));
-    g.addColorStop(0.42, rgba(mix(INK, INK_WARM, warm), alpha * 0.96));
+    var cx = W / 2, cy = H * 0.46;
+    var core = mix(mix([30, 5, 6], [70, 10, 8], heat), [16, 12, 5], warm);
+    var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.8);
+    g.addColorStop(0, rgba(core, alpha));
+    g.addColorStop(0.4, rgba(mix(INK, INK_WARM, warm), alpha * 0.97));
     g.addColorStop(1, rgba(mix(INK, INK_WARM, warm), alpha));
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
   }
 
-  function ring(cx, cy, R, span, bump){
-    var key = mix(RED, GOLD, warm);
-    var hot = mix(RED_HOT, GOLD_HOT, warm);
-    var i, a, v, r1, r2;
-
-    /* act one: hard spikes, the shape of something being taken apart */
-    if (warm < 1){
-      ctx.globalAlpha = (1 - warm) * hush;
-      ctx.lineCap = 'butt';
-      for (i = 0; i < N; i++){
-        v = level[i];
-        a = spin + (i / N) * Math.PI * 2;
-        r1 = R;
-        r2 = R + v * span * (1 + bump * 0.5);
-        ctx.strokeStyle = rgba(mix(key, hot, v * v), 0.28 + v * 0.72);
-        ctx.lineWidth = 1.4 + v * 2.4 + heat * 1.2;
-        ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
-        ctx.lineTo(cx + Math.cos(a) * r2, cy + Math.sin(a) * r2);
-        ctx.stroke();
-        /* the peak that hangs behind the band, a beat late */
-        if (peak[i] > v + 0.06){
-          r2 = R + peak[i] * span * (1 + bump * 0.5);
-          ctx.globalAlpha = (1 - warm) * hush * 0.4;
-          ctx.beginPath();
-          ctx.arc(cx + Math.cos(a) * r2, cy + Math.sin(a) * r2, 1.2, 0, 6.284);
-          ctx.fillStyle = rgba(hot, 1);
-          ctx.fill();
-          ctx.globalAlpha = (1 - warm) * hush;
-        }
-      }
-    }
-
-    /* act two: one closed curve, lit from inside */
-    if (warm > 0){
-      ctx.globalAlpha = warm * hush;
-      ctx.beginPath();
-      for (i = 0; i <= N; i++){
-        v = soft[i % N];
-        a = -spin * 0.6 + (i / N) * Math.PI * 2;
-        r1 = R + v * span * 0.92;
-        if (i === 0) ctx.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
-        else ctx.lineTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
-      }
-      ctx.closePath();
-      var gg = ctx.createRadialGradient(cx, cy, R * 0.82, cx, cy, R + span);
-      gg.addColorStop(0, rgba(GOLD, 0));
-      gg.addColorStop(1, rgba(GOLD_HOT, 0.055));
-      ctx.fillStyle = gg;
-      ctx.fill();
-      ctx.strokeStyle = rgba(mix(GOLD, GOLD_HOT, 0.55), 0.95);
-      ctx.lineWidth = 1.5;
-      ctx.shadowColor = rgba(GOLD, 0.7);
-      ctx.shadowBlur = 9 + bump * 13;
-      ctx.stroke();
-      ctx.shadowBlur = 0;
-
-      /* and its reflection, folded inwards */
-      ctx.globalAlpha = warm * hush * 0.34;
-      ctx.beginPath();
-      for (i = 0; i <= N; i++){
-        v = soft[i % N];
-        a = -spin * 0.6 + (i / N) * Math.PI * 2;
-        r1 = R - v * span * 0.4;
-        if (i === 0) ctx.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
-        else ctx.lineTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
-      }
-      ctx.closePath();
-      ctx.strokeStyle = rgba(GOLD_HOT, 0.8);
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
+  function vignette(bump){
+    var cx = W / 2, cy = H * 0.46;
+    var g = ctx.createRadialGradient(cx, cy, Math.min(W, H) * 0.30,
+                                     cx, cy, Math.max(W, H) * 0.78);
+    var dark = 0.34 + heat * 0.42 - warm * 0.30;
+    g.addColorStop(0, 'rgba(0,0,0,0)');
+    g.addColorStop(1, 'rgba(0,0,0,' + Math.max(0, dark).toFixed(3) + ')');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
   }
+
+  /* ================= the loop ================= */
+  var last = 0, spin = 0, rayspin = 0, now8 = 0;
 
   function frame(ms){
     requestAnimationFrame(frame);
-    var now = ms / 1000;
-    var dt = last ? Math.min(now - last, 0.05) : 0.016;
-    last = now;
+    now8 = ms / 1000;
+    var dt = last ? Math.min(now8 - last, 0.05) : 0.016;
+    last = now8;
 
     var t = audio.currentTime;
     state(t);
-    readBands();
     var onset = transients(t);
+    readBands();
 
-    var cx = W / 2, cy = H * 0.44;
-    var R = Math.min(W, H) * 0.235;
+    var cx = W / 2, cy = H * 0.46;
+    var R = Math.min(W, H) * 0.215;
     var span = Math.min(W, H) * 0.15;
 
-    /* the punch, and it is a punch, not a wobble */
     var since = t - kickAt;
     var bump = since >= 0 && since < 0.5
       ? Math.pow(1 - since / 0.5, 2.4) * kickHard * hush : 0;
 
-    ground(0.30 + bump * 0.10 + (1 - hush) * 0.30);
-
-    /* a hole for the words to sit in */
-    var hole = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * 1.02);
-    hole.addColorStop(0, rgba(mix(INK, INK_WARM, warm), 0.86));
-    hole.addColorStop(0.72, rgba(mix(INK, INK_WARM, warm), 0.66));
-    hole.addColorStop(1, rgba(mix(INK, INK_WARM, warm), 0));
-    ctx.fillStyle = hole;
-    ctx.beginPath(); ctx.arc(cx, cy, R * 1.02, 0, 6.284); ctx.fill();
-
-    spin += dt * (0.05 + heat * 0.16 + warm * 0.03);
-
-    ring(cx, cy, R * (1 + bump * 0.03), span, bump);
-
-    /* shockwaves. red ones are walls, gold ones are ripples. */
-    for (var i = waves.length - 1; i >= 0; i--){
-      var s = waves[i];
-      s.r += dt * Math.min(W, H) * (0.7 + s.hard * 0.7);
-      s.life -= dt * 1.5;
-      if (s.life <= 0){ waves.splice(i, 1); continue; }
-      ctx.globalAlpha = s.life * s.life * 0.55 * hush;
-      ctx.strokeStyle = rgba(mix(RED_HOT, GOLD, warm), 1);
-      ctx.lineWidth = (1 - warm) * (1 + s.hard * 3.4) + warm * 1.1;
-      ctx.beginPath(); ctx.arc(cx, cy, R + s.r, 0, 6.284); ctx.stroke();
+    if (blackout > 0){
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, W, H);
+      blackout = 0;
     }
-    ctx.globalAlpha = 1;
 
-    /* act two only: the approach circle, borrowed wholesale from osu */
-    if (warm > 0.35 && onset && !reduce) hit(W, H);
+    /* trails, and the screen clears itself when the music stops */
+    ground(0.26 + bump * 0.09 + (1 - hush) * 0.34 + warm * 0.06);
+
+    spin    += dt * (0.05 + heat * 0.30 + warm * 0.02);
+    rayspin += dt * (0.035 + burst * 0.5);
+
+    /* ---------------- the curse ---------------- */
+    if (warm < 0.999){
+      cross(cx, cy, Math.min(W, H) * 0.78, bump);
+      shardRing(cx, cy, R, span, bump);
+    }
+
+    /* ---------------- the light ---------------- */
+    if (warm > 0.001){
+      halo(cx, cy, R, bump);
+      godRays(cx, cy, R, bump);
+      rose(cx, cy, R, bump);
+      if (warm >= 0.999) cross(cx, cy, Math.min(W, H) * 0.78, bump);
+      lightRing(cx, cy, R, span, bump);
+    }
+
+    /* four seconds of nothing, with one thing in it. the first gold on the
+       page turns up here, half a minute before the turn does. */
+    if (hush < 0.6 && t > T.cut && t < T.back + 1.4){
+      var seed = (1 - hush) * ease((t - T.cut) / 2.4);
+      ctx.globalCompositeOperation = 'lighter';
+      var sd = ctx.createRadialGradient(cx, cy, 0, cx, cy, 7 + seed * 110);
+      sd.addColorStop(0,    rgba(GOLD_HOT, 0.85 * seed));
+      sd.addColorStop(0.18, rgba(GOLD, 0.20 * seed));
+      sd.addColorStop(1,    rgba(GOLD, 0));
+      ctx.fillStyle = sd;
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    /* shockwaves: walls in act one, ripples of light in act two */
+    var i, s;
+    for (i = waves.length - 1; i >= 0; i--){
+      s = waves[i];
+      s.r += dt * Math.min(W, H) * (s.holy ? 2.4 : 0.75 + s.hard * 0.8);
+      s.life -= dt * (s.holy ? 0.55 : 1.5);
+      if (s.life <= 0){ waves.splice(i, 1); continue; }
+      ctx.globalCompositeOperation = warm > 0.5 || s.holy ? 'lighter' : 'source-over';
+      ctx.globalAlpha = s.life * s.life * (s.holy ? 0.7 : 0.5) * hush;
+      ctx.strokeStyle = rgba(s.holy ? GOLD_HOT : mix(RED_HOT, GOLD, warm), 1);
+      ctx.lineWidth = s.holy ? 3 : (1 - warm) * (1.2 + s.hard * 4) + warm * 1.2;
+      ctx.beginPath(); ctx.arc(cx, cy, R + s.r, 0, TAU); ctx.stroke();
+    }
+    ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+
+    /* act two borrows osu approach circles, which is what it sounds like */
+    if (warm > 0.35 && onset && !reduce) hit();
     for (i = circles.length - 1; i >= 0; i--){
       var c = circles[i];
       c.t += dt;
       var k = c.t / c.dur;
+      ctx.globalCompositeOperation = 'lighter';
       if (k >= 1){
-        c.pop += dt * 4.2;
-        if (c.pop >= 1){ circles.splice(i, 1); continue; }
-        ctx.globalAlpha = (1 - c.pop) * 0.85 * warm;
+        c.pop += dt * 4;
+        if (c.pop >= 1){ circles.splice(i, 1); ctx.globalCompositeOperation = 'source-over'; continue; }
+        ctx.globalAlpha = (1 - c.pop) * 0.9 * warm;
         ctx.strokeStyle = rgba(GOLD_HOT, 1);
-        ctx.lineWidth = 2 * (1 - c.pop);
-        ctx.beginPath(); ctx.arc(c.x, c.y, 16 + c.pop * 34, 0, 6.284); ctx.stroke();
+        ctx.lineWidth = 2.4 * (1 - c.pop);
+        ctx.beginPath(); ctx.arc(c.x, c.y, 17 + c.pop * 40, 0, TAU); ctx.stroke();
       } else {
-        var rr = 16 + (1 - k) * 42;
-        ctx.globalAlpha = 0.72 * warm;
+        ctx.globalAlpha = 0.75 * warm;
         ctx.strokeStyle = rgba(GOLD, 1);
-        ctx.lineWidth = 1.4;
-        ctx.beginPath(); ctx.arc(c.x, c.y, rr, 0, 6.284); ctx.stroke();
-        ctx.globalAlpha = 0.3 * warm * k;
-        ctx.beginPath(); ctx.arc(c.x, c.y, 16, 0, 6.284);
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(c.x, c.y, 17 + (1 - k) * 46, 0, TAU); ctx.stroke();
+        ctx.globalAlpha = 0.35 * warm * k;
+        ctx.beginPath(); ctx.arc(c.x, c.y, 17, 0, TAU);
         ctx.strokeStyle = rgba(GOLD_HOT, 1); ctx.stroke();
       }
+      ctx.globalCompositeOperation = 'source-over';
     }
     ctx.globalAlpha = 1;
 
-    /* embers going up in act one, motes coming up in act two */
-    var want = hush * (0.4 + heat * 2.2 + warm * 0.9) * (reduce ? 0.3 : 1);
-    if (Math.random() < want) speck(W, H, warm);
-    if (Math.random() < want * 0.5) speck(W, H, warm);
+    /* shrapnel off the hard kicks in the drop */
+    if (heat > 0.4 && bump > 0.55 && !reduce){
+      for (i = 0; i < 7; i++) shard(cx, cy, R);
+    }
+    for (i = shards.length - 1; i >= 0; i--){
+      var f = shards[i];
+      f.x += f.vx * dt; f.y += f.vy * dt;
+      f.vy += 260 * dt; f.a += f.va * dt;
+      f.life -= f.decay * dt;
+      if (f.life <= 0){ shards.splice(i, 1); continue; }
+      ctx.globalAlpha = f.life * 0.8 * hush;
+      ctx.strokeStyle = rgba(mix(RED_HOT, EMBER, 1 - f.life), 1);
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(f.x, f.y);
+      ctx.lineTo(f.x + Math.cos(f.a) * f.len, f.y + Math.sin(f.a) * f.len);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    /* embers go up in the dark, motes come up into the light */
+    var want = hush * (0.35 + heat * 2.4 + warm * 0.85) * (reduce ? 0.3 : 1);
+    if (Math.random() < want) speck();
+    if (Math.random() < want * 0.6) speck();
+    ctx.globalCompositeOperation = 'lighter';
     for (i = dust.length - 1; i >= 0; i--){
       var d = dust[i];
       d.x += d.vx * dt; d.y += d.vy * dt;
-      d.vy += (d.warm ? 4 : 16) * dt;
+      d.vy += (d.warm ? -3 : 16) * dt;
       d.life -= d.decay * dt;
       if (d.life <= 0 || d.y < -20){ dust.splice(i, 1); continue; }
-      ctx.globalAlpha = d.life * (d.warm ? 0.75 : 0.6) * hush;
-      ctx.fillStyle = rgba(d.warm ? GOLD_HOT : mix(RED_HOT, [255, 190, 120], 0.4), 1);
-      ctx.beginPath(); ctx.arc(d.x, d.y, d.size, 0, 6.284); ctx.fill();
+      ctx.globalAlpha = d.life * (d.warm ? 0.5 : 0.6) * hush;
+      ctx.fillStyle = rgba(d.warm ? GOLD_HOT : EMBER, 1);
+      ctx.beginPath(); ctx.arc(d.x, d.y, d.size, 0, TAU); ctx.fill();
     }
+    ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = 1;
 
-    /* the actual waveform, down at the bottom, so you can see it is real */
+    /* the waveform, so you can see it is really the track */
     if (analyser && hush > 0.02){
       analyser.getByteTimeDomainData(wave);
-      var base = H - 74, amp = 26 * hush;
-      ctx.globalAlpha = 0.30 * hush;
+      var base = H - 74, amp = 26 * hush * (1 + warm * 0.4);
+      ctx.globalAlpha = 0.28 * hush;
       ctx.strokeStyle = rgba(mix(RED, GOLD, warm), 1);
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -785,27 +855,44 @@
       ctx.globalAlpha = 1;
     }
 
-    /* the flash off a hard kick, which is all the punch this page needs */
+    if (heat > 0.3 && bump > 0.5 && !reduce) tear(bump * heat);
+
+    vignette(bump);
+
+    /* the flash off a kick, and the three that matter */
     if (bump > 0.02){
-      ctx.globalAlpha = bump * (0.10 + (1 - warm) * 0.08);
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = bump * (0.05 + (1 - warm) * 0.05 + warm * 0.05);
       ctx.fillStyle = rgba(mix(RED_HOT, GOLD_HOT, warm), 1);
       ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 1;
+    }
+    for (i = flashes.length - 1; i >= 0; i--){
+      var fl = flashes[i];
+      var k2 = (t - fl.t) / fl.dur;
+      if (k2 < 0 || k2 >= 1){ flashes.splice(i, 1); continue; }
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = Math.min(1, Math.pow(1 - k2, 3.0) * fl.power);
+      ctx.fillStyle = rgba(fl.c, 1);
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'source-over';
       ctx.globalAlpha = 1;
     }
 
     hud(t);
   }
 
-  /* ---------------- the bar ---------------- */
+  /* ================= hud ================= */
   var lastShown = -1;
   function hud(t){
     var p = Math.max(0, Math.min(1, t / T.dur));
     fill.style.width = (p * 100) + '%';
     head.style.left = (p * 100) + '%';
-    var s = Math.floor(t);
+    var s = t | 0;
     if (s !== lastShown){
       lastShown = s;
-      clock.textContent = Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2);
+      clock.textContent = (s / 60 | 0) + ':' + ('0' + (s % 60)).slice(-2);
       bar.setAttribute('aria-valuenow', String(s));
     }
   }
@@ -813,17 +900,18 @@
   function jumped(){
     lastKick = lastOnset = kickAt = -9;
     lowPrev = rise = fluxPrev = fluxRise = 0;
-    waves.length = 0; circles.length = 0; dust.length = 0;
-    cued = -2;
+    waves.length = circles.length = dust.length = shards.length = 0;
+    flashes.length = 0;
+    burst = 0;
+    fired = {};
   }
 
-  function seek(e){
+  bar.addEventListener('click', function(e){
     var r = bar.getBoundingClientRect();
-    var x = (e.clientX - r.left) / r.width;
-    audio.currentTime = Math.max(0, Math.min(T.dur - 0.05, x * T.dur));
+    audio.currentTime = Math.max(0, Math.min(T.dur - 0.05,
+      ((e.clientX - r.left) / r.width) * T.dur));
     jumped();
-  }
-  bar.addEventListener('click', seek);
+  });
   bar.addEventListener('keydown', function(e){
     var d = e.key === 'ArrowRight' ? 5 : e.key === 'ArrowLeft' ? -5 : 0;
     if (!d) return;
@@ -832,47 +920,51 @@
     jumped();
   });
 
-  /* ---------------- going ---------------- */
   function toggle(){
     if (audio.paused){
       if (actx && actx.state === 'suspended') actx.resume();
       audio.play();
-    } else {
-      audio.pause();
-    }
+    } else audio.pause();
   }
   pp.addEventListener('click', toggle);
   audio.addEventListener('play',  function(){ document.body.classList.add('going'); });
   audio.addEventListener('pause', function(){ document.body.classList.remove('going'); });
-
   document.addEventListener('keydown', function(e){
-    if (e.code === 'Space' && e.target === document.body){
-      e.preventDefault(); toggle();
-    }
+    if (e.code === 'Space' && e.target === document.body){ e.preventDefault(); toggle(); }
   });
 
-  start.addEventListener('click', function(){
+  /* the furniture gets out of the way if you leave it alone */
+  var idleTimer;
+  function stir(){
+    document.body.classList.remove('idle');
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(function(){ document.body.classList.add('idle'); }, 2600);
+  }
+  document.addEventListener('mousemove', stir);
+  document.addEventListener('touchstart', stir);
+
+  document.getElementById('start').addEventListener('click', function(){
     listen();
     if (actx && actx.state === 'suspended') actx.resume();
     audio.play();
     gate.classList.add('gone');
-    setTimeout(function(){ gate.style.display = 'none'; }, 800);
+    setTimeout(function(){ gate.style.display = 'none'; }, 1000);
+    stir();
   });
+
+  window.__an = {
+    T: T,
+    at: function(t){
+      state(t);
+      return { phase: phase, warm: +warm.toFixed(3), hush: +hush.toFixed(3),
+               heat: +heat.toFixed(3), burst: +burst.toFixed(3),
+               flashes: flashes.length };
+    }
+  };
 
   document.body.classList.add('act1');
   size();
   requestAnimationFrame(frame);
-
-  window.__an = {
-    T: T,
-    script: SCRIPT,
-    at: function(t){
-      state(t);
-      var line = cued < 0 ? null : SCRIPT[cued];
-      return { phase: phase, warm: +warm.toFixed(3), hush: +hush.toFixed(3),
-               heat: +heat.toFixed(3), cue: cued, say: line ? line[1] : '' };
-    }
-  };
 
   /* the front page opens this in a frame and keeps its own arrow */
   try { if (window.top !== window.self) document.querySelector('.backlink').remove(); }
