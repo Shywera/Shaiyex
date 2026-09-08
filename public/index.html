@@ -1200,6 +1200,17 @@
   body.tekk .wip-c:hover{border-color:#F0C868;box-shadow:0 0 34px rgba(240,200,104,.3), 0 16px 40px rgba(0,0,0,.8)}
   body.tekk .wip-c:hover .wip-s{color:#FFE9B0}
 
+  /* the second one on the wall. it is a quieter thing and it looks it. */
+  body.tekk .wip-d{
+    --tilt:.85deg;
+    --hd:.21s;
+    --hdir:1;
+  }
+  body.tekk .wip-d .wip-tag{background:#6E86A8;color:#060911}
+  body.tekk .wip-d .wip-s{color:#5E7089}
+  body.tekk .wip-d:hover{border-color:#6E86A8;box-shadow:0 0 34px rgba(110,134,168,.28), 0 16px 40px rgba(0,0,0,.8)}
+  body.tekk .wip-d:hover .wip-s{color:#C8D4E6}
+
   body.tekk .wip-tag{background:#8E0F0F;color:#040203}
   /* the blacklist hangs lower and swings wider, like a sign outside a door */
   body.tekk .blbar.dropping{z-index:1}
@@ -1789,6 +1800,15 @@
           <span class="wip-s" data-t="The sentence, read out in full">Three minutes, and it does not stay like this</span>
         </span>
         <span class="wip-tag">LOUD</span>
+        <span class="drip" aria-hidden="true"></span>
+      </a>
+
+      <a class="wip wip-d" href="/miss/" data-go="swing-right" data-hush>
+        <span>
+          <span class="wip-t" data-t="did i tell u that i miss u">did i tell u that i miss u</span>
+          <span class="wip-s" data-t="Two minutes, and then twelve seconds of nothing">adore &middot; no words on it</span>
+        </span>
+        <span class="wip-tag">SLOW</span>
         <span class="drip" aria-hidden="true"></span>
       </a>
     </div>

@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Two minutes and six seconds, and then twelve seconds of nothing.">
+<meta name="theme-color" content="#070A12">
+<meta property="og:type" content="website">
+<meta property="og:title" content="did i tell u that i miss u">
+<meta property="og:description" content="adore. A visualiser, and no words on it.">
+<meta property="og:url" content="https://shaiyex.com/miss/">
+<meta name="twitter:card" content="summary">
+<title>did i tell u that i miss u</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap">
+
+<style>
+  :root{
+    --ink:#070A12;
+    --cold:#6E86A8;
+    --her:#FF89A8;
+    --warm:#FFC9A8;
+    --dim:#4E5A70;
+    --edge:#18202F;
+    --mono:"JetBrains Mono",Consolas,ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;overflow:hidden;background:#04060B;
+    color:var(--dim);font-family:var(--mono);
+    -webkit-font-smoothing:antialiased;
+  }
+  #viz{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0}
+
+  .hud{
+    position:fixed;left:0;right:0;bottom:0;z-index:3;
+    display:flex;align-items:center;gap:12px;
+    padding:12px clamp(12px,3vw,22px) 14px;
+    font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+    background:linear-gradient(180deg, rgba(4,6,11,0), rgba(4,6,11,.9) 46%);
+    transition:opacity .6s ease;
+  }
+  body.idle .hud{opacity:.1}
+  .hud:hover{opacity:1 !important}
+  .pp{
+    flex:0 0 auto;width:30px;height:30px;padding:0;cursor:pointer;
+    background:transparent;border:1px solid var(--edge);border-radius:2px;
+    color:var(--cold);
+    display:flex;align-items:center;justify-content:center;
+    transition:border-color .5s ease, color 2s ease, background .25s ease;
+  }
+  .pp:hover{background:rgba(255,255,255,.05);border-color:var(--cold)}
+  .pp b{display:block;width:0;height:0;
+        border-left:9px solid currentColor;border-top:6px solid transparent;
+        border-bottom:6px solid transparent;margin-left:2px}
+  body.going .pp b{
+    width:9px;height:11px;border:0;margin:0;background:currentColor;
+    box-shadow:inset 3px 0 0 rgba(0,0,0,.85);
+  }
+
+  .bar{position:relative;flex:1 1 auto;height:20px;cursor:pointer;
+       display:flex;align-items:center}
+  .bar-track{position:relative;width:100%;height:3px;
+             background:rgba(255,255,255,.07);overflow:hidden}
+  .bar-act{position:absolute;top:0;bottom:0}
+  .bar-her{background:rgba(255,137,168,.30)}
+  .bar-after{background:rgba(110,134,168,.20)}
+  .bar-quiet{background:rgba(255,255,255,.03)}
+  .bar-fill{position:absolute;left:0;top:0;bottom:0;width:0;
+            background:var(--cold);box-shadow:0 0 10px rgba(110,134,168,.7)}
+  .bar-head{position:absolute;top:50%;width:2px;height:13px;margin-top:-6.5px;
+            background:#C8D4E6;opacity:.7;pointer-events:none}
+  .t{flex:0 0 auto;font-variant-numeric:tabular-nums;letter-spacing:.1em}
+
+  .backlink{
+    position:fixed;top:14px;left:14px;z-index:4;
+    font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--dim);text-decoration:none;
+    padding:7px 11px 8px;border:1px solid var(--edge);border-radius:2px;
+    background:rgba(7,10,18,.7);
+    transition:color .25s ease, border-color .5s ease, opacity .6s ease;
+  }
+  .backlink:hover{color:#C8D4E6;border-color:var(--cold)}
+  body.idle .backlink{opacity:.1}
+  .backlink:hover{opacity:1}
+
+  .credit{
+    position:fixed;top:16px;right:16px;z-index:4;text-align:right;
+    font-size:9.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--dim);line-height:1.9;pointer-events:none;
+    transition:opacity .6s ease;
+  }
+  .credit b{color:var(--cold);font-weight:700}
+  body.idle .credit{opacity:.12}
+
+  .gate{
+    position:fixed;inset:0;z-index:20;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:30px;padding:24px;text-align:center;
+    background:radial-gradient(64% 50% at 50% 48%, #0C1220, #04060B 78%);
+    transition:opacity 1.2s ease;
+  }
+  .gate.gone{opacity:0;pointer-events:none}
+  .gate .o{
+    width:11px;height:11px;border-radius:50%;
+    background:var(--cold);
+    box-shadow:0 0 26px rgba(110,134,168,.9);
+    animation:breathe 4.4s ease-in-out infinite;
+  }
+  @keyframes breathe{
+    0%,100%{opacity:.42;transform:scale(1)}
+    50%{opacity:1;transform:scale(1.22)}
+  }
+  .gate h1{
+    margin:0;font-family:var(--mono);font-weight:400;
+    font-size:clamp(15px,2.6vw,21px);letter-spacing:.06em;
+    color:#C8D4E6;
+  }
+  .gate p{
+    margin:0;font-size:10px;font-weight:700;letter-spacing:.26em;
+    text-transform:uppercase;color:#3E4A5E;
+  }
+  .gate button{
+    margin-top:6px;cursor:pointer;font-family:var(--mono);
+    font-size:10.5px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+    color:#C8D4E6;background:transparent;
+    border:1px solid var(--edge);border-radius:2px;padding:13px 30px 14px;
+    transition:border-color .3s ease, color .3s ease, background .3s ease;
+  }
+  .gate button:hover{border-color:var(--cold);color:#FFF;background:rgba(110,134,168,.08)}
+  .gate button:focus-visible{outline:2px solid var(--her);outline-offset:4px}
+
+  @media (max-width:560px){ .credit{display:none} }
+</style>
+</head>
+<body>
+
+<canvas id="viz" aria-hidden="true"></canvas>
+
+<a class="backlink" href="/">&larr; shaiyex.com</a>
+<p class="credit">DID I TELL U THAT I MISS U<br><b>adore</b></p>
+
+<div class="hud" id="hud">
+  <button class="pp" id="pp" type="button" aria-label="Play or pause"><b></b></button>
+  <div class="bar" id="bar" role="slider" tabindex="0"
+       aria-label="Position" aria-valuemin="0" aria-valuemax="126" aria-valuenow="0">
+    <div class="bar-track">
+      <i class="bar-act bar-her" id="segHer"></i>
+      <i class="bar-act bar-after" id="segAfter"></i>
+      <i class="bar-act bar-quiet" id="segQuiet"></i>
+      <i class="bar-fill" id="fill"></i>
+    </div>
+    <i class="bar-head" id="head"></i>
+  </div>
+  <span class="t" id="clock">0:00</span>
+</div>
+
+<div class="gate" id="gate">
+  <i class="o" aria-hidden="true"></i>
+  <h1>did i tell u that i miss u</h1>
+  <p>adore &middot; no words on it</p>
+  <button id="start" type="button">Play</button>
+</div>
+
+<audio id="track" src="track.mp3" preload="auto"></audio>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ------------------------------------------------------------------
+     Measured off the file that ships. The two that matter most fall on
+     beats 64 and 70 of the grid below, which is how you know the grid is
+     right and not merely close.
+     ------------------------------------------------------------------ */
+  var T = {
+    her:     8.109,   /* she arrives. the highs open up */
+    gone:   34.410,   /* beat 64. the low end goes and does not come back */
+    reach:  37.630,   /* beat 70. it starts again without her */
+    small:  76.804,   /* it thins out. so does he */
+    truth:  91.307,   /* full again, and it changes nothing */
+    stop:  111.704,   /* the last of it */
+    quiet: 114.500,   /* and then twelve seconds of actual silence */
+    dur:   126.247
+  };
+
+  /* 111.781 bpm. the phase the three sections each land on agrees to
+     within 28 ms across a hundred seconds, and grid lines carry fifteen
+     times the average energy. */
+  var GRID = { bpm: 111.781, t0: 0.057 };
+  var SPB = 60 / GRID.bpm;
+
+  var audio  = document.getElementById('track');
+  var canvas = document.getElementById('viz');
+  var gate   = document.getElementById('gate');
+  var pp     = document.getElementById('pp');
+  var bar    = document.getElementById('bar');
+  var fill   = document.getElementById('fill');
+  var head   = document.getElementById('head');
+  var clock  = document.getElementById('clock');
+  var ctx    = canvas.getContext('2d', { alpha: false });
+
+  var reduce = window.matchMedia &&
+               window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var TAU = Math.PI * 2;
+
+  (function segments(){
+    var at  = function(a){ return (a / T.dur * 100) + '%'; };
+    var pct = function(a, b){ return ((b - a) / T.dur * 100) + '%'; };
+    var h = document.getElementById('segHer'),
+        a = document.getElementById('segAfter'),
+        q = document.getElementById('segQuiet');
+    h.style.left = at(T.her);    h.style.width = pct(T.her, T.gone);
+    a.style.left = at(T.gone);   a.style.width = pct(T.gone, T.stop);
+    q.style.left = at(T.stop);   q.style.width = pct(T.stop, T.dur);
+  })();
+
+  /* ================= audio ================= */
+  var actx, analyser, freq;
+
+  function listen(){
+    if (actx) return;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    actx = new AC();
+    analyser = actx.createAnalyser();
+    analyser.fftSize = 1024;
+    analyser.smoothingTimeConstant = 0.82;   /* it is a slow song */
+    freq = new Uint8Array(analyser.frequencyBinCount);
+    actx.createMediaElementSource(audio).connect(analyser);
+    analyser.connect(actx.destination);
+    bands();
+  }
+
+  var N = 0, edges = [], level;
+
+  function bands(){
+    N = window.innerWidth < 620 ? 40 : 64;
+    level = new Float32Array(N);
+    edges = [];
+    if (!analyser) return;
+    var lo = 2, hi = Math.min(analyser.frequencyBinCount - 1, 300);
+    for (var i = 0; i <= N; i++) edges.push(Math.round(lo * Math.pow(hi / lo, i / N)));
+  }
+
+  function readBands(){
+    if (!analyser || !edges.length) return;
+    analyser.getByteFrequencyData(freq);
+    for (var i = 0; i < N; i++){
+      var a = edges[i], b = Math.max(edges[i + 1], a + 1), m = 0;
+      for (var j = a; j < b; j++) if (freq[j] > m) m = freq[j];
+      var v = (m / 255) * (0.66 + 0.5 * (i / N));
+      if (v > 1) v = 1;
+      level[i] += (v - level[i]) * 0.20;
+    }
+  }
+
+  function energy(a, b){
+    if (!analyser) return 0;
+    var s = 0;
+    for (var i = a; i < b; i++) s += freq[i];
+    return (s / (b - a)) / 255;
+  }
+
+  /* ================= the clock ================= */
+  var lastBeat = -1e9, beatAt = -9, beatHard = 0;
+
+  function beats(t){
+    var n = Math.floor((t - GRID.t0) / SPB);
+    if (n === lastBeat) return;
+    var jump = n - lastBeat;
+    lastBeat = n;
+    if (jump < 0 || jump > 8) return;
+    beatAt = GRID.t0 + n * SPB;
+    /* no floor: through the twelve seconds of silence at the end there is
+       no energy, so there is no pulse, which is the point of them */
+    beatHard = Math.min(1, energy(1, 20) * 1.8);
+
+    /* he only reaches when there is something to reach for, and he reaches
+       harder the further in he gets */
+    if (t > T.reach && t < T.small && !reduce){
+      var into = (t - T.reach) / (T.small - T.reach);
+      if (n % 2 === 0 || Math.random() < into) sendReach(0.5 + into * 0.5);
+    }
+    /* and after he knows, once in a long while, anyway */
+    if (t > T.truth && !reduce && n % 8 === 0) sendReach(0.42);
+  }
+
+  /* ================= state ================= */
+  function ease(x){ return x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x); }
+
+  var bond = 0,   /* how much of her is here */
+      away = 0,   /* she is not, and the shape she left is */
+      ache = 0,   /* the cold straight after */
+      numb = 0,   /* the retreat */
+      know = 0,   /* what he works out, which helps and does not help */
+      hold = 0,   /* the silence at the end, which he does not leave */
+      lit  = 0;   /* how much light he has, all told */
+
+  function state(t){
+    bond = t < T.gone ? ease((t - T.her) / 3.4) : 0;
+    numb = t > T.small && t < T.truth
+      ? ease((t - T.small) / 3.5) * (1 - ease((t - (T.truth - 2)) / 2)) : 0;
+    know = ease((t - T.truth) / 6);
+    hold = ease((t - T.quiet) / 3.2);
+    away = ease((t - T.gone) / 1.2);
+    /* after numb and know, because it leans on both of them */
+    ache = t < T.gone ? 0 : ease((t - T.gone) / 1.1) * (1 - Math.max(numb, know) * 0.75);
+
+    /* alone he is dim. with her he is brighter than he has any business
+       being. then he spends it, and gets a little of it back on his own. */
+    var spent = t > T.reach
+      ? Math.min(0.22, ease((t - T.reach) / 34) * 0.22) : 0;
+    lit = 0.40
+        + bond * 0.62
+        - spent * (1 - know * 0.72)
+        - numb * 0.10
+        + know * 0.40
+        - hold * 0.10;
+    if (lit < 0.18) lit = 0.18;
+    if (lit > 1.05) lit = 1.05;
+  }
+
+  /* ================= colour ================= */
+  function mix(a, b, t){
+    return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+  }
+  function rgba(c, a){
+    return 'rgba(' + (c[0] | 0) + ',' + (c[1] | 0) + ',' + (c[2] | 0) + ',' + a + ')';
+  }
+  var INK   = [7, 10, 18];
+  var COLD  = [110, 134, 168];
+  var GREY  = [72, 82, 100];
+  var HER   = [255, 137, 168];
+  var HER_HOT = [255, 226, 232];
+  var WARM  = [255, 201, 168];
+  var CREAM = [255, 240, 224];
+
+  function hisColour(){
+    /* cold on his own, warm while she is here, grey while he is hiding,
+       and at the end something of his own that is neither */
+    var c = mix(COLD, mix(HER, WARM, 0.72), bond * 0.85);
+    c = mix(c, GREY, numb);
+    c = mix(c, CREAM, know * 0.55);
+    return c;
+  }
+
+  /* ================= the reaches ================= */
+  var reaches = [];
+
+  function sendReach(power){
+    if (reaches.length > 14) return;
+    reaches.push({ p: 0, power: power, v: 0.55 + Math.random() * 0.35,
+                   /* how far along it gets before it comes apart. never all
+                      the way, and it does not matter when it does. */
+                   far: 0.42 + Math.random() * 0.46 + power * 0.12,
+                   wob: Math.random() * TAU });
+  }
+
+  /* ================= motes ================= */
+  var motes = [];
+
+  function mote(){
+    var cap = (reduce ? 40 : 170) * (1 - slow * 0.6);
+    if (motes.length > cap) return;
+    var a = Math.random() * TAU;
+    var r = Math.min(W, H) * (0.12 + Math.random() * 0.55);
+    motes.push({
+      x: W / 2 + Math.cos(a) * r * (W > H ? 1.5 : 1),
+      y: H * 0.5 + Math.sin(a) * r,
+      vx: (Math.random() - 0.5) * 4,
+      vy: -1.5 - Math.random() * 5,
+      life: 1, decay: 0.13 + Math.random() * 0.14,
+      size: 0.5 + Math.random() * 1.5,
+      her: bond > 0.4 && Math.random() < bond * 0.7
+    });
+  }
+
+  /* ================= canvas ================= */
+  var W = 0, H = 0, dpr = 1, ema = 0.016, slow = 0;
+
+  function size(){
+    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width  = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    bands();
+  }
+  window.addEventListener('resize', size);
+
+  /* an orb: one gradient, bounded to its own square */
+  function orb(x, y, r, c, hotc, a){
+    if (a <= 0.004 || r <= 0.5) return;
+    var g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0,    rgba(hotc, Math.min(1, a)));
+    g.addColorStop(0.16, rgba(c, a * 0.72));
+    g.addColorStop(0.45, rgba(c, a * 0.20));
+    g.addColorStop(1,    rgba(c, 0));
+    ctx.fillStyle = g;
+    ctx.fillRect(x - r, y - r, r * 2, r * 2);
+  }
+
+  var spin = 0, last = 0, now8 = 0;
+
+  function frame(ms){
+    requestAnimationFrame(frame);
+    now8 = ms / 1000;
+    var dt = last ? Math.min(now8 - last, 0.05) : 0.016;
+    last = now8;
+    ema = ema * 0.94 + dt * 0.06;
+    slow = ema > 0.026 ? Math.min(1, slow + dt * 0.6) : Math.max(0, slow - dt * 0.25);
+
+    var t = audio.currentTime;
+    state(t);
+    readBands();
+    beats(t);
+
+    var cx = W / 2, cy = H * 0.5;
+    var M = Math.min(W, H);
+
+    var since = t - beatAt;
+    var pulse = since >= 0 && since < 0.62
+      ? Math.pow(1 - since / 0.62, 2.6) * beatHard : 0;
+
+    /* ---- the ground ----
+       the weather. it warms while she is here and it never quite gets back
+       to the same cold afterwards, it gets a colder one. */
+    var field = mix(INK, [26, 14, 22], bond * 0.9);
+    field = mix(field, [12, 14, 22], ache * 0.7);
+    field = mix(field, [11, 12, 15], numb);
+    field = mix(field, [16, 16, 22], know * 0.5);
+    field = mix(field, INK, hold * 0.85);
+    var fade = 0.20 + hold * 0.30 + numb * 0.10;
+    var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.78);
+    g.addColorStop(0, rgba(field, fade));
+    g.addColorStop(0.42, rgba(mix(field, INK, 0.55), fade * 0.98));
+    g.addColorStop(1, rgba(INK, Math.min(1, fade + 0.34 + numb * 0.2)));
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    /* ---- the orbit ----
+       while she is here it is the thing they go round. after she is gone it
+       is a shape with nothing on the other side of it, and he stays on it. */
+    /* full while she is on it, still full when she is not, small while he
+       is hiding, and back out again at the end */
+    var Ro = M * (0.055 + bond * 0.20 + away * 0.19 - numb * 0.145 + know * 0.03);
+    spin += dt * (0.10 + bond * 0.28 - numb * 0.05 + pulse * 0.05 - hold * 0.086);
+
+    var his = spin;
+    var hers = spin + Math.PI;
+    var hx = cx + Math.cos(his) * Ro, hy = cy + Math.sin(his) * Ro * 0.86;
+    var qx = cx + Math.cos(hers) * Ro, qy = cy + Math.sin(hers) * Ro * 0.86;
+
+    var hc = hisColour();
+
+    ctx.globalCompositeOperation = 'lighter';
+
+    /* the path itself. faint, except for the moment he sees it whole. */
+    var seen = know > 0 ? Math.pow(1 - Math.min(1, Math.abs(know - 0.5) / 0.5), 2) : 0;
+    var pathA = 0.05 + bond * 0.10 + know * 0.06 + seen * 0.30;
+    if (pathA > 0.01 && Ro > 2){
+      ctx.strokeStyle = rgba(mix(hc, HER, 0.4 * (1 - know)), 1);
+      ctx.globalAlpha = pathA;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, Ro, Ro * 0.86, 0, 0, TAU);
+      ctx.stroke();
+      /* and when he sees it, he sees the gap in it: it was never joined */
+      if (seen > 0.02){
+        ctx.globalAlpha = seen * 0.85;
+        ctx.strokeStyle = rgba(INK, 1);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, Ro, Ro * 0.86, 0, hers - 0.42, hers + 0.42);
+        ctx.stroke();
+        ctx.globalCompositeOperation = 'lighter';
+      }
+    }
+    ctx.globalAlpha = 1;
+
+    /* ---- the tether ----
+       what looked like the two of them being attached to each other */
+    if (bond > 0.02){
+      ctx.globalAlpha = bond * (0.30 + pulse * 0.25);
+      var tg = ctx.createLinearGradient(hx, hy, qx, qy);
+      tg.addColorStop(0, rgba(hc, 0.9));
+      tg.addColorStop(0.5, rgba(HER_HOT, 0.5));
+      tg.addColorStop(1, rgba(HER, 0.9));
+      ctx.strokeStyle = tg;
+      ctx.lineWidth = 1 + bond * 1.4;
+      ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(qx, qy); ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    /* ---- what he sends, and where it gets to ---- */
+    for (var i = reaches.length - 1; i >= 0; i--){
+      var rr = reaches[i];
+      rr.p += dt * rr.v;
+      if (rr.p >= 1){ reaches.splice(i, 1); continue; }
+      /* it comes apart somewhere short of the other side, every time */
+      var alive = rr.p < rr.far ? 1 : Math.pow(1 - (rr.p - rr.far) / (1 - rr.far), 1.4);
+      if (alive <= 0.01) continue;
+      var ang = his + rr.p * Math.PI;
+      var wob = Math.sin(rr.p * 7 + rr.wob) * M * 0.012 * (1 - rr.p);
+      var rx = cx + Math.cos(ang) * (Ro + wob);
+      var ry = cy + Math.sin(ang) * (Ro + wob) * 0.86;
+      ctx.globalAlpha = alive * (0.16 + rr.power * 0.30);
+      ctx.fillStyle = rgba(mix(hc, HER, 0.45), 1);
+      ctx.beginPath();
+      ctx.arc(rx, ry, (1.1 + rr.power * 1.7) * alive, 0, TAU);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    /* ---- her ----
+       brighter than him and never quite steady, and then not there */
+    if (bond > 0.01){
+      var flick = 0.72 + Math.sin(now8 * 2.7) * 0.16 + Math.sin(now8 * 6.1) * 0.12;
+      orb(qx, qy, M * (0.10 + bond * 0.05) * (1 + pulse * 0.12),
+          HER, HER_HOT, bond * flick * (0.5 + pulse * 0.35));
+    }
+
+    /* ---- her place, once she is not in it ----
+       nothing for a long time. and then, in the silence, something. */
+    if (hold > 0.01){
+      orb(qx, qy, M * 0.075 * (0.6 + hold * 0.4), HER, HER_HOT, hold * 0.22);
+    }
+
+    /* ---- him ---- */
+    orb(hx, hy, M * (0.070 + lit * 0.070) * (1 + pulse * 0.10),
+        hc, mix(hc, CREAM, 0.6), (0.22 + lit * 0.52) * (0.82 + pulse * 0.34));
+
+    /* the sound of it, wrapped round him. gentle. it is a slow song. */
+    if (analyser && N){
+      ctx.globalAlpha = 0.10 + lit * 0.16;
+      ctx.strokeStyle = rgba(mix(hc, CREAM, 0.3), 1);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      var Rb = M * (0.055 + lit * 0.030);
+      for (var k = 0; k <= N; k++){
+        var v = level[k % N];
+        var a2 = -spin * 0.5 + (k / N) * TAU;
+        var r2 = Rb + v * M * 0.030 * (0.4 + lit * 0.6);
+        var px = hx + Math.cos(a2) * r2, py = hy + Math.sin(a2) * r2;
+        if (k === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    /* ---- motes ---- */
+    var want = (0.07 + bond * 1.15 + know * 0.30) * (1 - numb * 0.85) * (1 - hold * 0.75);
+    if (Math.random() < want) mote();
+    if (Math.random() < want * 0.5) mote();
+    for (i = motes.length - 1; i >= 0; i--){
+      var mo = motes[i];
+      mo.x += mo.vx * dt; mo.y += mo.vy * dt;
+      mo.life -= mo.decay * dt;
+      if (mo.life <= 0){ motes.splice(i, 1); continue; }
+      ctx.globalAlpha = mo.life * (0.16 + bond * 0.24 + know * 0.10);
+      ctx.fillStyle = rgba(mo.her ? HER : mix(hc, CREAM, 0.35), 1);
+      ctx.beginPath(); ctx.arc(mo.x, mo.y, mo.size, 0, TAU); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+
+    hud(t);
+  }
+
+  /* ================= hud ================= */
+  var lastShown = -1;
+  function hud(t){
+    var p = Math.max(0, Math.min(1, t / T.dur));
+    fill.style.width = (p * 100) + '%';
+    head.style.left = (p * 100) + '%';
+    var s = t | 0;
+    if (s !== lastShown){
+      lastShown = s;
+      clock.textContent = (s / 60 | 0) + ':' + ('0' + (s % 60)).slice(-2);
+      bar.setAttribute('aria-valuenow', String(s));
+    }
+  }
+
+  function jumped(){
+    lastBeat = -1e9; beatAt = -9; beatHard = 0;
+    reaches.length = 0; motes.length = 0;
+  }
+
+  bar.addEventListener('click', function(e){
+    var r = bar.getBoundingClientRect();
+    audio.currentTime = Math.max(0, Math.min(T.dur - 0.05,
+      ((e.clientX - r.left) / r.width) * T.dur));
+    jumped();
+  });
+  bar.addEventListener('keydown', function(e){
+    var d = e.key === 'ArrowRight' ? 5 : e.key === 'ArrowLeft' ? -5 : 0;
+    if (!d) return;
+    e.preventDefault();
+    audio.currentTime = Math.max(0, Math.min(T.dur - 0.05, audio.currentTime + d));
+    jumped();
+  });
+
+  function toggle(){
+    if (audio.paused){
+      if (actx && actx.state === 'suspended') actx.resume();
+      audio.play();
+    } else audio.pause();
+  }
+  pp.addEventListener('click', toggle);
+  audio.addEventListener('play',  function(){ document.body.classList.add('going'); });
+  audio.addEventListener('pause', function(){ document.body.classList.remove('going'); });
+  document.addEventListener('keydown', function(e){
+    if (e.code === 'Space' && e.target === document.body){ e.preventDefault(); toggle(); }
+  });
+
+  var idleTimer;
+  function stir(){
+    document.body.classList.remove('idle');
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(function(){ document.body.classList.add('idle'); }, 3000);
+  }
+  document.addEventListener('mousemove', stir);
+  document.addEventListener('touchstart', stir);
+
+  document.getElementById('start').addEventListener('click', function(){
+    listen();
+    if (actx && actx.state === 'suspended') actx.resume();
+    audio.play();
+    gate.classList.add('gone');
+    setTimeout(function(){ gate.style.display = 'none'; }, 1300);
+    stir();
+  });
+
+  window.__miss = {
+    T: T, grid: GRID,
+    at: function(t){
+      state(t);
+      return { bond: +bond.toFixed(3), ache: +ache.toFixed(3),
+               numb: +numb.toFixed(3),
+               know: +know.toFixed(3), hold: +hold.toFixed(3),
+               lit: +lit.toFixed(3), reaches: reaches.length };
+    }
+  };
+
+  size();
+  requestAnimationFrame(frame);
+
+  try { if (window.top !== window.self) document.querySelector('.backlink').remove(); }
+  catch(e){}
+})();
+</script>
+</body>
+</html>
