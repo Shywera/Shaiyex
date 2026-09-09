@@ -12,6 +12,18 @@
    "realm": "Draenor (EU)",
    "link": "https://raider.io/characters/eu/draenor/Satíva",
    "note": ""
+  },
+  {
+   "name": "Convergedru",
+   "realm": "Blackhand (EU)",
+   "link": "https://raider.io/characters/eu/blackhand/Convergedru",
+   "note": "Premade with Markeric. Depleted it on the last boss because a DPS called them bad."
+  },
+  {
+   "name": "Markeric",
+   "realm": "Blackhand (EU)",
+   "link": "https://raider.io/characters/eu/blackhand/Markeric",
+   "note": "Premade with Convergedru. Depleted it on the last boss because a DPS called them bad."
   }
  ]
 }
