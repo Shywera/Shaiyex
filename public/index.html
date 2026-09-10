@@ -1169,23 +1169,30 @@
     pointer-events:none;
     font-family:"Grenze Gotisch","Pirata One",serif;
     font-weight:800;
-    font-size:clamp(26px,4.6vw,58px);
+    font-size:clamp(30px,5.2vw,68px);
     line-height:.86;
     letter-spacing:.015em;
     white-space:nowrap;
-    color:#41100C;
+    color:#B8281C;
     animation:sign 11s steps(1) infinite;
+  }
+  /* a rule under it, so it reads as a heading for the things below and not
+     as something that wandered into the background */
+  body.tekk .vrack-sign::after{
+    content:"";
+    position:absolute;left:0;right:0;bottom:-14px;height:1px;
+    background:linear-gradient(90deg, rgba(184,40,28,0), rgba(184,40,28,.85));
   }
   /* a tube with a loose connection somewhere behind the wall */
   @keyframes sign{
-    0%,38%   {opacity:.62; text-shadow:0 0 24px rgba(194,26,18,.26)}
-    39%      {opacity:.16; text-shadow:none}
-    40%      {opacity:.70; text-shadow:0 0 34px rgba(194,26,18,.38)}
-    41%      {opacity:.18; text-shadow:none}
-    42%,69%  {opacity:.58; text-shadow:0 0 22px rgba(194,26,18,.24)}
-    70%      {opacity:.88; text-shadow:0 0 40px rgba(240,200,104,.30)}
-    71%      {opacity:.20; text-shadow:none}
-    72%,100% {opacity:.62; text-shadow:0 0 24px rgba(194,26,18,.26)}
+    0%,38%   {opacity:1;   text-shadow:0 0 18px rgba(194,26,18,.75), 0 0 54px rgba(194,26,18,.35)}
+    39%      {opacity:.34; text-shadow:none}
+    40%      {opacity:1;   text-shadow:0 0 26px rgba(255,80,64,.85), 0 0 70px rgba(194,26,18,.45)}
+    41%      {opacity:.38; text-shadow:none}
+    42%,69%  {opacity:.94; text-shadow:0 0 18px rgba(194,26,18,.7), 0 0 50px rgba(194,26,18,.3)}
+    70%      {opacity:1;   text-shadow:0 0 30px rgba(255,120,80,.9), 0 0 80px rgba(240,200,104,.4)}
+    71%      {opacity:.4;  text-shadow:none}
+    72%,100% {opacity:1;   text-shadow:0 0 18px rgba(194,26,18,.75), 0 0 54px rgba(194,26,18,.35)}
   }
   body.tekk .vrack .wip{margin:0}
 
@@ -1210,6 +1217,17 @@
   body.tekk .wip-d .wip-s{color:#5E7089}
   body.tekk .wip-d:hover{border-color:#6E86A8;box-shadow:0 0 34px rgba(110,134,168,.28), 0 16px 40px rgba(0,0,0,.8)}
   body.tekk .wip-d:hover .wip-s{color:#C8D4E6}
+
+  /* and this one is wired straight to the mains */
+  body.tekk .wip-e{
+    --tilt:-.6deg;
+    --hd:.25s;
+    --hdir:-1;
+  }
+  body.tekk .wip-e .wip-tag{background:#38E8FF;color:#03121A}
+  body.tekk .wip-e .wip-s{color:#2E7A8C}
+  body.tekk .wip-e:hover{border-color:#38E8FF;box-shadow:0 0 36px rgba(56,232,255,.32), 0 16px 40px rgba(0,0,0,.8)}
+  body.tekk .wip-e:hover .wip-s{color:#9BF3FF}
 
   body.tekk .wip-tag{background:#8E0F0F;color:#040203}
   /* the blacklist hangs lower and swings wider, like a sign outside a door */
@@ -1809,6 +1827,15 @@
           <span class="wip-s" data-t="Two minutes, and then twelve seconds of nothing">adore &middot; no words on it</span>
         </span>
         <span class="wip-tag">SLOW</span>
+        <span class="drip" aria-hidden="true"></span>
+      </a>
+
+      <a class="wip wip-e" href="/overdrive/" data-go="swing-right" data-hush>
+        <span>
+          <span class="wip-t" data-t="OVERDRIVE">OVERDRIVE</span>
+          <span class="wip-s" data-t="210 bpm, and it does not let up">Seven scenes and a rev counter</span>
+        </span>
+        <span class="wip-tag">MAX</span>
         <span class="drip" aria-hidden="true"></span>
       </a>
     </div>

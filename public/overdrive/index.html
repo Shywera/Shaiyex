@@ -1,0 +1,949 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Four minutes and twenty seconds at two hundred and ten beats a minute. Do not stand too close.">
+<meta name="theme-color" content="#03040A">
+<meta property="og:type" content="website">
+<meta property="og:title" content="OVERDRIVE">
+<meta property="og:description" content="210 bpm. Seven scenes. One rev counter that does not come back down.">
+<meta property="og:url" content="https://shaiyex.com/overdrive/">
+<meta name="twitter:card" content="summary">
+<title>OVERDRIVE</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap">
+
+<style>
+  :root{
+    --ink:#03040A;
+    --cyan:#38E8FF;
+    --amber:#FFB020;
+    --red:#FF2D2D;
+    --hot:#FFF4E0;
+    --dim:#4A5A6E;
+    --edge:#141C28;
+    --mono:"JetBrains Mono",Consolas,ui-monospace,monospace;
+    --disp:"Bebas Neue","Arial Narrow",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;overflow:hidden;background:#000;
+    color:var(--dim);font-family:var(--mono);
+    -webkit-font-smoothing:antialiased;
+  }
+  #viz{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0}
+
+  .hud{
+    position:fixed;left:0;right:0;bottom:0;z-index:3;
+    display:flex;align-items:center;gap:12px;
+    padding:12px clamp(12px,3vw,22px) 14px;
+    font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+    background:linear-gradient(180deg, rgba(3,4,10,0), rgba(3,4,10,.9) 46%);
+    transition:opacity .5s ease;
+  }
+  body.idle .hud{opacity:.1}
+  .hud:hover{opacity:1 !important}
+  .pp{
+    flex:0 0 auto;width:30px;height:30px;padding:0;cursor:pointer;
+    background:transparent;border:1px solid var(--edge);border-radius:2px;
+    color:var(--cyan);
+    display:flex;align-items:center;justify-content:center;
+    transition:border-color .4s ease, color .8s ease, background .25s ease;
+  }
+  .pp:hover{background:rgba(255,255,255,.06);border-color:var(--cyan)}
+  .pp b{display:block;width:0;height:0;
+        border-left:9px solid currentColor;border-top:6px solid transparent;
+        border-bottom:6px solid transparent;margin-left:2px}
+  body.going .pp b{
+    width:9px;height:11px;border:0;margin:0;background:currentColor;
+    box-shadow:inset 3px 0 0 rgba(0,0,0,.85);
+  }
+
+  .bar{position:relative;flex:1 1 auto;height:22px;cursor:pointer;
+       display:flex;align-items:center}
+  .bar-track{position:relative;width:100%;height:4px;
+             background:rgba(255,255,255,.07);overflow:hidden}
+  .seg{position:absolute;top:0;bottom:0}
+  .bar-fill{position:absolute;left:0;top:0;bottom:0;width:0;
+            background:var(--hot);box-shadow:0 0 12px rgba(255,244,224,.8)}
+  .bar-head{position:absolute;top:50%;width:2px;height:15px;margin-top:-7.5px;
+            background:#FFF;opacity:.85;pointer-events:none}
+  .t{flex:0 0 auto;font-variant-numeric:tabular-nums;letter-spacing:.1em}
+
+  .backlink{
+    position:fixed;top:14px;left:14px;z-index:4;
+    font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--dim);text-decoration:none;
+    padding:7px 11px 8px;border:1px solid var(--edge);border-radius:2px;
+    background:rgba(3,4,10,.72);
+    transition:color .25s ease, border-color .4s ease, opacity .5s ease;
+  }
+  .backlink:hover{color:#FFF;border-color:var(--cyan)}
+  body.idle .backlink{opacity:.1}
+  .backlink:hover{opacity:1}
+
+  .credit{
+    position:fixed;top:14px;right:16px;z-index:4;text-align:right;
+    pointer-events:none;transition:opacity .5s ease;
+  }
+  .credit b{
+    display:block;font-family:var(--disp);font-size:26px;line-height:.9;
+    letter-spacing:.06em;color:#EAF6FF;
+  }
+  .credit span{
+    display:block;font-size:9px;font-weight:700;letter-spacing:.24em;
+    text-transform:uppercase;color:var(--dim);margin-top:3px;
+  }
+  body.idle .credit{opacity:.16}
+
+  .gate{
+    position:fixed;inset:0;z-index:20;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:20px;padding:24px;text-align:center;
+    background:radial-gradient(70% 55% at 50% 46%, #0A1020, #000 78%);
+    transition:opacity .8s ease;
+  }
+  .gate.gone{opacity:0;pointer-events:none}
+  .gate h1{
+    margin:0;font-family:var(--disp);
+    font-size:clamp(62px,17vw,220px);line-height:.84;letter-spacing:.02em;
+    color:#EAF6FF;
+    text-shadow:0 0 40px rgba(56,232,255,.5), 0 0 120px rgba(56,232,255,.22);
+    animation:rev 3.4s ease-in-out infinite;
+  }
+  @keyframes rev{
+    0%,100%{text-shadow:0 0 40px rgba(56,232,255,.5), 0 0 120px rgba(56,232,255,.22)}
+    50%    {text-shadow:0 0 46px rgba(255,45,45,.55), 0 0 140px rgba(255,176,32,.28)}
+  }
+  .gate .warn{
+    margin:0;font-size:10px;font-weight:700;letter-spacing:.3em;
+    text-transform:uppercase;color:var(--red);
+  }
+  .gate .meta{
+    margin:0;font-size:10px;font-weight:700;letter-spacing:.24em;
+    text-transform:uppercase;color:#3A4658;
+  }
+  .gate button{
+    margin-top:8px;cursor:pointer;font-family:var(--mono);
+    font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;
+    color:#03040A;background:var(--cyan);
+    border:1px solid #9BF3FF;border-radius:2px;padding:15px 34px 16px;
+    transition:background .2s ease, transform .1s ease;
+  }
+  .gate button:hover{background:#7BEEFF}
+  .gate button:active{transform:translateY(2px)}
+  .gate button:focus-visible{outline:2px solid var(--red);outline-offset:4px}
+
+  @media (max-width:620px){ .credit b{font-size:18px} }
+</style>
+</head>
+<body>
+
+<canvas id="viz" aria-hidden="true"></canvas>
+
+<a class="backlink" href="/">&larr; shaiyex.com</a>
+<p class="credit"><b>OVERDRIVE</b><span>210 bpm</span></p>
+
+<div class="hud" id="hud">
+  <button class="pp" id="pp" type="button" aria-label="Play or pause"><b></b></button>
+  <div class="bar" id="bar" role="slider" tabindex="0"
+       aria-label="Position" aria-valuemin="0" aria-valuemax="260" aria-valuenow="0">
+    <div class="bar-track" id="bartrack">
+      <i class="bar-fill" id="fill"></i>
+    </div>
+    <i class="bar-head" id="head"></i>
+  </div>
+  <span class="t" id="clock">0:00</span>
+</div>
+
+<div class="gate" id="gate">
+  <p class="warn">Redline</p>
+  <h1>OVERDRIVE</h1>
+  <p class="meta">4:20 &middot; 210 bpm &middot; headphones, and not quietly</p>
+  <button id="start" type="button">Send it</button>
+</div>
+
+<audio id="track" src="track.mp3" preload="auto"></audio>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ====================================================================
+     OVERDRIVE
+
+     210.0000 bpm exactly. Measured by fitting a comb over the onset
+     envelope: at 210 the phase the four loud sections independently land
+     on agrees to within 19 ms across 244 seconds, and at 209.96 it is 44,
+     which is how you know it is a round number and not a near one. First
+     beat at 0.2695 s. Grid lines carry five to seven times the average
+     energy depending on the section. The phrase is 8 beats, not 4: the
+     low band's 8 beat periodicity scores 35.8 against 1.9 for 4.
+
+     Every mark below is a beat of that grid. The two drops are beats 399
+     and 585.
+     ==================================================================== */
+  var GRID = { bpm: 210, t0: 0.2695 };
+  var SPB  = 60 / GRID.bpm;          /* 0.285714 */
+  var PHRASE = 8;
+
+  var T = {
+    caught: 12.555,   /* beat  43  the engine catches, low band 0.09 -> 0.66 */
+    turn:   47.984,   /* beat 167  after a one second hole */
+    subIn:  71.984,   /* beat 251  the centroid falls to 771. all sub, no top */
+    subOut: 79.984,   /* beat 279  and back up */
+    brk:    87.984,   /* beat 307  thin and bright */
+    drop1: 114.269,   /* beat 399  DROP ONE. loudest low band in the track */
+    out1:  131.984,   /* beat 461 */
+    hollow:151.984,   /* beat 531  the emptiest point, low band 0.03 */
+    drop2: 167.412,   /* beat 585  DROP TWO, and it is bigger */
+    dip:   191.984,   /* beat 671  one bar of air inside it */
+    out2:  204.555,   /* beat 715 */
+    last:  233.698,   /* beat 817  the final push */
+    finish:256.555,   /* beat 897  the body ends */
+    stab:  257.750,   /* one more hit after you thought it was over */
+    dead:  259.000,
+    dur:   260.306
+  };
+
+  /* scene, and how hard the machine is being pushed */
+  var ARC = [
+    [0,        'void',    0.12],
+    [T.caught, 'tunnel',  0.52],
+    [T.turn,   'grid',    0.60],
+    [T.subIn,  'sub',     0.80],
+    [T.subOut, 'tunnel',  0.56],
+    [T.brk,    'void',    0.26],
+    [T.drop1,  'redline', 1.00],
+    [T.out1,   'core',    0.34],
+    [T.hollow, 'void',    0.10],
+    [T.drop2,  'kaleido', 1.00],
+    [T.dip,    'redline', 0.92],
+    [T.out2,   'grid',    0.44],
+    [T.last,   'redline', 0.96],
+    [T.finish, 'core',    0.30],
+    [T.dead,   'dead',    0.00]
+  ];
+
+  var SCENE_TINT = {
+    void:    '#1C3A52', tunnel: '#38E8FF', grid: '#5AA8FF',
+    sub:     '#FF2D2D', redline:'#FFB020', core: '#8FE8FF',
+    kaleido: '#FF5CE0', dead:   '#101820'
+  };
+
+  var audio  = document.getElementById('track');
+  var canvas = document.getElementById('viz');
+  var gate   = document.getElementById('gate');
+  var pp     = document.getElementById('pp');
+  var bar    = document.getElementById('bar');
+  var fill   = document.getElementById('fill');
+  var head   = document.getElementById('head');
+  var clock  = document.getElementById('clock');
+  var ctx    = canvas.getContext('2d', { alpha: false });
+
+  var reduce = window.matchMedia &&
+               window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var TAU = Math.PI * 2;
+
+  /* the bar gets the shape of the track drawn into it */
+  (function segments(){
+    var tr = document.getElementById('bartrack');
+    for (var i = 0; i < ARC.length; i++){
+      var a = ARC[i][0], b = i + 1 < ARC.length ? ARC[i + 1][0] : T.dur;
+      var s = document.createElement('i');
+      s.className = 'seg';
+      s.style.left = (a / T.dur * 100) + '%';
+      s.style.width = ((b - a) / T.dur * 100) + '%';
+      s.style.background = SCENE_TINT[ARC[i][1]];
+      s.style.opacity = 0.18 + ARC[i][2] * 0.55;
+      tr.insertBefore(s, fill);
+    }
+  })();
+
+  /* ================= audio ================= */
+  var actx, analyser, freq, wave;
+
+  function listen(){
+    if (actx) return;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    actx = new AC();
+    analyser = actx.createAnalyser();
+    analyser.fftSize = 2048;
+    analyser.smoothingTimeConstant = 0.62;
+    freq = new Uint8Array(analyser.frequencyBinCount);
+    wave = new Uint8Array(analyser.fftSize);
+    actx.createMediaElementSource(audio).connect(analyser);
+    analyser.connect(actx.destination);
+    bands();
+  }
+
+  var N = 0, edges = [], level, peak;
+
+  function bands(){
+    N = window.innerWidth < 620 ? 32 : 48;
+    level = new Float32Array(N);
+    peak  = new Float32Array(N);
+    edges = [];
+    if (!analyser) return;
+    var lo = 2, hi = Math.min(analyser.frequencyBinCount - 1, 460);
+    for (var i = 0; i <= N; i++) edges.push(Math.round(lo * Math.pow(hi / lo, i / N)));
+  }
+
+  function readBands(){
+    if (!analyser || !edges.length) return;
+    analyser.getByteFrequencyData(freq);
+    for (var i = 0; i < N; i++){
+      var a = edges[i], b = Math.max(edges[i + 1], a + 1), m = 0;
+      for (var j = a; j < b; j++) if (freq[j] > m) m = freq[j];
+      var v = (m / 255) * (0.62 + 0.55 * (i / N));
+      v = Math.pow(v > 1 ? 1 : v, 1.25);
+      level[i] += (v - level[i]) * 0.40;
+      peak[i] = Math.max(peak[i] * 0.92, level[i]);
+    }
+  }
+
+  function energy(a, b){
+    if (!analyser) return 0;
+    var s = 0;
+    for (var i = a; i < b; i++) s += freq[i];
+    return (s / (b - a)) / 255;
+  }
+
+  /* ================= the clock ================= */
+  var lastBeat = -1e9, beatAt = -9, beatHard = 0, beatNo = 0, phraseAt = -9;
+  var tearAt = -9, splitAt = -9;
+
+  function beats(t){
+    var n = Math.floor((t - GRID.t0) / SPB);
+    if (n === lastBeat) return;
+    var jump = n - lastBeat;
+    lastBeat = n;
+    if (jump < 0 || jump > 8) return;
+    beatNo = n;
+    beatAt = GRID.t0 + n * SPB;
+    beatHard = Math.min(1, energy(1, 22) * 1.7);   /* no floor: silence is silent */
+
+    var onPhrase = ((n - phraseRoot) % PHRASE + PHRASE) % PHRASE === 0;
+    if (onPhrase) phraseAt = beatAt;
+
+    if (reduce) return;
+    /* the picture comes apart at the top of the rev range */
+    if (heat > 0.85 && (onPhrase || beatHard > 0.8)) tearAt = beatAt;
+    if (heat > 0.72 && onPhrase) splitAt = beatAt;
+  }
+
+  /* ================= state ================= */
+  function ease(x){ return x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x); }
+  function clamp(x, a, b){ return x < a ? a : x > b ? b : x; }
+
+  var scene = 'void', prevScene = 'void', sceneAt = -9, phraseRoot = 0;
+  var heat = 0, heatT = 0, rev = 0;
+
+  function state(t, dt){
+    var i, k = 0;
+    for (i = 0; i < ARC.length; i++) if (t >= ARC[i][0]) k = i;
+    var want = ARC[k][1];
+    heatT = ARC[k][2];
+    if (want !== scene){
+      prevScene = scene;
+      scene = want;
+      sceneAt = t;
+      /* phrases are counted from the scene that is running, so a cut is
+         always on the first beat of a phrase for whatever is playing now */
+      phraseRoot = Math.round((ARC[k][0] - GRID.t0) / SPB);
+    }
+    heat += (heatT - heat) * (dt ? clamp(dt * 3.2, 0, 1) : 1);
+    /* the needle climbs fast and falls slowly, like a real one */
+    var target = heat * 0.72 + energy(1, 22) * 0.42;
+    rev += (target - rev) * (dt ? clamp(dt * (target > rev ? 9 : 1.6), 0, 1) : 1);
+  }
+
+  /* ================= colour ================= */
+  function hex(h){
+    return [parseInt(h.substr(1, 2), 16), parseInt(h.substr(3, 2), 16),
+            parseInt(h.substr(5, 2), 16)];
+  }
+  function mix(a, b, t){
+    return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+  }
+  function rgba(c, a){
+    return 'rgba(' + (c[0] | 0) + ',' + (c[1] | 0) + ',' + (c[2] | 0) + ',' + a + ')';
+  }
+  var CYAN = hex('#38E8FF'), AMBER = hex('#FFB020'), RED = hex('#FF2D2D');
+  var HOT = hex('#FFF4E0'), PINK = hex('#FF5CE0'), STEEL = hex('#1C3A52');
+  var INK = [3, 4, 10];
+
+  /* the whole palette is one axis: how hard it is being pushed */
+  function key(){
+    var c = scene === 'sub' ? RED
+          : scene === 'kaleido' ? PINK
+          : mix(CYAN, AMBER, clamp((heat - 0.4) / 0.5, 0, 1));
+    return mix(c, RED, clamp((heat - 0.82) / 0.18, 0, 1) * 0.55);
+  }
+
+  /* ================= 3d ================= */
+  var W = 0, H = 0, dpr = 1, cx = 0, cy = 0, FL = 0, M = 0;
+  var ema = 0.016, slow = 0;
+
+  function size(){
+    /* This page's cost is almost entirely full-frame pixel work: four passes
+       over every pixel, every frame. So budget pixels rather than pick a
+       ratio, and a 4K monitor does not get punished for being large. It is
+       all glow and feedback smear, so a smaller backing store is invisible. */
+    dpr = Math.min(window.devicePixelRatio || 1, 1.25);
+    var budget = 2.25e6;
+    var px = window.innerWidth * window.innerHeight * dpr * dpr;
+    if (px > budget) dpr *= Math.sqrt(budget / px);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width  = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cx = W / 2; cy = H / 2; M = Math.min(W, H);
+    FL = M * 0.92;
+    bands();
+    lines = null; overKey = '';
+  }
+  window.addEventListener('resize', size);
+
+  /* ---- the tunnel -------------------------------------------------------
+     Rings at fixed spacing in z, marched toward the camera. Each ring's
+     radius is driven by one band, so the shape of the sound is the shape
+     of the throat you are going down. */
+  var RINGS = 24, SPACE = 300, ZNEAR = 46;
+  var travel = 0, spin = 0;
+
+  function tunnel(sides, amp, alpha, k, spokes){
+    var span = RINGS * SPACE;
+    var i, n, first, z, r, s, a, px, py;
+    for (n = 0; n < RINGS; n++){
+      z = ((n * SPACE - travel) % span + span) % span + ZNEAR;
+      var depth = 1 - z / (span + ZNEAR);
+      var band = level[(n * 2) % N];
+      r = M * (0.30 + band * amp) * (1 + Math.sin(n * 0.7 + travel * 0.002) * 0.06);
+      s = FL / z;
+      /* Rings this far down are a few pixels across and there are a dozen of
+         them on top of each other. Additively that is not a tunnel mouth, it
+         is a white pea. Drop them. */
+      if (r * s < M * 0.035) continue;
+      var fade = alpha * Math.pow(depth, 1.9) * (0.25 + depth * 0.9);
+      if (fade < 0.012) continue;
+      ctx.globalAlpha = Math.min(1, fade);
+      /* keep some colour in it. all the way to HOT and the palette is gone. */
+      ctx.strokeStyle = rgba(mix(k, HOT, band * 0.40), 1);
+      ctx.lineWidth = 0.6 + depth * 2.2 + band * 1.4;
+      ctx.beginPath();
+      for (i = 0; i <= sides; i++){
+        a = spin + (i / sides) * TAU + n * 0.09;
+        px = cx + Math.cos(a) * r * s;
+        py = cy + Math.sin(a) * r * s;
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    }
+    /* the long lines down the throat, which are what make it a tunnel */
+    if (spokes){
+      ctx.globalAlpha = alpha * 0.34;
+      ctx.strokeStyle = rgba(k, 1);
+      ctx.lineWidth = 1;
+      for (i = 0; i < sides; i += 2){
+        ctx.beginPath();
+        first = true;
+        for (n = 0; n < RINGS; n++){
+          z = ((n * SPACE - travel) % span + span) % span + ZNEAR;
+          if (z > span * 0.72) continue;
+          r = M * (0.30 + level[(n * 2) % N] * amp);
+          s = FL / z;
+          a = spin + (i / sides) * TAU + n * 0.09;
+          px = cx + Math.cos(a) * r * s;
+          py = cy + Math.sin(a) * r * s;
+          if (first){ ctx.moveTo(px, py); first = false; } else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  /* ---- the plane ---- */
+  function plane(k, alpha, bass){
+    var span = RINGS * SPACE;
+    var i, n, z, s, y, x;
+    var lift = M * (0.34 + bass * 0.10);
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = rgba(k, 1);
+    ctx.lineWidth = 1;
+    /* the lines coming at you */
+    for (n = 0; n < RINGS; n++){
+      z = ((n * SPACE - travel) % span + span) % span + ZNEAR;
+      var depth = 1 - z / (span + ZNEAR);
+      s = FL / z;
+      if (depth < 0.02) continue;
+      ctx.globalAlpha = alpha * Math.pow(depth, 1.4);
+      ctx.lineWidth = 0.5 + depth * 2;
+      for (var sgn = -1; sgn <= 1; sgn += 2){
+        y = cy + sgn * lift * s;
+        ctx.beginPath();
+        ctx.moveTo(cx - M * 3 * s, y);
+        ctx.lineTo(cx + M * 3 * s, y);
+        ctx.stroke();
+      }
+    }
+    /* and the rails running away from you */
+    ctx.globalAlpha = alpha * 0.5;
+    ctx.lineWidth = 1;
+    for (i = -7; i <= 7; i++){
+      x = i * M * 0.20;
+      for (var sg = -1; sg <= 1; sg += 2){
+        var s1 = FL / ZNEAR, s2 = FL / (span * 0.8);
+        ctx.beginPath();
+        ctx.moveTo(cx + x * s1, cy + sg * lift * s1);
+        ctx.lineTo(cx + x * s2, cy + sg * lift * s2);
+        ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  /* ---- the core: a real icosahedron, edges worked out once ---- */
+  var VERTS = null, EDGES = null;
+  function solid(){
+    if (VERTS) return;
+    var p = 1.6180339887, v = [];
+    var sgn = [1, -1], i, j, a, b;
+    for (i = 0; i < 2; i++) for (j = 0; j < 2; j++){
+      v.push([0, sgn[i], sgn[j] * p]);
+      v.push([sgn[i], sgn[j] * p, 0]);
+      v.push([sgn[i] * p, 0, sgn[j]]);
+    }
+    VERTS = v; EDGES = [];
+    for (a = 0; a < v.length; a++) for (b = a + 1; b < v.length; b++){
+      var dx = v[a][0]-v[b][0], dy = v[a][1]-v[b][1], dz = v[a][2]-v[b][2];
+      if (Math.abs(dx*dx + dy*dy + dz*dz - 4) < 0.001) EDGES.push([a, b]);
+    }
+  }
+
+  var rx = 0, ry = 0;
+  function core(k, alpha, blow){
+    solid();
+    var sa = Math.sin(rx), ca = Math.cos(rx), sb = Math.sin(ry), cb = Math.cos(ry);
+    var R = M * (0.16 + blow * 0.22);
+    var zc = FL * 1.35;
+    var pts = [], i;
+    for (i = 0; i < VERTS.length; i++){
+      var x = VERTS[i][0], y = VERTS[i][1], z = VERTS[i][2];
+      var y2 = y * ca - z * sa, z2 = y * sa + z * ca;
+      var x2 = x * cb + z2 * sb, z3 = -x * sb + z2 * cb;
+      var d = zc + z3 * R;
+      var s = FL / Math.max(60, d);
+      pts.push([cx + x2 * R * s, cy + y2 * R * s, s]);
+    }
+    ctx.globalAlpha = alpha;
+    ctx.lineWidth = 1.4;
+    for (i = 0; i < EDGES.length; i++){
+      var A = pts[EDGES[i][0]], B = pts[EDGES[i][1]];
+      ctx.strokeStyle = rgba(mix(k, HOT, (A[2] + B[2]) * 0.2), 1);
+      ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]); ctx.stroke();
+    }
+    ctx.globalAlpha = alpha * 0.9;
+    ctx.fillStyle = rgba(HOT, 1);
+    for (i = 0; i < pts.length; i++){
+      ctx.beginPath(); ctx.arc(pts[i][0], pts[i][1], 1.4 + pts[i][2] * 1.2, 0, TAU); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  /* ---- stars, in three dimensions so they streak properly ---- */
+  var STARS = 260, sx = null, sy = null, sz = null;
+  function stars(k, alpha, streak){
+    if (!sx){
+      sx = new Float32Array(STARS); sy = new Float32Array(STARS); sz = new Float32Array(STARS);
+      for (var i = 0; i < STARS; i++){
+        sx[i] = (Math.random() - 0.5) * M * 4;
+        sy[i] = (Math.random() - 0.5) * M * 4;
+        sz[i] = 60 + Math.random() * RINGS * SPACE;
+      }
+    }
+    var span = RINGS * SPACE;
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = rgba(k, 1);
+    ctx.lineWidth = 1.1;
+    ctx.beginPath();
+    for (var j = 0; j < STARS; j++){
+      var z = sz[j];
+      if (z < 60){ sz[j] = span; z = span; }
+      var s = FL / z, s2 = FL / (z + streak);
+      ctx.moveTo(cx + sx[j] * s,  cy + sy[j] * s);
+      ctx.lineTo(cx + sx[j] * s2, cy + sy[j] * s2);
+    }
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+  function starMarch(d){
+    if (!sz) return;
+    for (var i = 0; i < STARS; i++) sz[i] -= d;
+  }
+
+  /* ---- the rev counter, which is the whole point of the name ---- */
+  function gauge(bass){
+    var r = M * 0.085, gx = W - r - 26, gy = H - r - 62;
+    if (W < 620){ gx = W - r - 16; gy = H - r - 74; }
+    var a0 = Math.PI * 0.78, a1 = Math.PI * 2.22;
+    ctx.lineCap = 'butt';
+    /* the dial */
+    ctx.globalAlpha = 0.30;
+    ctx.strokeStyle = rgba(STEEL, 1);
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(gx, gy, r, a0, a1); ctx.stroke();
+    /* the redline zone */
+    ctx.globalAlpha = 0.55;
+    ctx.strokeStyle = rgba(RED, 1);
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(gx, gy, r, a0 + (a1 - a0) * 0.78, a1); ctx.stroke();
+    /* how far it is round */
+    var v = clamp(rev, 0, 1.08);
+    ctx.globalAlpha = 0.95;
+    ctx.strokeStyle = rgba(v > 0.78 ? mix(AMBER, RED, (v - 0.78) / 0.3) : key(), 1);
+    ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(gx, gy, r, a0, a0 + (a1 - a0) * Math.min(1, v)); ctx.stroke();
+    /* the needle */
+    var na = a0 + (a1 - a0) * Math.min(1, v);
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = rgba(HOT, 1);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(gx, gy);
+    ctx.lineTo(gx + Math.cos(na) * r * 0.92, gy + Math.sin(na) * r * 0.92);
+    ctx.stroke();
+    /* and it does not look right without ticks */
+    ctx.globalAlpha = 0.35;
+    ctx.strokeStyle = rgba(STEEL, 1);
+    ctx.lineWidth = 1.5;
+    for (var i = 0; i <= 8; i++){
+      var ta = a0 + (a1 - a0) * (i / 8);
+      ctx.beginPath();
+      ctx.moveTo(gx + Math.cos(ta) * r * 1.06, gy + Math.sin(ta) * r * 1.06);
+      ctx.lineTo(gx + Math.cos(ta) * r * 1.16, gy + Math.sin(ta) * r * 1.16);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  /* ---- the picture coming apart ---- */
+  function tear(power){
+    var n = 2 + (power * 3) | 0;
+    for (var i = 0; i < n; i++){
+      var y = Math.random() * H;
+      var h = 4 + Math.random() * 54;
+      var d = (Math.random() - 0.5) * 190 * power;
+      ctx.drawImage(canvas, 0, y * dpr, canvas.width, h * dpr, d, y, W, h);
+    }
+  }
+
+  /* The vignette and the scanlines never change within a frame and barely
+     change between them, and each was costing a whole screen of fill. They
+     are one transparent sheet now, rebuilt only when the heat bucket or the
+     window changes, and laid down with a single draw. Measured: the four
+     full-frame passes were the entire budget. Removing every stroke on the
+     page saved 0.2 ms; removing the full-frame fills saved ten. */
+  var lines = null, over = null, overKey = '';
+  function overlay(){
+    var q = Math.round(heat * 6);
+    var key = W + 'x' + H + '|' + q + '|' + dpr;
+    if (overKey !== key){
+      overKey = key;
+      if (!over) over = document.createElement('canvas');
+      over.width = canvas.width; over.height = canvas.height;
+      var g = over.getContext('2d');
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      g.clearRect(0, 0, W, H);
+      var vg = g.createRadialGradient(cx, cy, M * 0.24, cx, cy, M * 0.92);
+      vg.addColorStop(0, 'rgba(0,0,0,0)');
+      vg.addColorStop(1, 'rgba(0,0,0,' + (0.52 + (1 - q / 6) * 0.24).toFixed(3) + ')');
+      g.fillStyle = vg;
+      g.fillRect(0, 0, W, H);
+      if (!reduce){
+        if (!lines){
+          var c = document.createElement('canvas');
+          c.width = 1; c.height = 3;
+          var gc = c.getContext('2d');
+          gc.fillStyle = 'rgba(0,0,0,0.34)';
+          gc.fillRect(0, 0, 1, 1);
+          lines = c;
+        }
+        g.globalAlpha = 0.5;
+        g.fillStyle = g.createPattern(lines, 'repeat');
+        g.fillRect(0, 0, W, H);
+        g.globalAlpha = 1;
+      }
+    }
+    ctx.drawImage(over, 0, 0, W, H);
+  }
+
+  /* ================= the loop ================= */
+  var last = 0, now8 = 0, roll = 0, cut = 0;
+
+  function frame(ms){
+    requestAnimationFrame(frame);
+    now8 = ms / 1000;
+    var dt = last ? Math.min(now8 - last, 0.05) : 0.016;
+    last = now8;
+    ema = ema * 0.94 + dt * 0.06;
+    slow = ema > 0.034 ? Math.min(1, slow + dt * 0.5) : Math.max(0, slow - dt * 0.25);
+
+    var t = audio.currentTime;
+    state(t, dt);
+    readBands();
+    beats(t);
+
+    var bass = energy(1, 14);
+    var since = t - beatAt;
+    var pulse = since >= 0 && since < SPB * 0.9
+      ? Math.pow(1 - since / (SPB * 0.9), 2.2) * beatHard : 0;
+    var k = key();
+
+    /* the cut: a scene change is a hard white frame, not a crossfade */
+    var sc = t - sceneAt;
+    cut = sc >= 0 && sc < 0.24 ? Math.pow(1 - sc / 0.24, 2) : 0;
+
+    /* ---- feedback. the last frame, dimmed, and a bigger copy of it added
+       back on top, which is what makes everything leave a wake. ---- */
+    /* A copy of the last frame, slightly bigger and slightly turned, added
+       back on top of a dimmed version of itself. The turn matters: zoom on
+       its own has a fixed point dead centre, so the middle pixel feeds
+       itself every frame and runs away to white in about a second. Rotating
+       it turns that fixed point into a spiral instead. */
+    var zoom = 1 + (0.006 + heat * 0.018 + pulse * 0.010);
+    var twist = (0.010 + heat * 0.016) * (scene === 'kaleido' ? 1.8 : 1);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = rgba(INK, 0.26 + (1 - heat) * 0.10);
+    ctx.fillRect(0, 0, W, H);
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(twist);
+    ctx.scale(zoom, zoom);
+    ctx.translate(-cx, -cy);
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = 0.15 + heat * 0.05;
+    ctx.drawImage(canvas, 0, 0, W, H);
+    ctx.restore();
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+
+    /* ---- camera ---- */
+    var speed = (scene === 'sub' ? 260 : scene === 'void' ? 380 : scene === 'dead' ? 60
+               : 900 + heat * 2600) * (1 + bass * 0.7);
+    travel += dt * speed;
+    starMarch(dt * speed * 1.25);
+    spin += dt * (0.06 + heat * 0.30 + (scene === 'kaleido' ? 0.5 : 0));
+    rx += dt * (0.35 + heat * 0.5); ry += dt * (0.24 + bass * 0.9);
+    roll += dt * (heat > 0.85 ? 0.22 : 0.05) * Math.sin(now8 * 0.31);
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(roll + (scene === 'redline' ? Math.sin(now8 * 2.1) * 0.02 * heat : 0));
+    var punch = 1 + pulse * (0.010 + heat * 0.030);
+    ctx.scale(punch, punch);
+    ctx.translate(-cx, -cy);
+
+    ctx.globalCompositeOperation = 'lighter';
+
+    /* ---- the scene ---- */
+    if (scene === 'void' || scene === 'dead'){
+      stars(mix(STEEL, k, 0.6), 0.55, speed * 0.06);
+      /* one horizon, and the sound sitting on it */
+      ctx.globalAlpha = 0.5;
+      ctx.strokeStyle = rgba(k, 1);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (var q = 0; q <= N; q++){
+        var v = level[q % N];
+        var xx = (q / N) * W;
+        ctx.lineTo(xx, cy + Math.sin(q * 0.7 + now8) * 2 - v * M * 0.16);
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      if (scene !== 'dead') tunnel(10, 0.10, 0.30, k, false);
+
+    } else if (scene === 'grid'){
+      plane(k, 0.7, bass);
+      stars(k, 0.30, speed * 0.05);
+      tunnel(20, 0.16, 0.34, k, false);
+
+    } else if (scene === 'sub'){
+      /* no top end in the music, so no detail on the screen. huge and slow. */
+      tunnel(6, 0.62, 0.80, k, true);
+      ctx.globalAlpha = 0.22 + bass * 0.5;
+      var g2 = ctx.createRadialGradient(cx, cy, 0, cx, cy, M * (0.3 + bass * 0.5));
+      g2.addColorStop(0, rgba(RED, 0.5));
+      g2.addColorStop(1, rgba(RED, 0));
+      ctx.fillStyle = g2;
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalAlpha = 1;
+
+    } else if (scene === 'core'){
+      stars(mix(STEEL, k, 0.7), 0.4, speed * 0.05);
+      core(k, 0.9, pulse * 0.5 + bass * 0.25);
+      tunnel(14, 0.12, 0.24, k, false);
+
+    } else if (scene === 'kaleido'){
+      /* six of it, mirrored, which is one honest tunnel and five lies */
+      /* Six folds of a twenty four ring tunnel is a lot of blended pixels,
+         which is where this scene's time actually goes. Five reads the same
+         and costs a sixth less. */
+      var folds = slow > 0.5 ? 3 : 5;
+      for (var fo = 0; fo < folds; fo++){
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate((fo / folds) * TAU);
+        if (fo % 2) ctx.scale(1, -1);
+        ctx.translate(-cx, -cy);
+        tunnel(7, 0.40, fo === 0 ? 0.55 : 0.21, fo % 2 ? mix(k, HOT, 0.3) : k, fo === 0);
+        ctx.restore();
+      }
+      core(mix(k, HOT, 0.5), 0.34, pulse * 0.6);
+
+    } else { /* redline */
+      /* three passes, offset, one per channel. where they line up you get
+         white and where they do not you get the fringe, which is what a
+         lens does when it is being asked too much. */
+      var ab = (0.9 + pulse * 5.5 + heat * 2.2) * (reduce ? 0 : 1);
+      var chans = [[[255,0,0], -ab], [[0,255,90], 0], [[70,90,255], ab]];
+      for (var ci = 0; ci < chans.length; ci++){
+        ctx.save();
+        ctx.translate(chans[ci][1], 0);
+        tunnel(16, 0.34, ci === 1 ? 0.58 : 0.34, chans[ci][0], ci === 1);
+        ctx.restore();
+      }
+      stars(mix(k, HOT, 0.4), 0.5, speed * 0.09);
+      ctx.globalAlpha = 0.30 + pulse * 0.4;
+      ctx.strokeStyle = rgba(HOT, 1);
+      ctx.lineWidth = 1 + pulse * 3;
+      ctx.beginPath();
+      ctx.arc(cx, cy, M * (0.06 + pulse * 0.5), 0, TAU);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.restore();
+
+    /* ---- the signal breaking up ---- */
+    if (!reduce){
+      var td = t - tearAt;
+      if (td >= 0 && td < 0.14) tear(0.5 + heat * 0.6);
+      var sd = t - splitAt;
+      if (sd >= 0 && sd < 0.07){
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha = 0.26;
+        ctx.drawImage(canvas, 6, 0, W, H);
+        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = 'source-over';
+      }
+    }
+
+    /* ---- the cut ---- */
+    if (cut > 0.01){
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = cut * 0.5;
+      ctx.fillStyle = rgba(HOT, 1);
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    /* ---- the room it is all in ---- */
+    if (slow < 0.6) overlay();
+
+    gauge(bass);
+    hud(t);
+  }
+
+  /* ================= hud ================= */
+  var lastShown = -1;
+  function hud(t){
+    var p = clamp(t / T.dur, 0, 1);
+    fill.style.width = (p * 100) + '%';
+    head.style.left = (p * 100) + '%';
+    var s = t | 0;
+    if (s !== lastShown){
+      lastShown = s;
+      clock.textContent = (s / 60 | 0) + ':' + ('0' + (s % 60)).slice(-2);
+      bar.setAttribute('aria-valuenow', String(s));
+    }
+  }
+
+  function jumped(){
+    lastBeat = -1e9; beatAt = -9; beatHard = 0;
+    tearAt = splitAt = sceneAt = -9;
+    travel = 0; sz = null;
+  }
+
+  bar.addEventListener('click', function(e){
+    var r = bar.getBoundingClientRect();
+    audio.currentTime = clamp(((e.clientX - r.left) / r.width) * T.dur, 0, T.dur - 0.05);
+    jumped();
+  });
+  bar.addEventListener('keydown', function(e){
+    var d = e.key === 'ArrowRight' ? 5 : e.key === 'ArrowLeft' ? -5 : 0;
+    if (!d) return;
+    e.preventDefault();
+    audio.currentTime = clamp(audio.currentTime + d, 0, T.dur - 0.05);
+    jumped();
+  });
+
+  function toggle(){
+    if (audio.paused){
+      if (actx && actx.state === 'suspended') actx.resume();
+      audio.play();
+    } else audio.pause();
+  }
+  pp.addEventListener('click', toggle);
+  audio.addEventListener('play',  function(){ document.body.classList.add('going'); });
+  audio.addEventListener('pause', function(){ document.body.classList.remove('going'); });
+  document.addEventListener('keydown', function(e){
+    if (e.code === 'Space' && e.target === document.body){ e.preventDefault(); toggle(); }
+  });
+
+  var idleTimer;
+  function stir(){
+    document.body.classList.remove('idle');
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(function(){ document.body.classList.add('idle'); }, 2800);
+  }
+  document.addEventListener('mousemove', stir);
+  document.addEventListener('touchstart', stir);
+
+  document.getElementById('start').addEventListener('click', function(){
+    listen();
+    if (actx && actx.state === 'suspended') actx.resume();
+    audio.play();
+    gate.classList.add('gone');
+    setTimeout(function(){ gate.style.display = 'none'; }, 900);
+    stir();
+  });
+
+  window.__od = {
+    T: T, grid: GRID, arc: ARC,
+    at: function(t){
+      state(t);
+      return { scene: scene, heat: +heat.toFixed(3), rev: +rev.toFixed(3),
+               phraseRoot: phraseRoot };
+    }
+  };
+
+  size();
+  requestAnimationFrame(frame);
+
+  try { if (window.top !== window.self) document.querySelector('.backlink').remove(); }
+  catch(e){}
+})();
+</script>
+</body>
+</html>
