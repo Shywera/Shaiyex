@@ -112,6 +112,51 @@
   body.idle .credit{opacity:.14}
 
   /* ---------- the seal ---------- */
+  /* The turn washes the screen white, and then Steam turns up to award
+     you for it. Bottom right, which is where the real one goes, and it
+     waits out the white before sliding in so it is not announcing itself
+     into a frame you cannot see. */
+  .ach{
+    position:fixed;right:16px;bottom:58px;z-index:6;
+    display:flex;align-items:center;gap:12px;
+    padding:9px 18px 9px 9px;
+    max-width:calc(100vw - 32px);
+    font-family:"Motiva Sans",Arial,Helvetica,sans-serif;
+    background:linear-gradient(135deg,#33536f 0%,#1b2838 58%,#12171d 100%);
+    border:1px solid rgba(150,195,240,.20);
+    border-radius:3px;
+    box-shadow:0 10px 30px rgba(0,0,0,.78), inset 0 1px 0 rgba(255,255,255,.10);
+    opacity:0;transform:translateY(22px);
+    transition:opacity .36s ease, transform .42s cubic-bezier(.18,.9,.28,1);
+    pointer-events:none;
+  }
+  .ach.up{opacity:1;transform:none}
+  .ach-ico{
+    flex:0 0 auto;width:52px;height:52px;border-radius:2px;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(160deg,#ffd97a,#e2a423 58%,#a2660e);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.28);
+  }
+  .ach-ico svg{display:block;width:38px;height:38px}
+  .ach-txt{min-width:0}
+  .ach-txt b{
+    display:block;font-size:12px;font-weight:400;letter-spacing:.01em;
+    color:#c7d5e0;
+  }
+  .ach-txt span{
+    display:block;margin-top:2px;font-size:15px;font-weight:700;
+    color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  @media (max-width:560px){
+    .ach{right:10px;bottom:54px;padding:8px 14px 8px 8px}
+    .ach-ico{width:44px;height:44px}
+    .ach-ico svg{width:32px;height:32px}
+    .ach-txt span{font-size:13px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .ach{transform:none;transition:opacity .36s ease}
+  }
+
   .gate{
     position:fixed;inset:0;z-index:20;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -171,6 +216,21 @@
     <i class="bar-head" id="head"></i>
   </div>
   <span class="t" id="clock">0:00</span>
+</div>
+
+<div class="ach" id="ach" aria-hidden="true">
+  <span class="ach-ico">
+    <svg viewBox="0 0 48 48" aria-hidden="true">
+      <path d="M3 24s8-12 21-12 21 12 21 12-8 12-21 12S3 24 3 24z"
+            fill="none" stroke="#2b1c07" stroke-width="3.4" stroke-linejoin="round"/>
+      <circle cx="24" cy="24" r="6.6" fill="#2b1c07"/>
+      <circle cx="26.5" cy="21.5" r="2.2" fill="#ffeab4"/>
+    </svg>
+  </span>
+  <div class="ach-txt">
+    <b>Achievement Unlocked!</b>
+    <span>My eyes aaaahhhhhhhhh</span>
+  </div>
 </div>
 
 <div class="gate" id="gate">
@@ -421,6 +481,7 @@
       swell = t;
       burst = 1;
       waves.push({ r: 0, life: 1, hard: 1, holy: 1 });
+      achieve();
     });
 
     burst *= 0.982;
@@ -1111,7 +1172,25 @@
     }
   }
 
+  /* Held back nine tenths of a second so it lands as the white lets go
+     rather than inside it, and cleared on a seek so it cannot be left
+     hanging there by somebody scrubbing the bar. */
+  var achEl = document.getElementById('ach'), achIn, achOut;
+  function achieve(){
+    if (!achEl) return;
+    clearTimeout(achIn); clearTimeout(achOut);
+    achIn = setTimeout(function(){
+      achEl.classList.add('up');
+      achOut = setTimeout(function(){ achEl.classList.remove('up'); }, 5400);
+    }, 900);
+  }
+  function achHide(){
+    clearTimeout(achIn); clearTimeout(achOut);
+    if (achEl) achEl.classList.remove('up');
+  }
+
   function jumped(){
+    achHide();
     lastBeat = -1e9;
     kickAt = -9; kickHard = 0; tearAt = -9;
     waves.length = circles.length = dust.length = shards.length = 0;
