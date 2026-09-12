@@ -1178,12 +1178,41 @@
      hanging there by somebody scrubbing the bar. */
   var achEl = document.getElementById('ach'), achIn, achOut;
   var achSfx = document.getElementById('achSfx');
+  var achSrc = null, achGain = null, achWired = false;
+
+  /* An audio element's volume stops at 1, and against this track that is
+     nowhere near enough. Routed through the context instead, a gain node
+     can go past 1, and a compressor behind it set to a hard knee at 20:1
+     works as a brick wall so the extra gain cannot clip. If any of that
+     fails the element is left unrouted and plays at its own level. */
+  function achWire(){
+    if (achWired || !actx || !achSfx) return;
+    achWired = true;
+    try {
+      achSrc  = actx.createMediaElementSource(achSfx);
+      achGain = actx.createGain();
+      achGain.gain.value = 5.2;
+      var lim = actx.createDynamicsCompressor();
+      lim.threshold.value = -1.5;
+      lim.knee.value = 0;
+      lim.ratio.value = 20;
+      lim.attack.value = 0.002;
+      lim.release.value = 0.10;
+      achSrc.connect(achGain);
+      achGain.connect(lim);
+      lim.connect(actx.destination);
+      achOut2 = lim;
+    } catch (e){ achSrc = null; achGain = null; }
+  }
+  var achOut2 = null;
 
   function achSound(){
     if (!achSfx) return;
+    achWire();
+    if (actx && actx.state === 'suspended') actx.resume();
     try {
       achSfx.currentTime = 0;
-      achSfx.volume = 0.85;
+      achSfx.volume = 1;
       var pr = achSfx.play();
       if (pr && pr.catch) pr.catch(function(){});
     } catch (e){}
@@ -1196,7 +1225,7 @@
       achEl.classList.add('up');
       achSound();
       achOut = setTimeout(function(){ achEl.classList.remove('up'); }, 5400);
-    }, 900);
+    }, 300);
   }
 
   function achHide(){
@@ -1204,7 +1233,8 @@
     if (achEl) achEl.classList.remove('up');
   }
 
-  window.__ach = { sound: achSound, el: function(){ return achSfx; } };
+  window.__ach = { sound: achSound, el: function(){ return achSfx; },
+                   tap: function(){ return achOut2; } };
 
   function jumped(){
     achHide();
