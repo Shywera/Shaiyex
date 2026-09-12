@@ -241,6 +241,7 @@
 </div>
 
 <audio id="track" src="track.mp3" preload="auto"></audio>
+<audio id="achSfx" src="ach.mp3" preload="auto"></audio>
 
 <script>
 (function(){
@@ -1176,18 +1177,34 @@
      rather than inside it, and cleared on a seek so it cannot be left
      hanging there by somebody scrubbing the bar. */
   var achEl = document.getElementById('ach'), achIn, achOut;
+  var achSfx = document.getElementById('achSfx');
+
+  function achSound(){
+    if (!achSfx) return;
+    try {
+      achSfx.currentTime = 0;
+      achSfx.volume = 0.85;
+      var pr = achSfx.play();
+      if (pr && pr.catch) pr.catch(function(){});
+    } catch (e){}
+  }
+
   function achieve(){
     if (!achEl) return;
     clearTimeout(achIn); clearTimeout(achOut);
     achIn = setTimeout(function(){
       achEl.classList.add('up');
+      achSound();
       achOut = setTimeout(function(){ achEl.classList.remove('up'); }, 5400);
     }, 900);
   }
+
   function achHide(){
     clearTimeout(achIn); clearTimeout(achOut);
     if (achEl) achEl.classList.remove('up');
   }
+
+  window.__ach = { sound: achSound, el: function(){ return achSfx; } };
 
   function jumped(){
     achHide();
