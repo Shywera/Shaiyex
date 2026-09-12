@@ -95,10 +95,12 @@
   .credit b{
     display:block;font-family:var(--disp);font-size:26px;line-height:.9;
     letter-spacing:.06em;color:#EAF6FF;
+    text-shadow:0 2px 16px rgba(0,0,0,.95), 0 0 3px rgba(0,0,0,.8);
   }
   .credit span{
     display:block;font-size:9px;font-weight:700;letter-spacing:.24em;
-    text-transform:uppercase;color:var(--dim);margin-top:3px;
+    text-transform:uppercase;color:#9FB4C8;margin-top:3px;
+    text-shadow:0 1px 10px rgba(0,0,0,.95);
   }
   body.idle .credit{opacity:.16}
 
@@ -179,18 +181,21 @@
      OVERDRIVE
 
      210.0000 bpm exactly. Measured by fitting a comb over the onset
-     envelope: at 210 the phase the four loud sections independently land
-     on agrees to within 19 ms across 244 seconds, and at 209.96 it is 44,
-     which is how you know it is a round number and not a near one. First
-     beat at 0.2695 s. Grid lines carry five to seven times the average
-     energy depending on the section. The phrase is 8 beats, not 4: the
-     low band's 8 beat periodicity scores 35.8 against 1.9 for 4.
+     envelope: at 210 the beat phase that the four loud sections
+     independently land on agrees to within 19 ms across 244 seconds, and
+     at 209.96 it is 44 ms, which is how you know it is a round number and
+     not a near one. First beat at 0.2695 s. The phrase is 8 beats, not 4:
+     the low band's 8 beat periodicity scores 35.8 against 1.9 for 4.
 
      Every mark below is a beat of that grid. The two drops are beats 399
      and 585.
+
+     The shaft is drawn as solid shaded panels rather than a wireframe,
+     far ribs first so the near ones cover them, and it bends as it goes
+     so you are flying down a road instead of sitting inside an onion.
      ==================================================================== */
   var GRID = { bpm: 210, t0: 0.2695 };
-  var SPB  = 60 / GRID.bpm;          /* 0.285714 */
+  var SPB  = 60 / GRID.bpm;
   var PHRASE = 8;
 
   var T = {
@@ -207,34 +212,31 @@
     out2:  204.555,   /* beat 715 */
     last:  233.698,   /* beat 817  the final push */
     finish:256.555,   /* beat 897  the body ends */
-    stab:  257.750,   /* one more hit after you thought it was over */
     dead:  259.000,
     dur:   260.306
   };
 
-  /* scene, and how hard the machine is being pushed */
   var ARC = [
     [0,        'void',    0.12],
-    [T.caught, 'tunnel',  0.52],
-    [T.turn,   'grid',    0.60],
+    [T.caught, 'shaft',   0.52],
+    [T.turn,   'corridor',0.60],
     [T.subIn,  'sub',     0.80],
-    [T.subOut, 'tunnel',  0.56],
+    [T.subOut, 'shaft',   0.56],
     [T.brk,    'void',    0.26],
     [T.drop1,  'redline', 1.00],
     [T.out1,   'core',    0.34],
     [T.hollow, 'void',    0.10],
     [T.drop2,  'kaleido', 1.00],
     [T.dip,    'redline', 0.92],
-    [T.out2,   'grid',    0.44],
+    [T.out2,   'corridor',0.44],
     [T.last,   'redline', 0.96],
     [T.finish, 'core',    0.30],
     [T.dead,   'dead',    0.00]
   ];
 
   var SCENE_TINT = {
-    void:    '#1C3A52', tunnel: '#38E8FF', grid: '#5AA8FF',
-    sub:     '#FF2D2D', redline:'#FFB020', core: '#8FE8FF',
-    kaleido: '#FF5CE0', dead:   '#101820'
+    void:'#1C3A52', shaft:'#38E8FF', corridor:'#5AA8FF', sub:'#FF2D2D',
+    redline:'#FFB020', core:'#8FE8FF', kaleido:'#FF5CE0', dead:'#101820'
   };
 
   var audio  = document.getElementById('track');
@@ -251,7 +253,6 @@
                window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var TAU = Math.PI * 2;
 
-  /* the bar gets the shape of the track drawn into it */
   (function segments(){
     var tr = document.getElementById('bartrack');
     for (var i = 0; i < ARC.length; i++){
@@ -267,7 +268,7 @@
   })();
 
   /* ================= audio ================= */
-  var actx, analyser, freq, wave;
+  var actx, analyser, freq;
 
   function listen(){
     if (actx) return;
@@ -276,20 +277,18 @@
     actx = new AC();
     analyser = actx.createAnalyser();
     analyser.fftSize = 2048;
-    analyser.smoothingTimeConstant = 0.62;
+    analyser.smoothingTimeConstant = 0.58;
     freq = new Uint8Array(analyser.frequencyBinCount);
-    wave = new Uint8Array(analyser.fftSize);
     actx.createMediaElementSource(audio).connect(analyser);
     analyser.connect(actx.destination);
     bands();
   }
 
-  var N = 0, edges = [], level, peak;
+  var N = 0, edges = [], level;
 
   function bands(){
-    N = window.innerWidth < 620 ? 32 : 48;
+    N = window.innerWidth < 620 ? 26 : 40;
     level = new Float32Array(N);
-    peak  = new Float32Array(N);
     edges = [];
     if (!analyser) return;
     var lo = 2, hi = Math.min(analyser.frequencyBinCount - 1, 460);
@@ -303,11 +302,11 @@
       var a = edges[i], b = Math.max(edges[i + 1], a + 1), m = 0;
       for (var j = a; j < b; j++) if (freq[j] > m) m = freq[j];
       var v = (m / 255) * (0.62 + 0.55 * (i / N));
-      v = Math.pow(v > 1 ? 1 : v, 1.25);
-      level[i] += (v - level[i]) * 0.40;
-      peak[i] = Math.max(peak[i] * 0.92, level[i]);
+      level[i] += (Math.pow(v > 1 ? 1 : v, 1.2) - level[i]) * 0.40;
     }
   }
+
+  function band(n){ return level[((n * 2) % N + N) % N]; }
 
   function energy(a, b){
     if (!analyser) return 0;
@@ -317,8 +316,8 @@
   }
 
   /* ================= the clock ================= */
-  var lastBeat = -1e9, beatAt = -9, beatHard = 0, beatNo = 0, phraseAt = -9;
-  var tearAt = -9, splitAt = -9;
+  var lastBeat = -1e9, beatAt = -9, beatHard = 0, beatNo = 0;
+  var tearAt = -9, chromaAt = -9, blastAt = -9, shake = 0;
 
   function beats(t){
     var n = Math.floor((t - GRID.t0) / SPB);
@@ -328,22 +327,26 @@
     if (jump < 0 || jump > 8) return;
     beatNo = n;
     beatAt = GRID.t0 + n * SPB;
-    beatHard = Math.min(1, energy(1, 22) * 1.7);   /* no floor: silence is silent */
+    beatHard = Math.min(1, energy(1, 22) * 1.7);
 
     var onPhrase = ((n - phraseRoot) % PHRASE + PHRASE) % PHRASE === 0;
-    if (onPhrase) phraseAt = beatAt;
+
+    /* The room moves on every beat and it moves properly at the top of the
+       rev range. Offset and rotation only, so it reads as force without
+       spending anything against the flash budget. */
+    shake = Math.max(shake, beatHard * heat * (onPhrase ? 1 : 0.40));
 
     if (reduce) return;
-    /* the picture comes apart at the top of the rev range */
-    if (heat > 0.85 && (onPhrase || beatHard > 0.8)) tearAt = beatAt;
-    if (heat > 0.72 && onPhrase) splitAt = beatAt;
+    if (heat > 0.68 && onPhrase) blastAt = beatAt;
+    if (heat > 0.85 && (onPhrase || beatHard > 0.82)) tearAt = beatAt;
+    if (heat > 0.72 && onPhrase) chromaAt = beatAt;
+    if (heat > 0.45) sparks((onPhrase ? 30 : 10) * heat);
   }
 
   /* ================= state ================= */
-  function ease(x){ return x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x); }
   function clamp(x, a, b){ return x < a ? a : x > b ? b : x; }
 
-  var scene = 'void', prevScene = 'void', sceneAt = -9, phraseRoot = 0;
+  var scene = 'void', sceneAt = -9, phraseRoot = 0;
   var heat = 0, heatT = 0, rev = 0;
 
   function state(t, dt){
@@ -352,53 +355,47 @@
     var want = ARC[k][1];
     heatT = ARC[k][2];
     if (want !== scene){
-      prevScene = scene;
-      scene = want;
-      sceneAt = t;
-      /* phrases are counted from the scene that is running, so a cut is
-         always on the first beat of a phrase for whatever is playing now */
+      scene = want; sceneAt = t;
       phraseRoot = Math.round((ARC[k][0] - GRID.t0) / SPB);
     }
     heat += (heatT - heat) * (dt ? clamp(dt * 3.2, 0, 1) : 1);
-    /* the needle climbs fast and falls slowly, like a real one */
-    var target = heat * 0.72 + energy(1, 22) * 0.42;
-    rev += (target - rev) * (dt ? clamp(dt * (target > rev ? 9 : 1.6), 0, 1) : 1);
+    var target = heat * 0.72 + energy(1, 22) * 0.44;
+    rev += (target - rev) * (dt ? clamp(dt * (target > rev ? 9 : 1.5), 0, 1) : 1);
   }
 
   /* ================= colour ================= */
-  function hex(h){
-    return [parseInt(h.substr(1, 2), 16), parseInt(h.substr(3, 2), 16),
-            parseInt(h.substr(5, 2), 16)];
-  }
   function mix(a, b, t){
     return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
   }
   function rgba(c, a){
     return 'rgba(' + (c[0] | 0) + ',' + (c[1] | 0) + ',' + (c[2] | 0) + ',' + a + ')';
   }
-  var CYAN = hex('#38E8FF'), AMBER = hex('#FFB020'), RED = hex('#FF2D2D');
-  var HOT = hex('#FFF4E0'), PINK = hex('#FF5CE0'), STEEL = hex('#1C3A52');
+  var CYAN = [56, 232, 255], AMBER = [255, 176, 32], RED = [255, 45, 45];
+  var VIOLET = [150, 90, 255];
+  var HOT = [255, 244, 224], PINK = [255, 92, 224], STEEL = [26, 44, 66];
   var INK = [3, 4, 10];
 
-  /* the whole palette is one axis: how hard it is being pushed */
+  /* One axis: how hard it is being pushed. Cold cyan up to hot metal, by
+     way of violet, because cyan lerped straight at amber goes through grey
+     and the middle of the track came out the colour of pond water. */
+  function ramp(x){
+    x = clamp(x, 0, 1);
+    return x < 0.5 ? mix(CYAN, VIOLET, x * 2) : mix(VIOLET, AMBER, (x - 0.5) * 2);
+  }
   function key(){
     var c = scene === 'sub' ? RED
           : scene === 'kaleido' ? PINK
-          : mix(CYAN, AMBER, clamp((heat - 0.4) / 0.5, 0, 1));
+          : ramp((heat - 0.35) / 0.45);
     return mix(c, RED, clamp((heat - 0.82) / 0.18, 0, 1) * 0.55);
   }
 
-  /* ================= 3d ================= */
+  /* ================= geometry ================= */
   var W = 0, H = 0, dpr = 1, cx = 0, cy = 0, FL = 0, M = 0;
   var ema = 0.016, slow = 0;
 
   function size(){
-    /* This page's cost is almost entirely full-frame pixel work: four passes
-       over every pixel, every frame. So budget pixels rather than pick a
-       ratio, and a 4K monitor does not get punished for being large. It is
-       all glow and feedback smear, so a smaller backing store is invisible. */
     dpr = Math.min(window.devicePixelRatio || 1, 1.25);
-    var budget = 2.25e6;
+    var budget = 2.2e6;
     var px = window.innerWidth * window.innerHeight * dpr * dpr;
     if (px > budget) dpr *= Math.sqrt(budget / px);
     W = window.innerWidth; H = window.innerHeight;
@@ -406,279 +403,400 @@
     canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     cx = W / 2; cy = H / 2; M = Math.min(W, H);
-    FL = M * 0.92;
-    bands();
-    lines = null; overKey = '';
+    FL = M * 0.95;
+    bands(); overKey = '';
   }
   window.addEventListener('resize', size);
 
-  /* ---- the tunnel -------------------------------------------------------
-     Rings at fixed spacing in z, marched toward the camera. Each ring's
-     radius is driven by one band, so the shape of the sound is the shape
-     of the throat you are going down. */
-  var RINGS = 24, SPACE = 300, ZNEAR = 46;
-  var travel = 0, spin = 0;
+  var RINGS = 24, SPACE = 300, ZNEAR = 55;
+  var SPAN = RINGS * SPACE;
+  var travel = 0, spin = 0, bendT = 0;
 
-  function tunnel(sides, amp, alpha, k, spokes){
-    var span = RINGS * SPACE;
-    var i, n, first, z, r, s, a, px, py;
-    for (n = 0; n < RINGS; n++){
-      z = ((n * SPACE - travel) % span + span) % span + ZNEAR;
-      var depth = 1 - z / (span + ZNEAR);
-      var band = level[(n * 2) % N];
-      r = M * (0.30 + band * amp) * (1 + Math.sin(n * 0.7 + travel * 0.002) * 0.06);
+  /* The shaft is not straight. Offset is a function of a ring's real z, so
+     as a ring comes at you its offset falls to zero on its own and the
+     whole thing reads as a road with bends in it rather than an onion. */
+  var bx = 0, by = 0, bendH = 1, bendV = 1;
+  function bendAt(z){
+    var f = z / SPAN;
+    f *= f;
+    bx = Math.sin(z * 0.00040 + bendT) * M * 0.62 * f * bendH;
+    by = Math.cos(z * 0.00029 + bendT * 0.74) * M * 0.44 * f * bendV;
+  }
+
+  /* A pressure wave that runs away down the shaft when a phrase lands, so
+     the walls blow out in a ring you can watch travel into the distance. */
+  function blast(n, t){
+    var d = t - blastAt;
+    if (d < 0 || d > 1.5) return 0;
+    var g = n - d * 16;
+    return Math.exp(-(g * g) / 7) * (1 - d / 1.5) * 0.60;
+  }
+
+  function ringR(n, t){
+    return M * (0.30 + band(n) * 0.22 + blast(n, t)) *
+           (1 + Math.sin(n * 0.7 + travel * 0.0014) * 0.06);
+  }
+
+  /* ord* is preallocated: this runs up to five times a frame and the
+     garbage from rebuilding an array of pairs showed up in the frame times. */
+  var ordZ = new Float32Array(64), ordN = new Int16Array(64), ordC = 0;
+  function march(){
+    ordC = 0;
+    for (var n = 0; n < RINGS; n++){
+      ordZ[ordC] = ((n * SPACE - travel) % SPAN + SPAN) % SPAN + ZNEAR;
+      ordN[ordC] = n; ordC++;
+    }
+    for (var i = 1; i < ordC; i++){          /* insertion sort, far first */
+      var z = ordZ[i], nn = ordN[i], j = i - 1;
+      while (j >= 0 && ordZ[j] < z){ ordZ[j+1] = ordZ[j]; ordN[j+1] = ordN[j]; j--; }
+      ordZ[j+1] = z; ordN[j+1] = nn;
+    }
+  }
+
+  /* ---- the shaft ---- */
+  function shaft(sides, t, k, alpha, panels){
+    var i, n, z, zz, r, rr, s, ss, a, aa, ox, oy, oxx, oyy;
+    march();
+    for (var oi = 0; oi < ordC; oi++){
+      z = ordZ[oi]; n = ordN[oi];
+      var depth = 1 - z / (SPAN + ZNEAR);
+      if (depth < 0.015) continue;
+      r = ringR(n, t);
       s = FL / z;
-      /* Rings this far down are a few pixels across and there are a dozen of
-         them on top of each other. Additively that is not a tunnel mouth, it
-         is a white pea. Drop them. */
-      if (r * s < M * 0.035) continue;
-      var fade = alpha * Math.pow(depth, 1.9) * (0.25 + depth * 0.9);
-      if (fade < 0.012) continue;
-      ctx.globalAlpha = Math.min(1, fade);
-      /* keep some colour in it. all the way to HOT and the palette is gone. */
-      ctx.strokeStyle = rgba(mix(k, HOT, band * 0.40), 1);
-      ctx.lineWidth = 0.6 + depth * 2.2 + band * 1.4;
+      bendAt(z); ox = cx + bx; oy = cy + by;
+
+      var lit = alpha * Math.pow(depth, 1.15);
+      var bd = band(n);
+
+      /* The wall between this rib and the one just in front of it, filled.
+         A line has no weight and this track is nothing but weight. */
+      if (panels){
+        zz = z - SPACE;
+        if (zz > ZNEAR){
+          rr = ringR((n - 1 + RINGS) % RINGS, t);
+          ss = FL / zz;
+          bendAt(zz); oxx = cx + bx; oyy = cy + by;
+          for (i = 0; i < sides; i++){
+            a  = spin + (i / sides) * TAU + n * 0.10;
+            aa = spin + ((i + 1) / sides) * TAU + n * 0.10;
+            /* a light from above, so the shaft has a roof and a floor */
+            var face = 0.5 - Math.cos(a + TAU / (sides * 2)) * 0.5;
+            var shade = (0.14 + face * 0.36 + bd * 0.27) * lit;
+            if (i % 2) shade *= 0.52;
+            if (shade < 0.010) continue;
+            ctx.fillStyle = rgba(mix(mix(STEEL, k, 0.58), HOT, bd * 0.28), shade);
+            ctx.beginPath();
+            ctx.moveTo(ox  + Math.cos(a)  * r  * s,  oy  + Math.sin(a)  * r  * s);
+            ctx.lineTo(ox  + Math.cos(aa) * r  * s,  oy  + Math.sin(aa) * r  * s);
+            ctx.lineTo(oxx + Math.cos(aa) * rr * ss, oyy + Math.sin(aa) * rr * ss);
+            ctx.lineTo(oxx + Math.cos(a)  * rr * ss, oyy + Math.sin(a)  * rr * ss);
+            ctx.closePath();
+            ctx.fill();
+          }
+        }
+      }
+
+      /* the rib itself: bright, and thick when it is close */
+      if (r * s < M * 0.030) continue;
+      ctx.globalAlpha = Math.min(1, lit * (0.58 + bd * 0.58));
+      ctx.strokeStyle = rgba(mix(k, HOT, bd * 0.55), 1);
+      ctx.lineWidth = 0.7 + depth * 6 + bd * 1.7;
       ctx.beginPath();
       for (i = 0; i <= sides; i++){
-        a = spin + (i / sides) * TAU + n * 0.09;
-        px = cx + Math.cos(a) * r * s;
-        py = cy + Math.sin(a) * r * s;
+        a = spin + (i / sides) * TAU + n * 0.10;
+        var px = ox + Math.cos(a) * r * s, py = oy + Math.sin(a) * r * s;
         if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
       }
       ctx.stroke();
+      ctx.globalAlpha = 1;
     }
-    /* the long lines down the throat, which are what make it a tunnel */
-    if (spokes){
-      ctx.globalAlpha = alpha * 0.34;
-      ctx.strokeStyle = rgba(k, 1);
-      ctx.lineWidth = 1;
-      for (i = 0; i < sides; i += 2){
-        ctx.beginPath();
-        first = true;
-        for (n = 0; n < RINGS; n++){
-          z = ((n * SPACE - travel) % span + span) % span + ZNEAR;
-          if (z > span * 0.72) continue;
-          r = M * (0.30 + level[(n * 2) % N] * amp);
-          s = FL / z;
-          a = spin + (i / sides) * TAU + n * 0.09;
-          px = cx + Math.cos(a) * r * s;
-          py = cy + Math.sin(a) * r * s;
-          if (first){ ctx.moveTo(px, py); first = false; } else ctx.lineTo(px, py);
-        }
-        ctx.stroke();
-      }
-    }
-    ctx.globalAlpha = 1;
   }
 
-  /* ---- the plane ---- */
-  function plane(k, alpha, bass){
-    var span = RINGS * SPACE;
-    var i, n, z, s, y, x;
-    var lift = M * (0.34 + bass * 0.10);
+  /* ---- rails running the length of it, which is what sells the speed ---- */
+  function rails(sides, t, k, alpha){
     ctx.globalAlpha = alpha;
-    ctx.strokeStyle = rgba(k, 1);
-    ctx.lineWidth = 1;
-    /* the lines coming at you */
-    for (n = 0; n < RINGS; n++){
-      z = ((n * SPACE - travel) % span + span) % span + ZNEAR;
-      var depth = 1 - z / (span + ZNEAR);
-      s = FL / z;
-      if (depth < 0.02) continue;
-      ctx.globalAlpha = alpha * Math.pow(depth, 1.4);
-      ctx.lineWidth = 0.5 + depth * 2;
-      for (var sgn = -1; sgn <= 1; sgn += 2){
-        y = cy + sgn * lift * s;
-        ctx.beginPath();
-        ctx.moveTo(cx - M * 3 * s, y);
-        ctx.lineTo(cx + M * 3 * s, y);
-        ctx.stroke();
+    ctx.strokeStyle = rgba(mix(k, HOT, 0.40), 1);
+    ctx.lineWidth = 1.8;
+    for (var i = 0; i < sides; i += 2){
+      ctx.beginPath();
+      var first = true;
+      for (var n = 0; n < RINGS; n++){
+        var z = ((n * SPACE - travel) % SPAN + SPAN) % SPAN + ZNEAR;
+        if (z > SPAN * 0.7) continue;
+        var r = ringR(n, t), s = FL / z;
+        bendAt(z);
+        var a = spin + (i / sides) * TAU + n * 0.10;
+        var px = cx + bx + Math.cos(a) * r * s, py = cy + by + Math.sin(a) * r * s;
+        if (first){ ctx.moveTo(px, py); first = false; } else ctx.lineTo(px, py);
       }
-    }
-    /* and the rails running away from you */
-    ctx.globalAlpha = alpha * 0.5;
-    ctx.lineWidth = 1;
-    for (i = -7; i <= 7; i++){
-      x = i * M * 0.20;
-      for (var sg = -1; sg <= 1; sg += 2){
-        var s1 = FL / ZNEAR, s2 = FL / (span * 0.8);
-        ctx.beginPath();
-        ctx.moveTo(cx + x * s1, cy + sg * lift * s1);
-        ctx.lineTo(cx + x * s2, cy + sg * lift * s2);
-        ctx.stroke();
-      }
+      ctx.stroke();
     }
     ctx.globalAlpha = 1;
   }
 
-  /* ---- the core: a real icosahedron, edges worked out once ---- */
-  var VERTS = null, EDGES = null;
+  /* ---- a flat corridor: floor and ceiling in solid slabs ---- */
+  function corridor(t, k, alpha, bass){
+    var lift = M * (0.34 + bass * 0.12);
+    march();
+    for (var oi = 0; oi < ordC; oi++){
+      var z1 = ordZ[oi], nn = ordN[oi], z2 = z1 - SPACE;
+      if (z2 <= ZNEAR) continue;
+      var d = 1 - z1 / (SPAN + ZNEAR);
+      if (d < 0.02) continue;
+      var s1 = FL / z1, s2 = FL / z2;
+      var w1 = Math.max(M * 2.6 * s1, W), w2 = Math.max(M * 2.6 * s2, W);
+      bendAt(z1); var x1 = cx + bx, y1 = cy + by;
+      bendAt(z2); var x2 = cx + bx, y2 = cy + by;
+      var bd = band(nn);
+      var sh = alpha * Math.pow(d, 1.15) * (0.11 + bd * 0.52) * (nn % 2 ? 0.48 : 1);
+      ctx.fillStyle = rgba(mix(mix(STEEL, k, 0.52), HOT, bd * 0.24), sh);
+      for (var sg = -1; sg <= 1; sg += 2){
+        ctx.beginPath();
+        ctx.moveTo(x1 - w1, y1 + sg * lift * s1);
+        ctx.lineTo(x1 + w1, y1 + sg * lift * s1);
+        ctx.lineTo(x2 + w2, y2 + sg * lift * s2);
+        ctx.lineTo(x2 - w2, y2 + sg * lift * s2);
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.globalAlpha = Math.min(1, alpha * Math.pow(d, 1.05) * (0.35 + bd));
+      ctx.strokeStyle = rgba(mix(k, HOT, bd * 0.5), 1);
+      ctx.lineWidth = 0.8 + d * 4.5;
+      for (sg = -1; sg <= 1; sg += 2){
+        ctx.beginPath();
+        ctx.moveTo(x1 - w1, y1 + sg * lift * s1);
+        ctx.lineTo(x1 + w1, y1 + sg * lift * s1);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  /* ---- a solid icosahedron, back faces thrown away ---- */
+  var VERTS = null, FACES = null, rx = 0, ry = 0;
   function solid(){
     if (VERTS) return;
-    var p = 1.6180339887, v = [];
-    var sgn = [1, -1], i, j, a, b;
+    var p = 1.6180339887, v = [], i, j, a, b, c, sg = [1, -1];
     for (i = 0; i < 2; i++) for (j = 0; j < 2; j++){
-      v.push([0, sgn[i], sgn[j] * p]);
-      v.push([sgn[i], sgn[j] * p, 0]);
-      v.push([sgn[i] * p, 0, sgn[j]]);
+      v.push([0, sg[i], sg[j] * p]);
+      v.push([sg[i], sg[j] * p, 0]);
+      v.push([sg[i] * p, 0, sg[j]]);
     }
-    VERTS = v; EDGES = [];
-    for (a = 0; a < v.length; a++) for (b = a + 1; b < v.length; b++){
-      var dx = v[a][0]-v[b][0], dy = v[a][1]-v[b][1], dz = v[a][2]-v[b][2];
-      if (Math.abs(dx*dx + dy*dy + dz*dz - 4) < 0.001) EDGES.push([a, b]);
-    }
+    VERTS = v;
+    var edge = function(x, y){
+      var dx = v[x][0]-v[y][0], dy = v[x][1]-v[y][1], dz = v[x][2]-v[y][2];
+      return Math.abs(dx*dx + dy*dy + dz*dz - 4) < 0.001;
+    };
+    FACES = [];
+    for (a = 0; a < 12; a++) for (b = a+1; b < 12; b++) for (c = b+1; c < 12; c++)
+      if (edge(a,b) && edge(b,c) && edge(a,c)) FACES.push([a,b,c]);
   }
 
-  var rx = 0, ry = 0;
+  var PT = [];
   function core(k, alpha, blow){
     solid();
     var sa = Math.sin(rx), ca = Math.cos(rx), sb = Math.sin(ry), cb = Math.cos(ry);
-    var R = M * (0.16 + blow * 0.22);
-    var zc = FL * 1.35;
-    var pts = [], i;
-    for (i = 0; i < VERTS.length; i++){
+    var R = M * (0.19 + blow * 0.17), zc = FL * 1.55, i;
+    for (i = 0; i < 12; i++){
       var x = VERTS[i][0], y = VERTS[i][1], z = VERTS[i][2];
       var y2 = y * ca - z * sa, z2 = y * sa + z * ca;
       var x2 = x * cb + z2 * sb, z3 = -x * sb + z2 * cb;
-      var d = zc + z3 * R;
-      var s = FL / Math.max(60, d);
-      pts.push([cx + x2 * R * s, cy + y2 * R * s, s]);
+      var s = FL / Math.max(70, zc + z3 * R);
+      PT[i] = PT[i] || [0, 0, 0];
+      PT[i][0] = cx + x2 * R * s; PT[i][1] = cy + y2 * R * s; PT[i][2] = z3;
     }
-    ctx.globalAlpha = alpha;
-    ctx.lineWidth = 1.4;
-    for (i = 0; i < EDGES.length; i++){
-      var A = pts[EDGES[i][0]], B = pts[EDGES[i][1]];
-      ctx.strokeStyle = rgba(mix(k, HOT, (A[2] + B[2]) * 0.2), 1);
-      ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]); ctx.stroke();
+    for (i = 0; i < FACES.length; i++){
+      var f = FACES[i], A = PT[f[0]], B = PT[f[1]], C = PT[f[2]];
+      /* For a solid centred on the origin the outward normal of a face is
+         its own centroid, so a face points at the camera exactly when its
+         centroid sits in front of the centre. No winding order needed. */
+      var cz = (A[2] + B[2] + C[2]) / 3;
+      if (cz >= 0) continue;
+      var facing = clamp(-cz / 1.51, 0, 1);
+      ctx.fillStyle = rgba(mix(mix(STEEL, k, 0.72), HOT, facing * 0.45),
+                           alpha * (0.14 + facing * 0.72));
+      ctx.beginPath();
+      ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]); ctx.lineTo(C[0], C[1]);
+      ctx.closePath();
+      ctx.fill();
+      ctx.globalAlpha = alpha * (0.2 + facing * 0.5);
+      ctx.strokeStyle = rgba(mix(k, HOT, 0.45), 1);
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
     }
-    ctx.globalAlpha = alpha * 0.9;
-    ctx.fillStyle = rgba(HOT, 1);
-    for (i = 0; i < pts.length; i++){
-      ctx.beginPath(); ctx.arc(pts[i][0], pts[i][1], 1.4 + pts[i][2] * 1.2, 0, TAU); ctx.fill();
-    }
-    ctx.globalAlpha = 1;
   }
 
-  /* ---- stars, in three dimensions so they streak properly ---- */
-  var STARS = 260, sx = null, sy = null, sz = null;
+  /* ---- the vanishing point. something has to be down there. ---- */
+  function eye(k, power, bass){
+    var r = M * (0.05 + bass * 0.10 + power * 0.16);
+    bendAt(ZNEAR + SPAN * 0.96);
+    var ex = cx + bx * 0.5, ey = cy + by * 0.5;
+    ctx.globalCompositeOperation = 'lighter';
+    var g = ctx.createRadialGradient(ex, ey, 0, ex, ey, r * 3.4);
+    g.addColorStop(0,    rgba(mix(k, HOT, 0.75), 0.62));
+    g.addColorStop(0.22, rgba(k, 0.30));
+    g.addColorStop(1,    rgba(k, 0));
+    ctx.fillStyle = g;
+    ctx.fillRect(ex - r * 3.4, ey - r * 3.4, r * 6.8, r * 6.8);
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  /* ---- sparks: debris coming off it, with depth so they streak ---- */
+  var SP = [];
+  function sparks(n){
+    for (var i = 0; i < n && SP.length < 240; i++){
+      SP.push({ a: Math.random() * TAU, r: M * (0.22 + Math.random() * 0.24),
+                z: SPAN * (0.30 + Math.random() * 0.65),
+                v: 1 + Math.random() * 2.4, spr: 0.3 + Math.random() * 1.7,
+                life: 1, decay: 0.5 + Math.random() * 0.85 });
+    }
+  }
+  function drawSparks(dt, k, speed){
+    if (!SP.length) return;
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.strokeStyle = rgba(mix(k, HOT, 0.6), 1);
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for (var i = SP.length - 1; i >= 0; i--){
+      var p = SP[i];
+      p.z -= speed * p.v * dt;
+      p.r += M * 0.05 * p.spr * dt;
+      p.life -= p.decay * dt;
+      if (p.z < 45 || p.life <= 0){ SP.splice(i, 1); continue; }
+      var s1 = FL / p.z, s2 = FL / (p.z + speed * p.v * 0.05);
+      var c = Math.cos(p.a), sn = Math.sin(p.a);
+      bendAt(p.z);
+      ctx.moveTo(cx + bx + c * p.r * s1, cy + by + sn * p.r * s1);
+      ctx.lineTo(cx + bx + c * p.r * s2, cy + by + sn * p.r * s2);
+    }
+    ctx.stroke();
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  /* ---- stars for the empty stretches ---- */
+  var STARS = 200, stx = null, sty = null, stz = null;
   function stars(k, alpha, streak){
-    if (!sx){
-      sx = new Float32Array(STARS); sy = new Float32Array(STARS); sz = new Float32Array(STARS);
+    if (!stx){
+      stx = new Float32Array(STARS); sty = new Float32Array(STARS);
+      stz = new Float32Array(STARS);
       for (var i = 0; i < STARS; i++){
-        sx[i] = (Math.random() - 0.5) * M * 4;
-        sy[i] = (Math.random() - 0.5) * M * 4;
-        sz[i] = 60 + Math.random() * RINGS * SPACE;
+        stx[i] = (Math.random() - 0.5) * M * 4;
+        sty[i] = (Math.random() - 0.5) * M * 4;
+        stz[i] = 60 + Math.random() * SPAN;
       }
     }
-    var span = RINGS * SPACE;
+    ctx.globalCompositeOperation = 'lighter';
     ctx.globalAlpha = alpha;
     ctx.strokeStyle = rgba(k, 1);
     ctx.lineWidth = 1.1;
     ctx.beginPath();
     for (var j = 0; j < STARS; j++){
-      var z = sz[j];
-      if (z < 60){ sz[j] = span; z = span; }
+      var z = stz[j];
+      if (z < 60){ stz[j] = SPAN; z = SPAN; }
       var s = FL / z, s2 = FL / (z + streak);
-      ctx.moveTo(cx + sx[j] * s,  cy + sy[j] * s);
-      ctx.lineTo(cx + sx[j] * s2, cy + sy[j] * s2);
+      ctx.moveTo(cx + stx[j] * s,  cy + sty[j] * s);
+      ctx.lineTo(cx + stx[j] * s2, cy + sty[j] * s2);
     }
     ctx.stroke();
     ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
   }
-  function starMarch(d){
-    if (!sz) return;
-    for (var i = 0; i < STARS; i++) sz[i] -= d;
-  }
+  function starMarch(d){ if (stz) for (var i = 0; i < STARS; i++) stz[i] -= d; }
 
-  /* ---- the rev counter, which is the whole point of the name ---- */
+  /* ---- the rev counter. the track is named after it, so it is not small. ---- */
   function gauge(bass){
-    var r = M * 0.085, gx = W - r - 26, gy = H - r - 62;
-    if (W < 620){ gx = W - r - 16; gy = H - r - 74; }
-    var a0 = Math.PI * 0.78, a1 = Math.PI * 2.22;
-    ctx.lineCap = 'butt';
-    /* the dial */
-    ctx.globalAlpha = 0.30;
+    var r = M * 0.142, gx = W - r - 38, gy = H - r - 74;
+    if (W < 820){ r = M * 0.112; gx = W - r - 18; gy = H - r - 84; }
+    var a0 = Math.PI * 0.74, a1 = Math.PI * 2.26;
+    var v = clamp(rev, 0, 1.12), hot = v > 0.78;
+    var kk = hot ? mix(AMBER, RED, clamp((v - 0.78) / 0.3, 0, 1)) : key();
+
+    ctx.globalAlpha = 0.34;
     ctx.strokeStyle = rgba(STEEL, 1);
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 13;
     ctx.beginPath(); ctx.arc(gx, gy, r, a0, a1); ctx.stroke();
-    /* the redline zone */
-    ctx.globalAlpha = 0.55;
+
+    ctx.globalAlpha = hot ? 0.92 : 0.38;
     ctx.strokeStyle = rgba(RED, 1);
-    ctx.lineWidth = 3;
     ctx.beginPath(); ctx.arc(gx, gy, r, a0 + (a1 - a0) * 0.78, a1); ctx.stroke();
-    /* how far it is round */
-    var v = clamp(rev, 0, 1.08);
-    ctx.globalAlpha = 0.95;
-    ctx.strokeStyle = rgba(v > 0.78 ? mix(AMBER, RED, (v - 0.78) / 0.3) : key(), 1);
-    ctx.lineWidth = 4;
-    ctx.beginPath(); ctx.arc(gx, gy, r, a0, a0 + (a1 - a0) * Math.min(1, v)); ctx.stroke();
-    /* the needle */
-    var na = a0 + (a1 - a0) * Math.min(1, v);
+
     ctx.globalAlpha = 1;
-    ctx.strokeStyle = rgba(HOT, 1);
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(gx, gy);
-    ctx.lineTo(gx + Math.cos(na) * r * 0.92, gy + Math.sin(na) * r * 0.92);
+    ctx.strokeStyle = rgba(kk, 1);
+    ctx.beginPath(); ctx.arc(gx, gy, r, a0, a0 + (a1 - a0) * Math.min(1, v));
     ctx.stroke();
-    /* and it does not look right without ticks */
-    ctx.globalAlpha = 0.35;
-    ctx.strokeStyle = rgba(STEEL, 1);
-    ctx.lineWidth = 1.5;
+
+    if (hot){
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = clamp((v - 0.78) / 0.3, 0, 1) * (0.14 + bass * 0.26);
+      var fg = ctx.createRadialGradient(gx, gy, r * 0.55, gx, gy, r * 1.35);
+      fg.addColorStop(0, rgba(RED, 0.5));
+      fg.addColorStop(1, rgba(RED, 0));
+      ctx.fillStyle = fg;
+      ctx.fillRect(gx - r * 1.4, gy - r * 1.4, r * 2.8, r * 2.8);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 1;
+    }
+
+    var na = a0 + (a1 - a0) * Math.min(1, v);
+    ctx.strokeStyle = rgba(HOT, 1);
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.moveTo(gx - Math.cos(na) * r * 0.2, gy - Math.sin(na) * r * 0.2);
+    ctx.lineTo(gx + Math.cos(na) * r * 0.84, gy + Math.sin(na) * r * 0.84);
+    ctx.stroke();
+    ctx.fillStyle = rgba(HOT, 1);
+    ctx.beginPath(); ctx.arc(gx, gy, 5, 0, TAU); ctx.fill();
+
+    ctx.globalAlpha = 0.55;
+    ctx.lineWidth = 2;
     for (var i = 0; i <= 8; i++){
       var ta = a0 + (a1 - a0) * (i / 8);
+      ctx.strokeStyle = rgba(i >= 6 ? RED : STEEL, 1);
       ctx.beginPath();
-      ctx.moveTo(gx + Math.cos(ta) * r * 1.06, gy + Math.sin(ta) * r * 1.06);
-      ctx.lineTo(gx + Math.cos(ta) * r * 1.16, gy + Math.sin(ta) * r * 1.16);
+      ctx.moveTo(gx + Math.cos(ta) * r * 1.16, gy + Math.sin(ta) * r * 1.16);
+      ctx.lineTo(gx + Math.cos(ta) * r * (i >= 6 ? 1.34 : 1.27),
+                 gy + Math.sin(ta) * r * (i >= 6 ? 1.34 : 1.27));
       ctx.stroke();
     }
     ctx.globalAlpha = 1;
   }
 
-  /* ---- the picture coming apart ---- */
   function tear(power){
     var n = 2 + (power * 3) | 0;
     for (var i = 0; i < n; i++){
-      var y = Math.random() * H;
-      var h = 4 + Math.random() * 54;
-      var d = (Math.random() - 0.5) * 190 * power;
+      var y = Math.random() * H, h = 4 + Math.random() * 58;
+      var d = (Math.random() - 0.5) * 200 * power;
       ctx.drawImage(canvas, 0, y * dpr, canvas.width, h * dpr, d, y, W, h);
     }
   }
 
-  /* The vignette and the scanlines never change within a frame and barely
-     change between them, and each was costing a whole screen of fill. They
-     are one transparent sheet now, rebuilt only when the heat bucket or the
-     window changes, and laid down with a single draw. Measured: the four
-     full-frame passes were the entire budget. Removing every stroke on the
-     page saved 0.2 ms; removing the full-frame fills saved ten. */
-  var lines = null, over = null, overKey = '';
+  var over = null, overKey = '', linePat = null;
   function overlay(){
     var q = Math.round(heat * 6);
-    var key = W + 'x' + H + '|' + q + '|' + dpr;
-    if (overKey !== key){
-      overKey = key;
+    var k2 = W + 'x' + H + '|' + q + '|' + Math.round(dpr * 100);
+    if (overKey !== k2){
+      overKey = k2;
       if (!over) over = document.createElement('canvas');
       over.width = canvas.width; over.height = canvas.height;
       var g = over.getContext('2d');
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
       g.clearRect(0, 0, W, H);
-      var vg = g.createRadialGradient(cx, cy, M * 0.24, cx, cy, M * 0.92);
+      var vg = g.createRadialGradient(cx, cy, M * 0.30, cx, cy, M * 1.0);
       vg.addColorStop(0, 'rgba(0,0,0,0)');
-      vg.addColorStop(1, 'rgba(0,0,0,' + (0.52 + (1 - q / 6) * 0.24).toFixed(3) + ')');
-      g.fillStyle = vg;
-      g.fillRect(0, 0, W, H);
+      vg.addColorStop(1, 'rgba(0,0,0,' + (0.44 + (q / 6) * 0.30).toFixed(3) + ')');
+      g.fillStyle = vg; g.fillRect(0, 0, W, H);
       if (!reduce){
-        if (!lines){
+        if (!linePat){
           var c = document.createElement('canvas');
           c.width = 1; c.height = 3;
           var gc = c.getContext('2d');
           gc.fillStyle = 'rgba(0,0,0,0.34)';
           gc.fillRect(0, 0, 1, 1);
-          lines = c;
+          linePat = c;
         }
         g.globalAlpha = 0.5;
-        g.fillStyle = g.createPattern(lines, 'repeat');
+        g.fillStyle = g.createPattern(linePat, 'repeat');
         g.fillRect(0, 0, W, H);
         g.globalAlpha = 1;
       }
@@ -708,95 +826,83 @@
       ? Math.pow(1 - since / (SPB * 0.9), 2.2) * beatHard : 0;
     var k = key();
 
-    /* the cut: a scene change is a hard white frame, not a crossfade */
     var sc = t - sceneAt;
-    cut = sc >= 0 && sc < 0.24 ? Math.pow(1 - sc / 0.24, 2) : 0;
+    cut = sc >= 0 && sc < 0.26 ? Math.pow(1 - sc / 0.26, 2) : 0;
 
-    /* ---- feedback. the last frame, dimmed, and a bigger copy of it added
-       back on top, which is what makes everything leave a wake. ---- */
-    /* A copy of the last frame, slightly bigger and slightly turned, added
-       back on top of a dimmed version of itself. The turn matters: zoom on
-       its own has a fixed point dead centre, so the middle pixel feeds
-       itself every frame and runs away to white in about a second. Rotating
-       it turns that fixed point into a spiral instead. */
-    var zoom = 1 + (0.006 + heat * 0.018 + pulse * 0.010);
-    var twist = (0.010 + heat * 0.016) * (scene === 'kaleido' ? 1.8 : 1);
+    /* Solid walls do not want a heavy smear behind them, they want to be
+       seen. So this is a clear with a little carry, not a wake. */
     ctx.globalCompositeOperation = 'source-over';
-    ctx.fillStyle = rgba(INK, 0.26 + (1 - heat) * 0.10);
+    ctx.fillStyle = rgba(INK, 0.52 + (1 - heat) * 0.34);
     ctx.fillRect(0, 0, W, H);
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(twist);
-    ctx.scale(zoom, zoom);
-    ctx.translate(-cx, -cy);
-    ctx.globalCompositeOperation = 'lighter';
-    ctx.globalAlpha = 0.15 + heat * 0.05;
-    ctx.drawImage(canvas, 0, 0, W, H);
-    ctx.restore();
-    ctx.globalAlpha = 1;
-    ctx.globalCompositeOperation = 'source-over';
 
-    /* ---- camera ---- */
-    var speed = (scene === 'sub' ? 260 : scene === 'void' ? 380 : scene === 'dead' ? 60
-               : 900 + heat * 2600) * (1 + bass * 0.7);
+    var speed = (scene === 'sub' ? 340 : scene === 'void' ? 460 : scene === 'dead' ? 80
+               : 1200 + heat * 3200) * (1 + bass * 0.75);
     travel += dt * speed;
-    starMarch(dt * speed * 1.25);
-    spin += dt * (0.06 + heat * 0.30 + (scene === 'kaleido' ? 0.5 : 0));
-    rx += dt * (0.35 + heat * 0.5); ry += dt * (0.24 + bass * 0.9);
+    starMarch(dt * speed * 1.15);
+    spin += dt * (0.05 + heat * 0.24 + (scene === 'kaleido' ? 0.40 : 0));
+    bendT += dt * (0.16 + heat * 0.34);
+    rx += dt * (0.33 + heat * 0.45); ry += dt * (0.22 + bass * 0.8);
     roll += dt * (heat > 0.85 ? 0.22 : 0.05) * Math.sin(now8 * 0.31);
 
+    shake *= Math.pow(0.0018, dt);
+    var amp = M * 0.026 * shake;
+
     ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(roll + (scene === 'redline' ? Math.sin(now8 * 2.1) * 0.02 * heat : 0));
-    var punch = 1 + pulse * (0.010 + heat * 0.030);
+    ctx.translate(cx + (Math.random() - 0.5) * amp, cy + (Math.random() - 0.5) * amp);
+    var rollK = scene === 'corridor' ? 0.14 : 1;
+    ctx.rotate(roll * rollK + (Math.random() - 0.5) * 0.014 * shake);
+    var punch = 1 + pulse * (0.008 + heat * 0.032);
     ctx.scale(punch, punch);
     ctx.translate(-cx, -cy);
 
-    ctx.globalCompositeOperation = 'lighter';
-
     /* ---- the scene ---- */
     if (scene === 'void' || scene === 'dead'){
-      stars(mix(STEEL, k, 0.6), 0.55, speed * 0.06);
-      /* one horizon, and the sound sitting on it */
-      ctx.globalAlpha = 0.5;
-      ctx.strokeStyle = rgba(k, 1);
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      for (var q = 0; q <= N; q++){
-        var v = level[q % N];
-        var xx = (q / N) * W;
-        ctx.lineTo(xx, cy + Math.sin(q * 0.7 + now8) * 2 - v * M * 0.16);
+      stars(mix(STEEL, k, 0.7), 0.55, speed * 0.06);
+      if (scene !== 'dead'){
+        shaft(12, t, k, 0.36, false);
+        eye(k, pulse * 0.2, bass * 0.5);
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha = 0.5;
+        ctx.strokeStyle = rgba(k, 1);
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        for (var q2 = 0; q2 <= N; q2++){
+          ctx.lineTo((q2 / N) * W, cy + M * 0.34 - level[q2 % N] * M * 0.17);
+        }
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = 'source-over';
       }
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-      if (scene !== 'dead') tunnel(10, 0.10, 0.30, k, false);
 
-    } else if (scene === 'grid'){
-      plane(k, 0.7, bass);
-      stars(k, 0.30, speed * 0.05);
-      tunnel(20, 0.16, 0.34, k, false);
+    } else if (scene === 'corridor'){
+      /* a road bends sideways. it does not bend upwards, or the far floor
+         ends up above the near ceiling and the room turns inside out. */
+      bendH = 0.55; bendV = 0;
+      corridor(t, k, 0.9, bass);
+      stars(k, 0.24, speed * 0.05);
+      eye(k, pulse * 0.35, bass);
+      bendH = 1; bendV = 1;
 
     } else if (scene === 'sub'){
       /* no top end in the music, so no detail on the screen. huge and slow. */
-      tunnel(6, 0.62, 0.80, k, true);
-      ctx.globalAlpha = 0.22 + bass * 0.5;
-      var g2 = ctx.createRadialGradient(cx, cy, 0, cx, cy, M * (0.3 + bass * 0.5));
+      shaft(6, t, k, 1.0, true);
+      rails(6, t, k, 0.5);
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = 0.22 + bass * 0.42;
+      var g2 = ctx.createRadialGradient(cx, cy, 0, cx, cy, M * (0.34 + bass * 0.5));
       g2.addColorStop(0, rgba(RED, 0.5));
       g2.addColorStop(1, rgba(RED, 0));
-      ctx.fillStyle = g2;
-      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = g2; ctx.fillRect(0, 0, W, H);
       ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
 
     } else if (scene === 'core'){
-      stars(mix(STEEL, k, 0.7), 0.4, speed * 0.05);
-      core(k, 0.9, pulse * 0.5 + bass * 0.25);
-      tunnel(14, 0.12, 0.24, k, false);
+      stars(mix(STEEL, k, 0.7), 0.34, speed * 0.05);
+      shaft(12, t, k, 0.34, false);
+      eye(k, pulse * 0.3, bass * 0.7);
+      core(k, 0.95, pulse * 0.45 + bass * 0.22);
 
     } else if (scene === 'kaleido'){
-      /* six of it, mirrored, which is one honest tunnel and five lies */
-      /* Six folds of a twenty four ring tunnel is a lot of blended pixels,
-         which is where this scene's time actually goes. Five reads the same
-         and costs a sixth less. */
       var folds = slow > 0.5 ? 3 : 5;
       for (var fo = 0; fo < folds; fo++){
         ctx.save();
@@ -804,63 +910,88 @@
         ctx.rotate((fo / folds) * TAU);
         if (fo % 2) ctx.scale(1, -1);
         ctx.translate(-cx, -cy);
-        tunnel(7, 0.40, fo === 0 ? 0.55 : 0.21, fo % 2 ? mix(k, HOT, 0.3) : k, fo === 0);
+        shaft(7, t, fo % 2 ? mix(k, HOT, 0.3) : k,
+              fo === 0 ? 0.82 : fo === 1 ? 0.30 : 0.22, fo < 2);
         ctx.restore();
       }
-      core(mix(k, HOT, 0.5), 0.34, pulse * 0.6);
+      eye(mix(k, HOT, 0.35), pulse * 0.5, bass * 0.9);
+      core(mix(k, HOT, 0.4), 0.58, pulse * 0.5);
+      if (!reduce){
+        var kab = 2 + pulse * 7;
+        var kch = [[[255, 40, 140], -kab], [[90, 160, 255], kab]];
+        ctx.globalCompositeOperation = 'lighter';
+        for (var kc = 0; kc < 2; kc++){
+          ctx.save();
+          ctx.translate(kch[kc][1], 0);
+          shaft(7, t, kch[kc][0], 0.24, false);
+          ctx.restore();
+        }
+        ctx.globalCompositeOperation = 'source-over';
+      }
 
-    } else { /* redline */
-      /* three passes, offset, one per channel. where they line up you get
-         white and where they do not you get the fringe, which is what a
-         lens does when it is being asked too much. */
-      var ab = (0.9 + pulse * 5.5 + heat * 2.2) * (reduce ? 0 : 1);
-      var chans = [[[255,0,0], -ab], [[0,255,90], 0], [[70,90,255], ab]];
-      for (var ci = 0; ci < chans.length; ci++){
-        ctx.save();
-        ctx.translate(chans[ci][1], 0);
-        tunnel(16, 0.34, ci === 1 ? 0.58 : 0.34, chans[ci][0], ci === 1);
-        ctx.restore();
+    } else { /* shaft and redline */
+      var red = scene === 'redline';
+      shaft(red ? 14 : 16, t, k, red ? 1.0 : 0.9, true);
+      rails(red ? 14 : 16, t, k, red ? 0.55 : 0.34);
+      eye(k, pulse * (red ? 0.6 : 0.3), bass);
+      if (red && !reduce){
+        /* Three offset rib passes, one per channel, so the edges fringe the
+           way a lens does when it is being asked for more than it has. */
+        var ab = 1.5 + pulse * 6 + heat * 2.5;
+        var ch = [[[255, 24, 24], -ab], [[60, 255, 110], 0], [[70, 110, 255], ab]];
+        ctx.globalCompositeOperation = 'lighter';
+        for (var ci = 0; ci < 3; ci++){
+          ctx.save();
+          ctx.translate(ch[ci][1], 0);
+          shaft(14, t, ch[ci][0], 0.26, false);
+          ctx.restore();
+        }
+        ctx.globalCompositeOperation = 'source-over';
       }
-      stars(mix(k, HOT, 0.4), 0.5, speed * 0.09);
-      ctx.globalAlpha = 0.30 + pulse * 0.4;
-      ctx.strokeStyle = rgba(HOT, 1);
-      ctx.lineWidth = 1 + pulse * 3;
-      ctx.beginPath();
-      ctx.arc(cx, cy, M * (0.06 + pulse * 0.5), 0, TAU);
-      ctx.stroke();
-      ctx.globalAlpha = 1;
     }
 
-    ctx.globalCompositeOperation = 'source-over';
+    if (scene !== 'dead') drawSparks(dt, k, speed);
+
+    /* the pressure front, drawn as a ring you can watch leave */
+    var bdd = t - blastAt;
+    if (bdd >= 0 && bdd < 1.1){
+      var bp = bdd / 1.1;
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = (1 - bp) * (1 - bp) * 0.30;
+      ctx.strokeStyle = rgba(mix(k, HOT, 0.5), 1);
+      ctx.lineWidth = 2 + (1 - bp) * 9;
+      ctx.beginPath();
+      ctx.arc(cx, cy, M * (0.10 + bp * 1.0), 0, TAU);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
     ctx.restore();
 
-    /* ---- the signal breaking up ---- */
     if (!reduce){
       var td = t - tearAt;
       if (td >= 0 && td < 0.14) tear(0.5 + heat * 0.6);
-      var sd = t - splitAt;
-      if (sd >= 0 && sd < 0.07){
+      var cd = t - chromaAt;
+      if (cd >= 0 && cd < 0.07){
         ctx.globalCompositeOperation = 'lighter';
-        ctx.globalAlpha = 0.26;
-        ctx.drawImage(canvas, 6, 0, W, H);
+        ctx.globalAlpha = 0.2;
+        ctx.drawImage(canvas, 8, 0, W, H);
         ctx.globalAlpha = 1;
         ctx.globalCompositeOperation = 'source-over';
       }
     }
 
-    /* ---- the cut ---- */
     if (cut > 0.01){
       ctx.globalCompositeOperation = 'lighter';
-      ctx.globalAlpha = cut * 0.5;
+      ctx.globalAlpha = cut * 0.09;
       ctx.fillStyle = rgba(HOT, 1);
       ctx.fillRect(0, 0, W, H);
       ctx.globalAlpha = 1;
       ctx.globalCompositeOperation = 'source-over';
     }
 
-    /* ---- the room it is all in ---- */
     if (slow < 0.6) overlay();
-
     gauge(bass);
     hud(t);
   }
@@ -881,8 +1012,8 @@
 
   function jumped(){
     lastBeat = -1e9; beatAt = -9; beatHard = 0;
-    tearAt = splitAt = sceneAt = -9;
-    travel = 0; sz = null;
+    tearAt = chromaAt = blastAt = sceneAt = -9;
+    travel = 0; stz = null; stx = null; sty = null; SP.length = 0; shake = 0;
   }
 
   bar.addEventListener('click', function(e){
@@ -934,7 +1065,7 @@
     at: function(t){
       state(t);
       return { scene: scene, heat: +heat.toFixed(3), rev: +rev.toFixed(3),
-               phraseRoot: phraseRoot };
+               shake: +shake.toFixed(3), sparks: SP.length };
     }
   };
 
