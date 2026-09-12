@@ -310,7 +310,7 @@
 
   /* ================= the clock ================= */
   var lastBeat = -1e9, beatAt = -9, beatHard = 0, beatNo = 0, barNo = 0, onBar = false;
-  var burstAt = -9, chromaAt = -9;
+  var burstAt = -9, chromaAt = -9, greenHit = -9;
 
   function beats(t){
     var n = Math.floor((t - GRID.t0) / SPB);
@@ -328,13 +328,29 @@
     if (loud > 0.8 && onBar) chromaAt = beatAt;
     if (loud > 0.5) sparkles(onBar ? 7 : 3);
     if (loud > 0.85 && onBar) heartBurst();
+
+    /* the room moves. the green bar moves it about three times as much,
+       and it is movement rather than brightness so it costs nothing
+       against the flash budget. */
+    var g = ((Math.floor(beatNo / 4) % 4) + 4) % 4 === 3 ? 1 : 0;
+    shake = Math.max(shake, beatHard * loud * (g ? 1 : 0.30) * (onBar ? 1 : 0.45));
+    if (g && onBar && loud > 0.8){
+      heartBurst(); sparkles(10); greenHit = beatAt;
+    }
   }
 
   /* ================= state ================= */
   function ease(x){ return x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x); }
   function clamp(x, a, b){ return x < a ? a : x > b ? b : x; }
 
-  var scene = 'calm', sceneAt = -9, loud = 0, loudT = 0, hue = 0;
+  var scene = 'calm', sceneAt = -9, loud = 0, loudT = 0;
+
+  /* The candy runs pink, cyan, yellow, lime and turns over on the bar, so
+     the green one comes round every fourth bar. Inside a drop that is every
+     five seconds, which is exactly the right spacing for the bar that hits
+     harder than the other three. Everything below leans on this. */
+  var green = 0;
+  var shake = 0, shakeX = 0, shakeY = 0;
 
   function state(t, dt){
     var i, k = 0;
@@ -343,6 +359,10 @@
     loudT = ARC[k][2];
     /* a dead stop is instant. everything else eases. */
     loud += (loudT - loud) * (dt ? clamp(dt * (loudT < loud ? 9 : 3.4), 0, 1) : 1);
+
+    var bn = Math.floor((t - GRID.t0) / BAR);
+    var isGreen = ((bn % 4) + 4) % 4 === 3 ? 1 : 0;
+    green += (isGreen * loud - green) * (dt ? clamp(dt * 7, 0, 1) : 1);
   }
 
   /* the candy cycles on the bar, not the beat. a full palette swap at
@@ -575,6 +595,10 @@
       ? Math.pow(1 - since / (SPB * 0.85), 2.0) * beatHard * loud : 0;
 
     var k0 = candy(0), k1 = candy(1), k2 = candy(2);
+    if (green > 0.02){
+      k1 = mix(k1, LIME, green * 0.55);
+      k2 = mix(k2, WHITE, green * 0.30);
+    }
 
     /* ---- the ground, with a gentle wake ---- */
     ctx.globalCompositeOperation = 'source-over';
@@ -584,10 +608,16 @@
     spin += dt * (0.12 + loud * 0.55);
     roll += dt * 0.04 * Math.sin(now8 * 0.4);
 
+    /* shake decays fast enough to be a hit rather than a wobble */
+    shake *= Math.pow(0.0016, dt);
+    var amp = M * 0.030 * shake * (1 + green * 1.1);
+    shakeX = (Math.random() - 0.5) * amp;
+    shakeY = (Math.random() - 0.5) * amp;
+
     ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(roll);
-    var punch = 1 + pulse * (0.02 + loud * 0.055);
+    ctx.translate(cx + shakeX, cy + shakeY);
+    ctx.rotate(roll + (Math.random() - 0.5) * 0.016 * shake * (1 + green));
+    var punch = 1 + pulse * (0.02 + loud * 0.055) + green * pulse * 0.05;
     ctx.scale(punch, punch);
     ctx.translate(-cx, -cy);
     ctx.globalCompositeOperation = 'lighter';
@@ -604,9 +634,16 @@
       var nl = scene === 'drop' ? LINES : scene === 'build' ? 44 : 26;
       if (slow > 0.5) nl = (nl * 0.6) | 0;
       speedLines(nl, k0,
-        M * (0.27 + 0.10 * loud + pulse * 0.10),
-        M * (0.38 + loud * 0.52 + pulse * 0.28),
-        0.08 + loud * 0.20, spin);
+        M * (0.27 + 0.10 * loud + pulse * 0.10 - green * 0.09),
+        M * (0.38 + loud * 0.52 + pulse * 0.28 + green * 0.45),
+        0.08 + loud * 0.20 + green * 0.10, spin);
+      /* a second set running the other way, green bars only */
+      if (green > 0.04){
+        speedLines((nl * 0.6) | 0, mix(k2, WHITE, 0.35),
+          M * (0.16 + pulse * 0.08),
+          M * (0.50 + pulse * 0.30),
+          green * 0.16, -spin * 1.4);
+      }
 
       /* ---- the ring of sound, mirrored both ways ---- */
       var rb = 0.09 + loud * 0.15;
@@ -617,12 +654,36 @@
       ribbon(cy - M * 0.34, rh * 0.7, rb * 0.6, true);
 
       /* ---- the thing in the middle ---- */
-      var br = M * (0.048 + bass * 0.034 + pulse * 0.030);
+      var br = M * (0.048 + bass * 0.034 + pulse * 0.030 + green * 0.030);
       if (scene === 'drop' || scene === 'build'){
-        starburst(cx, cy, Math.min(M * 0.26, br * (1.7 + pulse * 0.5)), 12, k1,
-                  0.22 + pulse * 0.10, spin * 0.5);
+        starburst(cx, cy, Math.min(M * 0.34, br * (1.7 + pulse * 0.5)),
+                  green > 0.3 ? 16 : 12, k1,
+                  0.22 + pulse * 0.10 + green * 0.10, spin * 0.5);
       }
       starburst(cx, cy, br, 6, mix(k2, WHITE, 0.4), 0.34 + pulse * 0.10, -spin);
+
+      /* and the green bar throws a shockwave of its own, further and
+         faster than the ordinary bar ring, with a shape to it */
+      var gd = t - greenHit;
+      if (gd >= 0 && gd < 0.95){
+        var gp = gd / 0.95;
+        var gr2 = M * (0.06 + gp * 1.25);
+        ctx.globalAlpha = (1 - gp) * (1 - gp) * 0.5;
+        ctx.strokeStyle = rgba(LIME, 1);
+        ctx.lineWidth = 2 + (1 - gp) * 12;
+        ctx.beginPath();
+        for (var gi = 0; gi <= 24; gi++){
+          var ga = (gi / 24) * TAU + spin * 0.4;
+          var rr2 = gr2 * (gi % 2 ? 0.90 : 1);
+          if (gi === 0) ctx.moveTo(cx + Math.cos(ga) * rr2, cy + Math.sin(ga) * rr2);
+          else ctx.lineTo(cx + Math.cos(ga) * rr2, cy + Math.sin(ga) * rr2);
+        }
+        ctx.closePath();
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        starburst(cx, cy, M * (0.30 + gp * 0.5), 20, mix(LIME, WHITE, 0.3),
+                  (1 - gp) * (1 - gp) * 0.22, -spin * 0.8);
+      }
 
       /* the bar hit: a ring that leaves, on the bar and not the beat */
       var bd = t - burstAt;
@@ -764,8 +825,9 @@
     T: T, grid: GRID, arc: ARC,
     at: function(t){
       state(t);
-      return { scene: scene, loud: +loud.toFixed(3),
-               bar: Math.floor((t - GRID.t0) / BAR) };
+      var bn2 = Math.floor((t - GRID.t0) / BAR);
+      return { scene: scene, loud: +loud.toFixed(3), bar: bn2,
+               green: ((bn2 % 4) + 4) % 4 === 3, shake: +shake.toFixed(3) };
     }
   };
 
