@@ -187,12 +187,12 @@
      not a near one. First beat at 0.2695 s. The phrase is 8 beats, not 4:
      the low band's 8 beat periodicity scores 35.8 against 1.9 for 4.
 
-     Every mark below is a beat of that grid. The two drops are beats 399
-     and 585.
-
-     The shaft is drawn as solid shaded panels rather than a wireframe,
-     far ribs first so the near ones cover them, and it bends as it goes
-     so you are flying down a road instead of sitting inside an onion.
+     There is one thing on screen for four minutes and twenty seconds: a
+     vortex, and you are going down it. It never gets swapped for something
+     else. Every section of the track is the same vortex under different
+     settings, and the settings are crossfaded, so the shape is always on
+     its way somewhere. What snaps on a drop is how hard it is lit and how
+     fast it is moving, because that is what a drop actually is.
      ==================================================================== */
   var GRID = { bpm: 210, t0: 0.2695 };
   var SPB  = 60 / GRID.bpm;
@@ -216,29 +216,6 @@
     dur:   260.306
   };
 
-  var ARC = [
-    [0,        'void',    0.12],
-    [T.caught, 'shaft',   0.52],
-    [T.turn,   'corridor',0.60],
-    [T.subIn,  'sub',     0.80],
-    [T.subOut, 'shaft',   0.56],
-    [T.brk,    'void',    0.26],
-    [T.drop1,  'redline', 1.00],
-    [T.out1,   'core',    0.34],
-    [T.hollow, 'void',    0.10],
-    [T.drop2,  'kaleido', 1.00],
-    [T.dip,    'redline', 0.92],
-    [T.out2,   'corridor',0.44],
-    [T.last,   'redline', 0.96],
-    [T.finish, 'core',    0.30],
-    [T.dead,   'dead',    0.00]
-  ];
-
-  var SCENE_TINT = {
-    void:'#1C3A52', shaft:'#38E8FF', corridor:'#5AA8FF', sub:'#FF2D2D',
-    redline:'#FFB020', core:'#8FE8FF', kaleido:'#FF5CE0', dead:'#101820'
-  };
-
   var audio  = document.getElementById('track');
   var canvas = document.getElementById('viz');
   var gate   = document.getElementById('gate');
@@ -253,6 +230,125 @@
                window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var TAU = Math.PI * 2;
 
+  function clamp(x, a, b){ return x < a ? a : x > b ? b : x; }
+  function ease(x){ return x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x); }
+  function mix(a, b, t){
+    return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+  }
+  function rgba(c, a){
+    return 'rgba(' + (c[0] | 0) + ',' + (c[1] | 0) + ',' + (c[2] | 0) + ',' + a + ')';
+  }
+
+  var CYAN = [56, 232, 255], VIOLET = [150, 90, 255], AMBER = [255, 176, 32];
+  var RED = [255, 45, 45], PINK = [255, 92, 224];
+  var HOT = [255, 244, 224], STEEL = [26, 44, 66], INK = [3, 4, 10];
+
+  /* Hue is one number and it walks a ramp that never passes through grey.
+     Interpolating the number is what lets a section change colour on its
+     way in rather than at a cut. */
+  function ramp(x){
+    x = clamp(x, 0, 1);
+    if (x < 0.34) return mix(CYAN, VIOLET, x / 0.34);
+    if (x < 0.68) return mix(VIOLET, AMBER, (x - 0.34) / 0.34);
+    return mix(AMBER, RED, (x - 0.68) / 0.32);
+  }
+
+  /* ================= the cross section ================= */
+  /* SEG points around the tube. A look stores its own outline as x and y
+     offsets rather than as a side count, because two outlines can be
+     crossfaded point by point and two side counts cannot. This is what
+     lets the tube flatten into a road without anything being swapped. */
+  var SEG = 32;
+
+  function shape(o){
+    var L = {
+      n: 14, flat: 0, rad: 0.30, twist: 1, panel: 1, rail: 0.34,
+      spd: 1.6, bh: 1, bv: 1, hue: 0.2, tint: null, tintA: 0,
+      heat: 0.5, chroma: 0, star: 0.25, arc: 0, foldA: 0, alphaMul: 1
+    };
+    for (var key in o) L[key] = o[key];
+    L.px = new Float32Array(SEG + 1);
+    L.py = new Float32Array(SEG + 1);
+    L.alt = new Float32Array(SEG + 1);
+    for (var i = 0; i <= SEG; i++){
+      var th = (i % SEG) / SEG * TAU;
+      var half = Math.PI / L.n;
+      var a = ((th % (2 * half)) + 2 * half) % (2 * half) - half;
+      var r = Math.cos(half) / Math.cos(a);            /* regular n-gon */
+      L.px[i] = Math.cos(th) * r * (1 + L.flat * 2.5);
+      L.py[i] = Math.sin(th) * r * (1 - L.flat * 0.62);
+      /* one plate per side of the polygon, hard edged. Indexed off the
+         facet midpoint rather than off i, so it stays put when SEG and n
+         disagree, and it still crossfades between two looks cleanly. */
+      L.alt[i] = Math.floor(((i + 0.5) / SEG) * L.n) % 2;
+    }
+    return L;
+  }
+
+  var L_VOID = shape({ n: 12, rad: 0.30, twist: 1, panel: 0, rail: 0.10,
+                       spd: 0.26, hue: 0.03, heat: 0.12, star: 0.70, arc: 1,
+                       alphaMul: 0.36 });
+  var L_RUN  = shape({ n: 16, rad: 0.30, twist: 1, panel: 1, rail: 0.34,
+                       spd: 1.64, hue: 0.22, heat: 0.52, star: 0.10,
+                       alphaMul: 0.90 });
+  var L_ROAD = shape({ n: 10, flat: 0.86, rad: 0.29, twist: 0.14, panel: 1,
+                       rail: 0.80, spd: 1.80, bh: 0.55, bv: 0, hue: 0.30,
+                       heat: 0.60, star: 0.28, alphaMul: 0.92 });
+  var L_SUB  = shape({ n: 6, rad: 0.44, twist: 0.8, panel: 1, rail: 0.50,
+                       spd: 0.19, hue: 0.55, tint: RED, tintA: 0.80,
+                       heat: 0.80, star: 0.06, alphaMul: 1 });
+  var L_BRK  = shape({ n: 22, rad: 0.38, twist: 0.7, panel: 0.16, rail: 0.12,
+                       spd: 0.26, hue: 0.12, heat: 0.26, star: 0.60, arc: 1,
+                       alphaMul: 0.42 });
+  var L_RED  = shape({ n: 14, rad: 0.28, twist: 2.3, panel: 1, rail: 0.62,
+                       spd: 2.85, hue: 0.86, heat: 1.00, chroma: 1,
+                       star: 0.05, alphaMul: 1 });
+  var L_OPEN = shape({ n: 24, rad: 0.52, twist: 0.9, panel: 0.45, rail: 0.30,
+                       spd: 1.31, hue: 0.16, heat: 0.34, star: 0.45,
+                       alphaMul: 0.60 });
+  var L_HOLL = shape({ n: 24, rad: 0.46, twist: 0.4, panel: 0.05, rail: 0.06,
+                       spd: 0.24, hue: 0.04, heat: 0.10, star: 0.80, arc: 1,
+                       alphaMul: 0.30 });
+  var L_KAL  = shape({ n: 7, rad: 0.30, twist: 2.5, panel: 1, rail: 0.55,
+                       spd: 3.05, hue: 0.92, tint: PINK, tintA: 0.85,
+                       heat: 1.00, chroma: 0.8, star: 0.05, foldA: 1,
+                       alphaMul: 1 });
+  var L_GLIDE= shape({ n: 5, rad: 0.42, twist: 1.9, panel: 0.74, rail: 0.42,
+                       spd: 1.55, hue: 0.46, heat: 0.44, star: 0.32,
+                       alphaMul: 0.88 });
+  var L_DEAD = shape({ n: 24, rad: 0.40, twist: 0.2, panel: 0.04, rail: 0,
+                       spd: 0.046, hue: 0.02, heat: 0, star: 0.35,
+                       alphaMul: 0.22 });
+
+  /* mark, look, lead, morph, snap.
+
+     lead is how long before the mark the shape starts moving and morph is
+     how long it takes, so a drop is already on its way in while the bar
+     before it is still playing. snap is the separate, much shorter window
+     used for how hard it is lit, which is the part that is allowed to
+     arrive all at once. */
+  var ARC = [
+    [0,        L_VOID, 0,   0.10, 0.10, 'void'],
+    [T.caught, L_RUN,  2.3, 3.4,  0.40, 'run'],
+    [T.turn,   L_ROAD, 2.3, 5.0,  1.10, 'road'],
+    [T.subIn,  L_SUB,  2.3, 3.4,  0.55, 'sub'],
+    [T.subOut, L_RUN,  2.3, 3.4,  0.60, 'run'],
+    [T.brk,    L_BRK,  1.7, 3.6,  1.20, 'break'],
+    [T.drop1,  L_RED,  4.6, 5.2,  0.16, 'redline'],
+    [T.out1,   L_OPEN, 0.9, 4.4,  1.60, 'open'],
+    [T.hollow, L_HOLL, 1.7, 4.4,  1.40, 'hollow'],
+    [T.drop2,  L_KAL,  4.6, 5.2,  0.16, 'kaleido'],
+    [T.dip,    L_RED,  1.7, 2.4,  0.50, 'redline'],
+    [T.out2,   L_GLIDE,1.7, 4.2,  1.10, 'glide'],
+    [T.last,   L_RED,  2.3, 3.2,  0.24, 'redline'],
+    [T.finish, L_OPEN, 0.9, 2.8,  1.20, 'open'],
+    [T.dead,   L_DEAD, 0,   3.2,  2.00, 'dead']
+  ];
+
+  var SCENE_TINT = ['#1C3A52','#38E8FF','#5AA8FF','#FF2D2D','#38E8FF','#2C4A66',
+                    '#FFB020','#8FE8FF','#16222E','#FF5CE0','#FFB020','#B66CFF',
+                    '#FFB020','#8FE8FF','#101820'];
+
   (function segments(){
     var tr = document.getElementById('bartrack');
     for (var i = 0; i < ARC.length; i++){
@@ -261,8 +357,8 @@
       s.className = 'seg';
       s.style.left = (a / T.dur * 100) + '%';
       s.style.width = ((b - a) / T.dur * 100) + '%';
-      s.style.background = SCENE_TINT[ARC[i][1]];
-      s.style.opacity = 0.18 + ARC[i][2] * 0.55;
+      s.style.background = SCENE_TINT[i];
+      s.style.opacity = 0.18 + ARC[i][1].heat * 0.55;
       tr.insertBefore(s, fill);
     }
   })();
@@ -315,6 +411,72 @@
     return (s / (b - a)) / 255;
   }
 
+  /* ================= the blended state ================= */
+  var PX = new Float32Array(SEG + 1), PY = new Float32Array(SEG + 1);
+  var ALT = new Float32Array(SEG + 1);
+  var pyMax = 1;
+  var P = { rad: 0.30, twist: 1, panel: 0, rail: 0.1, spd: 0.26, bh: 1, bv: 1,
+            hue: 0.03, star: 0.7, arc: 1, foldA: 0, alphaMul: 0.36, flat: 0 };
+  var col = CYAN.slice();
+  var heat = 0, chroma = 0, rev = 0;
+  var sceneName = 'void', sceneIdx = 0, phraseRoot = 0, lastIdx = -1;
+  var surge = 0, surgeAt = -9, trans = 0, transDir = 1;
+
+  function state(t, dt){
+    var i, iSlow = 0, iFast = 0;
+    for (i = 1; i < ARC.length; i++){
+      if (t >= ARC[i][0] - ARC[i][2]) iSlow = i;
+      if (t >= ARC[i][0]) iFast = i;
+    }
+
+    /* shape: a long crossfade that opens before the mark */
+    var A = ARC[iSlow === 0 ? 0 : iSlow - 1][1], B = ARC[iSlow][1];
+    var raw = iSlow === 0 ? 1
+            : clamp((t - (ARC[iSlow][0] - ARC[iSlow][2])) / ARC[iSlow][3], 0, 1);
+    var u = ease(raw);
+    trans = Math.sin(raw * Math.PI);
+    transDir = B.spd >= A.spd ? 1 : -1;
+
+    for (i = 0; i <= SEG; i++){
+      PX[i]  = A.px[i]  + (B.px[i]  - A.px[i])  * u;
+      PY[i]  = A.py[i]  + (B.py[i]  - A.py[i])  * u;
+      ALT[i] = A.alt[i] + (B.alt[i] - A.alt[i]) * u;
+    }
+    pyMax = 0.001;
+    for (i = 0; i < SEG; i++){
+      var ay = PY[i] < 0 ? -PY[i] : PY[i];
+      if (ay > pyMax) pyMax = ay;
+    }
+    var keys = ['rad','twist','panel','rail','spd','bh','bv','hue','star',
+                'arc','foldA','alphaMul','flat'];
+    for (i = 0; i < keys.length; i++){
+      var k = keys[i];
+      P[k] = A[k] + (B[k] - A[k]) * u;
+    }
+    var cA = A.tint ? mix(ramp(A.hue), A.tint, A.tintA) : ramp(A.hue);
+    var cB = B.tint ? mix(ramp(B.hue), B.tint, B.tintA) : ramp(B.hue);
+    col = mix(cA, cB, u);
+
+    /* brightness and grain: the short window, anchored on the mark */
+    var C = ARC[iFast === 0 ? 0 : iFast - 1][1], D = ARC[iFast][1];
+    var v = iFast === 0 ? 1 : ease((t - ARC[iFast][0]) / ARC[iFast][4]);
+    heat   = C.heat   + (D.heat   - C.heat)   * v;
+    chroma = C.chroma + (D.chroma - C.chroma) * v;
+
+    if (iFast !== lastIdx){
+      if (lastIdx >= 0 && D.heat > C.heat + 0.28) surgeAt = ARC[iFast][0];
+      lastIdx = iFast;
+      sceneIdx = iFast;
+      sceneName = ARC[iFast][5];
+      phraseRoot = Math.round((ARC[iFast][0] - GRID.t0) / SPB);
+    }
+    var sd = t - surgeAt;
+    surge = sd >= 0 && sd < 1.6 ? Math.pow(1 - sd / 1.6, 2.4) : 0;
+
+    var target = heat * 0.72 + energy(1, 22) * 0.44;
+    rev += (target - rev) * (dt ? clamp(dt * (target > rev ? 9 : 1.5), 0, 1) : 1);
+  }
+
   /* ================= the clock ================= */
   var lastBeat = -1e9, beatAt = -9, beatHard = 0, beatNo = 0;
   var tearAt = -9, chromaAt = -9, blastAt = -9, shake = 0;
@@ -330,10 +492,6 @@
     beatHard = Math.min(1, energy(1, 22) * 1.7);
 
     var onPhrase = ((n - phraseRoot) % PHRASE + PHRASE) % PHRASE === 0;
-
-    /* The room moves on every beat and it moves properly at the top of the
-       rev range. Offset and rotation only, so it reads as force without
-       spending anything against the flash budget. */
     shake = Math.max(shake, beatHard * heat * (onPhrase ? 1 : 0.40));
 
     if (reduce) return;
@@ -341,52 +499,6 @@
     if (heat > 0.85 && (onPhrase || beatHard > 0.82)) tearAt = beatAt;
     if (heat > 0.72 && onPhrase) chromaAt = beatAt;
     if (heat > 0.45) sparks((onPhrase ? 30 : 10) * heat);
-  }
-
-  /* ================= state ================= */
-  function clamp(x, a, b){ return x < a ? a : x > b ? b : x; }
-
-  var scene = 'void', sceneAt = -9, phraseRoot = 0;
-  var heat = 0, heatT = 0, rev = 0;
-
-  function state(t, dt){
-    var i, k = 0;
-    for (i = 0; i < ARC.length; i++) if (t >= ARC[i][0]) k = i;
-    var want = ARC[k][1];
-    heatT = ARC[k][2];
-    if (want !== scene){
-      scene = want; sceneAt = t;
-      phraseRoot = Math.round((ARC[k][0] - GRID.t0) / SPB);
-    }
-    heat += (heatT - heat) * (dt ? clamp(dt * 3.2, 0, 1) : 1);
-    var target = heat * 0.72 + energy(1, 22) * 0.44;
-    rev += (target - rev) * (dt ? clamp(dt * (target > rev ? 9 : 1.5), 0, 1) : 1);
-  }
-
-  /* ================= colour ================= */
-  function mix(a, b, t){
-    return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
-  }
-  function rgba(c, a){
-    return 'rgba(' + (c[0] | 0) + ',' + (c[1] | 0) + ',' + (c[2] | 0) + ',' + a + ')';
-  }
-  var CYAN = [56, 232, 255], AMBER = [255, 176, 32], RED = [255, 45, 45];
-  var VIOLET = [150, 90, 255];
-  var HOT = [255, 244, 224], PINK = [255, 92, 224], STEEL = [26, 44, 66];
-  var INK = [3, 4, 10];
-
-  /* One axis: how hard it is being pushed. Cold cyan up to hot metal, by
-     way of violet, because cyan lerped straight at amber goes through grey
-     and the middle of the track came out the colour of pond water. */
-  function ramp(x){
-    x = clamp(x, 0, 1);
-    return x < 0.5 ? mix(CYAN, VIOLET, x * 2) : mix(VIOLET, AMBER, (x - 0.5) * 2);
-  }
-  function key(){
-    var c = scene === 'sub' ? RED
-          : scene === 'kaleido' ? PINK
-          : ramp((heat - 0.35) / 0.45);
-    return mix(c, RED, clamp((heat - 0.82) / 0.18, 0, 1) * 0.55);
   }
 
   /* ================= geometry ================= */
@@ -408,23 +520,18 @@
   }
   window.addEventListener('resize', size);
 
-  var RINGS = 24, SPACE = 300, ZNEAR = 55;
+  var RINGS = 22, SPACE = 300, ZNEAR = 55;
   var SPAN = RINGS * SPACE;
   var travel = 0, spin = 0, bendT = 0;
 
-  /* The shaft is not straight. Offset is a function of a ring's real z, so
-     as a ring comes at you its offset falls to zero on its own and the
-     whole thing reads as a road with bends in it rather than an onion. */
-  var bx = 0, by = 0, bendH = 1, bendV = 1;
+  var bx = 0, by = 0;
   function bendAt(z){
     var f = z / SPAN;
     f *= f;
-    bx = Math.sin(z * 0.00040 + bendT) * M * 0.62 * f * bendH;
-    by = Math.cos(z * 0.00029 + bendT * 0.74) * M * 0.44 * f * bendV;
+    bx = Math.sin(z * 0.00040 + bendT) * M * 0.62 * f * P.bh;
+    by = Math.cos(z * 0.00029 + bendT * 0.74) * M * 0.44 * f * P.bv;
   }
 
-  /* A pressure wave that runs away down the shaft when a phrase lands, so
-     the walls blow out in a ring you can watch travel into the distance. */
   function blast(n, t){
     var d = t - blastAt;
     if (d < 0 || d > 1.5) return 0;
@@ -433,12 +540,10 @@
   }
 
   function ringR(n, t){
-    return M * (0.30 + band(n) * 0.22 + blast(n, t)) *
+    return M * (P.rad + band(n) * 0.22 + blast(n, t)) *
            (1 + Math.sin(n * 0.7 + travel * 0.0014) * 0.06);
   }
 
-  /* ord* is preallocated: this runs up to five times a frame and the
-     garbage from rebuilding an array of pairs showed up in the frame times. */
   var ordZ = new Float32Array(64), ordN = new Int16Array(64), ordC = 0;
   function march(){
     ordC = 0;
@@ -453,80 +558,99 @@
     }
   }
 
-  /* ---- the shaft ---- */
-  function shaft(sides, t, k, alpha, panels){
-    var i, n, z, zz, r, rr, s, ss, a, aa, ox, oy, oxx, oyy;
+  /* Two rolling buffers of projected points: the ring being drawn and the
+     one behind it, so the wall between them can be filled without
+     projecting anything twice. Marching far to near means consecutive
+     entries are always one SPACE apart, and the near one paints over the
+     far one, which is the whole depth cue. */
+  var aX = new Float32Array(SEG + 1), aY = new Float32Array(SEG + 1);
+  var bX = new Float32Array(SEG + 1), bY = new Float32Array(SEG + 1);
+
+  function vortex(t, k, alpha, panelAmt, xoff, ribsOnly, near){
     march();
+    var curX = aX, curY = aY, prvX = bX, prvY = bY, sw;
+    var have = false, i, j;
     for (var oi = 0; oi < ordC; oi++){
-      z = ordZ[oi]; n = ordN[oi];
+      var z = ordZ[oi], n = ordN[oi];
       var depth = 1 - z / (SPAN + ZNEAR);
-      if (depth < 0.015) continue;
-      r = ringR(n, t);
-      s = FL / z;
-      bendAt(z); ox = cx + bx; oy = cy + by;
+      if (depth < (near || 0.015)){ have = false; continue; }
+      var r = ringR(n, t), s = FL / z, rs = r * s;
+      bendAt(z);
+      var ox = cx + bx + xoff, oy = cy + by;
+      /* the twist is what makes it a vortex rather than a pipe: each ring
+         is turned a little more than the one behind it */
+      var rot = spin + n * 0.10 * P.twist;
+      var ca = Math.cos(rot), sa = Math.sin(rot);
+      for (i = 0; i <= SEG; i++){
+        var qx = PX[i], qy = PY[i];
+        curX[i] = ox + (qx * ca - qy * sa) * rs;
+        curY[i] = oy + (qx * sa + qy * ca) * rs;
+      }
 
       var lit = alpha * Math.pow(depth, 1.15);
       var bd = band(n);
 
-      /* The wall between this rib and the one just in front of it, filled.
-         A line has no weight and this track is nothing but weight. */
-      if (panels){
-        zz = z - SPACE;
-        if (zz > ZNEAR){
-          rr = ringR((n - 1 + RINGS) % RINGS, t);
-          ss = FL / zz;
-          bendAt(zz); oxx = cx + bx; oyy = cy + by;
-          for (i = 0; i < sides; i++){
-            a  = spin + (i / sides) * TAU + n * 0.10;
-            aa = spin + ((i + 1) / sides) * TAU + n * 0.10;
-            /* a light from above, so the shaft has a roof and a floor */
-            var face = 0.5 - Math.cos(a + TAU / (sides * 2)) * 0.5;
-            var shade = (0.14 + face * 0.36 + bd * 0.27) * lit;
-            if (i % 2) shade *= 0.52;
-            if (shade < 0.010) continue;
-            ctx.fillStyle = rgba(mix(mix(STEEL, k, 0.58), HOT, bd * 0.28), shade);
-            ctx.beginPath();
-            ctx.moveTo(ox  + Math.cos(a)  * r  * s,  oy  + Math.sin(a)  * r  * s);
-            ctx.lineTo(ox  + Math.cos(aa) * r  * s,  oy  + Math.sin(aa) * r  * s);
-            ctx.lineTo(oxx + Math.cos(aa) * rr * ss, oyy + Math.sin(aa) * rr * ss);
-            ctx.lineTo(oxx + Math.cos(a)  * rr * ss, oyy + Math.sin(a)  * rr * ss);
-            ctx.closePath();
-            ctx.fill();
-          }
+      if (have && !ribsOnly && panelAmt > 0.02 && rs > M * 0.045){
+        for (i = 0; i < SEG; i += 2){
+          j = i + 2;
+          /* lit from above: judged from where the facet sits on screen, so
+             it stays right through any rotation, squash or morph */
+          if ((curX[i] < 0 && curX[j] < 0 && prvX[i] < 0 && prvX[j] < 0) ||
+              (curX[i] > W && curX[j] > W && prvX[i] > W && prvX[j] > W) ||
+              (curY[i] < 0 && curY[j] < 0 && prvY[i] < 0 && prvY[j] < 0) ||
+              (curY[i] > H && curY[j] > H && prvY[i] > H && prvY[j] > H)) continue;
+          var my = (curY[i] + curY[j]) * 0.5 - oy;
+          var face = clamp(0.5 - my / (2.2 * pyMax * rs), 0, 1);
+          var shade = (0.14 + face * 0.36 + bd * 0.27) * lit * panelAmt;
+          shade *= 0.46 + ALT[i + 1] * 0.54;
+          if (shade < 0.010) continue;
+          ctx.fillStyle = rgba(mix(mix(STEEL, k, 0.58), HOT, bd * 0.28), shade);
+          ctx.beginPath();
+          ctx.moveTo(curX[i], curY[i]);
+          ctx.lineTo(curX[j], curY[j]);
+          ctx.lineTo(prvX[j], prvY[j]);
+          ctx.lineTo(prvX[i], prvY[i]);
+          ctx.closePath();
+          ctx.fill();
         }
       }
 
-      /* the rib itself: bright, and thick when it is close */
-      if (r * s < M * 0.030) continue;
-      ctx.globalAlpha = Math.min(1, lit * (0.58 + bd * 0.58));
-      ctx.strokeStyle = rgba(mix(k, HOT, bd * 0.55), 1);
-      ctx.lineWidth = 0.7 + depth * 6 + bd * 1.7;
-      ctx.beginPath();
-      for (i = 0; i <= sides; i++){
-        a = spin + (i / sides) * TAU + n * 0.10;
-        var px = ox + Math.cos(a) * r * s, py = oy + Math.sin(a) * r * s;
-        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      if (rs > M * 0.030){
+        ctx.globalAlpha = Math.min(1, lit * (0.58 + bd * 0.58));
+        ctx.strokeStyle = rgba(mix(k, HOT, bd * 0.55), 1);
+        ctx.lineWidth = 0.7 + depth * 6 + bd * 1.7;
+        ctx.beginPath();
+        ctx.moveTo(curX[0], curY[0]);
+        for (i = 1; i <= SEG; i++) ctx.lineTo(curX[i], curY[i]);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
       }
-      ctx.stroke();
-      ctx.globalAlpha = 1;
+
+      sw = prvX; prvX = curX; curX = sw;
+      sw = prvY; prvY = curY; curY = sw;
+      have = true;
     }
   }
 
-  /* ---- rails running the length of it, which is what sells the speed ---- */
-  function rails(sides, t, k, alpha){
+  /* Lines running the length of it. On the round looks they are seams; on
+     the flattened one they land on the floor and read as lane markings. */
+  function rails(t, k, alpha){
+    if (alpha < 0.02) return;
     ctx.globalAlpha = alpha;
     ctx.strokeStyle = rgba(mix(k, HOT, 0.40), 1);
     ctx.lineWidth = 1.8;
-    for (var i = 0; i < sides; i += 2){
+    for (var i = 0; i < SEG; i += 4){
       ctx.beginPath();
       var first = true;
       for (var n = 0; n < RINGS; n++){
         var z = ((n * SPACE - travel) % SPAN + SPAN) % SPAN + ZNEAR;
         if (z > SPAN * 0.7) continue;
-        var r = ringR(n, t), s = FL / z;
+        var r = ringR(n, t), s = FL / z, rs = r * s;
         bendAt(z);
-        var a = spin + (i / sides) * TAU + n * 0.10;
-        var px = cx + bx + Math.cos(a) * r * s, py = cy + by + Math.sin(a) * r * s;
+        var rot = spin + n * 0.10 * P.twist;
+        var ca = Math.cos(rot), sa = Math.sin(rot);
+        var px = cx + bx + (PX[i] * ca - PY[i] * sa) * rs;
+        var py = cy + by + (PX[i] * sa + PY[i] * ca) * rs;
         if (first){ ctx.moveTo(px, py); first = false; } else ctx.lineTo(px, py);
       }
       ctx.stroke();
@@ -534,100 +658,7 @@
     ctx.globalAlpha = 1;
   }
 
-  /* ---- a flat corridor: floor and ceiling in solid slabs ---- */
-  function corridor(t, k, alpha, bass){
-    var lift = M * (0.34 + bass * 0.12);
-    march();
-    for (var oi = 0; oi < ordC; oi++){
-      var z1 = ordZ[oi], nn = ordN[oi], z2 = z1 - SPACE;
-      if (z2 <= ZNEAR) continue;
-      var d = 1 - z1 / (SPAN + ZNEAR);
-      if (d < 0.02) continue;
-      var s1 = FL / z1, s2 = FL / z2;
-      var w1 = Math.max(M * 2.6 * s1, W), w2 = Math.max(M * 2.6 * s2, W);
-      bendAt(z1); var x1 = cx + bx, y1 = cy + by;
-      bendAt(z2); var x2 = cx + bx, y2 = cy + by;
-      var bd = band(nn);
-      var sh = alpha * Math.pow(d, 1.15) * (0.11 + bd * 0.52) * (nn % 2 ? 0.48 : 1);
-      ctx.fillStyle = rgba(mix(mix(STEEL, k, 0.52), HOT, bd * 0.24), sh);
-      for (var sg = -1; sg <= 1; sg += 2){
-        ctx.beginPath();
-        ctx.moveTo(x1 - w1, y1 + sg * lift * s1);
-        ctx.lineTo(x1 + w1, y1 + sg * lift * s1);
-        ctx.lineTo(x2 + w2, y2 + sg * lift * s2);
-        ctx.lineTo(x2 - w2, y2 + sg * lift * s2);
-        ctx.closePath();
-        ctx.fill();
-      }
-      ctx.globalAlpha = Math.min(1, alpha * Math.pow(d, 1.05) * (0.35 + bd));
-      ctx.strokeStyle = rgba(mix(k, HOT, bd * 0.5), 1);
-      ctx.lineWidth = 0.8 + d * 4.5;
-      for (sg = -1; sg <= 1; sg += 2){
-        ctx.beginPath();
-        ctx.moveTo(x1 - w1, y1 + sg * lift * s1);
-        ctx.lineTo(x1 + w1, y1 + sg * lift * s1);
-        ctx.stroke();
-      }
-      ctx.globalAlpha = 1;
-    }
-  }
-
-  /* ---- a solid icosahedron, back faces thrown away ---- */
-  var VERTS = null, FACES = null, rx = 0, ry = 0;
-  function solid(){
-    if (VERTS) return;
-    var p = 1.6180339887, v = [], i, j, a, b, c, sg = [1, -1];
-    for (i = 0; i < 2; i++) for (j = 0; j < 2; j++){
-      v.push([0, sg[i], sg[j] * p]);
-      v.push([sg[i], sg[j] * p, 0]);
-      v.push([sg[i] * p, 0, sg[j]]);
-    }
-    VERTS = v;
-    var edge = function(x, y){
-      var dx = v[x][0]-v[y][0], dy = v[x][1]-v[y][1], dz = v[x][2]-v[y][2];
-      return Math.abs(dx*dx + dy*dy + dz*dz - 4) < 0.001;
-    };
-    FACES = [];
-    for (a = 0; a < 12; a++) for (b = a+1; b < 12; b++) for (c = b+1; c < 12; c++)
-      if (edge(a,b) && edge(b,c) && edge(a,c)) FACES.push([a,b,c]);
-  }
-
-  var PT = [];
-  function core(k, alpha, blow){
-    solid();
-    var sa = Math.sin(rx), ca = Math.cos(rx), sb = Math.sin(ry), cb = Math.cos(ry);
-    var R = M * (0.19 + blow * 0.17), zc = FL * 1.55, i;
-    for (i = 0; i < 12; i++){
-      var x = VERTS[i][0], y = VERTS[i][1], z = VERTS[i][2];
-      var y2 = y * ca - z * sa, z2 = y * sa + z * ca;
-      var x2 = x * cb + z2 * sb, z3 = -x * sb + z2 * cb;
-      var s = FL / Math.max(70, zc + z3 * R);
-      PT[i] = PT[i] || [0, 0, 0];
-      PT[i][0] = cx + x2 * R * s; PT[i][1] = cy + y2 * R * s; PT[i][2] = z3;
-    }
-    for (i = 0; i < FACES.length; i++){
-      var f = FACES[i], A = PT[f[0]], B = PT[f[1]], C = PT[f[2]];
-      /* For a solid centred on the origin the outward normal of a face is
-         its own centroid, so a face points at the camera exactly when its
-         centroid sits in front of the centre. No winding order needed. */
-      var cz = (A[2] + B[2] + C[2]) / 3;
-      if (cz >= 0) continue;
-      var facing = clamp(-cz / 1.51, 0, 1);
-      ctx.fillStyle = rgba(mix(mix(STEEL, k, 0.72), HOT, facing * 0.45),
-                           alpha * (0.14 + facing * 0.72));
-      ctx.beginPath();
-      ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]); ctx.lineTo(C[0], C[1]);
-      ctx.closePath();
-      ctx.fill();
-      ctx.globalAlpha = alpha * (0.2 + facing * 0.5);
-      ctx.strokeStyle = rgba(mix(k, HOT, 0.45), 1);
-      ctx.lineWidth = 1.4;
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-    }
-  }
-
-  /* ---- the vanishing point. something has to be down there. ---- */
+  /* the light at the end of it */
   function eye(k, power, bass){
     var r = M * (0.05 + bass * 0.10 + power * 0.16);
     bendAt(ZNEAR + SPAN * 0.96);
@@ -677,6 +708,7 @@
   /* ---- stars for the empty stretches ---- */
   var STARS = 200, stx = null, sty = null, stz = null;
   function stars(k, alpha, streak){
+    if (alpha < 0.02) return;
     if (!stx){
       stx = new Float32Array(STARS); sty = new Float32Array(STARS);
       stz = new Float32Array(STARS);
@@ -704,13 +736,13 @@
   }
   function starMarch(d){ if (stz) for (var i = 0; i < STARS; i++) stz[i] -= d; }
 
-  /* ---- the rev counter. the track is named after it, so it is not small. ---- */
+  /* ---- the rev counter. the track is named after it. ---- */
   function gauge(bass){
     var r = M * 0.142, gx = W - r - 38, gy = H - r - 74;
     if (W < 820){ r = M * 0.112; gx = W - r - 18; gy = H - r - 84; }
     var a0 = Math.PI * 0.74, a1 = Math.PI * 2.26;
     var v = clamp(rev, 0, 1.12), hot = v > 0.78;
-    var kk = hot ? mix(AMBER, RED, clamp((v - 0.78) / 0.3, 0, 1)) : key();
+    var kk = hot ? mix(AMBER, RED, clamp((v - 0.78) / 0.3, 0, 1)) : col;
 
     ctx.globalAlpha = 0.34;
     ctx.strokeStyle = rgba(STEEL, 1);
@@ -805,7 +837,7 @@
   }
 
   /* ================= the loop ================= */
-  var last = 0, now8 = 0, roll = 0, cut = 0;
+  var last = 0, now8 = 0, roll = 0;
 
   function frame(ms){
     requestAnimationFrame(frame);
@@ -824,24 +856,28 @@
     var since = t - beatAt;
     var pulse = since >= 0 && since < SPB * 0.9
       ? Math.pow(1 - since / (SPB * 0.9), 2.2) * beatHard : 0;
-    var k = key();
+    var k = col;
 
-    var sc = t - sceneAt;
-    cut = sc >= 0 && sc < 0.26 ? Math.pow(1 - sc / 0.26, 2) : 0;
-
-    /* Solid walls do not want a heavy smear behind them, they want to be
-       seen. So this is a clear with a little carry, not a wake. */
     ctx.globalCompositeOperation = 'source-over';
     ctx.fillStyle = rgba(INK, 0.52 + (1 - heat) * 0.34);
     ctx.fillRect(0, 0, W, H);
 
-    var speed = (scene === 'sub' ? 340 : scene === 'void' ? 460 : scene === 'dead' ? 80
-               : 1200 + heat * 3200) * (1 + bass * 0.75);
+    /* Speed comes from the crossfade, so it is already climbing while the
+       bar before a drop is still playing, and the surge on the mark is the
+       kick on top of it. The bass moves it too, which is the part you feel
+       rather than see. */
+    var speed = 1750 * P.spd * (1 + bass * 0.75) *
+                (1 + surge * 1.25) * (1 + trans * 0.55 * transDir);
     travel += dt * speed;
     starMarch(dt * speed * 1.15);
-    spin += dt * (0.05 + heat * 0.24 + (scene === 'kaleido' ? 0.40 : 0));
+    spin += dt * (0.05 + heat * 0.24 + P.twist * 0.06 +
+                  trans * 0.70 * (1 - P.flat)) * (1 - P.flat * 0.96);
+    if (P.flat > 0.02){
+      var sw = ((spin % TAU) + TAU) % TAU;
+      if (sw > Math.PI) sw -= TAU;
+      spin -= sw * Math.min(1, dt * 2.2 * P.flat);
+    }
     bendT += dt * (0.16 + heat * 0.34);
-    rx += dt * (0.33 + heat * 0.45); ry += dt * (0.22 + bass * 0.8);
     roll += dt * (heat > 0.85 ? 0.22 : 0.05) * Math.sin(now8 * 0.31);
 
     shake *= Math.pow(0.0018, dt);
@@ -849,110 +885,61 @@
 
     ctx.save();
     ctx.translate(cx + (Math.random() - 0.5) * amp, cy + (Math.random() - 0.5) * amp);
-    var rollK = scene === 'corridor' ? 0.14 : 1;
-    ctx.rotate(roll * rollK + (Math.random() - 0.5) * 0.014 * shake);
-    var punch = 1 + pulse * (0.008 + heat * 0.032);
+    ctx.rotate(roll * (1 - P.flat * 0.86) + (Math.random() - 0.5) * 0.014 * shake);
+    var punch = 1 + pulse * (0.008 + heat * 0.032) + surge * 0.03;
     ctx.scale(punch, punch);
     ctx.translate(-cx, -cy);
 
-    /* ---- the scene ---- */
-    if (scene === 'void' || scene === 'dead'){
-      stars(mix(STEEL, k, 0.7), 0.55, speed * 0.06);
-      if (scene !== 'dead'){
-        shaft(12, t, k, 0.36, false);
-        eye(k, pulse * 0.2, bass * 0.5);
-        ctx.globalCompositeOperation = 'lighter';
-        ctx.globalAlpha = 0.5;
-        ctx.strokeStyle = rgba(k, 1);
-        ctx.lineWidth = 1.6;
-        ctx.beginPath();
-        for (var q2 = 0; q2 <= N; q2++){
-          ctx.lineTo((q2 / N) * W, cy + M * 0.34 - level[q2 % N] * M * 0.17);
-        }
-        ctx.stroke();
-        ctx.globalAlpha = 1;
-        ctx.globalCompositeOperation = 'source-over';
-      }
+    stars(mix(STEEL, k, 0.7), P.star * 0.7, speed * 0.055);
 
-    } else if (scene === 'corridor'){
-      /* a road bends sideways. it does not bend upwards, or the far floor
-         ends up above the near ceiling and the room turns inside out. */
-      bendH = 0.55; bendV = 0;
-      corridor(t, k, 0.9, bass);
-      stars(k, 0.24, speed * 0.05);
-      eye(k, pulse * 0.35, bass);
-      bendH = 1; bendV = 1;
-
-    } else if (scene === 'sub'){
-      /* no top end in the music, so no detail on the screen. huge and slow. */
-      shaft(6, t, k, 1.0, true);
-      rails(6, t, k, 0.5);
-      ctx.globalCompositeOperation = 'lighter';
-      ctx.globalAlpha = 0.22 + bass * 0.42;
-      var g2 = ctx.createRadialGradient(cx, cy, 0, cx, cy, M * (0.34 + bass * 0.5));
-      g2.addColorStop(0, rgba(RED, 0.5));
-      g2.addColorStop(1, rgba(RED, 0));
-      ctx.fillStyle = g2; ctx.fillRect(0, 0, W, H);
-      ctx.globalAlpha = 1;
-      ctx.globalCompositeOperation = 'source-over';
-
-    } else if (scene === 'core'){
-      stars(mix(STEEL, k, 0.7), 0.34, speed * 0.05);
-      shaft(12, t, k, 0.34, false);
-      eye(k, pulse * 0.3, bass * 0.7);
-      core(k, 0.95, pulse * 0.45 + bass * 0.22);
-
-    } else if (scene === 'kaleido'){
-      var folds = slow > 0.5 ? 3 : 5;
-      for (var fo = 0; fo < folds; fo++){
+    /* the kaleidoscope is the same vortex seen in a folded mirror, and it
+       fades in and out rather than being switched on */
+    if (P.foldA > 0.02 && !reduce){
+      var folds = slow > 0.5 ? 3 : 4;
+      for (var fo = 1; fo < folds; fo++){
         ctx.save();
         ctx.translate(cx, cy);
         ctx.rotate((fo / folds) * TAU);
         if (fo % 2) ctx.scale(1, -1);
         ctx.translate(-cx, -cy);
-        shaft(7, t, fo % 2 ? mix(k, HOT, 0.3) : k,
-              fo === 0 ? 0.82 : fo === 1 ? 0.30 : 0.22, fo < 2);
+        vortex(t, fo % 2 ? mix(k, HOT, 0.3) : k,
+               P.alphaMul * P.foldA * (fo === 1 ? 0.40 : 0.28),
+               0, 0, true, 0.42);
         ctx.restore();
-      }
-      eye(mix(k, HOT, 0.35), pulse * 0.5, bass * 0.9);
-      core(mix(k, HOT, 0.4), 0.58, pulse * 0.5);
-      if (!reduce){
-        var kab = 2 + pulse * 7;
-        var kch = [[[255, 40, 140], -kab], [[90, 160, 255], kab]];
-        ctx.globalCompositeOperation = 'lighter';
-        for (var kc = 0; kc < 2; kc++){
-          ctx.save();
-          ctx.translate(kch[kc][1], 0);
-          shaft(7, t, kch[kc][0], 0.24, false);
-          ctx.restore();
-        }
-        ctx.globalCompositeOperation = 'source-over';
-      }
-
-    } else { /* shaft and redline */
-      var red = scene === 'redline';
-      shaft(red ? 14 : 16, t, k, red ? 1.0 : 0.9, true);
-      rails(red ? 14 : 16, t, k, red ? 0.55 : 0.34);
-      eye(k, pulse * (red ? 0.6 : 0.3), bass);
-      if (red && !reduce){
-        /* Three offset rib passes, one per channel, so the edges fringe the
-           way a lens does when it is being asked for more than it has. */
-        var ab = 1.5 + pulse * 6 + heat * 2.5;
-        var ch = [[[255, 24, 24], -ab], [[60, 255, 110], 0], [[70, 110, 255], ab]];
-        ctx.globalCompositeOperation = 'lighter';
-        for (var ci = 0; ci < 3; ci++){
-          ctx.save();
-          ctx.translate(ch[ci][1], 0);
-          shaft(14, t, ch[ci][0], 0.26, false);
-          ctx.restore();
-        }
-        ctx.globalCompositeOperation = 'source-over';
       }
     }
 
-    if (scene !== 'dead') drawSparks(dt, k, speed);
+    vortex(t, k, P.alphaMul, P.panel, 0, false);
+    rails(t, k, P.rail);
+    eye(k, pulse * (0.3 + heat * 0.35) + trans * 0.55, bass);
 
-    /* the pressure front, drawn as a ring you can watch leave */
+    if (chroma > 0.05 && !reduce){
+      var ab = (1.5 + pulse * 6 + heat * 2.5) * chroma;
+      var ch = [[[255, 24, 24], -ab], [[70, 110, 255], ab]];
+      ctx.globalCompositeOperation = 'lighter';
+      for (var ci = 0; ci < 2; ci++){
+        vortex(t, ch[ci][0], 0.26 * chroma, 0, ch[ci][1], true, 0.48);
+      }
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    if (P.spd > 0.1) drawSparks(dt, k, speed);
+
+    /* the spectrum, for the stretches with nothing else in them */
+    if (P.arc > 0.03){
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = P.arc * 0.5;
+      ctx.strokeStyle = rgba(k, 1);
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      for (var q2 = 0; q2 <= N; q2++){
+        ctx.lineTo((q2 / N) * W, cy + M * 0.34 - level[q2 % N] * M * 0.17);
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
     var bdd = t - blastAt;
     if (bdd >= 0 && bdd < 1.1){
       var bp = bdd / 1.1;
@@ -982,9 +969,10 @@
       }
     }
 
-    if (cut > 0.01){
+    /* the surge reads as the tunnel being pulled at, not as a flash */
+    if (surge > 0.01){
       ctx.globalCompositeOperation = 'lighter';
-      ctx.globalAlpha = cut * 0.09;
+      ctx.globalAlpha = surge * 0.09;
       ctx.fillStyle = rgba(HOT, 1);
       ctx.fillRect(0, 0, W, H);
       ctx.globalAlpha = 1;
@@ -1012,8 +1000,9 @@
 
   function jumped(){
     lastBeat = -1e9; beatAt = -9; beatHard = 0;
-    tearAt = chromaAt = blastAt = sceneAt = -9;
-    travel = 0; stz = null; stx = null; sty = null; SP.length = 0; shake = 0;
+    tearAt = chromaAt = blastAt = surgeAt = -9;
+    travel = 0; stz = null; stx = null; sty = null; SP.length = 0;
+    shake = 0; lastIdx = -1;
   }
 
   bar.addEventListener('click', function(e){
@@ -1061,10 +1050,14 @@
   });
 
   window.__od = {
-    T: T, grid: GRID, arc: ARC,
+    T: T, grid: GRID,
     at: function(t){
-      state(t);
-      return { scene: scene, heat: +heat.toFixed(3), rev: +rev.toFixed(3),
+      state(t, 0);
+      return { scene: sceneName, heat: +heat.toFixed(3), rev: +rev.toFixed(3),
+               spd: +P.spd.toFixed(3), panel: +P.panel.toFixed(3),
+               hue: +P.hue.toFixed(3), surge: +surge.toFixed(3),
+               trans: +trans.toFixed(3), dir: transDir,
+               flat: +P.flat.toFixed(3),
                shake: +shake.toFixed(3), sparks: SP.length };
     }
   };
