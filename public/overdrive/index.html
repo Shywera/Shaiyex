@@ -516,6 +516,7 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     cx = W / 2; cy = H / 2; M = Math.min(W, H);
     FL = M * 0.95;
+    starLim2 = W * W + H * H;
     bands(); overKey = '';
   }
   window.addEventListener('resize', size);
@@ -639,19 +640,21 @@
     ctx.globalAlpha = alpha;
     ctx.strokeStyle = rgba(mix(k, HOT, 0.40), 1);
     ctx.lineWidth = 1.8;
+    march();
     for (var i = 0; i < SEG; i += 4){
       ctx.beginPath();
-      var first = true;
-      for (var n = 0; n < RINGS; n++){
-        var z = ((n * SPACE - travel) % SPAN + SPAN) % SPAN + ZNEAR;
-        if (z > SPAN * 0.7) continue;
+      var prevN = -99;
+      for (var oi = 0; oi < ordC; oi++){
+        var z = ordZ[oi], n = ordN[oi];
+        if (z > SPAN * 0.7){ prevN = -99; continue; }
         var r = ringR(n, t), s = FL / z, rs = r * s;
         bendAt(z);
         var rot = spin + n * 0.10 * P.twist;
         var ca = Math.cos(rot), sa = Math.sin(rot);
         var px = cx + bx + (PX[i] * ca - PY[i] * sa) * rs;
         var py = cy + by + (PX[i] * sa + PY[i] * ca) * rs;
-        if (first){ ctx.moveTo(px, py); first = false; } else ctx.lineTo(px, py);
+        if (n === prevN - 1) ctx.lineTo(px, py); else ctx.moveTo(px, py);
+        prevN = n;
       }
       ctx.stroke();
     }
@@ -694,7 +697,8 @@
       p.z -= speed * p.v * dt;
       p.r += M * 0.05 * p.spr * dt;
       p.life -= p.decay * dt;
-      if (p.z < 45 || p.life <= 0){ SP.splice(i, 1); continue; }
+      if (p.z < 45 || p.life <= 0 ||
+          p.r * FL / p.z > M * 2.2){ SP.splice(i, 1); continue; }
       var s1 = FL / p.z, s2 = FL / (p.z + speed * p.v * 0.05);
       var c = Math.cos(p.a), sn = Math.sin(p.a);
       bendAt(p.z);
@@ -706,7 +710,7 @@
   }
 
   /* ---- stars for the empty stretches ---- */
-  var STARS = 200, stx = null, sty = null, stz = null;
+  var STARS = 200, stx = null, sty = null, stz = null, starLim2 = 1e9;
   function stars(k, alpha, streak){
     if (alpha < 0.02) return;
     if (!stx){
@@ -726,8 +730,10 @@
     for (var j = 0; j < STARS; j++){
       var z = stz[j];
       if (z < 60){ stz[j] = SPAN; z = SPAN; }
-      var s = FL / z, s2 = FL / (z + streak);
-      ctx.moveTo(cx + stx[j] * s,  cy + sty[j] * s);
+      var s = FL / z, ax = stx[j] * s, ay = sty[j] * s;
+      if (ax * ax + ay * ay > starLim2){ stz[j] = SPAN; continue; }
+      var s2 = FL / (z + streak);
+      ctx.moveTo(cx + ax, cy + ay);
       ctx.lineTo(cx + stx[j] * s2, cy + sty[j] * s2);
     }
     ctx.stroke();
