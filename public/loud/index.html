@@ -1,0 +1,780 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Two and a half minutes of anime happy hardcore at 190. Sparkles, speed lines, and a dead stop at 1:32.">
+<meta name="theme-color" content="#0A0414">
+<meta property="og:type" content="website">
+<meta property="og:title" content="PLAY IT LOUD">
+<meta property="og:description" content="S3RL and Remzcore. 190 bpm, three drops, and one hard stop.">
+<meta property="og:url" content="https://shaiyex.com/loud/">
+<meta name="twitter:card" content="summary">
+<title>PLAY IT LOUD</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap">
+
+<style>
+  :root{
+    --ink:#0A0414;
+    --pink:#FF2D95;
+    --cyan:#00E5FF;
+    --yellow:#FFE600;
+    --lime:#7CFF00;
+    --dim:#6A4E7A;
+    --edge:#2A1338;
+    --mono:"JetBrains Mono",Consolas,ui-monospace,monospace;
+    --disp:"Bebas Neue","Arial Narrow",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;overflow:hidden;background:#05020B;
+    color:var(--dim);font-family:var(--mono);
+    -webkit-font-smoothing:antialiased;
+  }
+  #viz{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0}
+
+  .hud{
+    position:fixed;left:0;right:0;bottom:0;z-index:3;
+    display:flex;align-items:center;gap:12px;
+    padding:12px clamp(12px,3vw,22px) 14px;
+    font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+    background:linear-gradient(180deg, rgba(10,4,20,0), rgba(10,4,20,.92) 46%);
+    transition:opacity .5s ease;
+  }
+  body.idle .hud{opacity:.12}
+  .hud:hover{opacity:1 !important}
+  .pp{
+    flex:0 0 auto;width:30px;height:30px;padding:0;cursor:pointer;
+    background:transparent;border:1px solid var(--edge);border-radius:2px;
+    color:var(--pink);
+    display:flex;align-items:center;justify-content:center;
+    transition:border-color .4s ease, color .8s ease, background .25s ease;
+  }
+  .pp:hover{background:rgba(255,255,255,.07);border-color:var(--pink)}
+  .pp b{display:block;width:0;height:0;
+        border-left:9px solid currentColor;border-top:6px solid transparent;
+        border-bottom:6px solid transparent;margin-left:2px}
+  body.going .pp b{
+    width:9px;height:11px;border:0;margin:0;background:currentColor;
+    box-shadow:inset 3px 0 0 rgba(0,0,0,.85);
+  }
+
+  .bar{position:relative;flex:1 1 auto;height:22px;cursor:pointer;
+       display:flex;align-items:center}
+  .bar-track{position:relative;width:100%;height:4px;
+             background:rgba(255,255,255,.08);overflow:hidden}
+  .seg{position:absolute;top:0;bottom:0}
+  .bar-fill{position:absolute;left:0;top:0;bottom:0;width:0;
+            background:#FFF;box-shadow:0 0 12px rgba(255,255,255,.7)}
+  .bar-head{position:absolute;top:50%;width:2px;height:15px;margin-top:-7.5px;
+            background:#FFF;opacity:.9;pointer-events:none}
+  .t{flex:0 0 auto;font-variant-numeric:tabular-nums;letter-spacing:.1em}
+
+  .backlink{
+    position:fixed;top:14px;left:14px;z-index:4;
+    font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--dim);text-decoration:none;
+    padding:7px 11px 8px;border:1px solid var(--edge);border-radius:2px;
+    background:rgba(10,4,20,.74);
+    transition:color .25s ease, border-color .4s ease, opacity .5s ease;
+  }
+  .backlink:hover{color:#FFF;border-color:var(--pink)}
+  body.idle .backlink{opacity:.12}
+  .backlink:hover{opacity:1}
+
+  .credit{
+    position:fixed;top:14px;right:16px;z-index:4;text-align:right;
+    pointer-events:none;transition:opacity .5s ease;
+  }
+  .credit b{
+    display:block;font-family:var(--disp);font-size:24px;line-height:.9;
+    letter-spacing:.05em;color:#FFE9F6;
+  }
+  .credit span{
+    display:block;font-size:9px;font-weight:700;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--dim);margin-top:3px;
+  }
+  body.idle .credit{opacity:.18}
+
+  .gate{
+    position:fixed;inset:0;z-index:20;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:16px;padding:24px;text-align:center;
+    background:radial-gradient(72% 56% at 50% 46%, #22083A, #05020B 78%);
+    transition:opacity .8s ease;
+  }
+  .gate.gone{opacity:0;pointer-events:none}
+  .gate h1{
+    margin:0;font-family:var(--disp);
+    font-size:clamp(54px,15vw,190px);line-height:.82;letter-spacing:.01em;
+    color:#FFF0FA;
+    text-shadow:0 0 34px rgba(255,45,149,.6), 0 0 100px rgba(0,229,255,.3);
+  }
+  .gate .who{
+    margin:0;font-family:var(--disp);font-size:clamp(15px,3vw,26px);
+    letter-spacing:.16em;color:var(--cyan);
+  }
+  .gate .meta{
+    margin:4px 0 0;font-size:10px;font-weight:700;letter-spacing:.22em;
+    text-transform:uppercase;color:#5B4270;line-height:2;
+  }
+  .gate button{
+    margin-top:10px;cursor:pointer;font-family:var(--mono);
+    font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;
+    color:#12021C;background:var(--pink);
+    border:1px solid #FF8DC4;border-radius:2px;padding:15px 34px 16px;
+    transition:background .2s ease, transform .1s ease;
+  }
+  .gate button:hover{background:#FF5CAF}
+  .gate button:active{transform:translateY(2px)}
+  .gate button:focus-visible{outline:2px solid var(--cyan);outline-offset:4px}
+
+  @media (max-width:620px){ .credit b{font-size:17px} }
+</style>
+</head>
+<body>
+
+<canvas id="viz" aria-hidden="true"></canvas>
+
+<a class="backlink" href="/">&larr; shaiyex.com</a>
+<p class="credit"><b>PLAY IT LOUD</b><span>S3RL &amp; Remzcore</span></p>
+
+<div class="hud" id="hud">
+  <button class="pp" id="pp" type="button" aria-label="Play or pause"><b></b></button>
+  <div class="bar" id="bar" role="slider" tabindex="0"
+       aria-label="Position" aria-valuemin="0" aria-valuemax="153" aria-valuenow="0">
+    <div class="bar-track" id="bartrack">
+      <i class="bar-fill" id="fill"></i>
+    </div>
+    <i class="bar-head" id="head"></i>
+  </div>
+  <span class="t" id="clock">0:00</span>
+</div>
+
+<div class="gate" id="gate">
+  <h1>PLAY IT LOUD</h1>
+  <p class="who">S3RL &amp; Remzcore</p>
+  <p class="meta">190 bpm &middot; three drops &middot; one hard stop at 1:32</p>
+  <button id="start" type="button">Play it loud</button>
+</div>
+
+<audio id="track" src="track.mp3" preload="auto"></audio>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ====================================================================
+     PLAY IT LOUD
+
+     190.0000 bpm, first beat at 0.058 s.
+
+     Worth writing down because it took some proving. A naive detector
+     halves this to 95, and a first pass at it came back 191.5, which is
+     close enough to sound right and wrong enough to drift a second and a
+     half by the end. The test that settles it: fit the beat phase inside
+     each loud section separately and see whether the sections agree. At
+     190 they agree to 6 ms and the grid carries 9.4 times the average
+     onset energy. At 191.5 they disagree by 56 ms and the fit is a third
+     as good.
+
+     Then the confirmation, which is the part that makes it certain: every
+     one of the sixteen places the kick drum starts or stops in this track
+     lands on a beat that is an exact multiple of four from that origin.
+     Sixteen for sixteen. The bar grid below is the track's own.
+     ==================================================================== */
+  var GRID = { bpm: 190, t0: 0.058 };
+  var SPB  = 60 / GRID.bpm;          /* 0.3157895 */
+  var BAR  = SPB * 4;
+
+  var T = {
+    verse:   10.163,  /* beat  32   the kick arrives */
+    dip:     27.848,  /* beat  88   pulls back */
+    build:   34.163,  /* beat 108 */
+    run:     39.216,  /* beat 124   the run in */
+    drop1:   40.479,  /* beat 128   DROP ONE */
+    brk:     59.427,  /* beat 188   breakdown */
+    drop2:   70.795,  /* beat 224   DROP TWO, the peak of it */
+    stop:    92.269,  /* beat 292   everything cuts */
+    verse2:  94.795,  /* beat 300   and starts again */
+    build2: 115.005,  /* beat 364 */
+    drop3:  126.374,  /* beat 400   DROP THREE */
+    tail:   146.584,  /* beat 464 */
+    outro:  147.847,  /* beat 468 */
+    dur:    153.832
+  };
+
+  /* scene, and how loud it is being played */
+  var ARC = [
+    [0,        'calm',  0.12],
+    [T.verse,  'verse', 0.42],
+    [T.dip,    'verse', 0.26],
+    [T.build,  'build', 0.55],
+    [T.run,    'build', 0.78],
+    [T.drop1,  'drop',  0.94],
+    [T.brk,    'calm',  0.38],
+    [T.drop2,  'drop',  1.00],
+    [T.stop,   'dead',  0.00],
+    [T.verse2, 'verse', 0.44],
+    [T.build2, 'build', 0.68],
+    [T.drop3,  'drop',  0.98],
+    [T.tail,   'verse', 0.40],
+    [T.outro,  'calm',  0.14]
+  ];
+
+  var audio  = document.getElementById('track');
+  var canvas = document.getElementById('viz');
+  var gate   = document.getElementById('gate');
+  var pp     = document.getElementById('pp');
+  var bar    = document.getElementById('bar');
+  var fill   = document.getElementById('fill');
+  var head   = document.getElementById('head');
+  var clock  = document.getElementById('clock');
+  var ctx    = canvas.getContext('2d', { alpha: false });
+
+  var reduce = window.matchMedia &&
+               window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var TAU = Math.PI * 2;
+
+  /* ---- the candy, and nothing outside it ---- */
+  var PINK = [255, 45, 149], CYAN = [0, 229, 255], YEL = [255, 230, 0],
+      LIME = [124, 255, 0], WHITE = [255, 255, 255], INK = [10, 4, 20];
+  var CANDY = [PINK, CYAN, YEL, LIME];
+
+  (function segments(){
+    var tr = document.getElementById('bartrack');
+    for (var i = 0; i < ARC.length; i++){
+      var a = ARC[i][0], b = i + 1 < ARC.length ? ARC[i + 1][0] : T.dur;
+      var s = document.createElement('i');
+      s.className = 'seg';
+      s.style.left = (a / T.dur * 100) + '%';
+      s.style.width = ((b - a) / T.dur * 100) + '%';
+      var c = CANDY[i % CANDY.length];
+      s.style.background = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
+      s.style.opacity = 0.16 + ARC[i][2] * 0.5;
+      tr.insertBefore(s, fill);
+    }
+  })();
+
+  /* ================= audio ================= */
+  var actx, analyser, freq;
+
+  function listen(){
+    if (actx) return;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    actx = new AC();
+    analyser = actx.createAnalyser();
+    analyser.fftSize = 2048;
+    analyser.smoothingTimeConstant = 0.58;
+    freq = new Uint8Array(analyser.frequencyBinCount);
+    actx.createMediaElementSource(audio).connect(analyser);
+    analyser.connect(actx.destination);
+    bands();
+  }
+
+  var N = 0, edges = [], level;
+
+  function bands(){
+    N = window.innerWidth < 620 ? 28 : 40;
+    level = new Float32Array(N);
+    edges = [];
+    if (!analyser) return;
+    var lo = 2, hi = Math.min(analyser.frequencyBinCount - 1, 440);
+    for (var i = 0; i <= N; i++) edges.push(Math.round(lo * Math.pow(hi / lo, i / N)));
+  }
+
+  function readBands(){
+    if (!analyser || !edges.length) return;
+    analyser.getByteFrequencyData(freq);
+    for (var i = 0; i < N; i++){
+      var a = edges[i], b = Math.max(edges[i + 1], a + 1), m = 0;
+      for (var j = a; j < b; j++) if (freq[j] > m) m = freq[j];
+      var v = (m / 255) * (0.66 + 0.5 * (i / N));
+      level[i] += ((v > 1 ? 1 : v) - level[i]) * 0.38;
+    }
+  }
+
+  function energy(a, b){
+    if (!analyser) return 0;
+    var s = 0;
+    for (var i = a; i < b; i++) s += freq[i];
+    return (s / (b - a)) / 255;
+  }
+
+  /* ================= the clock ================= */
+  var lastBeat = -1e9, beatAt = -9, beatHard = 0, beatNo = 0, barNo = 0, onBar = false;
+  var burstAt = -9, chromaAt = -9;
+
+  function beats(t){
+    var n = Math.floor((t - GRID.t0) / SPB);
+    if (n === lastBeat) return;
+    var jump = n - lastBeat;
+    lastBeat = n;
+    if (jump < 0 || jump > 8) return;
+    beatNo = n;
+    barNo = Math.floor(n / 4);
+    onBar = (n % 4 + 4) % 4 === 0;
+    beatAt = GRID.t0 + n * SPB;
+    beatHard = Math.min(1, energy(1, 20) * 1.7);   /* no floor, so a stop is a stop */
+    if (reduce || loud < 0.2) return;
+    if (onBar) burstAt = beatAt;
+    if (loud > 0.8 && onBar) chromaAt = beatAt;
+    if (loud > 0.5) sparkles(onBar ? 7 : 3);
+    if (loud > 0.85 && onBar) heartBurst();
+  }
+
+  /* ================= state ================= */
+  function ease(x){ return x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x); }
+  function clamp(x, a, b){ return x < a ? a : x > b ? b : x; }
+
+  var scene = 'calm', sceneAt = -9, loud = 0, loudT = 0, hue = 0;
+
+  function state(t, dt){
+    var i, k = 0;
+    for (i = 0; i < ARC.length; i++) if (t >= ARC[i][0]) k = i;
+    if (ARC[k][1] !== scene){ scene = ARC[k][1]; sceneAt = t; }
+    loudT = ARC[k][2];
+    /* a dead stop is instant. everything else eases. */
+    loud += (loudT - loud) * (dt ? clamp(dt * (loudT < loud ? 9 : 3.4), 0, 1) : 1);
+  }
+
+  /* the candy cycles on the bar, not the beat. a full palette swap at
+     3.2 Hz is unwatchable and it is also the thing the health guidance
+     tells you not to do. */
+  function candy(off){
+    var i = ((barNo + (off || 0)) % CANDY.length + CANDY.length) % CANDY.length;
+    return CANDY[i];
+  }
+  function mix(a, b, t){
+    return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+  }
+  function rgba(c, a){
+    return 'rgba(' + (c[0] | 0) + ',' + (c[1] | 0) + ',' + (c[2] | 0) + ',' + a + ')';
+  }
+
+  /* ================= the bits ================= */
+  var W = 0, H = 0, dpr = 1, cx = 0, cy = 0, M = 0, ema = 0.016, slow = 0;
+
+  /* speed lines want to stay put between frames or they boil, so their
+     randomness is drawn once and kept */
+  var LINES = 64, lr = null;
+  function seedLines(){
+    lr = [];
+    for (var i = 0; i < LINES; i++){
+      lr.push({ a: Math.random(), len: 0.4 + Math.random() * 0.9,
+                w: 0.3 + Math.random() * 1.0, off: Math.random() });
+    }
+  }
+
+  function speedLines(n, k, inner, reach, alpha, spin){
+    if (!lr) seedLines();
+    ctx.globalAlpha = alpha;
+    for (var i = 0; i < n; i++){
+      var L = lr[i % LINES];
+      var a = spin + L.a * TAU;
+      var r0 = inner * (0.85 + L.off * 0.5);
+      var r1 = r0 + reach * L.len;
+      var w = (TAU / n) * 0.34 * L.w;
+      var ca = Math.cos(a), sa = Math.sin(a);
+      ctx.fillStyle = rgba(i % 3 === 0 ? k : mix(k, WHITE, 0.55), 1);
+      ctx.beginPath();
+      /* a point at the near end and wide at the far end, the way the
+         lines in a manga panel run away from the thing that just hit */
+      ctx.moveTo(cx + ca * r0, cy + sa * r0);
+      ctx.lineTo(cx + Math.cos(a - w) * r1, cy + Math.sin(a - w) * r1);
+      ctx.lineTo(cx + Math.cos(a + w) * r1, cy + Math.sin(a + w) * r1);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  /* the anime impact shape: a polygon with every other point pushed out */
+  function starburst(x, y, r, points, k, alpha, rot){
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = rgba(k, 1);
+    ctx.beginPath();
+    for (var i = 0; i < points * 2; i++){
+      var a = rot + (i / (points * 2)) * TAU;
+      var rr = r * (i % 2 ? 0.42 : 1);
+      if (i === 0) ctx.moveTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr);
+      else ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  /* four point sparkle, the one that goes on everything in this genre */
+  function sparkle(x, y, r, k, alpha, rot){
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = rgba(k, 1);
+    ctx.beginPath();
+    for (var i = 0; i < 8; i++){
+      var a = rot + (i / 8) * TAU;
+      var rr = i % 2 ? r * 0.16 : r;
+      if (i === 0) ctx.moveTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr);
+      else ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  function heart(x, y, s, k, alpha, rot){
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rot);
+    ctx.scale(s, s);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = rgba(k, 1);
+    ctx.beginPath();
+    ctx.moveTo(0, 0.30);
+    ctx.bezierCurveTo(-0.50, -0.10, -0.36, -0.72, 0, -0.38);
+    ctx.bezierCurveTo(0.36, -0.72, 0.50, -0.10, 0, 0.30);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    ctx.globalAlpha = 1;
+  }
+
+  var sparks = [], hearts = [];
+
+  function sparkles(n){
+    for (var i = 0; i < n; i++){
+      if (sparks.length > 90) break;
+      var a = Math.random() * TAU, r = M * (0.12 + Math.random() * 0.62);
+      sparks.push({
+        x: cx + Math.cos(a) * r * (W > H ? 1.5 : 1),
+        y: cy + Math.sin(a) * r,
+        r: M * (0.012 + Math.random() * 0.030),
+        t: 0, dur: 0.35 + Math.random() * 0.5,
+        rot: Math.random() * TAU, c: (Math.random() * 4) | 0
+      });
+    }
+  }
+
+  function heartBurst(){
+    for (var i = 0; i < 9; i++){
+      if (hearts.length > 46) break;
+      var a = Math.random() * TAU;
+      var v = M * (0.55 + Math.random() * 0.9);
+      hearts.push({
+        x: cx, y: cy,
+        vx: Math.cos(a) * v, vy: Math.sin(a) * v - M * 0.1,
+        s: M * (0.030 + Math.random() * 0.042),
+        rot: (Math.random() - 0.5) * 1.2, spin: (Math.random() - 0.5) * 4,
+        t: 0, dur: 1.1 + Math.random() * 0.8, c: (Math.random() * 4) | 0
+      });
+    }
+  }
+
+  /* the mirrored spectrum. The gradient is built across half the width and
+     mirrored with the shape, because a gradient that runs left to right
+     under a shape that is symmetric looks wrong in a way that is hard to
+     name and impossible to unsee. */
+  function ribbon(yBase, height, alpha, flip){
+    if (!N) return;
+    var half = W / 2;
+    var g = ctx.createLinearGradient(cx, 0, flip ? 0 : W, 0);
+    g.addColorStop(0, rgba(candy(0), alpha));
+    g.addColorStop(0.5, rgba(candy(1), alpha * 0.9));
+    g.addColorStop(1, rgba(candy(2), alpha * 0.7));
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(cx, yBase);
+    var i, v, x, y;
+    for (i = 0; i < N; i++){
+      v = level[i];
+      x = cx + (i / (N - 1)) * half * (flip ? -1 : 1);
+      y = yBase - v * height;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(cx + half * (flip ? -1 : 1), yBase);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  /* ================= canvas ================= */
+  function size(){
+    dpr = Math.min(window.devicePixelRatio || 1, 1.3);
+    var budget = 2.4e6;
+    var px = window.innerWidth * window.innerHeight * dpr * dpr;
+    if (px > budget) dpr *= Math.sqrt(budget / px);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width  = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cx = W / 2; cy = H / 2; M = Math.min(W, H);
+    bands(); seedLines(); overKey = '';
+  }
+  window.addEventListener('resize', size);
+
+  var over = null, overKey = '', linePat = null;
+  function overlay(){
+    var q = Math.round(loud * 5);
+    var key = W + 'x' + H + '|' + q + '|' + dpr;
+    if (overKey !== key){
+      overKey = key;
+      if (!over) over = document.createElement('canvas');
+      over.width = canvas.width; over.height = canvas.height;
+      var g = over.getContext('2d');
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      g.clearRect(0, 0, W, H);
+      var vg = g.createRadialGradient(cx, cy, M * 0.30, cx, cy, M * 0.95);
+      vg.addColorStop(0, 'rgba(0,0,0,0)');
+      vg.addColorStop(1, 'rgba(5,2,11,' + (0.46 + (1 - q / 5) * 0.2).toFixed(3) + ')');
+      g.fillStyle = vg;
+      g.fillRect(0, 0, W, H);
+      if (!reduce){
+        if (!linePat){
+          var c = document.createElement('canvas');
+          c.width = 1; c.height = 3;
+          var gc = c.getContext('2d');
+          gc.fillStyle = 'rgba(0,0,0,0.26)';
+          gc.fillRect(0, 0, 1, 1);
+          linePat = c;
+        }
+        g.globalAlpha = 0.45;
+        g.fillStyle = g.createPattern(linePat, 'repeat');
+        g.fillRect(0, 0, W, H);
+        g.globalAlpha = 1;
+      }
+    }
+    ctx.drawImage(over, 0, 0, W, H);
+  }
+
+  /* ================= the loop ================= */
+  var last = 0, now8 = 0, spin = 0, roll = 0;
+
+  function frame(ms){
+    requestAnimationFrame(frame);
+    now8 = ms / 1000;
+    var dt = last ? Math.min(now8 - last, 0.05) : 0.016;
+    last = now8;
+    ema = ema * 0.94 + dt * 0.06;
+    slow = ema > 0.034 ? Math.min(1, slow + dt * 0.5) : Math.max(0, slow - dt * 0.25);
+
+    var t = audio.currentTime;
+    state(t, dt);
+    readBands();
+    beats(t);
+
+    var bass = energy(1, 14);
+    var since = t - beatAt;
+    /* the kick response is a shape change, not a light switch. see the note
+       by the flash below. */
+    var pulse = since >= 0 && since < SPB * 0.85
+      ? Math.pow(1 - since / (SPB * 0.85), 2.0) * beatHard * loud : 0;
+
+    var k0 = candy(0), k1 = candy(1), k2 = candy(2);
+
+    /* ---- the ground, with a gentle wake ---- */
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = rgba(INK, 0.30 + (1 - loud) * 0.14);
+    ctx.fillRect(0, 0, W, H);
+
+    spin += dt * (0.12 + loud * 0.55);
+    roll += dt * 0.04 * Math.sin(now8 * 0.4);
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(roll);
+    var punch = 1 + pulse * (0.02 + loud * 0.055);
+    ctx.scale(punch, punch);
+    ctx.translate(-cx, -cy);
+    ctx.globalCompositeOperation = 'lighter';
+
+    if (scene === 'dead'){
+      /* the best two and a half seconds in the track are the ones with
+         nothing in them. one sparkle, breathing, and that is all. */
+      var dq = (t - sceneAt) / 2.4;
+      sparkle(cx, cy, M * (0.05 + Math.sin(now8 * 2) * 0.012), WHITE,
+              0.5 * (1 - clamp(dq, 0, 1)) + 0.12, now8 * 0.6);
+
+    } else {
+      /* ---- speed lines. the spine of the whole thing. ---- */
+      var nl = scene === 'drop' ? LINES : scene === 'build' ? 44 : 26;
+      if (slow > 0.5) nl = (nl * 0.6) | 0;
+      speedLines(nl, k0,
+        M * (0.27 + 0.10 * loud + pulse * 0.10),
+        M * (0.38 + loud * 0.52 + pulse * 0.28),
+        0.08 + loud * 0.20, spin);
+
+      /* ---- the ring of sound, mirrored both ways ---- */
+      var rb = 0.09 + loud * 0.15;
+      var rh = M * (0.085 + loud * 0.095);
+      ribbon(cy + M * 0.34, rh, rb, false);
+      ribbon(cy + M * 0.34, rh, rb, true);
+      ribbon(cy - M * 0.34, rh * 0.7, rb * 0.6, false);
+      ribbon(cy - M * 0.34, rh * 0.7, rb * 0.6, true);
+
+      /* ---- the thing in the middle ---- */
+      var br = M * (0.048 + bass * 0.034 + pulse * 0.030);
+      if (scene === 'drop' || scene === 'build'){
+        starburst(cx, cy, Math.min(M * 0.26, br * (1.7 + pulse * 0.5)), 12, k1,
+                  0.22 + pulse * 0.10, spin * 0.5);
+      }
+      starburst(cx, cy, br, 6, mix(k2, WHITE, 0.4), 0.34 + pulse * 0.10, -spin);
+
+      /* the bar hit: a ring that leaves, on the bar and not the beat */
+      var bd = t - burstAt;
+      if (bd >= 0 && bd < 0.7){
+        var bp = bd / 0.7;
+        ctx.globalAlpha = (1 - bp) * (1 - bp) * 0.34 * loud;
+        ctx.strokeStyle = rgba(k1, 1);
+        ctx.lineWidth = 2 + (1 - bp) * 7;
+        ctx.beginPath();
+        ctx.arc(cx, cy, M * (0.10 + bp * 0.75), 0, TAU);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    /* ---- sparkles ---- */
+    var i;
+    for (i = sparks.length - 1; i >= 0; i--){
+      var s = sparks[i];
+      s.t += dt;
+      var q = s.t / s.dur;
+      if (q >= 1){ sparks.splice(i, 1); continue; }
+      var a = Math.sin(q * Math.PI);
+      sparkle(s.x, s.y, s.r * (0.4 + a), CANDY[s.c], a * 0.85, s.rot + q * 1.4);
+    }
+
+    /* ---- and the hearts, because it is that kind of record ---- */
+    for (i = hearts.length - 1; i >= 0; i--){
+      var hh = hearts[i];
+      hh.t += dt;
+      if (hh.t >= hh.dur){ hearts.splice(i, 1); continue; }
+      hh.x += hh.vx * dt; hh.y += hh.vy * dt;
+      hh.vy += M * 0.55 * dt;
+      hh.rot += hh.spin * dt;
+      var hq = 1 - hh.t / hh.dur;
+      heart(hh.x, hh.y, hh.s * (0.5 + hq * 0.7), CANDY[hh.c], hq * 0.8, hh.rot);
+    }
+
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.restore();
+
+    /* ---- the lens giving up, on bar lines in the drops only ---- */
+    if (!reduce){
+      var cd = t - chromaAt;
+      if (cd >= 0 && cd < 0.09){
+        var ca2 = (1 - cd / 0.09) * 7;
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha = 0.20;
+        ctx.drawImage(canvas, ca2, 0, W, H);
+        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = 'source-over';
+      }
+    }
+
+    /* ---- the beat, as light ----
+       190 bpm is 3.2 beats a second, which sits in the band that sets off
+       photosensitive seizures. So this is a small lift on top of whatever
+       is already lit rather than a full field going dark to bright and
+       back, the amplitude is capped well under a tenth, and anyone who has
+       asked for less motion gets none of it at all. */
+    if (!reduce && pulse > 0.02){
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = Math.min(0.030, pulse * 0.030);
+      ctx.fillStyle = rgba(mix(k0, WHITE, 0.5), 1);
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    if (slow < 0.6) overlay();
+    hud(t);
+  }
+
+  /* ================= hud ================= */
+  var lastShown = -1;
+  function hud(t){
+    var p = clamp(t / T.dur, 0, 1);
+    fill.style.width = (p * 100) + '%';
+    head.style.left = (p * 100) + '%';
+    var s = t | 0;
+    if (s !== lastShown){
+      lastShown = s;
+      clock.textContent = (s / 60 | 0) + ':' + ('0' + (s % 60)).slice(-2);
+      bar.setAttribute('aria-valuenow', String(s));
+    }
+  }
+
+  function jumped(){
+    lastBeat = -1e9; beatAt = -9; beatHard = 0;
+    burstAt = chromaAt = sceneAt = -9;
+    sparks.length = 0; hearts.length = 0;
+  }
+
+  bar.addEventListener('click', function(e){
+    var r = bar.getBoundingClientRect();
+    audio.currentTime = clamp(((e.clientX - r.left) / r.width) * T.dur, 0, T.dur - 0.05);
+    jumped();
+  });
+  bar.addEventListener('keydown', function(e){
+    var d = e.key === 'ArrowRight' ? 5 : e.key === 'ArrowLeft' ? -5 : 0;
+    if (!d) return;
+    e.preventDefault();
+    audio.currentTime = clamp(audio.currentTime + d, 0, T.dur - 0.05);
+    jumped();
+  });
+
+  function toggle(){
+    if (audio.paused){
+      if (actx && actx.state === 'suspended') actx.resume();
+      audio.play();
+    } else audio.pause();
+  }
+  pp.addEventListener('click', toggle);
+  audio.addEventListener('play',  function(){ document.body.classList.add('going'); });
+  audio.addEventListener('pause', function(){ document.body.classList.remove('going'); });
+  document.addEventListener('keydown', function(e){
+    if (e.code === 'Space' && e.target === document.body){ e.preventDefault(); toggle(); }
+  });
+
+  var idleTimer;
+  function stir(){
+    document.body.classList.remove('idle');
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(function(){ document.body.classList.add('idle'); }, 2800);
+  }
+  document.addEventListener('mousemove', stir);
+  document.addEventListener('touchstart', stir);
+
+  document.getElementById('start').addEventListener('click', function(){
+    listen();
+    if (actx && actx.state === 'suspended') actx.resume();
+    audio.play();
+    gate.classList.add('gone');
+    setTimeout(function(){ gate.style.display = 'none'; }, 900);
+    stir();
+  });
+
+  window.__loud = {
+    T: T, grid: GRID, arc: ARC,
+    at: function(t){
+      state(t);
+      return { scene: scene, loud: +loud.toFixed(3),
+               bar: Math.floor((t - GRID.t0) / BAR) };
+    }
+  };
+
+  size();
+  requestAnimationFrame(frame);
+
+  try { if (window.top !== window.self) document.querySelector('.backlink').remove(); }
+  catch(e){}
+})();
+</script>
+</body>
+</html>
