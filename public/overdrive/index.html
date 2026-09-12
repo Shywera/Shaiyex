@@ -298,8 +298,8 @@
   var L_AUGR = shape({ n: 6, spike: 0.30, rad: 0.245, twist: 2.4, panel: 1,
                        rail: 0.38, spd: 2.05, hue: 0.34, heat: 0.60,
                        star: 0.20, alphaMul: 0.95 });
-  var L_SUB  = shape({ n: 6, rad: 0.44, twist: 0.8, panel: 1, rail: 0.50,
-                       spd: 0.95, hue: 0.55, tint: RED, tintA: 0.80,
+  var L_SUB  = shape({ n: 6, rad: 0.40, twist: 1.6, panel: 1, rail: 0.50,
+                       spd: 2.15, hue: 0.55, tint: RED, tintA: 0.80,
                        heat: 0.80, star: 0.06, alphaMul: 1 });
   var L_BRK  = shape({ n: 22, rad: 0.38, twist: 0.7, panel: 0.16, rail: 0.12,
                        spd: 0.26, hue: 0.12, heat: 0.26, star: 0.60, arc: 1,
@@ -439,7 +439,8 @@
             : clamp((t - (ARC[iSlow][0] - ARC[iSlow][2])) / ARC[iSlow][3], 0, 1);
     var u = ease(raw);
     trans = Math.sin(raw * Math.PI);
-    transDir = B.spd >= A.spd ? 1 : -1;
+    var rel = (B.spd - A.spd) / Math.max(A.spd, B.spd, 0.001);
+    transDir = clamp(rel * 1.6, -1, 1);
 
     for (i = 0; i <= SEG; i++){
       PX[i]  = A.px[i]  + (B.px[i]  - A.px[i])  * u;
