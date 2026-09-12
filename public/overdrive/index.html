@@ -262,7 +262,7 @@
 
   function shape(o){
     var L = {
-      n: 14, flat: 0, rad: 0.30, twist: 1, panel: 1, rail: 0.34,
+      n: 14, flat: 0, spike: 0, rad: 0.30, twist: 1, panel: 1, rail: 0.34,
       spd: 1.6, bh: 1, bv: 1, hue: 0.2, tint: null, tintA: 0,
       heat: 0.5, chroma: 0, star: 0.25, arc: 0, foldA: 0, alphaMul: 1
     };
@@ -275,6 +275,10 @@
       var half = Math.PI / L.n;
       var a = ((th % (2 * half)) + 2 * half) % (2 * half) - half;
       var r = Math.cos(half) / Math.cos(a);            /* regular n-gon */
+      /* pull the corners out and the flats in and the section becomes a
+         star. Given enough twist that is an auger, and an auger is the
+         most obviously vortex shaped thing a tunnel can be. */
+      r *= 1 - L.spike * Math.cos(th * L.n);
       L.px[i] = Math.cos(th) * r * (1 + L.flat * 2.5);
       L.py[i] = Math.sin(th) * r * (1 - L.flat * 0.62);
       /* one plate per side of the polygon, hard edged. Indexed off the
@@ -291,11 +295,11 @@
   var L_RUN  = shape({ n: 16, rad: 0.30, twist: 1, panel: 1, rail: 0.34,
                        spd: 1.64, hue: 0.22, heat: 0.52, star: 0.10,
                        alphaMul: 0.90 });
-  var L_ROAD = shape({ n: 10, flat: 0.86, rad: 0.29, twist: 0.14, panel: 1,
-                       rail: 0.80, spd: 1.80, bh: 0.55, bv: 0, hue: 0.30,
-                       heat: 0.60, star: 0.28, alphaMul: 0.92 });
+  var L_AUGR = shape({ n: 6, spike: 0.30, rad: 0.245, twist: 2.4, panel: 1,
+                       rail: 0.38, spd: 2.05, hue: 0.34, heat: 0.60,
+                       star: 0.20, alphaMul: 0.95 });
   var L_SUB  = shape({ n: 6, rad: 0.44, twist: 0.8, panel: 1, rail: 0.50,
-                       spd: 0.19, hue: 0.55, tint: RED, tintA: 0.80,
+                       spd: 0.95, hue: 0.55, tint: RED, tintA: 0.80,
                        heat: 0.80, star: 0.06, alphaMul: 1 });
   var L_BRK  = shape({ n: 22, rad: 0.38, twist: 0.7, panel: 0.16, rail: 0.12,
                        spd: 0.26, hue: 0.12, heat: 0.26, star: 0.60, arc: 1,
@@ -330,7 +334,7 @@
   var ARC = [
     [0,        L_VOID, 0,   0.10, 0.10, 'void'],
     [T.caught, L_RUN,  2.3, 3.4,  0.40, 'run'],
-    [T.turn,   L_ROAD, 2.3, 5.0,  1.10, 'road'],
+    [T.turn,   L_AUGR, 2.3, 5.0,  1.10, 'auger'],
     [T.subIn,  L_SUB,  2.3, 3.4,  0.55, 'sub'],
     [T.subOut, L_RUN,  2.3, 3.4,  0.60, 'run'],
     [T.brk,    L_BRK,  1.7, 3.6,  1.20, 'break'],
@@ -345,7 +349,7 @@
     [T.dead,   L_DEAD, 0,   3.2,  2.00, 'dead']
   ];
 
-  var SCENE_TINT = ['#1C3A52','#38E8FF','#5AA8FF','#FF2D2D','#38E8FF','#2C4A66',
+  var SCENE_TINT = ['#1C3A52','#38E8FF','#9B6CFF','#FF2D2D','#38E8FF','#2C4A66',
                     '#FFB020','#8FE8FF','#16222E','#FF5CE0','#FFB020','#B66CFF',
                     '#FFB020','#8FE8FF','#101820'];
 
@@ -503,7 +507,7 @@
 
   /* ================= geometry ================= */
   var W = 0, H = 0, dpr = 1, cx = 0, cy = 0, FL = 0, M = 0;
-  var ema = 0.016, slow = 0;
+  var ema = 0.016, slow = 0, relief = 0;
 
   function size(){
     dpr = Math.min(window.devicePixelRatio || 1, 1.25);
@@ -851,7 +855,12 @@
     var dt = last ? Math.min(now8 - last, 0.05) : 0.016;
     last = now8;
     ema = ema * 0.94 + dt * 0.06;
-    slow = ema > 0.034 ? Math.min(1, slow + dt * 0.5) : Math.max(0, slow - dt * 0.25);
+    slow = ema > 0.032 ? Math.min(1, slow + dt * 0.5) : Math.max(0, slow - dt * 0.25);
+    /* Separate thresholds to come on and to go off. With one threshold
+       the relief takes the frame time back under it, switches itself off,
+       and the whole thing hunts around the boundary. */
+    var want = relief > 0.5 ? (ema > 0.0166 ? 1 : 0) : (ema > 0.0192 ? 1 : 0);
+    relief += (want - relief) * Math.min(1, dt * 1.1);
 
     var t = audio.currentTime;
     state(t, dt);
@@ -901,7 +910,7 @@
     /* the kaleidoscope is the same vortex seen in a folded mirror, and it
        fades in and out rather than being switched on */
     if (P.foldA > 0.02 && !reduce){
-      var folds = slow > 0.5 ? 3 : 4;
+      var folds = relief > 0.5 ? 2 : 4;
       for (var fo = 1; fo < folds; fo++){
         ctx.save();
         ctx.translate(cx, cy);
@@ -923,7 +932,8 @@
       var ab = (1.5 + pulse * 6 + heat * 2.5) * chroma;
       var ch = [[[255, 24, 24], -ab], [[70, 110, 255], ab]];
       ctx.globalCompositeOperation = 'lighter';
-      for (var ci = 0; ci < 2; ci++){
+      var passes = relief > 0.5 ? 1 : 2;
+      for (var ci = 0; ci < passes; ci++){
         vortex(t, ch[ci][0], 0.26 * chroma, 0, ch[ci][1], true, 0.48);
       }
       ctx.globalCompositeOperation = 'source-over';
@@ -1063,6 +1073,7 @@
                spd: +P.spd.toFixed(3), panel: +P.panel.toFixed(3),
                hue: +P.hue.toFixed(3), surge: +surge.toFixed(3),
                trans: +trans.toFixed(3), dir: transDir,
+               relief: +relief.toFixed(2), ms: +(ema * 1000).toFixed(1),
                flat: +P.flat.toFixed(3),
                shake: +shake.toFixed(3), sparks: SP.length };
     }
