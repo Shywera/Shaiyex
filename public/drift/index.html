@@ -223,26 +223,24 @@
   var PHRASE = 8;
 
   var T = {
-    drop:   18.950,  /* udar  56  bubanj ulazi pun */
-    brk1:   64.283,  /* udar 192  bas ispada */
-    air:    80.283,  /* udar 240  najveci prekid, ostaju samo visoki */
-    brk2:  112.283,  /* udar 336  bas ispada */
-    stani: 128.283,  /* udar 384  zastoj pred zadnji dio */
-    last:  130.950,  /* udar 392  i onda do kraja bez predaha */
-    fin:   162.950,  /* udar 488  tijelo zavrsava */
+    p2a:    18.950,  /* udar  56  fraza  7  drift krece */
+    p3a:    50.950,  /* udar 152  fraza 19  mirno */
+    p2b:    82.950,  /* udar 248  fraza 31  drift */
+    p3b:    98.950,  /* udar 296  fraza 37  mirno */
+    p2c:   130.950,  /* udar 392  fraza 49  zadnji, bez predaha */
+    fin:   162.950,  /* udar 488  fraza 61  tijelo zavrsava */
     dur:   165.35
   };
 
   /* dionica, boja na traci, koliko je gusto */
   var ARC = [
-    [0,        '#1A2340', 0.14],
-    [T.drop,   '#FF2D95', 0.92],
-    [T.brk1,   '#00E5FF', 0.52],
-    [T.air,    '#22305A', 0.22],
-    [T.brk2,   '#00E5FF', 0.55],
-    [T.stani,  '#141A30', 0.10],
-    [T.last,   '#FFB338', 1.00],
-    [T.fin,    '#0C1020', 0.06]
+    [0,       '#1A2340', 0.14],   /* uvod: ravna cesta, bez drifta */
+    [T.p2a,   '#FF2D95', 0.95],   /* drift */
+    [T.p3a,   '#00E5FF', 0.32],   /* mirno: zavoji ostaju, klizanja gotovo nema */
+    [T.p2b,   '#FF2D95', 0.95],   /* drift */
+    [T.p3b,   '#00E5FF', 0.32],   /* mirno */
+    [T.p2c,   '#FFB338', 1.00],   /* zadnji, najjaci */
+    [T.fin,   '#0C1020', 0.06]    /* odjava */
   ];
 
   var audio  = document.getElementById('track');
@@ -328,7 +326,7 @@
 
     /* Auto dobije trzaj na svaku frazu. To je ono sto pretvara
        zavijanje ceste u drift: guma pukne na dobu, ne kad joj se prohtjee. */
-    if (heat > 0.3){
+    if (heat > 0.5){
       flick += (onPhrase ? 0.42 : 0.12) * beatHard * heat *
                (cornerAt(beatNo / PHRASE) > 0 ? 1 : -1);
       shake = Math.max(shake, beatHard * heat * (onPhrase ? 1 : 0.4));
@@ -365,7 +363,7 @@
     var h = Math.sin(n * 12.9898 + 4.1) * 43758.5453;
     return h - Math.floor(h);
   }
-  var DROP_PH = Math.round((T.drop - GRID.t0) / SPB / PHRASE);
+  var DROP_PH = Math.round((T.p2a - GRID.t0) / SPB / PHRASE);
   function cornerAt(ph){
     ph = Math.floor(ph);
     if (ph < DROP_PH) return 0;
@@ -421,7 +419,7 @@
 
     /* Kontra volan: auto je okrenut suprotno od smjera krivine. Zato
        drift izgleda kao drift a ne kao skretanje. */
-    var target = ahead * 0.22 * clamp(heat * 1.6, 0, 1);
+    var target = ahead * 0.22 * Math.pow(clamp(heat * 1.15, 0, 1), 1.7);
     var k = 9.5, d = 5.0;           /* opruga i prigusenje */
     yawV += (target - yaw) * k * dt - yawV * d * dt;
     yawV += flick * 3.2 * dt;
