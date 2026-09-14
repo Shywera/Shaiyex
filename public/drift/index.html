@@ -329,8 +329,8 @@
     /* Auto dobije trzaj na svaku frazu. To je ono sto pretvara
        zavijanje ceste u drift: guma pukne na dobu, ne kad joj se prohtjee. */
     if (heat > 0.3){
-      flick += (onPhrase ? 1 : 0.28) * beatHard * heat *
-               (cornerAt(beatNo / PHRASE) > 0 ? -1 : 1);
+      flick += (onPhrase ? 0.42 : 0.12) * beatHard * heat *
+               (cornerAt(beatNo / PHRASE) > 0 ? 1 : -1);
       shake = Math.max(shake, beatHard * heat * (onPhrase ? 1 : 0.4));
       if (onPhrase) popAt = beatAt;
     }
@@ -357,7 +357,7 @@
      koja se slucajno poklopi. */
   var SEG = 200;          /* svjetskih jedinica po odsjecku */
   var DRAW = 120;         /* koliko ih crtamo */
-  var UPB = 3400;         /* jedinica po udaru: veze put uz takt */
+  var UPB = 5200;         /* jedinica po udaru: veze put uz takt */
   var ROADW = 2100;       /* poluširina ceste */
   var CAMH = 1250;
 
@@ -365,17 +365,21 @@
     var h = Math.sin(n * 12.9898 + 4.1) * 43758.5453;
     return h - Math.floor(h);
   }
+  var DROP_PH = Math.round((T.drop - GRID.t0) / SPB / PHRASE);
   function cornerAt(ph){
     ph = Math.floor(ph);
-    if (ph < 1) return 0;
+    if (ph < DROP_PH) return 0;
     var amp = 1.1 + hash(ph) * 2.2;
-    return ((ph & 1) ? -1 : 1) * amp;
+    return ((ph & 1) ? 1 : -1) * amp;
   }
   /* glatko izmedu dvije fraze, da krivina ulazi a ne pukne */
+  var HOLD = 0.64;        /* koliko fraze zavoj stoji prije prijelaza */
   function curveAtBeat(b){
     var ph = b / PHRASE;
     var i = Math.floor(ph), f = ph - i;
-    return cornerAt(i) + (cornerAt(i + 1) - cornerAt(i)) * ease(f);
+    if (f < HOLD) return cornerAt(i);
+    var g = ease((f - HOLD) / (1 - HOLD));
+    return cornerAt(i) + (cornerAt(i + 1) - cornerAt(i)) * g;
   }
 
   var W = 0, H = 0, dpr = 1, cx = 0, cy = 0, FL = 0, M = 0, horizon = 0;
@@ -417,18 +421,18 @@
 
     /* Kontra volan: auto je okrenut suprotno od smjera krivine. Zato
        drift izgleda kao drift a ne kao skretanje. */
-    var target = -ahead * 0.30;
-    var k = 16.0, d = 5.2;          /* opruga i prigusenje */
+    var target = ahead * 0.22 * clamp(heat * 1.6, 0, 1);
+    var k = 9.5, d = 5.0;           /* opruga i prigusenje */
     yawV += (target - yaw) * k * dt - yawV * d * dt;
-    yawV += flick * 2.4 * dt * 60;
-    flick *= Math.pow(0.02, dt);
+    yawV += flick * 3.2 * dt;
+    flick *= Math.pow(0.05, dt);
     yaw += yawV * dt;
-    yaw = clamp(yaw, -0.95, 0.95);
+    yaw = clamp(yaw, -0.80, 0.80);
 
     /* Auto se u krivini izbaci prema vanjskoj strani. */
-    var wantLean = here * 0.30 + yaw * 0.22;
+    var wantLean = -here * 0.10 - yaw * 0.05;
     lean += (wantLean - lean) * clamp(dt * 3.4, 0, 1);
-    camX = lean * ROADW * 0.55;
+    camX = lean * ROADW * 0.55 * 0.25;
   }
 
   /* ================= nebo i grad ================= */
@@ -949,13 +953,33 @@
     stir();
   });
 
+  /* Ponovi akumulaciju iz road() i vrati gdje sredina ceste zavrsi na
+     ekranu blizu i daleko. Sluzi da se smjer zavoja provjeri iz modela, a
+     ne iz piksela, gdje dim i auto zavaraju mjerenje. */
+  function probe(){
+    var beat = (audio.currentTime - GRID.t0) / SPB;
+    var offset = pos % SEG;
+    var x = 0, dx = 0, near = cx, far = cx;
+    for (var i = 0; i < DRAW; i++){
+      var z = (i + 1) * SEG - offset;
+      if (z < 1) continue;
+      var sb = beat + (i * SEG - offset) / UPB;
+      x += dx; dx += curveAtBeat(sb) * 0.62;
+      var sx = cx + (x - camX) * (FL / z);
+      if (i === 4) near = sx;
+      if (i === 100) far = sx;
+    }
+    return { near: near, far: far };
+  }
+
   window.__td = {
-    T: T, grid: GRID,
+    T: T, grid: GRID, probe: probe,
     at: function(t){
       director(t, 0);
       return { heat: +heat.toFixed(3), yaw: +yaw.toFixed(3),
                beat: Math.round((t - GRID.t0) / SPB),
                curve: +curveAtBeat((t - GRID.t0) / SPB).toFixed(3),
+               ahead: +curveAtBeat((t - GRID.t0) / SPB + 0.9).toFixed(3),
                smoke: SM.length, lyrics: LYRICS.length };
     }
   };
