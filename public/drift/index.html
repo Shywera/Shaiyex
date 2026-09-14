@@ -929,21 +929,25 @@
     /* Veliko krilo na dva nosaca iznad poklopca. Nosaci se crtaju prije
        ploce, pa ih ona dijelom pokrije i krilo stoji na njima umjesto da
        lebdi. */
-    var wgY = ROOF + 72, wgZ = TAIL * 0.68;
+    var wgY = ROOF - 16, wgZ = TAIL * 0.95;
+    /* nosaci stoje na petim vratima, ne na krovu */
     for (var fs = -1; fs <= 1; fs += 2){
-      quad([proj(fs * HW * 0.58, ROOF - 26, wgZ, carX),
-            proj(fs * HW * 0.58 + 24, ROOF - 26, wgZ, carX),
-            proj(fs * HW * 0.58 + 24, wgY, wgZ, carX),
-            proj(fs * HW * 0.58, wgY, wgZ, carX)], '#15181F');
+      quad([proj(fs * HW * 0.56, BODY + 16, wgZ, carX),
+            proj(fs * HW * 0.56 + 26, BODY + 16, wgZ, carX),
+            proj(fs * HW * 0.56 + 26, wgY, wgZ, carX),
+            proj(fs * HW * 0.56, wgY, wgZ, carX)], '#15181F');
     }
-    quad([proj(-HW * 1.06, wgY, wgZ - 34, carX),
-          proj(HW * 1.06, wgY, wgZ - 34, carX),
-          proj(HW * 1.06, wgY + 26, wgZ + 62, carX),
-          proj(-HW * 1.06, wgY + 26, wgZ + 62, carX)], '#C41E26');
-    quad([proj(-HW * 1.06, wgY, wgZ - 34, carX),
-          proj(HW * 1.06, wgY, wgZ - 34, carX),
-          proj(HW * 1.06, wgY - 12, wgZ - 34, carX),
-          proj(-HW * 1.06, wgY - 12, wgZ - 34, carX)], '#12151C');
+    /* Prednji rub ide prvi jer je dalje od kamere. Obrnutim redom je
+       tamna traka prekrivala plocu i krilo je izgledalo kao crna precka. */
+    quad([proj(-HW * 1.06, wgY, wgZ + 44, carX),
+          proj(HW * 1.06, wgY, wgZ + 44, carX),
+          proj(HW * 1.06, wgY - 13, wgZ + 44, carX),
+          proj(-HW * 1.06, wgY - 13, wgZ + 44, carX)], '#12151C');
+    /* ploca prelazi rub karoserije prema natrag, pa krilo strsi iza auta */
+    quad([proj(-HW * 1.06, wgY + 22, wgZ - 78, carX),
+          proj(HW * 1.06, wgY + 22, wgZ - 78, carX),
+          proj(HW * 1.06, wgY, wgZ + 44, carX),
+          proj(-HW * 1.06, wgY, wgZ + 44, carX)], '#C41E26');
 
     var pd = t - popAt;
     if (pd >= 0 && pd < 0.16 && !reduce){
