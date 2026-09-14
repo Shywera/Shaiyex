@@ -1,0 +1,969 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Nocna serpentina, neon i auto koji ide bokom kroz svaku krivinu. 180 otkucaja u minuti.">
+<meta name="theme-color" content="#05060F">
+<meta property="og:type" content="website">
+<meta property="og:title" content="TOKYO DRIFT">
+<meta property="og:description" content="Svaka krivina pada na frazu. Auto ne ide ravno.">
+<meta property="og:url" content="https://shaiyex.com/drift/">
+<meta name="twitter:card" content="summary">
+<title>TOKYO DRIFT</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;700&display=swap">
+
+<style>
+  :root{
+    --ink:#05060F;
+    --pink:#FF2D95;
+    --cyan:#00E5FF;
+    --amber:#FFB338;
+    --hot:#FFF3E0;
+    --dim:#5A6480;
+    --edge:#161C2E;
+    --mono:"JetBrains Mono",Consolas,ui-monospace,monospace;
+    --disp:"Anton","Arial Narrow",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;overflow:hidden;background:#000;
+    color:var(--dim);font-family:var(--mono);
+    -webkit-font-smoothing:antialiased;
+  }
+  #viz{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0}
+
+  /* ---- karaoke ---- */
+  .ly{
+    position:fixed;left:0;right:0;bottom:14vh;z-index:2;
+    text-align:center;pointer-events:none;
+    padding:0 clamp(12px,4vw,60px);
+  }
+  .ly-now{
+    margin:0;font-family:var(--disp);
+    font-size:clamp(30px,6.4vw,84px);line-height:1;letter-spacing:.01em;
+    text-transform:uppercase;color:#2A3350;
+    -webkit-text-stroke:1px rgba(255,255,255,.10);
+    position:relative;display:inline-block;max-width:100%;
+  }
+  /* the sung part is painted over the unsung part, wiped left to right */
+  .ly-now i{
+    position:absolute;left:0;top:0;white-space:nowrap;overflow:hidden;
+    font-style:normal;color:var(--hot);width:0;
+    -webkit-text-stroke:0;
+    text-shadow:0 0 18px rgba(255,45,149,.75), 0 0 46px rgba(0,229,255,.35);
+  }
+  .ly-next{
+    margin:10px 0 0;font-size:clamp(10px,1.5vw,14px);font-weight:700;
+    letter-spacing:.26em;text-transform:uppercase;color:#3C4763;
+  }
+  body.idle .ly{opacity:.25;transition:opacity .5s ease}
+
+  .hud{
+    position:fixed;left:0;right:0;bottom:0;z-index:3;
+    display:flex;align-items:center;gap:12px;
+    padding:12px clamp(12px,3vw,22px) 14px;
+    font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+    background:linear-gradient(180deg, rgba(5,6,15,0), rgba(5,6,15,.92) 46%);
+    transition:opacity .5s ease;
+  }
+  body.idle .hud{opacity:.12}
+  .hud:hover{opacity:1 !important}
+  .pp{
+    flex:0 0 auto;width:30px;height:30px;padding:0;cursor:pointer;
+    background:transparent;border:1px solid var(--edge);border-radius:2px;
+    color:var(--pink);
+    display:flex;align-items:center;justify-content:center;
+    transition:border-color .4s ease, color .8s ease, background .25s ease;
+  }
+  .pp:hover{background:rgba(255,255,255,.06);border-color:var(--pink)}
+  .pp b{display:block;width:0;height:0;
+        border-left:9px solid currentColor;border-top:6px solid transparent;
+        border-bottom:6px solid transparent;margin-left:2px}
+  body.going .pp b{
+    width:9px;height:11px;border:0;margin:0;background:currentColor;
+    box-shadow:inset 3px 0 0 rgba(0,0,0,.85);
+  }
+  .bar{position:relative;flex:1 1 auto;height:22px;cursor:pointer;
+       display:flex;align-items:center}
+  .bar-track{position:relative;width:100%;height:4px;
+             background:rgba(255,255,255,.07);overflow:hidden}
+  .seg{position:absolute;top:0;bottom:0}
+  .bar-fill{position:absolute;left:0;top:0;bottom:0;width:0;
+            background:var(--hot);box-shadow:0 0 12px rgba(255,243,224,.8)}
+  .bar-head{position:absolute;top:50%;width:2px;height:15px;margin-top:-7.5px;
+            background:#FFF;opacity:.85;pointer-events:none}
+  .t{flex:0 0 auto;font-variant-numeric:tabular-nums;letter-spacing:.1em}
+
+  .gauge{
+    position:fixed;right:clamp(12px,3vw,26px);top:clamp(12px,3vw,22px);
+    z-index:3;text-align:right;pointer-events:none;
+    transition:opacity .5s ease;
+  }
+  body.idle .gauge{opacity:.2}
+  .gauge b{
+    display:block;font-family:var(--disp);font-size:clamp(28px,5vw,54px);
+    line-height:.9;color:var(--hot);letter-spacing:.02em;
+    text-shadow:0 2px 20px rgba(0,0,0,.9);
+  }
+  .gauge span{
+    display:block;font-size:9px;font-weight:700;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--dim);margin-top:4px;
+  }
+
+  .backlink{
+    position:fixed;top:14px;left:14px;z-index:4;
+    font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--dim);text-decoration:none;
+    padding:7px 11px 8px;border:1px solid var(--edge);border-radius:2px;
+    background:rgba(5,6,15,.72);
+    transition:color .25s ease, border-color .4s ease, opacity .5s ease;
+  }
+  .backlink:hover{color:#FFF;border-color:var(--pink)}
+  body.idle .backlink{opacity:.12}
+  .backlink:hover{opacity:1}
+
+  .gate{
+    position:fixed;inset:0;z-index:20;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:18px;padding:24px;text-align:center;
+    background:radial-gradient(70% 55% at 50% 52%, #12183A, #000 76%);
+    transition:opacity .8s ease;
+  }
+  .gate.gone{opacity:0;pointer-events:none}
+  .gate .kj{
+    margin:0;font-family:var(--disp);font-size:clamp(14px,2.4vw,22px);
+    letter-spacing:.5em;color:var(--pink);text-transform:uppercase;
+  }
+  .gate h1{
+    margin:0;font-family:var(--disp);
+    font-size:clamp(50px,14vw,190px);line-height:.86;letter-spacing:.01em;
+    color:#EAF2FF;text-transform:uppercase;
+    text-shadow:0 0 34px rgba(255,45,149,.5), 0 0 90px rgba(0,229,255,.28);
+  }
+  .gate .meta{
+    margin:0;font-size:10px;font-weight:700;letter-spacing:.24em;
+    text-transform:uppercase;color:#404B6A;
+  }
+  .gate button{
+    margin-top:10px;cursor:pointer;font-family:var(--mono);
+    font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;
+    color:#05060F;background:var(--pink);
+    border:1px solid #FF7FC0;border-radius:2px;padding:15px 34px 16px;
+    transition:background .2s ease, transform .1s ease;
+  }
+  .gate button:hover{background:#FF5CAC}
+  .gate button:active{transform:translateY(2px)}
+  .gate button:focus-visible{outline:2px solid var(--cyan);outline-offset:4px}
+
+  @media (max-width:620px){ .ly{bottom:18vh} }
+</style>
+</head>
+<body>
+
+<canvas id="viz" aria-hidden="true"></canvas>
+
+<a class="backlink" href="/">&larr; shaiyex.com</a>
+
+<p class="gauge"><b id="spd">0</b><span id="spdl">km/h</span></p>
+
+<div class="ly" id="ly" aria-hidden="true">
+  <p class="ly-now" id="lyNow"><span id="lyBase"></span><i id="lyFill"></i></p>
+  <p class="ly-next" id="lyNext"></p>
+</div>
+
+<div class="hud" id="hud">
+  <button class="pp" id="pp" type="button" aria-label="Pusti ili pauziraj"><b></b></button>
+  <div class="bar" id="bar" role="slider" tabindex="0"
+       aria-label="Pozicija" aria-valuemin="0" aria-valuemax="165" aria-valuenow="0">
+    <div class="bar-track" id="bartrack">
+      <i class="bar-fill" id="fill"></i>
+    </div>
+    <i class="bar-head" id="head"></i>
+  </div>
+  <span class="t" id="clock">0:00</span>
+</div>
+
+<div class="gate" id="gate">
+  <p class="kj">Serpentina</p>
+  <h1>Tokyo Drift</h1>
+  <p class="meta">2:45 &middot; 180 bpm &middot; svaka krivina pada na frazu</p>
+  <button id="start" type="button">Pali</button>
+</div>
+
+<audio id="track" src="track.mp3" preload="auto"></audio>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ====================================================================
+     TOKYO DRIFT
+
+     180.0000 bpm tocno. Izmjereno cesljem preko spektralnog toka: faze
+     koje svaka sestina pjesme nade neovisno slazu se na 11 ms, a na
+     179.95 i 180.05 rasprse se na 30 i 44 ms. Prvi udar na 0.2834 s.
+
+     Prvi pokusaj mjerenja dao je 60 bpm s kvalitetom grida 0.48x, dakle
+     cesalj je padao na praznine. Uzrok je bila spora komponenta u
+     ovojnici: |z| je najveci blizu nule herca, ne na tempu. Nakon
+     oduzimanja klizecog prosjeka grid je 2.46x.
+
+     Sve granice dijelova padaju na visekratnik od 8 udara, sto je druga
+     potvrda da grid stoji.
+     ==================================================================== */
+  var GRID = { bpm: 180, t0: 0.2834 };
+  var SPB  = 60 / GRID.bpm;          /* 0.333333 */
+  var PHRASE = 8;
+
+  var T = {
+    drop:   18.950,  /* udar  56  bubanj ulazi pun */
+    brk1:   64.283,  /* udar 192  bas ispada */
+    air:    80.283,  /* udar 240  najveci prekid, ostaju samo visoki */
+    brk2:  112.283,  /* udar 336  bas ispada */
+    stani: 128.283,  /* udar 384  zastoj pred zadnji dio */
+    last:  130.950,  /* udar 392  i onda do kraja bez predaha */
+    fin:   162.950,  /* udar 488  tijelo zavrsava */
+    dur:   165.35
+  };
+
+  /* dionica, boja na traci, koliko je gusto */
+  var ARC = [
+    [0,        '#1A2340', 0.14],
+    [T.drop,   '#FF2D95', 0.92],
+    [T.brk1,   '#00E5FF', 0.52],
+    [T.air,    '#22305A', 0.22],
+    [T.brk2,   '#00E5FF', 0.55],
+    [T.stani,  '#141A30', 0.10],
+    [T.last,   '#FFB338', 1.00],
+    [T.fin,    '#0C1020', 0.06]
+  ];
+
+  var audio  = document.getElementById('track');
+  var canvas = document.getElementById('viz');
+  var gate   = document.getElementById('gate');
+  var pp     = document.getElementById('pp');
+  var bar    = document.getElementById('bar');
+  var fill   = document.getElementById('fill');
+  var head   = document.getElementById('head');
+  var clock  = document.getElementById('clock');
+  var spdEl  = document.getElementById('spd');
+  var ctx    = canvas.getContext('2d', { alpha: false });
+
+  var reduce = window.matchMedia &&
+               window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var TAU = Math.PI * 2;
+
+  function clamp(x, a, b){ return x < a ? a : x > b ? b : x; }
+  function ease(x){ return x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x); }
+  function mix(a, b, t){
+    return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t,
+            a[2] + (b[2] - a[2]) * t];
+  }
+  function rgba(c, a){
+    return 'rgba(' + (c[0] | 0) + ',' + (c[1] | 0) + ',' + (c[2] | 0) + ',' + a + ')';
+  }
+
+  var PINK = [255, 45, 149], CYAN = [0, 229, 255], AMBER = [255, 179, 56];
+  var HOT = [255, 243, 224], NIGHT = [10, 14, 34], INK = [5, 6, 15];
+  var TAR = [26, 30, 46], LINE = [214, 226, 255];
+
+  (function segments(){
+    var tr = document.getElementById('bartrack');
+    for (var i = 0; i < ARC.length; i++){
+      var a = ARC[i][0], b = i + 1 < ARC.length ? ARC[i + 1][0] : T.dur;
+      var s = document.createElement('i');
+      s.className = 'seg';
+      s.style.left = (a / T.dur * 100) + '%';
+      s.style.width = ((b - a) / T.dur * 100) + '%';
+      s.style.background = ARC[i][1];
+      s.style.opacity = 0.2 + ARC[i][2] * 0.5;
+      tr.insertBefore(s, fill);
+    }
+  })();
+
+  /* ================= zvuk ================= */
+  var actx, analyser, freq;
+
+  function listen(){
+    if (actx) return;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    actx = new AC();
+    analyser = actx.createAnalyser();
+    analyser.fftSize = 2048;
+    analyser.smoothingTimeConstant = 0.62;
+    freq = new Uint8Array(analyser.frequencyBinCount);
+    actx.createMediaElementSource(audio).connect(analyser);
+    analyser.connect(actx.destination);
+  }
+  function energy(a, b){
+    if (!analyser) return 0;
+    analyser.getByteFrequencyData(freq);
+    var s = 0;
+    for (var i = a; i < b; i++) s += freq[i];
+    return (s / (b - a)) / 255;
+  }
+
+  /* ================= sat ================= */
+  var lastBeat = -1e9, beatAt = -9, beatHard = 0, beatNo = 0, onPhrase = false;
+  var popAt = -9;
+
+  function beats(t){
+    var n = Math.floor((t - GRID.t0) / SPB);
+    if (n === lastBeat) return;
+    var jump = n - lastBeat;
+    lastBeat = n;
+    if (jump < 0 || jump > 8) return;
+    beatNo = n;
+    beatAt = GRID.t0 + n * SPB;
+    beatHard = Math.min(1, energy(1, 20) * 1.8);
+    onPhrase = ((n % PHRASE) + PHRASE) % PHRASE === 0;
+
+    /* Auto dobije trzaj na svaku frazu. To je ono sto pretvara
+       zavijanje ceste u drift: guma pukne na dobu, ne kad joj se prohtjee. */
+    if (heat > 0.3){
+      flick += (onPhrase ? 1 : 0.28) * beatHard * heat *
+               (cornerAt(beatNo / PHRASE) > 0 ? -1 : 1);
+      shake = Math.max(shake, beatHard * heat * (onPhrase ? 1 : 0.4));
+      if (onPhrase) popAt = beatAt;
+    }
+  }
+
+  /* ================= dionice ================= */
+  var heat = 0, heatT = 0, arcIdx = -1, arcAt = -9;
+
+  function director(t, dt){
+    var k = 0;
+    for (var i = 0; i < ARC.length; i++) if (t >= ARC[i][0]) k = i;
+    heatT = ARC[k][2];
+    if (k !== arcIdx){ arcIdx = k; arcAt = t; }
+    heat += (heatT - heat) * (dt ? clamp(dt * 2.6, 0, 1) : 1);
+  }
+
+  /* ================= cesta ================= */
+  /* Klasicna pseudo 3D cesta: svaki odsjecak nosi zakrivljenost, a
+     vodoravni pomak se zbraja prema horizontu, pa se daleki dio ceste
+     odnese u stranu i to citamo kao krivinu.
+
+     Zakrivljenost je funkcija fraze, ne udaljenosti, pa svaka krivina
+     pocinje tocno na frazi. Time je staza dio aranzmana, a ne kulisa
+     koja se slucajno poklopi. */
+  var SEG = 200;          /* svjetskih jedinica po odsjecku */
+  var DRAW = 150;         /* koliko ih crtamo */
+  var UPB = 430;          /* jedinica po udaru: veze put uz takt */
+  var ROADW = 2100;       /* poluširina ceste */
+  var CAMH = 1250;
+
+  function hash(n){
+    var h = Math.sin(n * 12.9898 + 4.1) * 43758.5453;
+    return h - Math.floor(h);
+  }
+  function cornerAt(ph){
+    ph = Math.floor(ph);
+    if (ph < 1) return 0;
+    var amp = 0.5 + hash(ph) * 1.7;
+    return ((ph & 1) ? -1 : 1) * amp;
+  }
+  /* glatko izmedu dvije fraze, da krivina ulazi a ne pukne */
+  function curveAtBeat(b){
+    var ph = b / PHRASE;
+    var i = Math.floor(ph), f = ph - i;
+    return cornerAt(i) + (cornerAt(i + 1) - cornerAt(i)) * ease(f);
+  }
+
+  var W = 0, H = 0, dpr = 1, cx = 0, cy = 0, FL = 0, M = 0, horizon = 0;
+  var ema = 0.016, relief = 0;
+
+  function size(){
+    dpr = Math.min(window.devicePixelRatio || 1, 1.25);
+    var budget = 2.2e6;
+    var px = window.innerWidth * window.innerHeight * dpr * dpr;
+    if (px > budget) dpr *= Math.sqrt(budget / px);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width  = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cx = W / 2; cy = H / 2; M = Math.min(W, H);
+    FL = M * 1.05;
+    horizon = H * 0.44;
+    skyKey = '';
+  }
+  window.addEventListener('resize', size);
+
+  /* ================= stanje voznje ================= */
+  var pos = 0;            /* prijedeni put u svjetskim jedinicama */
+  var yaw = 0;            /* kut auta prema cesti, ovo je drift */
+  var yawV = 0;
+  var flick = 0;          /* trzaj koji stize s dobe */
+  var lean = 0;           /* bocni pomak auta po cesti */
+  var shake = 0;
+  var camX = 0;
+
+  function drive(t, dt, bass){
+    var beat = (t - GRID.t0) / SPB;
+    pos = beat * UPB;
+
+    /* Kamo cesta ide malo ispred auta. Gleda se unaprijed jer vozac
+       reagira na krivinu prije nego u nju ude. */
+    var ahead = curveAtBeat(beat + 1.6);
+    var here  = curveAtBeat(beat + 0.2);
+
+    /* Kontra volan: auto je okrenut suprotno od smjera krivine. Zato
+       drift izgleda kao drift a ne kao skretanje. */
+    var target = -ahead * 0.42;
+    var k = 16.0, d = 5.2;          /* opruga i prigusenje */
+    yawV += (target - yaw) * k * dt - yawV * d * dt;
+    yawV += flick * 2.4 * dt * 60;
+    flick *= Math.pow(0.02, dt);
+    yaw += yawV * dt;
+    yaw = clamp(yaw, -0.95, 0.95);
+
+    /* Auto se u krivini izbaci prema vanjskoj strani. */
+    var wantLean = here * 0.30 + yaw * 0.22;
+    lean += (wantLean - lean) * clamp(dt * 3.4, 0, 1);
+    camX = lean * ROADW * 0.55;
+  }
+
+  /* ================= nebo i grad ================= */
+  var sky = null, skyKey = '';
+  function skyLayer(){
+    var key = W + 'x' + H + '|' + Math.round(dpr * 100);
+    if (skyKey === key) return;
+    skyKey = key;
+    if (!sky) sky = document.createElement('canvas');
+    sky.width = canvas.width; sky.height = canvas.height;
+    var g = sky.getContext('2d');
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    var sg = g.createLinearGradient(0, 0, 0, horizon);
+    sg.addColorStop(0, '#05060F');
+    sg.addColorStop(0.55, '#0B1030');
+    sg.addColorStop(1, '#2A1442');
+    g.fillStyle = sg;
+    g.fillRect(0, 0, W, horizon + 2);
+
+    /* zvijezde su rijetke jer grad ispod njih grize nebo */
+    g.fillStyle = 'rgba(255,255,255,.5)';
+    for (var i = 0; i < 90; i++){
+      var sx = Math.random() * W, sy = Math.random() * horizon * 0.72;
+      var r = Math.random() < 0.85 ? 0.7 : 1.3;
+      g.globalAlpha = 0.18 + Math.random() * 0.5;
+      g.fillRect(sx, sy, r, r);
+    }
+    g.globalAlpha = 1;
+
+    /* silueta grada u dva sloja, blizi tamniji, s prozorima */
+    for (var layer = 0; layer < 2; layer++){
+      var base = horizon + 2;
+      var far = layer === 0;
+      g.fillStyle = far ? '#0E1330' : '#070A1C';
+      var x = -40;
+      while (x < W + 40){
+        var bw = (far ? 26 : 38) + Math.random() * (far ? 52 : 74);
+        var bh = (far ? 30 : 46) + Math.random() * (far ? 90 : 150);
+        g.fillRect(x, base - bh, bw, bh);
+        var cols = Math.max(1, Math.floor(bw / (far ? 9 : 12)));
+        var rows = Math.max(1, Math.floor(bh / (far ? 11 : 15)));
+        for (var cc = 0; cc < cols; cc++){
+          for (var rr = 0; rr < rows; rr++){
+            if (Math.random() > (far ? 0.20 : 0.26)) continue;
+            g.fillStyle = Math.random() < 0.72
+              ? 'rgba(255,179,56,' + (0.25 + Math.random() * 0.5) + ')'
+              : 'rgba(0,229,255,' + (0.20 + Math.random() * 0.45) + ')';
+            g.fillRect(x + 3 + cc * (far ? 9 : 12),
+                       base - bh + 4 + rr * (far ? 11 : 15),
+                       far ? 3 : 4, far ? 4 : 6);
+          }
+        }
+        g.fillStyle = far ? '#0E1330' : '#070A1C';
+        x += bw + 3 + Math.random() * 12;
+      }
+    }
+  }
+
+  /* ================= dim ================= */
+  var SM = [];
+  function smoke(n, str){
+    for (var i = 0; i < n && SM.length < 190; i++){
+      var wheel = (Math.random() < 0.5 ? -1 : 1) * HW * 1.05;
+      SM.push({
+        x: lean * ROADW * 0.55 + wheel + (Math.random() - 0.5) * 90, y: 0,
+        z: CARZ + TAIL * 0.7 + (Math.random() - 0.5) * 160,
+        vx: (Math.random() - 0.5) * 150 - yaw * 520,
+        vz: -(700 + Math.random() * 380),
+        r: 90 + Math.random() * 110,
+        life: 1, dec: 0.30 + Math.random() * 0.30,
+        tone: Math.random()
+      });
+    }
+  }
+  function drawSmoke(dt, k){
+    if (!SM.length) return;
+    for (var i = SM.length - 1; i >= 0; i--){
+      var p = SM[i];
+      p.z += p.vz * dt;
+      p.x += p.vx * dt;
+      p.r += 320 * dt;
+      p.life -= p.dec * dt;
+      if (p.life <= 0 || p.z < 620){ SM.splice(i, 1); continue; }
+      var s = FL / p.z;
+      var sx = cx + (p.x - camX * 0.25) * s;
+      var sy = horizon + (CAMH - 90) * s;
+      var rr = p.r * s;
+      if (rr < 0.6) continue;
+      var a = p.life * p.life * 0.22;
+      var c = mix([210, 216, 236], k, p.tone * 0.55);
+      ctx.fillStyle = rgba(c, a);
+      ctx.beginPath();
+      ctx.arc(sx, sy, rr, 0, TAU);
+      ctx.fill();
+    }
+  }
+
+  /* ================= cesta ================= */
+  function road(t, k, bass){
+    var beat = (t - GRID.t0) / SPB;
+    var offset = pos % SEG;
+    var x = 0, dx = 0;
+    var prev = null;
+
+    for (var i = 0; i < DRAW; i++){
+      var z = (i + 1) * SEG - offset;
+      if (z < 1) continue;
+      var segBeat = beat + (i * SEG - offset) / UPB;
+      var c = curveAtBeat(segBeat) * 0.62;
+      x += dx; dx += c;
+
+      var s = FL / z;
+      var sy = horizon + CAMH * s;
+      if (sy > H + 60) { prev = null; continue; }
+      var sx = cx + (x - camX) * s;
+      var sw = ROADW * s;
+      var depth = 1 - i / DRAW;
+
+      if (prev){
+        var n = Math.floor(segBeat);
+        var alt = ((n % 2) + 2) % 2;
+        /* asfalt */
+        ctx.fillStyle = rgba(mix(TAR, k, 0.06 + depth * 0.05),
+                             0.90 + depth * 0.10);
+        ctx.beginPath();
+        ctx.moveTo(prev.sx - prev.sw, prev.sy);
+        ctx.lineTo(prev.sx + prev.sw, prev.sy);
+        ctx.lineTo(sx + sw, sy);
+        ctx.lineTo(sx - sw, sy);
+        ctx.closePath();
+        ctx.fill();
+
+        /* rub ceste, naizmjence, jer to je ono sto daje brzinu */
+        if (alt){
+          ctx.fillStyle = rgba(mix(PINK, HOT, 0.25), 0.55 + depth * 0.4);
+          var e = sw * 0.10, pe = prev.sw * 0.10;
+          ctx.beginPath();
+          ctx.moveTo(prev.sx - prev.sw, prev.sy);
+          ctx.lineTo(prev.sx - prev.sw + pe, prev.sy);
+          ctx.lineTo(sx - sw + e, sy);
+          ctx.lineTo(sx - sw, sy);
+          ctx.closePath(); ctx.fill();
+          ctx.beginPath();
+          ctx.moveTo(prev.sx + prev.sw, prev.sy);
+          ctx.lineTo(prev.sx + prev.sw - pe, prev.sy);
+          ctx.lineTo(sx + sw - e, sy);
+          ctx.lineTo(sx + sw, sy);
+          ctx.closePath(); ctx.fill();
+        }
+        /* isprekidana sredina */
+        if (alt && i < DRAW * 0.72){
+          ctx.fillStyle = rgba(LINE, 0.16 + depth * 0.5);
+          var mw = sw * 0.018, pm = prev.sw * 0.018;
+          ctx.beginPath();
+          ctx.moveTo(prev.sx - pm, prev.sy);
+          ctx.lineTo(prev.sx + pm, prev.sy);
+          ctx.lineTo(sx + mw, sy);
+          ctx.lineTo(sx - mw, sy);
+          ctx.closePath(); ctx.fill();
+        }
+        /* ulicna rasvjeta, svakih osam udara, s obje strane */
+        if (n % 8 === 0 && depth > 0.12 && depth < 0.96){
+          lamp(sx - sw * 1.18, sy, s, k, depth);
+          lamp(sx + sw * 1.18, sy, s, k, depth);
+        }
+      }
+      prev = { sx: sx, sy: sy, sw: sw };
+    }
+  }
+
+  function lamp(x, y, s, k, depth){
+    var hgt = 1500 * s;
+    var a = depth * 0.9;
+    ctx.strokeStyle = rgba([40, 48, 76], a);
+    ctx.lineWidth = Math.max(1, 46 * s);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y - hgt);
+    ctx.stroke();
+    var r = Math.max(1.5, 150 * s);
+    var g = ctx.createRadialGradient(x, y - hgt, 0, x, y - hgt, r * 3.2);
+    g.addColorStop(0, rgba(AMBER, 0.85 * a));
+    g.addColorStop(0.3, rgba(AMBER, 0.28 * a));
+    g.addColorStop(1, rgba(AMBER, 0));
+    ctx.fillStyle = g;
+    ctx.fillRect(x - r * 3.2, y - hgt - r * 3.2, r * 6.4, r * 6.4);
+  }
+
+  /* ================= auto ================= */
+  /* Kutija s osam vrhova u prostoru auta, zaokrenuta oko okomite osi za
+     kut klizanja i projicirana istom perspektivom kao cesta, pa auto
+     stoji na asfaltu umjesto da lebdi nad njim.
+
+     Koja se lica vide odreduje normala, a ne predznak kuta. Zato je
+     okretanje jednako ispravno u lijevo i u desno, i nema trenutka u
+     kojem se auto izvrne.
+
+     Mjere su u istim jedinicama kao cesta, gdje je metar oko 300, pa je
+     auto sirok 1.9 m i dug 4.3 m koliko i treba biti u odnosu na traku. */
+  var CARZ = 3550;        /* koliko je ispred kamere */
+  var HW = 280, NOSE = 640, TAIL = -640;
+  var BODY = 300, ROOF = 430;
+
+  function proj(lx, ly, lz, carX){
+    var c = Math.cos(yaw), s = Math.sin(yaw);
+    var rx = lx * c + lz * s;
+    var rz = -lx * s + lz * c;
+    var Z = CARZ + rz;
+    if (Z < 60) Z = 60;
+    var sc = FL / Z;
+    return [cx + (carX + rx - camX) * sc, horizon + (CAMH - ly) * sc, Z];
+  }
+
+  /* lice je okrenuto prema nama ako njegova normala gleda u kameru */
+  function facing(nx, nz, cxw, czw, carX){
+    var c = Math.cos(yaw), s = Math.sin(yaw);
+    var wx = nx * c + nz * s;
+    var wz = -nx * s + nz * c;
+    var vx = camX - (carX + cxw);
+    var vz = -(CARZ + czw);
+    return wx * vx + wz * vz > 0;
+  }
+
+  function quad(pts, fillStyle){
+    ctx.fillStyle = fillStyle;
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function car(t, k, bass){
+    var carX = lean * ROADW * 0.55;
+    var sc = FL / CARZ;
+    var side = Math.sin(yaw) >= 0 ? 1 : -1;
+
+    /* sjena pod autom, spljostena po tlu */
+    var sh = proj(0, 0, 0, carX);
+    ctx.fillStyle = 'rgba(0,0,0,.6)';
+    ctx.beginPath();
+    ctx.ellipse(sh[0], sh[1], HW * 2.1 * sc, HW * 0.42 * sc, 0, 0, TAU);
+    ctx.fill();
+
+    /* podsvjetlo */
+    ctx.globalCompositeOperation = 'lighter';
+    var ug = ctx.createRadialGradient(sh[0], sh[1], 0, sh[0], sh[1], HW * 3 * sc);
+    ug.addColorStop(0, rgba(k, 0.34 + bass * 0.26));
+    ug.addColorStop(1, rgba(k, 0));
+    ctx.fillStyle = ug;
+    ctx.fillRect(sh[0] - HW * 3 * sc, sh[1] - HW * 3 * sc, HW * 6 * sc, HW * 6 * sc);
+    ctx.globalCompositeOperation = 'source-over';
+
+    /* kotaci idu prije karoserije da ih ona dijelom pokrije */
+    var wr = 108, wz = [NOSE * 0.62, TAIL * 0.62];
+    for (var wi = 0; wi < 2; wi++){
+      for (var ws = -1; ws <= 1; ws += 2){
+        var a = proj(ws * HW * 1.02, 0, wz[wi] - wr, carX);
+        var b = proj(ws * HW * 1.02, 0, wz[wi] + wr, carX);
+        var c2 = proj(ws * HW * 1.02, wr * 1.7, wz[wi] + wr, carX);
+        var d2 = proj(ws * HW * 1.02, wr * 1.7, wz[wi] - wr, carX);
+        quad([a, b, c2, d2], '#05070C');
+      }
+    }
+
+    /* bok koji gleda prema nama */
+    if (facing(side, 0, side * HW, 0, carX)){
+      quad([proj(side * HW, 0, TAIL, carX),
+            proj(side * HW, 0, NOSE, carX),
+            proj(side * HW, BODY, NOSE, carX),
+            proj(side * HW, BODY, TAIL, carX)], '#131A2C');
+      /* kabina na boku */
+      quad([proj(side * HW * 0.88, BODY, TAIL * 0.66, carX),
+            proj(side * HW * 0.88, BODY, NOSE * 0.42, carX),
+            proj(side * HW * 0.88, ROOF, NOSE * 0.18, carX),
+            proj(side * HW * 0.88, ROOF, TAIL * 0.46, carX)], '#1B2540');
+      /* neonska crta po pragu */
+      ctx.strokeStyle = rgba(k, 0.75);
+      ctx.lineWidth = Math.max(1.2, 22 * sc);
+      var s1 = proj(side * HW * 1.01, 40, TAIL * 0.9, carX);
+      var s2 = proj(side * HW * 1.01, 40, NOSE * 0.9, carX);
+      ctx.beginPath(); ctx.moveTo(s1[0], s1[1]); ctx.lineTo(s2[0], s2[1]); ctx.stroke();
+    }
+
+    /* krov */
+    quad([proj(-HW * 0.88, ROOF, TAIL * 0.46, carX),
+          proj(HW * 0.88, ROOF, TAIL * 0.46, carX),
+          proj(HW * 0.88, ROOF, NOSE * 0.18, carX),
+          proj(-HW * 0.88, ROOF, NOSE * 0.18, carX)], '#232E4E');
+
+    /* straznje lice */
+    if (facing(0, -1, 0, TAIL, carX)){
+      var r0 = proj(-HW, 0, TAIL, carX);
+      var r1 = proj(HW, 0, TAIL, carX);
+      var r2 = proj(HW, BODY, TAIL, carX);
+      var r3 = proj(-HW, BODY, TAIL, carX);
+      var gb = ctx.createLinearGradient(0, r2[1], 0, r0[1]);
+      gb.addColorStop(0, '#26304E');
+      gb.addColorStop(1, '#0B0F1C');
+      quad([r0, r1, r2, r3], gb);
+
+      /* staklo */
+      quad([proj(-HW * 0.82, BODY, TAIL * 0.98, carX),
+            proj(HW * 0.82, BODY, TAIL * 0.98, carX),
+            proj(HW * 0.80, ROOF, TAIL * 0.52, carX),
+            proj(-HW * 0.80, ROOF, TAIL * 0.52, carX)], 'rgba(28,40,76,.95)');
+
+      /* stop svjetla */
+      var glow = 0.5 + bass * 0.5;
+      for (var g = -1; g <= 1; g += 2){
+        var l0 = proj(g * HW * 0.30 - HW * 0.24, BODY * 0.52, TAIL, carX);
+        var l1 = proj(g * HW * 0.30 + HW * 0.24, BODY * 0.52, TAIL, carX);
+        var l2 = proj(g * HW * 0.30 + HW * 0.24, BODY * 0.78, TAIL, carX);
+        var l3 = proj(g * HW * 0.30 - HW * 0.24, BODY * 0.78, TAIL, carX);
+        quad([l0, l1, l2, l3], 'rgba(255,42,64,.96)');
+        ctx.globalCompositeOperation = 'lighter';
+        var mx = (l0[0] + l2[0]) / 2, my = (l0[1] + l2[1]) / 2;
+        var lg = ctx.createRadialGradient(mx, my, 0, mx, my, HW * 1.1 * sc);
+        lg.addColorStop(0, 'rgba(255,42,64,' + (0.55 * glow) + ')');
+        lg.addColorStop(1, 'rgba(255,42,64,0)');
+        ctx.fillStyle = lg;
+        ctx.fillRect(mx - HW * 1.1 * sc, my - HW * 1.1 * sc,
+                     HW * 2.2 * sc, HW * 2.2 * sc);
+        ctx.globalCompositeOperation = 'source-over';
+      }
+    }
+
+    /* krilo, dvije nozice i ploca */
+    var wy = ROOF * 0.96, wzz = TAIL * 0.80;
+    for (var fs = -1; fs <= 1; fs += 2){
+      var f0 = proj(fs * HW * 0.62, BODY, wzz, carX);
+      var f1 = proj(fs * HW * 0.62 + 26, BODY, wzz, carX);
+      var f2 = proj(fs * HW * 0.62 + 26, wy, wzz, carX);
+      var f3 = proj(fs * HW * 0.62, wy, wzz, carX);
+      quad([f0, f1, f2, f3], '#0D1220');
+    }
+    quad([proj(-HW * 1.02, wy, wzz - 60, carX),
+          proj(HW * 1.02, wy, wzz - 60, carX),
+          proj(HW * 1.02, wy + 34, wzz + 30, carX),
+          proj(-HW * 1.02, wy + 34, wzz + 30, carX)], '#161E36');
+
+    /* ispuh na frazu */
+    var pd = t - popAt;
+    if (pd >= 0 && pd < 0.16 && !reduce){
+      var pw = 1 - pd / 0.16;
+      ctx.globalCompositeOperation = 'lighter';
+      for (var e = -1; e <= 1; e += 2){
+        var ep = proj(e * HW * 0.44, BODY * 0.22, TAIL * 1.02, carX);
+        var er = HW * 0.95 * sc * pw;
+        var eg = ctx.createRadialGradient(ep[0], ep[1], 0, ep[0], ep[1], er);
+        eg.addColorStop(0, 'rgba(255,226,160,' + (0.95 * pw) + ')');
+        eg.addColorStop(0.42, 'rgba(255,124,42,' + (0.5 * pw) + ')');
+        eg.addColorStop(1, 'rgba(255,60,20,0)');
+        ctx.fillStyle = eg;
+        ctx.fillRect(ep[0] - er, ep[1] - er, er * 2, er * 2);
+      }
+      ctx.globalCompositeOperation = 'source-over';
+    }
+  }
+
+  /* ================= karaoke ================= */
+  /* LYRICS je namjerno prazan. Tekst pjesme je autorski i ne ide u
+     datoteku koja se objavljuje; upisi ga sam ako ga zelis ovdje.
+     Oblik je { t: sekunda kad redak pocinje, s: 'redak' }, poredano po
+     vremenu. Zadnji redak traje do LY_END. */
+  var LYRICS = [];
+  var LY_END = T.fin;
+
+  var lyBase = document.getElementById('lyBase');
+  var lyFill = document.getElementById('lyFill');
+  var lyNext = document.getElementById('lyNext');
+  var lyIdx = -2;
+
+  function lyrics(t){
+    if (!LYRICS.length) return;
+    var i = -1;
+    for (var q = 0; q < LYRICS.length; q++) if (t >= LYRICS[q].t) i = q;
+    if (i !== lyIdx){
+      lyIdx = i;
+      var cur = i >= 0 ? LYRICS[i].s : '';
+      lyBase.textContent = cur;
+      lyFill.textContent = cur;
+      lyNext.textContent = (i + 1 < LYRICS.length) ? LYRICS[i + 1].s : '';
+    }
+    if (i < 0){ lyFill.style.width = '0'; return; }
+    var a = LYRICS[i].t;
+    var b = (i + 1 < LYRICS.length) ? LYRICS[i + 1].t : LY_END;
+    var f = clamp((t - a) / Math.max(0.2, b - a), 0, 1);
+    lyFill.style.width = (f * 100) + '%';
+  }
+
+  /* ================= petlja ================= */
+  var last = 0, now8 = 0, spdShown = -1, roll = 0;
+
+  function frame(ms){
+    requestAnimationFrame(frame);
+    now8 = ms / 1000;
+    var dt = last ? Math.min(now8 - last, 0.05) : 0.016;
+    last = now8;
+    ema = ema * 0.94 + dt * 0.06;
+    var want = relief > 0.5 ? (ema > 0.0166 ? 1 : 0) : (ema > 0.0192 ? 1 : 0);
+    relief += (want - relief) * Math.min(1, dt * 1.1);
+
+    var t = audio.currentTime;
+    director(t, dt);
+    beats(t);
+    var bass = energy(1, 14);
+    drive(t, dt, bass);
+
+    var k = mix(mix(CYAN, PINK, clamp(heat, 0, 1)), AMBER,
+                clamp((heat - 0.9) / 0.1, 0, 1) * 0.5);
+
+    skyLayer();
+
+    /* nebo se ne precrtava, samo se kopira, pa grad i zvijezde ne kostaju */
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.drawImage(sky, 0, 0, W, H);
+    ctx.fillStyle = rgba(INK, 1);
+    ctx.fillRect(0, horizon, W, H - horizon);
+
+    shake *= Math.pow(0.0022, dt);
+    var amp = M * 0.018 * shake;
+    roll += (yaw * 0.06 - roll) * clamp(dt * 5, 0, 1);
+
+    ctx.save();
+    ctx.translate(cx + (Math.random() - 0.5) * amp, cy + (Math.random() - 0.5) * amp);
+    ctx.rotate(roll);
+    ctx.translate(-cx, -cy);
+
+    road(t, k, bass);
+
+    /* dim se sipa iz straznjih guma kad je kut velik */
+    var slip = Math.abs(yaw);
+    if (heat > 0.25 && slip > 0.07 && !reduce){
+      smoke(Math.min(5, Math.round(slip * 13 * heat)), slip);
+    }
+    drawSmoke(dt, k);
+    car(t, k, bass);
+
+    ctx.restore();
+
+    /* vinjeta, jedan potez, bez slojeva */
+    var vg = ctx.createRadialGradient(cx, cy, M * 0.34, cx, cy, M * 1.02);
+    vg.addColorStop(0, 'rgba(0,0,0,0)');
+    vg.addColorStop(1, 'rgba(0,0,0,.62)');
+    ctx.fillStyle = vg;
+    ctx.fillRect(0, 0, W, H);
+
+    lyrics(t);
+    hud(t, slip);
+  }
+
+  /* ================= hud ================= */
+  var lastShown = -1;
+  function hud(t, slip){
+    var p = clamp(t / T.dur, 0, 1);
+    fill.style.width = (p * 100) + '%';
+    head.style.left = (p * 100) + '%';
+    var s = t | 0;
+    if (s !== lastShown){
+      lastShown = s;
+      clock.textContent = (s / 60 | 0) + ':' + ('0' + (s % 60)).slice(-2);
+      bar.setAttribute('aria-valuenow', String(s));
+    }
+    var kmh = Math.round(80 + heat * 95 + slip * 55);
+    if (kmh !== spdShown){ spdShown = kmh; spdEl.textContent = kmh; }
+  }
+
+  function jumped(){
+    lastBeat = -1e9; beatAt = -9; beatHard = 0; popAt = -9;
+    SM.length = 0; yaw = 0; yawV = 0; flick = 0; shake = 0; lyIdx = -2;
+  }
+
+  bar.addEventListener('click', function(e){
+    var r = bar.getBoundingClientRect();
+    audio.currentTime = clamp(((e.clientX - r.left) / r.width) * T.dur, 0, T.dur - 0.05);
+    jumped();
+  });
+  bar.addEventListener('keydown', function(e){
+    var d = e.key === 'ArrowRight' ? 5 : e.key === 'ArrowLeft' ? -5 : 0;
+    if (!d) return;
+    e.preventDefault();
+    audio.currentTime = clamp(audio.currentTime + d, 0, T.dur - 0.05);
+    jumped();
+  });
+
+  function toggle(){
+    if (audio.paused){
+      if (actx && actx.state === 'suspended') actx.resume();
+      audio.play();
+    } else audio.pause();
+  }
+  pp.addEventListener('click', toggle);
+  audio.addEventListener('play',  function(){ document.body.classList.add('going'); });
+  audio.addEventListener('pause', function(){ document.body.classList.remove('going'); });
+  document.addEventListener('keydown', function(e){
+    if (e.code === 'Space' && e.target === document.body){ e.preventDefault(); toggle(); }
+  });
+
+  var idleTimer;
+  function stir(){
+    document.body.classList.remove('idle');
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(function(){ document.body.classList.add('idle'); }, 3000);
+  }
+  document.addEventListener('mousemove', stir);
+  document.addEventListener('touchstart', stir);
+
+  document.getElementById('start').addEventListener('click', function(){
+    listen();
+    if (actx && actx.state === 'suspended') actx.resume();
+    audio.play();
+    gate.classList.add('gone');
+    setTimeout(function(){ gate.style.display = 'none'; }, 900);
+    stir();
+  });
+
+  window.__td = {
+    T: T, grid: GRID,
+    at: function(t){
+      director(t, 0);
+      return { heat: +heat.toFixed(3), yaw: +yaw.toFixed(3),
+               beat: Math.round((t - GRID.t0) / SPB),
+               curve: +curveAtBeat((t - GRID.t0) / SPB).toFixed(3),
+               smoke: SM.length, lyrics: LYRICS.length };
+    }
+  };
+
+  size();
+  requestAnimationFrame(frame);
+
+  try { if (window.top !== window.self) document.querySelector('.backlink').remove(); }
+  catch(e){}
+})();
+</script>
+</body>
+</html>
