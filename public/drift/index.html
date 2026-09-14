@@ -604,6 +604,8 @@
     var offset = pos % SEG;
     var x = 0, dx = 0;
     var prev = null, lastLamp = -1;
+    /* gdje zadnji odsjecak pada na ekranu: odatle prema dolje ide gasenje */
+    var endY = horizon + CAMH * (FL / (DRAW * SEG));
 
     for (var i = 0; i < DRAW; i++){
       var z = (i + 1) * SEG - offset;
@@ -618,6 +620,9 @@
       var sx = cx + (x - camX) * s;
       var sw = ROADW * s;
       var depth = 1 - i / DRAW;
+      /* gasi se prema horizontu, u pikselima a ne u odsjeccima, pa
+         cesta nestane u izmaglici umjesto da se odreze */
+      var tail = clamp((sy - endY) / (M * 0.15), 0, 1);
 
       if (prev){
         var n = Math.floor(segBeat * 2);
@@ -626,7 +631,7 @@
         /* sto je dalje, to vise poprima boju izmaglice */
         var fog = (1 - depth) * (1 - depth);
         ctx.fillStyle = rgba(mix(mix(TAR, k, 0.06 + depth * 0.05), HAZE, fog * 0.72),
-                             0.90 + depth * 0.10);
+                             (0.90 + depth * 0.10) * tail);
         ctx.beginPath();
         ctx.moveTo(prev.sx - prev.sw, prev.sy);
         ctx.lineTo(prev.sx + prev.sw, prev.sy);
@@ -637,7 +642,7 @@
 
         /* rub ceste, naizmjence, jer to je ono sto daje brzinu */
         if (alt){
-          ctx.fillStyle = rgba(mix(PINK, HOT, 0.25), 0.55 + depth * 0.4);
+          ctx.fillStyle = rgba(mix(PINK, HOT, 0.25), (0.55 + depth * 0.4) * tail);
           var e = sw * 0.10, pe = prev.sw * 0.10;
           ctx.beginPath();
           ctx.moveTo(prev.sx - prev.sw, prev.sy);
@@ -654,7 +659,7 @@
         }
         /* isprekidana sredina */
         if (alt && i < DRAW * 0.72){
-          ctx.fillStyle = rgba(LINE, 0.16 + depth * 0.5);
+          ctx.fillStyle = rgba(LINE, (0.16 + depth * 0.5) * tail);
           var mw = sw * 0.018, pm = prev.sw * 0.018;
           ctx.beginPath();
           ctx.moveTo(prev.sx - pm, prev.sy);
