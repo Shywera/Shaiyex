@@ -417,6 +417,9 @@
     var ahead = curveAtBeat(beat + 0.9);
     var here  = curveAtBeat(beat + 0.2);
 
+    /* kad skreces udesno, svijet ti odlazi ulijevo */
+    cityX += here * 34 * dt;
+
     /* Kontra volan: auto je okrenut suprotno od smjera krivine. Zato
        drift izgleda kao drift a ne kao skretanje. */
     var target = ahead * 0.22 * Math.pow(clamp(heat * 1.15, 0, 1), 1.7);
@@ -434,60 +437,125 @@
   }
 
   /* ================= nebo i grad ================= */
-  var sky = null, skyKey = '';
+  var sky = null, skyKey = '', SW = 0, WIN = [];
+  var cityX = 0;          /* koliko se grad otkotrljao u stranu */
+  var HAZE = [64, 78, 122];
+
   function skyLayer(){
     var key = W + 'x' + H + '|' + Math.round(dpr * 100);
     if (skyKey === key) return;
     skyKey = key;
+    SW = W * 2;                     /* dvostruko sire da ima sto kliziti */
     if (!sky) sky = document.createElement('canvas');
-    sky.width = canvas.width; sky.height = canvas.height;
+    sky.width = Math.round(SW * dpr);
+    sky.height = Math.round((horizon + 6) * dpr);
     var g = sky.getContext('2d');
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    WIN = [];
 
     var sg = g.createLinearGradient(0, 0, 0, horizon);
     sg.addColorStop(0, '#05060F');
     sg.addColorStop(0.55, '#0B1030');
     sg.addColorStop(1, '#2A1442');
     g.fillStyle = sg;
-    g.fillRect(0, 0, W, horizon + 2);
+    g.fillRect(0, 0, SW, horizon + 6);
 
-    /* zvijezde su rijetke jer grad ispod njih grize nebo */
     g.fillStyle = 'rgba(255,255,255,.5)';
-    for (var i = 0; i < 90; i++){
-      var sx = Math.random() * W, sy = Math.random() * horizon * 0.72;
+    for (var i = 0; i < 180; i++){
+      var sx = Math.random() * SW, sy = Math.random() * horizon * 0.72;
       var r = Math.random() < 0.85 ? 0.7 : 1.3;
       g.globalAlpha = 0.18 + Math.random() * 0.5;
       g.fillRect(sx, sy, r, r);
     }
     g.globalAlpha = 1;
 
-    /* silueta grada u dva sloja, blizi tamniji, s prozorima */
     for (var layer = 0; layer < 2; layer++){
       var base = horizon + 2;
       var far = layer === 0;
-      g.fillStyle = far ? '#0E1330' : '#070A1C';
+      var body = far ? '#0E1330' : '#070A1C';
       var x = -40;
-      while (x < W + 40){
+      while (x < SW + 40){
         var bw = (far ? 26 : 38) + Math.random() * (far ? 52 : 74);
         var bh = (far ? 30 : 46) + Math.random() * (far ? 90 : 150);
+        g.fillStyle = body;
         g.fillRect(x, base - bh, bw, bh);
         var cols = Math.max(1, Math.floor(bw / (far ? 9 : 12)));
         var rows = Math.max(1, Math.floor(bh / (far ? 11 : 15)));
         for (var cc = 0; cc < cols; cc++){
           for (var rr = 0; rr < rows; rr++){
             if (Math.random() > (far ? 0.20 : 0.26)) continue;
-            g.fillStyle = Math.random() < 0.72
+            var wx = x + 3 + cc * (far ? 9 : 12);
+            var wy = base - bh + 4 + rr * (far ? 11 : 15);
+            var ww = far ? 3 : 4, wh = far ? 4 : 6;
+            var warm = Math.random() < 0.72;
+            g.fillStyle = warm
               ? 'rgba(255,179,56,' + (0.25 + Math.random() * 0.5) + ')'
               : 'rgba(0,229,255,' + (0.20 + Math.random() * 0.45) + ')';
-            g.fillRect(x + 3 + cc * (far ? 9 : 12),
-                       base - bh + 4 + rr * (far ? 11 : 15),
-                       far ? 3 : 4, far ? 4 : 6);
+            g.fillRect(wx, wy, ww, wh);
+            /* mali dio prozora pamtimo da ih mozemo paliti i gasiti */
+            if (!far && WIN.length < 80 && Math.random() < 0.05){
+              WIN.push({ x: wx, y: wy, w: ww, h: wh, warm: warm,
+                         ph: Math.random() * 6.28,
+                         sp: 0.5 + Math.random() * 2.2 });
+            }
           }
         }
-        g.fillStyle = far ? '#0E1330' : '#070A1C';
         x += bw + 3 + Math.random() * 12;
       }
     }
+  }
+
+  /* Nebo se crta iz dvostruko sire slike, pomaknuto po tome koliko smo
+     skrenuli. Uzima se samo onaj isjecak koji treba, pa je posla tocno
+     koliko i prije: jedan ekran piksela. */
+  function drawSky(){
+    var ox = ((cityX % SW) + SW) % SW;
+    var hh = horizon + 6;
+    if (ox + W <= SW){
+      ctx.drawImage(sky, ox * dpr, 0, W * dpr, hh * dpr, 0, 0, W, hh);
+    } else {
+      var a = SW - ox;
+      ctx.drawImage(sky, ox * dpr, 0, a * dpr, hh * dpr, 0, 0, a, hh);
+      ctx.drawImage(sky, 0, 0, (W - a) * dpr, hh * dpr, a, 0, W - a, hh);
+    }
+  }
+
+  /* Prozori koji se pale i gase. Osamdeset komada, pomaknuti zajedno s
+     gradom, pa grad zivi a da se nista ne mora ponovno crtati. */
+  function windows(now){
+    if (!WIN.length) return;
+    var ox = ((cityX % SW) + SW) % SW;
+    ctx.globalCompositeOperation = 'lighter';
+    for (var i = 0; i < WIN.length; i++){
+      var w = WIN[i];
+      var a = Math.sin(now * w.sp + w.ph);
+      if (a < 0.55) continue;
+      var x = w.x - ox;
+      if (x < -20) x += SW;
+      if (x > W + 20) continue;
+      ctx.fillStyle = w.warm
+        ? 'rgba(255,196,96,' + ((a - 0.55) * 1.1) + ')'
+        : 'rgba(120,240,255,' + ((a - 0.55) * 0.9) + ')';
+      ctx.fillRect(x, w.y, w.w, w.h);
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  /* Izmaglica na horizontu. Bez nje cesta jednostavno prestane i dalje je
+     crno; s njom se daleki asfalt gubi u istom sjaju u kojem stoji grad,
+     pa se cita da cesta vodi tamo. */
+  function mist(k, bass){
+    var top = horizon - M * 0.085, bot = horizon + M * 0.075;
+    var mg = ctx.createLinearGradient(0, top, 0, bot);
+    var c = mix(HAZE, mix(AMBER, k, 0.45), 0.42);
+    mg.addColorStop(0, rgba(c, 0));
+    mg.addColorStop(0.42, rgba(c, 0.17 + bass * 0.07));
+    mg.addColorStop(0.70, rgba(c, 0.11));
+    mg.addColorStop(1, rgba(c, 0));
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = mg;
+    ctx.fillRect(0, top, W, bot - top);
+    ctx.globalCompositeOperation = 'source-over';
   }
 
   /* ================= dim ================= */
@@ -555,7 +623,9 @@
         var n = Math.floor(segBeat * 2);
         var alt = ((n % 2) + 2) % 2;
         /* asfalt */
-        ctx.fillStyle = rgba(mix(TAR, k, 0.06 + depth * 0.05),
+        /* sto je dalje, to vise poprima boju izmaglice */
+        var fog = (1 - depth) * (1 - depth);
+        ctx.fillStyle = rgba(mix(mix(TAR, k, 0.06 + depth * 0.05), HAZE, fog * 0.72),
                              0.90 + depth * 0.10);
         ctx.beginPath();
         ctx.moveTo(prev.sx - prev.sw, prev.sy);
@@ -850,7 +920,8 @@
 
     /* nebo se ne precrtava, samo se kopira, pa grad i zvijezde ne kostaju */
     ctx.globalCompositeOperation = 'source-over';
-    ctx.drawImage(sky, 0, 0, W, H);
+    drawSky();
+    windows(now8);
     ctx.fillStyle = rgba(INK, 1);
     ctx.fillRect(0, horizon, W, H - horizon);
 
@@ -864,6 +935,8 @@
     ctx.translate(-cx, -cy);
 
     road(t, k, bass);
+    /* odmah iza ceste, pa magli daleki asfalt a ne bliski */
+    mist(k, bass);
 
     /* dim se sipa iz straznjih guma kad je kut velik */
     var slip = Math.abs(yaw);
@@ -972,6 +1045,7 @@
 
   window.__td = {
     T: T, grid: GRID, probe: probe,
+    city: function(){ return Math.round(cityX); },
     at: function(t){
       director(t, 0);
       return { heat: +heat.toFixed(3), yaw: +yaw.toFixed(3),
