@@ -418,7 +418,7 @@
     var here  = curveAtBeat(beat + 0.2);
 
     /* kad skreces udesno, svijet ti odlazi ulijevo */
-    cityX += here * 34 * dt;
+    cityX += (here * 85 + 14) * dt;
 
     /* Kontra volan: auto je okrenut suprotno od smjera krivine. Zato
        drift izgleda kao drift a ne kao skretanje. */
@@ -493,7 +493,7 @@
               : 'rgba(0,229,255,' + (0.20 + Math.random() * 0.45) + ')';
             g.fillRect(wx, wy, ww, wh);
             /* mali dio prozora pamtimo da ih mozemo paliti i gasiti */
-            if (!far && WIN.length < 80 && Math.random() < 0.05){
+            if (!far && WIN.length < 190 && Math.random() < 0.13){
               WIN.push({ x: wx, y: wy, w: ww, h: wh, warm: warm,
                          ph: Math.random() * 6.28,
                          sp: 0.5 + Math.random() * 2.2 });
@@ -529,13 +529,13 @@
     for (var i = 0; i < WIN.length; i++){
       var w = WIN[i];
       var a = Math.sin(now * w.sp + w.ph);
-      if (a < 0.55) continue;
+      if (a < 0.30) continue;
       var x = w.x - ox;
       if (x < -20) x += SW;
       if (x > W + 20) continue;
       ctx.fillStyle = w.warm
-        ? 'rgba(255,196,96,' + ((a - 0.55) * 1.1) + ')'
-        : 'rgba(120,240,255,' + ((a - 0.55) * 0.9) + ')';
+        ? 'rgba(255,206,120,' + ((a - 0.30) * 1.25) + ')'
+        : 'rgba(140,244,255,' + ((a - 0.30) * 1.05) + ')';
       ctx.fillRect(x, w.y, w.w, w.h);
     }
     ctx.globalCompositeOperation = 'source-over';
@@ -545,12 +545,12 @@
      crno; s njom se daleki asfalt gubi u istom sjaju u kojem stoji grad,
      pa se cita da cesta vodi tamo. */
   function mist(k, bass){
-    var top = horizon - M * 0.085, bot = horizon + M * 0.075;
+    var top = horizon - M * 0.115, bot = horizon + M * 0.09;
     var mg = ctx.createLinearGradient(0, top, 0, bot);
     var c = mix(HAZE, mix(AMBER, k, 0.45), 0.42);
     mg.addColorStop(0, rgba(c, 0));
-    mg.addColorStop(0.42, rgba(c, 0.17 + bass * 0.07));
-    mg.addColorStop(0.70, rgba(c, 0.11));
+    mg.addColorStop(0.42, rgba(c, 0.30 + bass * 0.12));
+    mg.addColorStop(0.70, rgba(c, 0.19));
     mg.addColorStop(1, rgba(c, 0));
     ctx.globalCompositeOperation = 'lighter';
     ctx.fillStyle = mg;
