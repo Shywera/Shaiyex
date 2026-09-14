@@ -712,7 +712,11 @@
   var CW = 0, CT = 0;   /* sirina kabine dolje i gore */        /* koliko je ispred kamere */
   var HW = 280, NOSE = 640, TAIL = -640;
   CW = HW * 0.92; CT = HW * 0.66;
-  var BODY = 300, ROOF = 430;
+  var BODY = 300, ROOF = 452;
+  /* crvena u tri tona: gornje plohe hvataju svjetlo, bokovi su srednji,
+     donji rub tamni. Bez te razlike auto na noci ispadne kao jedna mrlja. */
+  var CAR_HI = '#E4232C', CAR_MID = '#A8151D', CAR_LO = '#4E0A0F';
+  var CAR_PIL = '#630C11';
 
   function proj(lx, ly, lz, carX){
     var c = Math.cos(yaw), s = Math.sin(yaw);
@@ -803,26 +807,26 @@
     quad([proj(-HW, BODY, TAIL, carX),
           proj(HW, BODY, TAIL, carX),
           proj(HW, BODY, NOSE, carX),
-          proj(-HW, BODY, NOSE, carX)], '#1A2238');
+          proj(-HW, BODY, NOSE, carX)], CAR_HI);
 
     if (facing(side, 0, side * HW, 0, carX)){
       /* bok */
       quad([proj(side * HW, 0, TAIL, carX),
             proj(side * HW, 0, NOSE, carX),
             proj(side * HW, BODY, NOSE, carX),
-            proj(side * HW, BODY, TAIL, carX)], '#131A2C');
+            proj(side * HW, BODY, TAIL, carX)], CAR_MID);
 
       /* zadnji bok se izbaci van, to je ono sto autu daje ramena */
       quad([proj(side * HW * 1.09, BODY * 0.10, TAIL * 0.98, carX),
             proj(side * HW * 1.09, BODY * 0.10, TAIL * 0.16, carX),
             proj(side * HW * 1.02, BODY * 0.78, TAIL * 0.16, carX),
-            proj(side * HW * 1.02, BODY * 0.78, TAIL * 0.98, carX)], '#171F36');
+            proj(side * HW * 1.02, BODY * 0.78, TAIL * 0.98, carX)], '#BE1A22');
 
       /* bok kabine, isti vrhovi kao krov i zadnje lice */
       quad([proj(side * CW, BODY, TAIL * 0.98, carX),
             proj(side * CW, BODY, NOSE * 0.30, carX),
-            proj(side * CT, ROOF, NOSE * 0.16, carX),
-            proj(side * CT, ROOF, TAIL * 0.44, carX)], '#1B2540');
+            proj(side * CT, ROOF, NOSE * 0.06, carX),
+            proj(side * CT, ROOF, TAIL * 0.62, carX)], CAR_PIL);
 
       /* Staklo s pregibom: donji straznji kut se lomi prema naprijed
          umjesto da ide ravno u stup. To je potez po kojem se auto
@@ -851,10 +855,10 @@
     }
 
     /* krov, dijeli gornje vrhove s bokom kabine */
-    quad([proj(-CT, ROOF, TAIL * 0.44, carX),
-          proj(CT, ROOF, TAIL * 0.44, carX),
-          proj(CT, ROOF, NOSE * 0.16, carX),
-          proj(-CT, ROOF, NOSE * 0.16, carX)], '#232E4E');
+    quad([proj(-CT, ROOF, TAIL * 0.62, carX),
+          proj(CT, ROOF, TAIL * 0.62, carX),
+          proj(CT, ROOF, NOSE * 0.06, carX),
+          proj(-CT, ROOF, NOSE * 0.06, carX)], CAR_HI);
 
     if (facing(0, -1, 0, TAIL, carX)){
       var r0 = proj(-HW, 0, TAIL, carX);
@@ -862,15 +866,15 @@
       var r2 = proj(HW, BODY, TAIL, carX);
       var r3 = proj(-HW, BODY, TAIL, carX);
       var gb = ctx.createLinearGradient(0, r2[1], 0, r0[1]);
-      gb.addColorStop(0, '#26304E');
-      gb.addColorStop(1, '#0B0F1C');
+      gb.addColorStop(0, CAR_MID);
+      gb.addColorStop(1, CAR_LO);
       quad([r0, r1, r2, r3], gb);
 
       /* puno zadnje lice kabine, pa staklo kao umetak u njemu */
       quad([proj(-CW, BODY, TAIL * 0.98, carX),
             proj(CW, BODY, TAIL * 0.98, carX),
-            proj(CT, ROOF, TAIL * 0.44, carX),
-            proj(-CT, ROOF, TAIL * 0.44, carX)], '#1B2540');
+            proj(CT, ROOF, TAIL * 0.62, carX),
+            proj(-CT, ROOF, TAIL * 0.62, carX)], CAR_PIL);
       quad([proj(-CW * 0.86, BODY + 22, TAIL * 0.96, carX),
             proj(CW * 0.86, BODY + 22, TAIL * 0.96, carX),
             proj(CT * 0.88, ROOF - 20, TAIL * 0.46, carX),
@@ -886,8 +890,8 @@
 
       /* L stop svjetla */
       var glow = 0.5 + bass * 0.5;
-      rearPoly(LAMP_L, carX, 'rgba(120,16,28,.95)');
-      rearPoly(LAMP_R, carX, 'rgba(120,16,28,.95)');
+      rearPoly(LAMP_L, carX, 'rgba(24,8,10,.96)');
+      rearPoly(LAMP_R, carX, 'rgba(24,8,10,.96)');
       /* uska cijev u leci: ona je ono sto gori */
       rearPoly([[-0.42, 0.615], [-0.86, 0.615], [-0.86, 0.565], [-0.42, 0.565]],
                carX, 'rgba(255,58,78,.98)');
@@ -910,24 +914,36 @@
       }
       ctx.globalCompositeOperation = 'source-over';
 
-      /* cetiri cijevi, dvije po strani */
-      for (var es = -1; es <= 1; es += 2){
-        for (var ei = 0; ei < 2; ei++){
-          var ex = es * (0.52 + ei * 0.18);
-          rearPoly([[ex - 0.07, 0.03], [ex + 0.07, 0.03],
-                    [ex + 0.07, 0.15], [ex - 0.07, 0.15]], carX, '#1E2740');
-          rearPoly([[ex - 0.05, 0.05], [ex + 0.05, 0.05],
-                    [ex + 0.05, 0.13], [ex - 0.05, 0.13]], carX, '#04060B');
-        }
+      /* sredisnji sklop cijevi, kako stoji na hot hatchevima */
+      rearPoly([[-0.30, 0.02], [0.30, 0.02], [0.30, 0.17], [-0.30, 0.17]],
+               carX, '#15181F');
+      for (var ei = -1; ei <= 1; ei++){
+        var ex = ei * 0.175;
+        rearPoly([[ex - 0.075, 0.035], [ex + 0.075, 0.035],
+                  [ex + 0.075, 0.155], [ex - 0.075, 0.155]], carX, '#2A3040');
+        rearPoly([[ex - 0.055, 0.05], [ex + 0.055, 0.05],
+                  [ex + 0.055, 0.14], [ex - 0.055, 0.14]], carX, '#04060B');
       }
     }
 
-    /* niski spojler na poklopcu, ne veliko krilo */
-    var wy = BODY * 1.02, wzz = TAIL * 0.86;
-    quad([proj(-HW * 0.96, BODY * 0.94, wzz, carX),
-          proj(HW * 0.96, BODY * 0.94, wzz, carX),
-          proj(HW * 0.92, wy, wzz + 46, carX),
-          proj(-HW * 0.92, wy, wzz + 46, carX)], '#1A2340');
+    /* Veliko krilo na dva nosaca iznad poklopca. Nosaci se crtaju prije
+       ploce, pa ih ona dijelom pokrije i krilo stoji na njima umjesto da
+       lebdi. */
+    var wgY = ROOF + 72, wgZ = TAIL * 0.68;
+    for (var fs = -1; fs <= 1; fs += 2){
+      quad([proj(fs * HW * 0.58, ROOF - 26, wgZ, carX),
+            proj(fs * HW * 0.58 + 24, ROOF - 26, wgZ, carX),
+            proj(fs * HW * 0.58 + 24, wgY, wgZ, carX),
+            proj(fs * HW * 0.58, wgY, wgZ, carX)], '#15181F');
+    }
+    quad([proj(-HW * 1.06, wgY, wgZ - 34, carX),
+          proj(HW * 1.06, wgY, wgZ - 34, carX),
+          proj(HW * 1.06, wgY + 26, wgZ + 62, carX),
+          proj(-HW * 1.06, wgY + 26, wgZ + 62, carX)], '#C41E26');
+    quad([proj(-HW * 1.06, wgY, wgZ - 34, carX),
+          proj(HW * 1.06, wgY, wgZ - 34, carX),
+          proj(HW * 1.06, wgY - 12, wgZ - 34, carX),
+          proj(-HW * 1.06, wgY - 12, wgZ - 34, carX)], '#12151C');
 
     var pd = t - popAt;
     if (pd >= 0 && pd < 0.16 && !reduce){
