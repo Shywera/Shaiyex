@@ -4,17 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Five questions, about a minute.">
+<meta name="description" content="Five questions about a month in Zagreb.">
 <meta name="theme-color" content="#0B0A1A">
 <meta property="og:type" content="website">
-<meta property="og:title" content="a question for you">
-<meta property="og:description" content="Five questions, about a minute. One of them has a right answer.">
-<meta property="og:url" content="https://shaiyex.com/date/">
+<meta property="og:title" content="nairobi to zagreb">
+<meta property="og:description" content="Five questions about you, me, and a month in Zagreb.">
+<meta property="og:url" content="https://shaiyex.com/zagreb/">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/favicon.svg">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}</style>
-<title>a question for you</title>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<title>nairobi to zagreb</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
@@ -24,7 +24,7 @@
  * display: Gloock · body: Onest · utility: JetBrains Mono · axes: dark / high-contrast-serif / warm
  * pre-emit critique: P4 H5 E4 S5 R4 V5
  */
-/* Layout: one question per screen. Question top-left, answers in the thumb zone, a paper ticket at the end. */
+/* Layout: one question per screen. Question top-left, answers in the thumb zone, a boarding pass at the end. */
 :root{
   --night: oklch(15% 0.03 285);
   --night-2: oklch(20% 0.035 288);
@@ -48,6 +48,7 @@
   background: var(--night);
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{height:100%;overflow-x:clip}
 body{
   margin:0;background:var(--night);color:var(--text);
@@ -93,7 +94,7 @@ main{flex:1;display:flex;flex-direction:column}
 .peek{
   margin-top:auto;align-self:flex-start;
   background:var(--paper);color:var(--paper-mute);border-radius:10px;
-  padding:14px 18px;width:min(240px,70%);transform:rotate(-4deg);
+  padding:14px 18px;width:min(250px,72%);transform:rotate(-4deg);
   font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
   display:flex;justify-content:space-between;gap:var(--space-md);
 }
@@ -118,38 +119,24 @@ main{flex:1;display:flex;flex-direction:column}
 .opt.check[aria-pressed="true"] .mark{background:var(--her)}
 .opt.check[aria-pressed="true"] .mark::after{content:"";display:block;width:6px;height:11px;margin:3px 0 0 7px;border:solid var(--night);border-width:0 2px 2px 0;transform:rotate(45deg)}
 
-/* day grid */
-.days-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--space-sm)}
-.days-head span{font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
-.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
-.day{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-  min-height:62px;padding:6px 0;cursor:pointer;
+/* month grid */
+.months-head{font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:var(--space-sm)}
+.months{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.month{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+  min-height:58px;padding:6px 0;cursor:pointer;
   background:transparent;border:1px solid var(--line);border-radius:10px;
   transition:background .2s var(--ease-out),border-color .2s var(--ease-out);
 }
-.day small{font-size:11px;color:var(--muted);text-transform:lowercase}
-.day b{font-family:var(--font-mono);font-size:19px;font-weight:500;font-variant-numeric:tabular-nums}
-.day i{font-style:normal;font-size:10px;color:var(--her);font-family:var(--font-mono);height:12px;line-height:12px}
-@media (hover:hover){.day:hover{border-color:var(--muted)}}
-.day[aria-pressed="true"]{background:var(--her);border-color:var(--her);color:var(--night)}
-.day[aria-pressed="true"] small,.day[aria-pressed="true"] i{color:var(--night)}
-.readout{margin-top:var(--space-md);min-height:32px;font-family:var(--font-display);font-size:24px;color:var(--her)}
-.readout.empty{color:var(--muted);font-family:var(--font-body);font-size:15px;padding-top:6px}
-
-/* times */
-.times{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-sm)}
-.time{
-  display:flex;flex-direction:column;align-items:flex-start;gap:2px;
-  padding:16px;min-height:88px;text-align:left;cursor:pointer;
-  background:transparent;border:1px solid var(--line);border-radius:var(--radius);
-  transition:background .2s var(--ease-out),border-color .2s var(--ease-out);
-}
-.time b{font-family:var(--font-mono);font-size:28px;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums}
-.time small{color:var(--muted);font-size:13px}
-@media (hover:hover){.time:hover{border-color:var(--muted)}}
-.time[aria-pressed="true"]{background:var(--her);border-color:var(--her);color:var(--night)}
-.time[aria-pressed="true"] small{color:var(--night)}
+.month b{font-family:var(--font-mono);font-size:17px;font-weight:500}
+.month small{font-size:11px;color:var(--muted);font-family:var(--font-mono)}
+@media (hover:hover){.month:hover{border-color:var(--muted)}}
+.month[aria-pressed="true"]{background:var(--her);border-color:var(--her);color:var(--night)}
+.month[aria-pressed="true"] small{color:var(--night)}
+.readout{margin-top:var(--space-md);min-height:58px}
+.readout strong{display:block;font-family:var(--font-display);font-weight:400;font-size:24px;line-height:1.2;color:var(--her)}
+.readout span{display:block;color:var(--muted);font-size:15px}
+.readout.empty strong{display:none}
 
 /* buttons */
 .foot{padding-top:var(--space-lg)}
@@ -168,37 +155,44 @@ main{flex:1;display:flex;flex-direction:column}
 /* the question */
 .ask h1{font-size:clamp(84px,28vw,128px);line-height:.85}
 .ask .q2{margin:var(--space-md) 0 0;font-family:var(--font-display);font-size:clamp(30px,8.6vw,38px);line-height:1.12;color:var(--text);max-width:12em;text-wrap:balance}
-.zone{position:relative;height:260px;margin-top:auto;touch-action:manipulation}
+.zone{position:relative;height:250px;margin-top:auto;touch-action:manipulation}
 .zone .btn{position:absolute;width:auto;padding-inline:30px}
 #yes{left:0;bottom:0;transform-origin:left bottom;transition:transform .32s var(--ease-out)}
 #no{left:0;top:0;background:transparent;color:var(--muted);border:1px solid var(--line);transition:transform .3s var(--ease-out),background .2s,color .2s}
 #no.turned{background:var(--her);color:var(--night);border-color:var(--her)}
 
-/* ticket */
-.ticket{position:relative;margin-top:var(--space-lg);background:var(--paper);color:var(--paper-ink);border-radius:12px;animation:print .7s var(--ease-out) both}
+/* boarding pass */
+.pass{position:relative;margin-top:var(--space-lg);background:var(--paper);color:var(--paper-ink);border-radius:12px;animation:print .7s var(--ease-out) both}
 @keyframes print{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
-.t-main{padding:18px 20px 20px}
-.t-head{min-height:52px;font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--paper-mute)}
-.t-plan{font-family:var(--font-display);font-size:clamp(26px,7.4vw,32px);line-height:1.08;margin:0 0 18px;text-wrap:balance;overflow-wrap:anywhere}
-.t-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0}
-.t-grid div,.t-rules{min-width:0}
-.ticket dt{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-mute)}
-.ticket dd{margin:3px 0 0;font-size:17px;font-weight:600;line-height:1.3}
-.t-rules{margin:16px 0 0}
-.t-rules dd{font-weight:500;font-size:15px}
-.t-stub{
+.p-main{padding:16px 20px 20px}
+.p-head{min-height:44px;font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--paper-mute)}
+.route{display:grid;grid-template-columns:auto 1fr auto;align-items:end;gap:var(--space-md);margin-bottom:18px}
+.route div{min-width:0}
+.route b{display:block;font-family:var(--font-display);font-weight:400;font-size:clamp(40px,12vw,52px);line-height:.95}
+.route small{display:block;font-size:13px;color:var(--paper-mute);margin-top:4px}
+.route .to{text-align:right}
+.route .line{align-self:center;height:0;border-top:2px dotted var(--paper-rule);position:relative;margin-bottom:14px}
+.route .line::after{content:"";position:absolute;right:-2px;top:-6px;border-left:9px solid var(--paper-rule);border-top:5px solid transparent;border-bottom:5px solid transparent}
+.p-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0}
+.p-grid div,.p-list{min-width:0}
+.pass dt{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-mute)}
+.pass dd{margin:3px 0 0;font-size:17px;font-weight:600;line-height:1.3;overflow-wrap:anywhere}
+.pass dd.mono{font-family:var(--font-mono);font-weight:700;letter-spacing:.04em}
+.p-list{margin:16px 0 0}
+.p-list dd{font-weight:500;font-size:15px}
+.p-stub{
   position:relative;padding:14px 20px 16px;border-top:2px dashed var(--paper-rule);
-  display:flex;justify-content:space-between;gap:var(--space-md);flex-wrap:wrap;
+  display:flex;justify-content:space-between;gap:6px var(--space-md);flex-wrap:wrap;
   font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;color:var(--paper-mute);
 }
-.t-stub b{color:var(--paper-ink);font-weight:700}
-.t-stub::before,.t-stub::after{content:"";position:absolute;top:-11px;width:20px;height:20px;border-radius:50%;background:var(--night)}
-.t-stub::before{left:-10px}
-.t-stub::after{right:-10px}
+.p-stub b{color:var(--paper-ink);font-weight:700}
+.p-stub::before,.p-stub::after{content:"";position:absolute;top:-11px;width:20px;height:20px;border-radius:50%;background:var(--night)}
+.p-stub::before{left:-10px}
+.p-stub::after{right:-10px}
 .stamp{
-  position:absolute;top:12px;right:16px;padding:0 14px;
+  position:absolute;top:10px;right:16px;padding:0 14px;
   border:3px solid var(--her-ink);border-radius:8px;color:var(--her-ink);
-  font-family:var(--font-display);font-size:34px;line-height:1.3;
+  font-family:var(--font-display);font-size:30px;line-height:1.3;
   transform:rotate(-9deg);opacity:.9;mix-blend-mode:multiply;
   animation:stamp .42s var(--ease-out) .7s both;
 }
@@ -232,50 +226,51 @@ main{flex:1;display:flex;flex-direction:column}
     <section class="screen cover" data-s="cover">
       <header class="q">
         <h1 tabindex="-1">for <span class="name" id="toName">you</span>,</h1>
-        <p>i made you something. five questions, about a minute. one of them has a right answer.</p>
+        <p>i made you something. five questions about you, me, and a month in zagreb. one of them has a right answer.</p>
       </header>
-      <div class="peek" aria-hidden="true"><span>admit <b>two</b></span><span>nº ····</span></div>
+      <div class="peek" aria-hidden="true"><span><b>nbo</b> to <b>zag</b></span><span>30 days</span></div>
     </section>
 
-    <section class="screen" data-s="day" hidden>
+    <section class="screen" data-s="month" hidden>
       <header class="q">
-        <h1 tabindex="-1">when are you free?</h1>
-        <p>any evening in the next two weeks.</p>
+        <h1 tabindex="-1">when could you come?</h1>
+        <p>one month. pick the one that feels right, we'll work out the rest.</p>
       </header>
       <div class="answers">
-        <div class="days-head"><span id="monthLabel"></span></div>
-        <div class="days" id="days"></div>
-        <div class="readout empty" id="readout">tap a day</div>
+        <div class="months-head" id="yearLabel"></div>
+        <div class="months" id="months"></div>
+        <div class="readout empty" id="readout"><strong></strong><span>tap a month to see what zagreb is like then.</span></div>
       </div>
     </section>
 
-    <section class="screen" data-s="plan" hidden>
+    <section class="screen" data-s="see" hidden>
       <header class="q">
-        <h1 tabindex="-1">what are we doing?</h1>
-        <p>pick one. you can't get this wrong.</p>
+        <h1 tabindex="-1">what do you want to see?</h1>
+        <p>pick as many as you like.</p>
       </header>
-      <div class="answers"><div class="opts" id="plans"></div></div>
+      <div class="answers"><div class="opts" id="see"></div></div>
     </section>
 
-    <section class="screen" data-s="time" hidden>
+    <section class="screen" data-s="food" hidden>
       <header class="q">
-        <h1 tabindex="-1">what time should i pick you up?</h1>
+        <h1 tabindex="-1">what do we eat first?</h1>
+        <p>the night you land.</p>
       </header>
-      <div class="answers"><div class="times" id="times"></div></div>
+      <div class="answers"><div class="opts" id="food"></div></div>
     </section>
 
-    <section class="screen" data-s="rules" hidden>
+    <section class="screen" data-s="work" hidden>
       <header class="q">
-        <h1 tabindex="-1">any house rules?</h1>
-        <p>pick as many as you like, or none.</p>
+        <h1 tabindex="-1">two of the four weeks, i work.</h1>
+        <p>evenings and weekends are still ours. what do you do in the day?</p>
       </header>
-      <div class="answers"><div class="opts" id="rules"></div></div>
+      <div class="answers"><div class="opts" id="work"></div></div>
     </section>
 
     <section class="screen ask" data-s="ask" hidden>
       <header class="q">
         <h1 tabindex="-1">so.</h1>
-        <p class="q2">will you go on a date with me?</p>
+        <p class="q2">will you come to zagreb?</p>
       </header>
       <div class="zone" id="zone">
         <button class="btn primary" id="yes" type="button">yes</button>
@@ -283,22 +278,30 @@ main{flex:1;display:flex;flex-direction:column}
       </div>
     </section>
 
-    <section class="screen" data-s="ticket" hidden>
+    <section class="screen" data-s="pass" hidden>
       <header class="q">
-        <h1 tabindex="-1">it's a date.</h1>
-        <p id="ticketLede">send me your ticket so it's official.</p>
+        <h1 tabindex="-1">see you in zagreb.</h1>
+        <p id="passLede">send kristijan your boarding pass so it's official.</p>
       </header>
-      <div class="ticket" id="ticket">
-        <div class="t-main">
-          <div class="t-head">admit two</div>
-          <div class="t-plan" id="tPlan"></div>
-          <dl class="t-grid">
-            <div><dt>date</dt><dd id="tDate"></dd></div>
-            <div><dt>pick-up</dt><dd id="tTime"></dd></div>
+      <div class="pass" id="pass">
+        <div class="p-main">
+          <div class="p-head">boarding pass</div>
+          <div class="route">
+            <div><b>NBO</b><small>nairobi</small></div>
+            <div class="line" aria-hidden="true"></div>
+            <div class="to"><b>ZAG</b><small>zagreb</small></div>
+          </div>
+          <dl class="p-grid">
+            <div><dt>passenger</dt><dd class="mono" id="pName"></dd></div>
+            <div><dt>month</dt><dd id="pMonth"></dd></div>
+            <div><dt>stay</dt><dd>30 days</dd></div>
+            <div><dt>seat</dt><dd>next to me</dd></div>
           </dl>
-          <dl class="t-rules" id="tRulesWrap"><dt>house rules</dt><dd id="tRules"></dd></dl>
+          <dl class="p-list" id="pSeeWrap"><dt>to see</dt><dd id="pSee"></dd></dl>
+          <dl class="p-list"><dt>first meal</dt><dd id="pFood"></dd></dl>
+          <dl class="p-list"><dt>workdays</dt><dd id="pWork"></dd></dl>
         </div>
-        <div class="t-stub"><span>nº <b id="tSerial"></b></span><span id="tNo"></span></div>
+        <div class="p-stub"><span>nº <b id="pSerial"></b></span><span id="pNo"></span></div>
         <div class="stamp" aria-hidden="true">yes</div>
       </div>
       <div class="actions">
@@ -325,32 +328,50 @@ main{flex:1;display:flex;flex-direction:column}
   function clean(s){ return (s || "").trim().replace(/\s+/g, " ").slice(0, 24); }
   var TO = clean(params.get("to"));
   var FROM = clean(params.get("from")) || "kristijan";
-  var KEY = "date.v1";
+  var KEY = "zagreb.v1";
+  var from = FROM.toLowerCase();
 
-  var PLANS = [
-    { id: "dinner", t: "dinner somewhere nice", n: "i book the table, you order first" },
-    { id: "cinema", t: "cinema, back row", n: "you pick the film, i bring the snacks" },
-    { id: "walk", t: "an evening walk, then something warm", n: "hot chocolate counts" },
-    { id: "cook", t: "i cook, you judge", n: "scored out of ten, honestly" },
-    { id: "surprise", t: "surprise me", n: "you find out on the night" }
+  // what zagreb is like, by month
+  var WEATHER = [
+    "cold, maybe snow. you'll need a real coat.",
+    "still cold, and quiet. fewer tourists.",
+    "spring starts. still a jacket.",
+    "the parks turn green. a jacket for the evenings.",
+    "warm days, long evenings.",
+    "summer starts, and the sea warms up.",
+    "hot, around 30°. the sea is at its best.",
+    "hot, and half the city is at the coast.",
+    "still warm, the sea too, the crowds gone.",
+    "autumn colours, cooler evenings.",
+    "grey and cosy. advent starts at the end of it.",
+    "advent in zagreb: lights, mulled wine, crowds."
   ];
-  var TIMES = [
-    { t: "18:00", n: "more evening to share" },
-    { t: "19:00", n: "the classic" },
-    { t: "20:00", n: "fashionably late" },
-    { t: "21:00", n: "a late one" }
+  var SEE = [
+    { t: "the upper town, by funicular", n: "the ride takes about a minute" },
+    { t: "plitvice lakes", n: "sixteen lakes and waterfalls, two hours away" },
+    { t: "a day at the sea", n: "the adriatic, two to four hours' drive" },
+    { t: "museum of broken relationships", n: "we'd only be visiting" },
+    { t: "dolac market on a saturday", n: "fruit, flowers, coffee after" },
+    { t: "lake jarun at sunset", n: "a walk, or a swim in summer" }
   ];
-  var RULES = [
-    "phones stay in pockets",
-    "dessert is not optional",
-    "you control the music",
-    "you get the last bite",
-    "i walk you home"
+  var FOOD = [
+    { t: "štrukli", n: "dough, cheese, baked. from right here" },
+    { t: "ćevapi", n: "with onion and ajvar" },
+    { t: "peka", n: "meat and potatoes under a bell, hours on the fire" },
+    { t: "burek", n: "the honest croatian breakfast" },
+    { t: "fritule", n: "small fried doughnuts, for dessert" }
+  ];
+  var WORK = [
+    { t: "sleep in, then explore the city", n: "i'll leave you a map and the coffee" },
+    { t: "come meet me for lunch", n: "every day you feel like it" },
+    { t: "plan our evenings", n: "you're in charge after five" },
+    { t: "make me something kenyan", n: "i'll do the dishes" }
   ];
   var NO_LABELS = ["no", "are you sure?", "really?", "think again", "last chance", "ok fine, yes"];
-  var STEPS = ["cover", "day", "plan", "time", "rules", "ask", "ticket"];
+  var STEPS = ["cover", "month", "see", "food", "work", "ask", "pass"];
 
-  var state = { day: null, plan: null, time: null, rules: [], no: 0, said: null };
+  function fresh(){ return { month: null, see: [], food: null, work: null, no: 0, said: null }; }
+  var state = fresh();
   var cur = 0;
   var lastDodge = 0;
 
@@ -362,43 +383,39 @@ main{flex:1;display:flex;flex-direction:column}
   function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
   function wipe(){ try { localStorage.removeItem(KEY); } catch(e){} }
 
-  // names
   if (TO) $("toName").textContent = TO.toLowerCase();
-  document.querySelectorAll(".fromName").forEach(function(el){ el.textContent = FROM.toLowerCase(); });
-  $("ticketLede").textContent = "send " + FROM.toLowerCase() + " your ticket so it's official.";
+  document.querySelectorAll(".fromName").forEach(function(el){ el.textContent = from; });
+  $("passLede").textContent = "send " + from + " your boarding pass so it's official.";
 
-  // days: tomorrow + 13
-  var fmtW = new Intl.DateTimeFormat("en-GB", { weekday: "short" });
-  var fmtLong = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long" });
-  var fmtShort = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short" });
-  var fmtMonth = new Intl.DateTimeFormat("en-GB", { month: "long" });
-  var days = [];
-  var base = new Date(); base.setHours(12, 0, 0, 0);
-  for (var i = 1; i <= 14; i++){
-    var d = new Date(base); d.setDate(base.getDate() + i); days.push(d);
-  }
-  var m1 = fmtMonth.format(days[0]).toLowerCase(), m2 = fmtMonth.format(days[13]).toLowerCase();
-  $("monthLabel").textContent = m1 === m2 ? m1 : m1 + " / " + m2;
-  function iso(d){ return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
-  function fromIso(s){ var p = s.split("-"); return new Date(+p[0], +p[1]-1, +p[2], 12); }
+  // twelve months, starting three months out: time to save, and time for the visa
+  var fmtMon = new Intl.DateTimeFormat("en-GB", { month: "short" });
+  var fmtMonth = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" });
+  var now = new Date();
+  var months = [];
+  for (var i = 3; i < 15; i++) months.push(new Date(now.getFullYear(), now.getMonth() + i, 1, 12));
+  var y1 = months[0].getFullYear(), y2 = months[11].getFullYear();
+  $("yearLabel").textContent = y1 === y2 ? String(y1) : y1 + " / " + y2;
+  function key(d){ return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"); }
+  function fromKey(k){ var p = k.split("-"); return new Date(+p[0], +p[1] - 1, 1, 12); }
+  function monthName(k){ return fmtMonth.format(fromKey(k)).toLowerCase(); }
 
-  days.forEach(function(d){
+  months.forEach(function(d){
     var b = document.createElement("button");
-    b.type = "button"; b.className = "day"; b.setAttribute("aria-pressed", "false");
-    b.dataset.v = iso(d);
-    b.setAttribute("aria-label", fmtLong.format(d));
-    var w = document.createElement("small"); w.textContent = fmtW.format(d).toLowerCase();
-    var n = document.createElement("b"); n.textContent = d.getDate();
-    var m = document.createElement("i"); m.textContent = d.getDate() === 1 ? fmtMonth.format(d).slice(0,3).toLowerCase() : "";
-    b.append(w, n, m);
+    b.type = "button"; b.className = "month"; b.setAttribute("aria-pressed", "false");
+    b.dataset.v = key(d);
+    b.setAttribute("aria-label", fmtMonth.format(d));
+    var m = document.createElement("b"); m.textContent = fmtMon.format(d).toLowerCase();
+    var y = document.createElement("small"); y.textContent = "'" + String(d.getFullYear()).slice(2);
+    b.append(m, y);
     b.addEventListener("click", function(){
-      state.day = b.dataset.v;
-      pressOnly($("days"), b);
+      state.month = b.dataset.v;
+      pressOnly($("months"), b);
       var r = $("readout"); r.classList.remove("empty");
-      r.textContent = fmtLong.format(d).toLowerCase().replace(",", "");
+      r.querySelector("strong").textContent = monthName(state.month);
+      r.querySelector("span").textContent = WEATHER[d.getMonth()];
       sync();
     });
-    $("days").append(b);
+    $("months").append(b);
   });
 
   function optRow(title, note, check){
@@ -414,29 +431,25 @@ main{flex:1;display:flex;flex-direction:column}
     wrap.querySelectorAll("[aria-pressed]").forEach(function(x){ x.setAttribute("aria-pressed", String(x === el)); });
   }
 
-  PLANS.forEach(function(p){
-    var b = optRow(p.t, p.n);
-    b.addEventListener("click", function(){ state.plan = p.id; pressOnly($("plans"), b); sync(); });
-    $("plans").append(b);
-  });
-  TIMES.forEach(function(t){
-    var b = document.createElement("button");
-    b.type = "button"; b.className = "time"; b.setAttribute("aria-pressed", "false");
-    var x = document.createElement("b"); x.textContent = t.t;
-    var s = document.createElement("small"); s.textContent = t.n;
-    b.append(x, s);
-    b.addEventListener("click", function(){ state.time = t.t; pressOnly($("times"), b); sync(); });
-    $("times").append(b);
-  });
-  RULES.forEach(function(r){
-    var b = optRow(r, "", true);
+  SEE.forEach(function(p){
+    var b = optRow(p.t, p.n, true);
     b.addEventListener("click", function(){
-      var on = state.rules.indexOf(r) === -1;
-      state.rules = on ? state.rules.concat(r) : state.rules.filter(function(x){ return x !== r; });
+      var on = state.see.indexOf(p.t) === -1;
+      state.see = on ? state.see.concat(p.t) : state.see.filter(function(x){ return x !== p.t; });
       b.setAttribute("aria-pressed", String(on));
       sync();
     });
-    $("rules").append(b);
+    $("see").append(b);
+  });
+  FOOD.forEach(function(p){
+    var b = optRow(p.t, p.n);
+    b.addEventListener("click", function(){ state.food = p.t; pressOnly($("food"), b); sync(); });
+    $("food").append(b);
+  });
+  WORK.forEach(function(p){
+    var b = optRow(p.t, p.n);
+    b.addEventListener("click", function(){ state.work = p.t; pressOnly($("work"), b); sync(); });
+    $("work").append(b);
   });
 
   // navigation
@@ -448,25 +461,25 @@ main{flex:1;display:flex;flex-direction:column}
     s.style.animation = "none"; void s.offsetWidth; s.style.animation = "";
     var inQuiz = i >= 1 && i <= 5;
     $("top").hidden = !inQuiz;
-    $("foot").hidden = name === "ask" || name === "ticket";
+    $("foot").hidden = name === "ask" || name === "pass";
     $("back").disabled = !inQuiz;
     if (inQuiz){
       $("count").textContent = i + " / 5";
       document.querySelectorAll(".progress i").forEach(function(el, k){ el.classList.toggle("on", k < i); });
     }
     if (name === "ask") placeButtons();
-    if (name === "ticket") fillTicket();
+    if (name === "pass") fillPass();
     sync();
     window.scrollTo(0, 0);
     var h = s.querySelector("h1"); if (h && i > 0) h.focus({ preventScroll: true });
   }
   function sync(){
     var nx = $("next"), name = STEPS[cur];
-    nx.disabled = (name === "day" && !state.day) || (name === "plan" && !state.plan) || (name === "time" && !state.time);
-    nx.textContent = name === "cover" ? "open it" : name === "rules" ? (state.rules.length ? "next" : "no rules, next") : "next";
+    nx.disabled = (name === "month" && !state.month) || (name === "food" && !state.food) || (name === "work" && !state.work);
+    nx.textContent = name === "cover" ? "open it" : name === "see" ? (state.see.length ? "next" : "surprise me, next") : "next";
   }
   $("next").addEventListener("click", function(){ if (!this.disabled) show(cur + 1); });
-  $("back").addEventListener("click", function(){ if (cur > 1) show(cur - 1); else show(0); });
+  $("back").addEventListener("click", function(){ show(Math.max(0, cur - 1)); });
 
   // the question
   var zone = $("zone"), yes = $("yes"), no = $("no");
@@ -494,12 +507,12 @@ main{flex:1;display:flex;flex-direction:column}
       var z = zone.getBoundingClientRect(), n = no.getBoundingClientRect(), y = yes.getBoundingClientRect();
       var maxX = Math.max(0, z.width - n.width), maxY = Math.max(0, z.height - n.height);
       var yTop = y.top - z.top - 12, yRight = y.right - z.left + 12;
+      var nx = n.left - z.left, ny = n.top - z.top;
       var px = 0, py = 0;
       for (var k = 0; k < 24; k++){
         px = Math.random() * maxX; py = Math.random() * maxY;
         var overlapsYes = py + n.height > yTop && px < yRight;
-        var nowRect = { x: n.left - z.left, y: n.top - z.top };
-        var far = Math.abs(px - nowRect.x) + Math.abs(py - nowRect.y) > 90;
+        var far = Math.abs(px - nx) + Math.abs(py - ny) > 90;
         if (!overlapsYes && far) break;
       }
       no.style.transform = "translate(" + px + "px," + py + "px)";
@@ -514,45 +527,36 @@ main{flex:1;display:flex;flex-direction:column}
   yes.addEventListener("click", accept);
   function accept(){ state.said = "yes"; save(); show(6); }
 
-  // ticket
-  function planText(){
-    if (state.plan === "surprise") return "a surprise, planned by " + FROM.toLowerCase();
-    var p = PLANS.filter(function(x){ return x.id === state.plan; })[0];
-    return p ? p.t : "";
-  }
-  function serial(){
-    var d = fromIso(state.day);
-    return String(d.getDate()).padStart(2,"0") + String(d.getMonth()+1).padStart(2,"0") + "-" + state.time.replace(":", "");
-  }
+  // boarding pass
+  function serial(){ var d = fromKey(state.month); return "ZAG-" + String(d.getMonth() + 1).padStart(2, "0") + String(d.getFullYear()).slice(2); }
   function noLine(){
     if (state.no === 0) return "yes on the first try";
     if (state.no === 1) return "said no once first";
     return "said no " + state.no + " times first";
   }
+  function seeText(sep){ return state.see.length ? state.see.join(sep) : "surprise me"; }
   function message(){
-    var d = fromIso(state.day);
-    var lines = [
-      "it's a date.",
-      fmtShort.format(d).toLowerCase().replace(",", "") + ", pick-up at " + state.time,
-      planText()
-    ];
-    if (state.rules.length) lines.push("house rules: " + state.rules.join(", "));
-    lines.push("(" + noLine() + ")");
-    lines.push("ticket nº " + serial());
-    return lines.join("\n");
+    return [
+      "yes. i'm coming to zagreb.",
+      monthName(state.month) + ", for a month",
+      "to see: " + seeText(", "),
+      "first meal: " + state.food,
+      "workdays: " + state.work,
+      "(" + noLine() + ")",
+      "boarding pass nº " + serial()
+    ].join("\n");
   }
-  function fillTicket(){
-    var d = fromIso(state.day);
-    $("tPlan").textContent = planText();
-    $("tDate").textContent = fmtShort.format(d).toLowerCase().replace(",", "");
-    $("tTime").textContent = state.time;
-    $("tRulesWrap").hidden = !state.rules.length;
-    $("tRules").textContent = state.rules.join(" · ");
-    $("tSerial").textContent = serial();
-    $("tNo").textContent = noLine();
+  function fillPass(){
+    $("pName").textContent = (TO || "you").toUpperCase();
+    $("pMonth").textContent = monthName(state.month);
+    $("pSee").textContent = seeText(" · ");
+    $("pFood").textContent = state.food;
+    $("pWork").textContent = state.work;
+    $("pSerial").textContent = serial();
+    $("pNo").textContent = noLine();
     $("note").textContent = "";
-    var t = $("ticket"); t.style.animation = "none"; void t.offsetWidth; t.style.animation = "";
-    var st = t.querySelector(".stamp"); st.style.animation = "none"; void st.offsetWidth; st.style.animation = "";
+    var p = $("pass"); p.style.animation = "none"; void p.offsetWidth; p.style.animation = "";
+    var st = p.querySelector(".stamp"); st.style.animation = "none"; void st.offsetWidth; st.style.animation = "";
     var canShare = typeof navigator.share === "function";
     $("share").hidden = !canShare;
     $("wa").hidden = canShare;
@@ -567,14 +571,14 @@ main{flex:1;display:flex;flex-direction:column}
   });
   $("copy").addEventListener("click", function(){
     var text = message(), btn = this;
-    function done(){ btn.textContent = "copied"; $("note").textContent = "paste it to " + FROM.toLowerCase() + "."; setTimeout(function(){ btn.textContent = "copy as text"; }, 1800); }
+    function done(){ btn.textContent = "copied"; $("note").textContent = "paste it to " + from + "."; setTimeout(function(){ btn.textContent = "copy as text"; }, 1800); }
     function fallback(){
       var ta = document.createElement("textarea");
       ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
       document.body.append(ta); ta.select();
       var ok = false; try { ok = document.execCommand("copy"); } catch(e){}
       ta.remove();
-      if (ok) done(); else $("note").textContent = "couldn't copy. take a screenshot of the ticket instead.";
+      if (ok) done(); else $("note").textContent = "couldn't copy. take a screenshot of the pass instead.";
     }
     if (navigator.clipboard && navigator.clipboard.writeText){
       navigator.clipboard.writeText(text).then(done, fallback);
@@ -582,15 +586,17 @@ main{flex:1;display:flex;flex-direction:column}
   });
   $("restart").addEventListener("click", function(){
     wipe();
-    state = { day: null, plan: null, time: null, rules: [], no: 0, said: null };
+    state = fresh();
     document.querySelectorAll("[aria-pressed]").forEach(function(x){ x.setAttribute("aria-pressed", "false"); });
-    var r = $("readout"); r.classList.add("empty"); r.textContent = "tap a day";
+    var r = $("readout"); r.classList.add("empty");
+    r.querySelector("strong").textContent = "";
+    r.querySelector("span").textContent = "tap a month to see what zagreb is like then.";
     show(0);
   });
 
-  // a returning visit keeps her ticket, as long as the date hasn't passed
+  // a returning visit keeps her pass
   var saved = load();
-  if (saved && saved.said === "yes" && saved.day && saved.time && fromIso(saved.day) >= base){
+  if (saved && saved.said === "yes" && saved.month && saved.food && saved.work){
     state = saved;
     show(6);
   } else {
