@@ -4,2562 +4,750 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Shaiyex - Holy Paladin. Mythic+ score, current keys, raid progression and logs.">
-<meta name="theme-color" content="#EDE9DE">
+<meta name="description" content="Shaiyex. Rated PvP on EU Argent Dawn: Elite once, Duelist eight times, every character and every season.">
+<meta name="theme-color" content="#101319">
+<meta name="color-scheme" content="dark">
 <meta property="og:type" content="profile">
 <meta property="og:title" content="Shaiyex">
-<meta property="og:description" content="Holy Paladin. Mythic+ score, keys, progression and logs.">
+<meta property="og:description" content="Rated PvP on EU Argent Dawn. Elite once, Duelist eight times.">
 <meta property="og:url" content="https://shaiyex.com/">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://shaiyex.com/clips/holy.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <title>Shaiyex</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Schibsted+Grotesk:wght@400;500;600;700&family=Archivo+Black&family=Pirata+One&family=Grenze+Gotisch:wght@600;700;800&display=swap">
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="preload" href="data/pvp.json" as="fetch" crossorigin>
 <style>
-  :root{
-    --ink:#EDE9DE;
-    --ink-2:#FBF8F0;
-    --panel:#FBF8F0;
-    --panel-2:#F4EFE1;
-    --line:#DED5BF;
-    --line-hot:#C4B48D;
-    --text:#231F16;
-    --dim:#5A5344;
-    --dimmer:#8A8069;
-    --gold:#9A7018;
-    --gold-hot:#7A5608;
-    --gold-deep:#C9AE68;
-    --amber:#E9A83C;
-    --pink:#F48CBA;
-    --blue:#7FB6E8;
-
-    --display:"Schibsted Grotesk","Segoe UI",Helvetica,Arial,sans-serif;
-    --body:"Schibsted Grotesk","Segoe UI",Helvetica,Arial,sans-serif;
-    --mono:"IBM Plex Mono",Consolas,ui-monospace,monospace;
-  }
-
-  *{box-sizing:border-box}
-
-  body{
-    margin:0;
-    background:
-      linear-gradient(180deg,#F8F4E9 0%, #EDE9DE 62%, #E5DFCE 100%),
-      var(--ink);
-    background-attachment:fixed;
-    color:var(--text);
-    font-family:var(--body);
-    font-size:17px;
-    line-height:1.6;
-    -webkit-font-smoothing:antialiased;
-    min-height:100svh;
-    display:flex;
-    flex-direction:column;
-  }
-
-  a{color:inherit;text-decoration:none}
-
-
-  /* ---------- hero ---------- */
-  .hero{
-    position:relative;
-    flex:1 0 auto;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:clamp(52px,10vw,96px) clamp(18px,5vw,28px) clamp(30px,5vw,48px);
-
-  }
-  #rays{
-    position:fixed;inset:0;width:100%;height:100%;
-    pointer-events:none;opacity:0;z-index:0;display:none;
-  }
-  body.tekk #rays{display:block}
-
-  /* god rays. white through the glass, gold at the edges, and they move. */
-  .glory{
-    position:fixed;inset:-10vh -10vw;z-index:0;pointer-events:none;
-    transition:opacity .8s ease;
-    background:
-      conic-gradient(from 198deg at 50% -8%,
-        rgba(255,255,255,0)   0deg,
-        rgba(255,255,255,.95) 8deg,
-        rgba(255,241,205,.55) 13deg,
-        rgba(255,255,255,0)   19deg,
-        rgba(255,255,255,0)   30deg,
-        rgba(255,252,240,.8)  38deg,
-        rgba(250,226,166,.4)  43deg,
-        rgba(255,255,255,0)   50deg,
-        rgba(255,255,255,0)   62deg,
-        rgba(255,255,255,.7)  70deg,
-        rgba(255,240,200,.35) 75deg,
-        rgba(255,255,255,0)   82deg,
-        rgba(255,255,255,0)   96deg,
-        rgba(255,253,244,.6)  104deg,
-        rgba(255,255,255,0)   112deg,
-        rgba(255,255,255,0)   360deg);
-    -webkit-mask-image:linear-gradient(180deg,#000 0%, rgba(0,0,0,.75) 42%, rgba(0,0,0,.2) 72%, rgba(0,0,0,0) 92%);
-    mask-image:linear-gradient(180deg,#000 0%, rgba(0,0,0,.75) 42%, rgba(0,0,0,.2) 72%, rgba(0,0,0,0) 92%);
-    animation:glory 22s ease-in-out infinite alternate;
-  }
-  body.tekk .glory{opacity:0}
-  @keyframes glory{
-    0%  {transform:rotate(-2.2deg) scale(1.04)}
-    100%{transform:rotate(2.2deg) scale(1.09)}
-  }
-  /* the source of it, sitting just off the top of the page */
-  .glory-eye{
-    position:fixed;left:50%;top:-30vh;width:120vw;height:74vh;margin-left:-60vw;
-    z-index:0;pointer-events:none;
-    background:radial-gradient(closest-side,
-      rgba(255,255,255,.95) 0%, rgba(255,246,222,.6) 38%, rgba(255,238,196,0) 74%);
-    animation:breathe 7s ease-in-out infinite;
-  }
-  body.tekk .glory-eye{opacity:0}
-  @keyframes breathe{
-    0%,100%{opacity:.7;transform:scale(1)}
-    50%    {opacity:1;transform:scale(1.05)}
-  }
-
-  /* feathers, falling the whole time */
-  .plumes{position:fixed;inset:0;z-index:1;pointer-events:none}
-  body.tekk .plumes{opacity:0}
-  .plumes i{
-    position:absolute;top:-8vh;width:8px;height:20px;
-    border-radius:70% 70% 55% 55%;
-    background:linear-gradient(160deg, #FFFFFF 0%, #FFF7E2 46%, rgba(226,186,104,.5) 100%);
-    box-shadow:0 0 10px rgba(255,244,214,.9), 0 1px 2px rgba(140,110,50,.18);
-    opacity:0;
-    animation:feather linear infinite;
-  }
-  @keyframes feather{
-    0%  {opacity:0;   transform:translate3d(0,0,0) rotate(-12deg)}
-    8%  {opacity:.95}
-    50% {transform:translate3d(calc(var(--dx,30px) * .55), 52vh, 0) rotate(24deg)}
-    85% {opacity:.7}
-    100%{opacity:0;   transform:translate3d(var(--dx,30px), 112vh, 0) rotate(-16deg)}
-  }
-  /* motes of light, smaller and slower */
-  .plumes b{
-    position:absolute;top:-4vh;width:3px;height:3px;border-radius:50%;
-    background:#FFF6DE;box-shadow:0 0 8px rgba(255,236,180,.95);
-    opacity:0;animation:feather linear infinite;
-  }
-
-  .hero > .inner, footer{position:relative;z-index:1}
-  .inner{
-    position:relative;
-    width:100%;
-    max-width:min(1120px,94vw);
-    margin:0 auto;
-    text-align:center;
-  }
-
-  .avatar-wrap{position:relative;width:118px;height:118px;margin:0 auto}
-  .avatar-wrap::after{
-    content:"";
-    position:absolute;inset:-16px;
-    border-radius:50%;
-    background:radial-gradient(circle, rgba(255,252,240,.95) 0%, rgba(255,238,196,0) 70%);
-    animation:halo 5.5s ease-in-out infinite;
-  }
-  @keyframes halo{
-    0%,100%{opacity:.75;transform:scale(1)}
-    50%{opacity:1;transform:scale(1.07)}
-  }
-  .avatar{
-    position:relative;z-index:1;
-    width:118px;height:118px;
-    border-radius:50%;
-    object-fit:cover;
-    border:2px solid var(--gold);
-    box-shadow:0 0 0 5px rgba(255,255,255,.85), 0 0 0 7px rgba(201,174,104,.55), 0 0 46px rgba(255,232,170,.85);
-    display:block;
-  }
-
-  .kicker{
-    font-family:var(--mono);
-    font-size:11px;
-    font-weight:600;
-    letter-spacing:.24em;
-    text-transform:uppercase;
-    color:var(--gold);
-    margin:24px 0 0;
-  }
-
-  h1{
-    font-family:var(--display);
-    font-weight:800;
-    font-size:clamp(56px,14vw,124px);
-    line-height:.88;
-    text-transform:uppercase;
-    letter-spacing:.02em;
-    margin:.12em 0 0;
-    background:linear-gradient(100deg,
-      #8A6410 0%, #B8912F 26%,
-      #FFF6DA 46%, #D9B65E 56%,
-      #B8912F 74%, #8A6410 100%);
-    background-size:260% 100%;
-    -webkit-background-clip:text;background-clip:text;color:transparent;
-    filter:drop-shadow(0 1px 0 rgba(255,255,255,.9)) drop-shadow(0 0 30px rgba(226,186,104,.55));
-    animation:shimmer 7s linear infinite;
-  }
-  @keyframes shimmer{
-    0%{background-position:180% 0}
-    100%{background-position:-80% 0}
-  }
-
-  .sub{
-    font-size:clamp(16px,2.4vw,19px);
-    color:var(--dim);
-    max-width:46ch;
-    margin:1.1em auto 0;
-    text-wrap:balance;
-  }
-  .sub b{color:var(--text);font-weight:600}
-
-  /* ---------- the two doors ---------- */
-  .doors{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:14px;
-    margin-top:clamp(34px,6vw,52px);
-    text-align:left;
-  }
-  .drip{display:none}
-
-  /* the front only has two things on it. the rest is on the other side. */
-  body:not(.tekk) .door-2,
-  body:not(.tekk) .wip{display:none}
-  body:not(.tekk) .doors{
-    grid-template-columns:repeat(2,1fr);
-    max-width:860px;margin-left:auto;margin-right:auto;
-  }
-
-  .door{
-    --c:var(--gold);
-    position:relative;
-    display:flex;
-    flex-direction:column;
-    gap:9px;
-    padding:22px 20px 20px;
-    background:linear-gradient(168deg, #FFFFFF 0%, rgba(255,255,255,0) 58%), var(--panel);
-    border:1px solid var(--line);
-    border-top:2px solid var(--gold-deep);
-    border-radius:2px;
-    box-shadow:0 12px 30px rgba(120,96,40,.10);
-    overflow:hidden;
-    transition:transform .28s cubic-bezier(.2,.8,.25,1), border-color .28s ease, box-shadow .28s ease;
-  }
-  .door::after{
-    content:"";
-    position:absolute;left:0;right:0;bottom:0;
-    height:3px;
-    background:var(--c);
-    opacity:0;
-    transition:opacity .28s ease, box-shadow .28s ease;
-  }
-  .door:hover,.door:focus-visible{
-    border-color:var(--line-hot);
-    border-top-color:var(--gold);
-    box-shadow:0 18px 40px rgba(120,96,40,.18), 0 0 0 1px rgba(201,174,104,.5);
-    transform:translateY(-4px);
-    outline:none;
-  }
-  body.tekk .door:hover,
-  body.tekk .door:focus-visible{border-color:var(--c)}
-  body.tekk .door::after{opacity:.6}
-  body.tekk .door:hover::after,
-  body.tekk .door:focus-visible::after{opacity:1;box-shadow:0 0 24px var(--c)}
-  .door-3:hover{animation-play-state:paused;filter:none;box-shadow:0 0 46px rgba(200,30,30,.75), 0 0 110px rgba(200,30,30,.4), inset 0 0 42px rgba(200,30,30,.2)}
-
-  .door-k{
-    font-family:var(--mono);
-    font-size:10px;
-    font-weight:600;
-    letter-spacing:.2em;
-    text-transform:uppercase;
-    color:var(--c);
-  }
-  .door-t{
-    font-family:var(--display);
-    font-weight:800;
-    font-size:clamp(24px,3vw,31px);
-    line-height:1.02;
-    color:var(--text);
-    letter-spacing:-.01em;
-  }
-  .door-d{font-size:14px;line-height:1.5;color:var(--dim);flex:1 1 auto}
-  .door-go{
-    margin-top:6px;
-    font-family:var(--mono);
-    font-size:11px;
-    font-weight:600;
-    letter-spacing:.16em;
-    text-transform:uppercase;
-    color:var(--c);
-  }
-  .door:hover .door-go{color:var(--text)}
-
-  .door-2{--c:var(--amber)}
-  .door-3{
-    --c:#FF4A46;
-    border-color:#8E2B2E;
-    background:
-      radial-gradient(120% 100% at 50% 120%, rgba(200,30,30,.28), rgba(200,30,30,0) 70%),
-      linear-gradient(165deg, rgba(255,255,255,.03), rgba(255,255,255,0) 60%),
-      #0B0709;
-    box-shadow:0 0 46px rgba(200,30,30,.75), 0 0 110px rgba(200,30,30,.4), inset 0 0 42px rgba(200,30,30,.2);
-    animation:doorNeon 13s steps(1) infinite;
-  }
-  .door-3 .door-t{color:#FFD9D7;text-shadow:0 0 30px rgba(255,74,70,.95), 0 0 70px rgba(200,30,30,.55)}
-  .door-3 .door-k,.door-3 .door-go{color:#FF6B67}
-  .door-3 .door-d{color:#C9A9AB}
-  .door-3::after{opacity:1}
-  @keyframes doorNeon{
-    0%,30%   {box-shadow:0 0 46px rgba(200,30,30,.75), 0 0 110px rgba(200,30,30,.4), inset 0 0 42px rgba(200,30,30,.2);  border-color:#8E2B2E; filter:none}
-    31%      {box-shadow:none;    border-color:#241214; filter:brightness(.32)}
-    32%      {box-shadow:0 0 46px rgba(200,30,30,.75), 0 0 110px rgba(200,30,30,.4), inset 0 0 42px rgba(200,30,30,.2);  border-color:#8E2B2E; filter:none}
-    33%      {box-shadow:none;    border-color:#241214; filter:brightness(.22)}
-    35%,58%  {box-shadow:0 0 46px rgba(200,30,30,.75), 0 0 110px rgba(200,30,30,.4), inset 0 0 42px rgba(200,30,30,.2);  border-color:#8E2B2E; filter:none}
-    59%,66%  {box-shadow:none;    border-color:#1E0F11; filter:brightness(.18)}
-    67%      {box-shadow:0 0 14px rgba(200,30,30,.25); border-color:#5A1E20; filter:brightness(.6)}
-    68%      {box-shadow:none;    border-color:#1E0F11; filter:brightness(.2)}
-    70%,86%  {box-shadow:0 0 46px rgba(200,30,30,.75), 0 0 110px rgba(200,30,30,.4), inset 0 0 42px rgba(200,30,30,.2);  border-color:#8E2B2E; filter:none}
-    87%      {box-shadow:none;    border-color:#241214; filter:brightness(.28)}
-    89%      {box-shadow:0 0 14px rgba(200,30,30,.25); border-color:#5A1E20; filter:brightness(.7)}
-    90%      {box-shadow:none;    border-color:#241214; filter:brightness(.25)}
-    92%,100% {box-shadow:0 0 46px rgba(200,30,30,.75), 0 0 110px rgba(200,30,30,.4), inset 0 0 42px rgba(200,30,30,.2);  border-color:#8E2B2E; filter:none}
-  }
-
-  .door-4{--c:var(--gold)}
-  body.tekk .door-4{--c:#B14BFF}
-
-  /* ---------- side tab, work in progress ---------- */
-  .wip{
-    position:fixed;
-    right:0;
-    top:50%;
-    transform:translateY(-50%);
-    z-index:40;
-    display:flex;
-    align-items:center;
-    gap:9px;
-    padding:11px 14px 12px 15px;
-    background:#FFFFFF;
-    border:1px solid var(--line-hot);
-    border-right:0;
-    border-radius:3px 0 0 3px;
-    box-shadow:-6px 0 22px rgba(120,96,48,.16);
-    transition:transform .25s cubic-bezier(.2,.8,.25,1), box-shadow .25s ease, border-color .25s ease;
-  }
-  .wip:hover{
-    transform:translateY(-50%) translateX(-4px);
-    border-color:var(--gold);
-    box-shadow:-8px 0 30px rgba(120,96,48,.28);
-  }
-
-  .wip-t{
-    font-family:var(--display);
-    font-weight:800;
-    font-size:15px;
-    line-height:1.1;
-    letter-spacing:-.01em;
-    color:var(--text);
-  }
-  .wip-s{
-    display:block;
-    font-family:var(--mono);
-    font-size:9.5px;
-    font-weight:600;
-    letter-spacing:.14em;
-    text-transform:uppercase;
-    color:var(--gold);
-    margin-top:3px;
-  }
-  body.tekk .wip-s{color:#B98CFF}
-  .wip-tag{
-    font-family:var(--mono);
-    font-size:9px;
-    font-weight:600;
-    letter-spacing:.14em;
-    padding:3px 6px 4px;
-    color:#FFFDF6;
-    background:var(--gold);
-    border-radius:2px;
-    animation:wipPulse 2.4s ease-in-out infinite;
-  }
-  @keyframes wipPulse{
-    0%,100%{opacity:1}
-    50%{opacity:.5}
-  }
-  @media (max-width:880px){
-    body.tekk .vrack{
-      margin:70px auto 0;
-      align-items:center;
-      text-align:center;
-      padding-top:104px;
-    }
-    body.tekk .vrack-sign{
-      right:auto;left:50%;transform:translateX(-50%);
-      white-space:normal;
-    }
-    .wip{
-      position:static;
-      transform:none;
-      margin:18px auto 0;
-      width:fit-content;
-      border-right:1px solid var(--line-hot);
-      border-radius:3px;
-    }
-    .wip:hover{transform:none}
-  }
-
-  /* ---------- blacklist strip ---------- */
-  .blbar{
-    position:relative;
-    display:none;
-    align-items:center;
-    gap:clamp(14px,3vw,28px);
-    margin-top:14px;
-    padding:14px clamp(16px,3vw,24px);
-    text-align:left;
-    border:1px solid #8E2B2E;
-    border-radius:2px;
-    background:
-      radial-gradient(140% 260% at 50% 130%, rgba(200,30,30,.30), rgba(200,30,30,0) 70%),
-      #0B0709;
-    box-shadow:0 0 40px rgba(200,30,30,.6), 0 0 96px rgba(200,30,30,.3), inset 0 0 34px rgba(200,30,30,.18);
-    overflow:hidden;
-    animation:blNeon 13s steps(1) infinite;
-    transition:transform .28s cubic-bezier(.2,.8,.25,1);
-  }
-  .blbar::after{
-    content:"";
-    position:absolute;left:0;right:0;bottom:0;height:2px;
-    background:linear-gradient(90deg, rgba(255,74,70,.15), #FF4A46 30%, #FF4A46 70%, rgba(255,74,70,.15));
-    box-shadow:0 0 14px rgba(255,74,70,.7);
-  }
-  .blbar:hover{
-    animation-play-state:paused;
-    filter:none;
-    transform:translateY(-3px);
-    box-shadow:0 0 52px rgba(200,30,30,.85), 0 0 130px rgba(200,30,30,.45), inset 0 0 42px rgba(200,30,30,.22);
-  }
-  .bl-t{
-    font-family:var(--display);
-    font-weight:800;
-    font-size:clamp(20px,3.4vw,30px);
-    line-height:1;
-    letter-spacing:.06em;
-    text-transform:uppercase;
-    color:#FFD9D7;
-    text-shadow:0 0 26px rgba(255,74,70,.95), 0 0 66px rgba(200,30,30,.6);
-    white-space:nowrap;
-  }
-  .bl-d{
-    flex:1 1 auto;
-    font-size:13.5px;
-    line-height:1.45;
-    color:#C9A9AB;
-  }
-  .bl-go{
-    font-family:var(--mono);
-    font-size:11px;
-    font-weight:600;
-    letter-spacing:.16em;
-    text-transform:uppercase;
-    color:#FF6B67;
-    white-space:nowrap;
-  }
-  .blbar:hover .bl-go{color:#FFD9D7}
-  @keyframes blNeon{
-    0%,30%   {filter:none}
-    31%      {filter:brightness(.32)}
-    32%      {filter:none}
-    33%      {filter:brightness(.22)}
-    35%,58%  {filter:none}
-    59%,66%  {filter:brightness(.18)}
-    67%      {filter:brightness(.6)}
-    68%      {filter:brightness(.2)}
-    70%,86%  {filter:none}
-    87%      {filter:brightness(.28)}
-    89%      {filter:brightness(.7)}
-    90%      {filter:brightness(.25)}
-    92%,100% {filter:none}
-  }
-
-  @media (max-width:880px){
-    .doors{grid-template-columns:1fr}
-  }
-  @media (max-width:620px){
-    .blbar{flex-direction:column;align-items:flex-start;gap:8px;padding:18px}
-  }
-
-  footer{
-    flex:0 0 auto;
-    max-width:74ch;
-    width:100%;
-    margin:0 auto;
-    padding:0 clamp(18px,5vw,28px) 34px;
-    border-top:1px solid var(--line);
-    padding-top:20px;
-    font-family:var(--mono);
-    font-size:11px;
-    line-height:1.9;
-    letter-spacing:.04em;
-    color:var(--dimmer);
-    text-align:center;
-  }
-
-  /* ================= hardtekk =================
-     blood red on black, heavy grain, distressed display type.
-     everything below only applies when body carries .tekk */
-
-  /* the switch is the cross itself, nothing around it. upright while
-     the Light still has him, over on its head once it does not. */
-  #themeSw{
-    position:fixed;top:30px;right:46px;z-index:70;
-    display:grid;place-items:center;
-    width:66px;height:86px;padding:0;cursor:pointer;
-    background:none;border:0;
-    -webkit-tap-highlight-color:transparent;
-  }
-  #themeSw .t1{display:none}
-  #themeSw:focus-visible{outline:1px solid #C21A12;outline-offset:4px}
-
-  /* the upright, and the crossbar sitting high on it */
-  #themeSw .rune{
-    position:relative;
-    width:3px;height:58px;border-radius:1px;
-    background:#C21A12;
-    box-shadow:0 0 9px rgba(194,26,18,.85), 0 0 26px rgba(194,26,18,.35);
-    transform:rotate(0deg);
-    /* a tenth of a second: it is over before you have let go of it */
-    transition:transform .1s cubic-bezier(.3,.9,.35,1),
-               background .5s ease, box-shadow .5s ease;
-  }
-  #themeSw .rune::before{
-    content:"";position:absolute;
-    left:50%;top:15px;margin-left:-13px;
-    width:27px;height:3px;border-radius:1px;
-    background:inherit;
-    box-shadow:0 0 9px rgba(194,26,18,.85), 0 0 26px rgba(194,26,18,.35);
-  }
-  /* a slow breath on it, so it is the one thing on a still page that
-     asks to be pressed */
-  #themeSw .rune::after{
-    content:"";position:absolute;inset:-26px -30px;
-    background:radial-gradient(circle, rgba(194,26,18,.3), rgba(194,26,18,0) 68%);
-    animation:crossGlow 3.4s ease-in-out infinite;
-    pointer-events:none;
-  }
-  @keyframes crossGlow{
-    0%,100%{opacity:.35;transform:scale(.9)}
-    50%    {opacity:1;  transform:scale(1.08)}
-  }
-  #themeSw:hover .rune{
-    background:#F0342A;
-    box-shadow:0 0 16px rgba(240,52,42,1), 0 0 44px rgba(194,26,18,.6);
-  }
-  #themeSw:active .rune{transform:scale(.94)}
-
-  /* and once it has turned, it stays turned. this is on the button, not
-     on the theme, so the turn happens on the press rather than waiting
-     for the theme to come round to it. */
-  #themeSw.turned .rune{transform:rotate(180deg)}
-  #themeSw.turned:active .rune{transform:rotate(180deg) scale(.94)}
-
-  /* something has run down the wall under it */
-  #themeSw::after{
-    content:"";position:absolute;left:50%;top:82%;
-    width:2px;height:30px;margin-left:-1px;pointer-events:none;
-    background:linear-gradient(180deg, rgba(150,10,8,.7), rgba(150,10,8,0));
-  }
-  /* the nudge, shown once until it is pressed */
-  #themeHint{
-    position:fixed;top:126px;right:44px;z-index:69;
-    text-align:right;
-    font-family:var(--mono);font-size:10px;font-weight:700;
-    letter-spacing:.14em;text-transform:uppercase;color:#C21A12;
-    white-space:nowrap;pointer-events:none;
-    animation:nudge 1.9s ease-in-out infinite;
-  }
-  #themeHint.gone{display:none}
-  @keyframes nudge{
-    0%,100%{opacity:.5;transform:translateY(0)}
-    50%    {opacity:1;transform:translateY(-4px)}
-  }
-  body.tekk #themeHint{display:none}
-
-  /* cold moonlight from above, a red ember glow from below, nothing blotchy */
-  .smear{
-    position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;
-    transition:opacity .6s ease;
-    background:
-      radial-gradient(46% 30% at 50% -6%, rgba(150,170,210,.14), rgba(150,170,210,0) 70%),
-      radial-gradient(120% 70% at 50% 108%, rgba(90,6,6,.30), rgba(90,6,6,0) 62%),
-      linear-gradient(180deg, #080A11 0%, #06070C 46%, #08060A 100%);
-  }
-  body.tekk .smear{opacity:1}
-  .smear, .arch, .fog{transition:opacity .9s ease, background .9s ease}
-  /* No transition on these. Chrome will not repaint an svg gradient
-     through a transition on its stops, and it leaves the computed value
-     stuck at whatever it started as, which had the dark side rendering
-     the pale stone from the bright one. The wipe covers the change
-     anyway, so there is nothing to soften. */
-
-  /* the window and the pillars */
-  .arch{
-    position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;
-    display:grid;place-items:start center;
-    transition:opacity .8s ease;
-  }
-  /* the room does not change when you renounce. only the light in it does,
-     so the window and the pillars stand on the bright side too, in stone. */
-  .arch{opacity:1}
-  .arch .m1{stop-color:#FFFFFF;stop-opacity:.92}
-  .arch .m2{stop-color:#FBF6E6;stop-opacity:.5}
-  .arch .m3{stop-color:#FBF6E6;stop-opacity:0}
-  .arch .s1{stop-color:#F1EBDB}
-  .arch .s2{stop-color:#DDD4BE}
-  .arch .tracery{stroke:#C9BC9B}
-  .arch .pillars{stroke:#C3B593}
-  .arch .arcade{stroke:#DCD3BC}
-  .arch svg{filter:none}
-
-  body.tekk .arch{opacity:1}
-  body.tekk .arch .m1{stop-color:#9FB4D8;stop-opacity:.30}
-  body.tekk .arch .m2{stop-color:#6E82A8;stop-opacity:.10}
-  body.tekk .arch .m3{stop-color:#6E82A8;stop-opacity:0}
-  body.tekk .arch .s1{stop-color:#10131B}
-  body.tekk .arch .s2{stop-color:#07080D}
-  body.tekk .arch .tracery{stroke:#1B2130}
-  body.tekk .arch .pillars{stroke:#161B26}
-  body.tekk .arch .arcade{stroke:#131824}
-  body.tekk .arch svg{filter:drop-shadow(0 0 60px rgba(120,150,200,.10))}
-  .arch svg{
-    width:min(1150px,150vw);height:auto;margin-top:-6vh;
-    filter:drop-shadow(0 0 60px rgba(120,150,200,.10));
-  }
-
-  /* moonlight coming through the window, and the dust hanging in it */
-  .shafts{
-    position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;
-    transition:opacity .9s ease;
-    background:
-      conic-gradient(from 196deg at 50% -6%,
-        rgba(0,0,0,0) 0deg, rgba(150,178,224,.13) 12deg, rgba(0,0,0,0) 22deg,
-        rgba(0,0,0,0) 34deg, rgba(160,186,230,.10) 45deg, rgba(0,0,0,0) 56deg,
-        rgba(0,0,0,0) 92deg, rgba(140,168,215,.08) 102deg, rgba(0,0,0,0) 113deg,
-        rgba(0,0,0,0) 360deg);
-    -webkit-mask-image:linear-gradient(180deg,#000 0%, rgba(0,0,0,.55) 52%, rgba(0,0,0,0) 88%);
-    mask-image:linear-gradient(180deg,#000 0%, rgba(0,0,0,.55) 52%, rgba(0,0,0,0) 88%);
-    animation:sway 34s ease-in-out infinite alternate;
-  }
-  body.tekk .shafts{opacity:1}
-  @keyframes sway{
-    0%{transform:rotate(-1.2deg) scale(1.03)}
-    100%{transform:rotate(1.2deg) scale(1.07)}
-  }
-  /* the light itself breathes with the track */
-  body.tekk.live .shafts{opacity:calc(.7 + var(--pulse,0) * .5)}
-
-  /* dust, falling through the shafts, slower than the embers rise */
-  .dust{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity .9s ease}
-  body.tekk .dust{opacity:.7}
-  .dust i{
-    position:absolute;top:-4vh;width:1.6px;height:1.6px;border-radius:50%;
-    background:#C8D6EE;box-shadow:0 0 6px rgba(180,200,235,.7);
-    animation:sink linear infinite;
-  }
-  @keyframes sink{
-    0%{transform:translateY(0) translateX(0);opacity:0}
-    14%{opacity:.7}
-    76%{opacity:.35}
-    100%{transform:translateY(112vh) translateX(var(--dx,18px));opacity:0}
-  }
-
-  /* fog rolling along the floor */
-  .fog{
-    position:fixed;left:-30%;right:-30%;bottom:-14vh;height:56vh;
-    z-index:0;pointer-events:none;opacity:0;
-    transition:opacity .8s ease;
-    background:
-      radial-gradient(48% 60% at 20% 70%, rgba(140,160,195,.09), rgba(140,160,195,0) 70%),
-      radial-gradient(52% 66% at 62% 78%, rgba(120,140,180,.08), rgba(120,140,180,0) 72%),
-      radial-gradient(40% 55% at 88% 72%, rgba(150,165,200,.07), rgba(150,165,200,0) 70%);
-    filter:blur(6px);
-  }
-  .fog{
-    opacity:.5;
-    background:
-      radial-gradient(48% 60% at 20% 70%, rgba(255,252,240,.75), rgba(255,252,240,0) 70%),
-      radial-gradient(52% 66% at 62% 78%, rgba(255,250,236,.6), rgba(255,250,236,0) 72%),
-      radial-gradient(40% 55% at 88% 72%, rgba(255,252,242,.5), rgba(255,252,242,0) 70%);
-    animation:drift 46s ease-in-out infinite alternate;
-  }
-  body.tekk .fog{
-    opacity:1;
-    background:
-      radial-gradient(48% 60% at 20% 70%, rgba(140,160,195,.09), rgba(140,160,195,0) 70%),
-      radial-gradient(52% 66% at 62% 78%, rgba(120,140,180,.08), rgba(120,140,180,0) 72%),
-      radial-gradient(40% 55% at 88% 72%, rgba(150,165,200,.07), rgba(150,165,200,0) 70%);
-    animation:drift 46s ease-in-out infinite alternate;
-  }
-  @keyframes drift{
-    0%{transform:translateX(-4%) scaleX(1)}
-    100%{transform:translateX(4%) scaleX(1.08)}
-  }
-
-  /* embers, slow, nothing like confetti */
-  .motes{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity .8s ease}
-  body.tekk .motes{opacity:1}
-  .motes i{
-    position:absolute;bottom:-6vh;width:2px;height:2px;border-radius:50%;
-    background:#C24A22;box-shadow:0 0 7px rgba(200,70,30,.9);
-    animation:rise linear infinite;
-  }
-  @keyframes rise{
-    0%{transform:translateY(0) translateX(0);opacity:0}
-    12%{opacity:.85}
-    70%{opacity:.5}
-    100%{transform:translateY(-108vh) translateX(var(--dx,14px));opacity:0}
-  }
-
-  /* ---------- the room takes the bass ----------
-     one transform on one element, so the whole room moves together and
-     the compositor does the work. it never runs while the camera is
-     already moving somewhere. */
-  /* the menu is not bolted to the room, so it lags and overshoots it */
-  /* and the plates least of all, because they are on chains */
-  /* the rack itself hangs from somewhere above the page and swings as
-     one piece, which is what actually moves the chains left and right */
-
-  .doors{--rack:1}
-  /* the light under the floor answers it */
-  /* opacity is already spoken for by the pulse here, and it cannot go
-     past 1 anyway, so the flare rides on brightness instead */
-  body.tekk.boom:not(.travel):not(.winch) .smear{animation:smearBoom .6s ease-in-out}
-  @keyframes smearBoom{
-    0%  {filter:brightness(1)}
-    34% {filter:brightness(1.25)}
-    100%{filter:brightness(1)}
-  }
-  body.tekk.boom:not(.travel):not(.winch) .vig{animation:vigBoom .6s ease-in-out}
-  @keyframes vigBoom{
-    0%  {transform:scale(1)}
-    38% {transform:scale(calc(1 + .004 * var(--amp,1)))}
-    100%{transform:scale(1)}
-  }
-  /* every plate lights along its edge for as long as the hit lasts */
-  body.tekk.boom:not(.travel):not(.winch) .door::after,
-  body.tekk.boom:not(.travel):not(.winch) .blbar::after{
-    animation:edgeBoom .6s ease-in-out;
-  }
-  @keyframes edgeBoom{
-    0%  {opacity:.6; box-shadow:0 0 0 rgba(194,26,18,0)}
-    34% {opacity:.8; box-shadow:0 0 8px rgba(240,52,42,.28)}
-    100%{opacity:.6; box-shadow:0 0 0 rgba(194,26,18,0)}
-  }
-  /* the name takes it too */
-  /* the window rattles in its frame */
-  /* embers get shoved up off the floor */
-
-  /* between hits the sway itself breathes with the low end, so a quiet
-     passage barely moves and a loud one swings */
-  .door, .blbar, .wip{--amp:1}
-
-  /* the walls, the window and the air in front of them, one piece so
-     the whole backdrop can take the hit together */
-  #room{position:fixed;inset:0;z-index:0;pointer-events:none}
-
-  /* the light of the hit. both layers are transform and opacity only,
-     so they cost the compositor and nothing else. */
-  .boomfx{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:0}
-  body.tekk .boomfx{opacity:1}
-  .bf-flash{
-    position:absolute;inset:0;opacity:0;
-    background:
-      radial-gradient(120% 74% at 50% 112%, rgba(226,26,16,.72), rgba(120,6,6,0) 58%),
-      radial-gradient(70% 46% at 50% 104%, rgba(255,120,40,.5), rgba(255,120,40,0) 66%);
-  }
-  body.tekk.boom:not(.travel):not(.winch) .bf-flash{animation:bfFlash .6s ease-in-out}
-  @keyframes bfFlash{
-    0%  {opacity:0;   transform:translateY(8%)}
-    30% {opacity:calc(.05 * var(--amp,1)); transform:translateY(0)}
-    100%{opacity:0;   transform:translateY(-3%)}
-  }
-
-  /* a red flash off the floor two or three times a second is exactly
-     the thing some people cannot look at, so anyone who has asked for
-     less movement gets the pulse and none of the hit. */
-  @media (prefers-reduced-motion: reduce){
-    body.tekk.boom #world,
-    body.tekk.boom .inner,
-    body.tekk.boom .doors,
-    body.tekk.boom .vig,
-    body.tekk.boom .arch svg,
-    body.tekk.boom .motes,
-    body.tekk.boom .dust,
-    body.tekk.boom h1,
-    body.tekk.boom .smear,
-    body.tekk.boom .door::after,
-    body.tekk.boom .blbar::after,
-    body.tekk.boom #room,
-    body.tekk.boom .doors{animation:none !important}
-    body.tekk.boom .door,
-    body.tekk.boom .door::before,
-    body.tekk.boom .wip,
-    body.tekk.boom .blbar,
-    body.tekk.boom .doors{animation:none !important}
-    .boomfx{display:none}
-  }
-
-  /* the dark closes in, and it does it on a pulse */
-  .vig{
-    position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0;
-    transition:opacity .6s ease;
-    background:
-      radial-gradient(115% 88% at 50% 46%,
-        rgba(0,0,0,0) 34%, rgba(0,0,0,.55) 72%, rgba(0,0,0,.94) 100%);
-  }
-  /* the dark sits still and closes in on the hit, rather than scaling
-     off a variable that steps twelve times a second */
-  body.tekk .vig{opacity:1}
-  body.tekk.live .smear{opacity:calc(.75 + var(--pulse,0) * .35)}
-  body.tekk.live h1{
-    text-shadow:
-      3px 3px 0 #06070C, -1px -1px 0 #06070C,
-      0 0 calc(14px + var(--pulse,0) * 40px) rgba(170,12,10,.75),
-      0 0 calc(60px + var(--pulse,0) * 90px) rgba(90,4,4,.6);
-  }
-  body.tekk.live .tag .un{
-    text-shadow:0 0 calc(10px + var(--pulse,0) * 26px) rgba(194,26,18,.95),
-                0 0 calc(30px + var(--pulse,0) * 50px) rgba(194,26,18,.5);
-  }
-
-  body.tekk{
-    --text:#C8BEB4;
-    --dim:#7C716C;
-    --dimmer:#544A47;
-    --line:#141821;
-    --line-hot:#2A3040;
-    --gold:#8E0F0F;
-    --gold-hot:#C21A12;
-    --amber:#C21A12;
-    background:#06070C;
-  }
-  body.tekk #rays{opacity:.16}
-  body.tekk .avatar-wrap{display:none}
-
-  /* in this theme the title sits under the name instead of over it */
-  body.tekk .kicker{display:none}
-  .tag{display:none}
-  body.tekk .tag{
-    display:block;margin:.5em 0 0;
-    font-family:"Grenze Gotisch","Pirata One",serif;
-    font-weight:700;
-    font-size:clamp(19px,3.4vw,30px);
-    line-height:1.1;letter-spacing:.04em;
-    color:#8E7A76;
-    min-height:1.2em;
-    text-shadow:0 0 18px rgba(120,8,8,.5);
-  }
-  .tag .un{
-    color:#C21A12;
-    text-shadow:0 0 14px rgba(194,26,18,.9), 0 0 40px rgba(194,26,18,.5);
-    animation:un 2.6s steps(1) infinite;
-  }
-  @keyframes un{
-    0%,8%   {opacity:0}
-    9%,11%  {opacity:1}
-    12%,14% {opacity:0}
-    15%,62% {opacity:1}
-    63%,65% {opacity:.25}
-    66%,100%{opacity:1}
-  }
-  .tag.swap{animation:tagIn .5s ease}
-  @keyframes tagIn{
-    0%{opacity:0;transform:translateY(4px)}
-    100%{opacity:1;transform:none}
-  }
-  body.tekk h1{
-    font-family:"Grenze Gotisch","Pirata One",serif;
-    font-weight:800;letter-spacing:.06em;
-    background:none;color:#A50D09;-webkit-text-fill-color:#A50D09;
-    filter:none;
-    text-shadow:
-      3px 3px 0 #06070C, -1px -1px 0 #06070C,
-      0 0 18px rgba(150,10,8,.5), 0 0 70px rgba(90,4,4,.55);
-    animation:flicker 6.5s steps(1) infinite;
-  }
-  /* a bulb on its way out */
-  @keyframes flicker{
-    0%,52%,54%,58%,72%,74%,100%{opacity:1}
-    53%,57%{opacity:.62}
-    73%{opacity:.34}
-  }
-  body.tekk .kicker{animation:flicker 6.5s steps(1) .3s infinite}
-  body.tekk .sub{color:var(--dim)}
-  body.tekk .avatar{
-    border-color:#8A1414;
-    box-shadow:0 0 0 6px rgba(200,20,20,.1), 0 0 44px rgba(200,20,20,.38);
-    filter:grayscale(.65) contrast(1.15);
-  }
-  body.tekk .avatar-wrap::after{
-    background:radial-gradient(circle, rgba(200,20,20,.34) 0%, rgba(200,20,20,0) 68%);
-  }
-  /* nothing a chain passes on its way down should end up in front of
-     the thing it passes. depth, from the front of the room back. */
-  body.tekk .avatar-wrap,
-  body.tekk h1,
-  body.tekk .kicker,
-  body.tekk .tag,
-  body.tekk .sub{position:relative;z-index:6}
-  body.tekk .doors{position:relative;z-index:4}
-  body.tekk .wip{position:relative;z-index:3}
-  body.tekk .blbar{position:relative;z-index:2}
-
-  /* the cards stop being cards. they hang, at whatever length the chain
-     happened to be, and none of them agree on anything. */
-  body.tekk .doors{
-    padding-top:78px;
-    align-items:start;
-    grid-template-columns:repeat(3,1fr);
-    gap:clamp(22px,3vw,40px);
-  }
-  body.tekk .door{
-    --tilt:0deg;
-    --chain:60px;
-    margin-top:var(--drop,0px);
-    overflow:visible;
-  }
-  body.tekk .door:nth-child(1){--drop:0px;   --tilt:-.55deg; --chain:52px}
-  body.tekk .door:nth-child(2){--drop:82px;  --tilt:.45deg;  --chain:126px}
-  body.tekk .door:nth-child(3){--drop:34px;  --tilt:-.3deg;  --chain:80px}
-  @media (max-width:880px){
-    body.tekk .doors{grid-template-columns:1fr;gap:34px}
-    body.tekk .door{--drop:0px !important}
-  }
-  body.tekk .door{
-    background:
-      radial-gradient(circle at 50% 7px, #7E8898 0 3.5px, rgba(0,0,0,0) 4.5px),
-      radial-gradient(circle at 50% 7px, rgba(0,0,0,0) 0 5px, rgba(120,132,150,.45) 6px, rgba(0,0,0,0) 7px),
-      radial-gradient(54% 26% at 50% 0%, rgba(110,11,8,.5), rgba(110,11,8,0) 74%),
-      radial-gradient(circle at 12px 12px, rgba(150,168,196,.16) 0 2px, rgba(0,0,0,0) 3px),
-      radial-gradient(circle at calc(100% - 12px) 12px, rgba(150,168,196,.16) 0 2px, rgba(0,0,0,0) 3px),
-      radial-gradient(circle at 12px calc(100% - 12px), rgba(150,168,196,.12) 0 2px, rgba(0,0,0,0) 3px),
-      radial-gradient(circle at calc(100% - 12px) calc(100% - 12px), rgba(150,168,196,.12) 0 2px, rgba(0,0,0,0) 3px),
-      linear-gradient(165deg, rgba(160,180,220,.035), rgba(160,180,220,0) 60%),
-      #090B12;
-    border-color:#232A38;
-    border-top-color:#39424F;
-    /* the nail in the ceiling, at the far top of this plate's chain */
-    transform-origin:50% calc(-1 * (var(--chain,52px) + 60vh));
-    transform:rotate(var(--tilt,0deg));
-  }
-  /* the chain is rigid with the plate now, so it needs nothing of its
-     own: they turn together about the point the chain hangs from */
-  body.tekk .door::before{transform:none}
-
-  /* the hit, and only the hit. each plate is knocked a different way and
-     a beat behind the last, so the rack answers in sequence rather than
-     all of it twitching at once. the angles are small because the arm is
-     long: a degree at the end of a chain this size is a long way. */
-  body.tekk.boom:not(.travel):not(.winch) .door{
-    animation:plateHit .62s cubic-bezier(.4,0,.35,1) var(--hd,0s) both;
-  }
-  body.tekk .door:nth-child(1){--hd:0s;    --hdir:1}
-  body.tekk .door:nth-child(2){--hd:.03s;  --hdir:-1}
-  body.tekk .door:nth-child(3){--hd:.06s;  --hdir:1}
-
-  /* a swell rather than a snap: it leaves rest slowly, so what you see
-     is a sway on the beat and not a twitch on it */
-  @keyframes plateHit{
-    0%  {transform:rotate(var(--tilt,0deg))}
-    38% {transform:rotate(calc(var(--tilt,0deg) + .13deg * var(--hdir,1) * var(--amp,1)))}
-    74% {transform:rotate(calc(var(--tilt,0deg) - .05deg * var(--hdir,1) * var(--amp,1)))}
-    100%{transform:rotate(var(--tilt,0deg))}
-  }
-  /* and every so often something upstairs shifts */
-  /* two chains up into the dark above each one */
-  body.tekk .door::before{
-    content:"";position:absolute;left:0;right:0;z-index:-1;
-    top:calc(-1 * (var(--chain) + 60vh));height:calc(var(--chain) + 60vh);
-    pointer-events:none;
-    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='17'%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23545C6B' stroke-width='1.7'/%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23222833' stroke-width='.6'/%3E%3C/svg%3E"),
-      linear-gradient(180deg, rgba(110,11,8,0), rgba(110,11,8,.5));
-    background-repeat:repeat-y, no-repeat;
-    background-position:50% top, 50% bottom;
-    background-size:12px 17px, 3px 42%;
-    opacity:.85;
-  }
-  body.tekk .door:nth-child(2)::before{animation-duration:11.8s;animation-delay:-3.1s}
-  body.tekk .door:nth-child(3)::before{animation-duration:8.1s;animation-delay:-5.3s}
-  /* the chain gives a little less than the plate on the end of it */
-  /* it has been running down these for a while */
-  /* what has run down the front of this plate, and is still running.
-     three gradients, no tile, no repeat, and a different arrangement on
-     every plate. */
-  body.tekk .drip{
-    /* it starts at the bottom edge of the plate and runs down from
-       there, not up into the words */
-    display:block;position:absolute;left:0;right:0;
-    top:calc(100% - 5px);bottom:auto;height:70px;
-    pointer-events:none;overflow:visible;
-    background:
-      /* the seep along the bottom edge it came from */
-      linear-gradient(180deg, rgba(94,14,8,.85), rgba(58,7,4,0) 62%)
-        no-repeat 0 0 / 100% 7px,
-      /* the long one */
-      linear-gradient(180deg, #6B1109 0%, #4A0A05 62%, rgba(58,7,4,0) 100%)
-        no-repeat var(--r1x,18%) 0 / var(--r1w,5px) var(--r1h,38px),
-      /* and two that gave up earlier */
-      linear-gradient(180deg, #5E0F08 0%, #3E0804 70%, rgba(58,7,4,0) 100%)
-        no-repeat var(--r2x,52%) 0 / var(--r2w,4px) var(--r2h,18px),
-      linear-gradient(180deg, #560D07 0%, #380703 74%, rgba(58,7,4,0) 100%)
-        no-repeat var(--r3x,79%) 0 / var(--r3w,3px) var(--r3h,11px);
-    opacity:.85;
-    filter:drop-shadow(0 1px 2px rgba(0,0,0,.7));
-  }
-  /* the bead on the end of the long one. it hangs, swells, and every
-     so often it goes. */
-  body.tekk .drip::after{
-    content:"";position:absolute;
-    left:var(--r1x,18%);top:calc(var(--r1h,38px) - 3px);
-    width:var(--r1w,5px);height:var(--r1w,5px);
-    margin-left:calc(var(--r1w,5px) / -2 + 1px);
-    border-radius:0 0 50% 50% / 0 0 60% 60%;
-    background:linear-gradient(180deg,#7A1309,#420904);
-    box-shadow:0 1px 3px rgba(0,0,0,.7);
-    transform-origin:50% 0;
-    animation:bead var(--bt,13s) cubic-bezier(.4,0,.85,1) var(--bd,0s) infinite;
-  }
-  @keyframes bead{
-    /* most of the time it is just sitting there getting heavier */
-    0%,58%  {transform:translateY(0) scaleY(.6) scaleX(.8); opacity:.9}
-    76%     {transform:translateY(2px) scaleY(1.25) scaleX(1); opacity:1}
-    84%     {transform:translateY(3px) scaleY(1.5) scaleX(.92); opacity:1}
-    92%     {transform:translateY(26px) scaleY(1.7) scaleX(.7); opacity:.55}
-    100%    {transform:translateY(52px) scaleY(1.8) scaleX(.55); opacity:0}
-  }
-
-  /* no two of them the same, and none of them lined up */
-  body.tekk .door:nth-child(1) .drip{
-    --r1x:23%; --r1w:6px; --r1h:44px;
-    --r2x:61%; --r2w:4px; --r2h:15px;
-    --r3x:9%;  --r3w:3px; --r3h:9px;
-    --bt:13s;  --bd:-2s;
-  }
-  body.tekk .door:nth-child(2) .drip{
-    --r1x:74%; --r1w:5px; --r1h:31px;
-    --r2x:38%; --r2w:4px; --r2h:20px;
-    --r3x:88%; --r3w:3px; --r3h:8px;
-    --bt:17s;  --bd:-9s;
-    opacity:.7;
-  }
-  body.tekk .door:nth-child(3) .drip{
-    --r1x:44%; --r1w:6px; --r1h:52px;
-    --r2x:17%; --r2w:3px; --r2h:12px;
-    --r3x:83%; --r3w:4px; --r3h:22px;
-    --bt:11s;  --bd:-5s;
-  }
-  /* hovering does not lift an iron plate, it just catches the light */
-  body.tekk .door:hover,
-  body.tekk .door:focus-visible{
-    transform:rotate(var(--tilt,0deg));
-    border-color:var(--c);
-    box-shadow:0 18px 44px rgba(0,0,0,.85), 0 0 30px rgba(140,10,10,.18);
-  }
-  body.tekk .door{box-shadow:0 14px 34px rgba(0,0,0,.6)}
-  body.tekk .door:hover{box-shadow:0 16px 40px rgba(0,0,0,.8)}
-  body.tekk .door-d{color:#6E635F}
-  body.tekk .door-t{font-family:"Grenze Gotisch",serif;font-weight:700;letter-spacing:.01em}
-  body.tekk .bl-t{font-family:"Grenze Gotisch",serif;font-weight:800}
-  body.tekk .wip-t{font-family:"Grenze Gotisch",serif;font-weight:700}
-  body.tekk .door-1{--c:#8E0F0F}
-  body.tekk .door-2{--c:#A8340F}
-  body.tekk .door-4{--c:#8E0F0F}
-  /* it stops floating over the plates and hangs with them */
-  body.tekk .wip{
-    position:static;
-    transform:none;
-    display:flex;
-    width:fit-content;
-    margin:96px auto 0 6%;
-    border-right:1px solid #2A3040;
-    border-radius:3px;
-    --tilt:-.8deg;
-    --hd:.09s;
-    --hdir:-1;
-    transform-origin:50% calc(-1 * (var(--chain,70px) + 60vh));
-    transform:rotate(var(--tilt));
-    overflow:visible;
-    background:
-      radial-gradient(circle at 50% 6px, #7E8898 0 3px, rgba(0,0,0,0) 4px),
-      radial-gradient(circle at 50% 6px, rgba(0,0,0,0) 0 4.5px, rgba(120,132,150,.4) 5.5px, rgba(0,0,0,0) 6.5px),
-      linear-gradient(120deg, rgba(160,180,220,.03), rgba(160,180,220,0) 60%), #090B12;
-    border-color:#2A3040;
-    box-shadow:-6px 0 26px rgba(0,0,0,.85), 0 0 26px rgba(140,10,10,.16);
-  }
-  body.tekk .wip-s{color:#9A3A32}
-  /* and it lights the same way the plates do */
-  body.tekk .wip:hover{
-    transform:rotate(var(--tilt,0deg));
-    border-color:#C21A12;
-    box-shadow:0 0 34px rgba(194,26,18,.45), 0 16px 40px rgba(0,0,0,.8);
-  }
-  body.tekk .wip:hover .wip-t{color:#F0E4E0}
-  body.tekk .wip:hover .wip-s{color:#F0342A}
-  body.tekk .wip::before{
-    content:"";position:absolute;left:0;right:0;z-index:-1;
-    top:calc(-1 * (var(--chain,70px) + 60vh));height:calc(var(--chain,70px) + 60vh);
-    pointer-events:none;
-    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='17'%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23545C6B' stroke-width='1.7'/%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23222833' stroke-width='.6'/%3E%3C/svg%3E");
-    background-repeat:repeat-y;
-    background-position:50% top;
-    background-size:12px 17px;
-    opacity:.8;
-    transform:none;
-  }
-  body.tekk.boom:not(.travel):not(.winch) .wip{animation:plateHit .62s cubic-bezier(.4,0,.35,1) var(--hd,0s) both}
-  body.tekk .wip .drip{
-    --r1x:64%; --r1w:4px; --r1h:19px;
-    --r2x:28%; --r2w:3px; --r2h:9px;
-    --r3x:88%; --r3w:2px; --r3h:6px;
-    --bt:19s;  --bd:-14s;
-    opacity:.6;
-  }
-  /* the second one hangs under the first, further out and leaning the
-     other way, so they do not read as a pair of buttons */
-  body.tekk .wip-b{
-    margin:74px auto 0 14%;
-    --tilt:.7deg;
-    --hd:.13s;
-    --hdir:1;
-  }
-  body.tekk .wip-b .wip-tag{background:#2FD8C3;color:#04120F}
-  body.tekk .wip-b .wip-s{color:#7FE8AC}
-  body.tekk .wip-b:hover{border-color:#2FD8C3;box-shadow:0 0 34px rgba(47,216,195,.3), 0 16px 40px rgba(0,0,0,.8)}
-  body.tekk .wip-b:hover .wip-s{color:#A8F0E6}
-
-  /* ---------- the visualiser wall, over on the right ----------
-     A sign on the wall with things hanging under it, so there is somewhere
-     obvious to hang the next one. */
-  body:not(.tekk) .vrack{display:none}
-  body.tekk .vrack{
-    position:relative;
-    width:fit-content;
-    margin:118px 4% 0 auto;
-    padding-top:112px;   /* the sign hangs above the first plate, not under it */
-    display:flex;
-    flex-direction:column;
-    align-items:flex-end;
-    gap:76px;                 /* the next one hangs in here */
-    text-align:right;
-  }
-  body.tekk .vrack-sign{
-    position:absolute;
-    right:0;
-    top:-4px;
-    z-index:0;
-    pointer-events:none;
-    font-family:"Grenze Gotisch","Pirata One",serif;
-    font-weight:800;
-    font-size:clamp(30px,5.2vw,68px);
-    line-height:.86;
-    letter-spacing:.015em;
-    white-space:nowrap;
-    color:#B8281C;
-    animation:sign 11s steps(1) infinite;
-  }
-  /* a rule under it, so it reads as a heading for the things below and not
-     as something that wandered into the background */
-  body.tekk .vrack-sign::after{
-    content:"";
-    position:absolute;left:0;right:0;bottom:-14px;height:1px;
-    background:linear-gradient(90deg, rgba(184,40,28,0), rgba(184,40,28,.85));
-  }
-  /* a tube with a loose connection somewhere behind the wall */
-  @keyframes sign{
-    0%,38%   {opacity:1;   text-shadow:0 0 18px rgba(194,26,18,.75), 0 0 54px rgba(194,26,18,.35)}
-    39%      {opacity:.34; text-shadow:none}
-    40%      {opacity:1;   text-shadow:0 0 26px rgba(255,80,64,.85), 0 0 70px rgba(194,26,18,.45)}
-    41%      {opacity:.38; text-shadow:none}
-    42%,69%  {opacity:.94; text-shadow:0 0 18px rgba(194,26,18,.7), 0 0 50px rgba(194,26,18,.3)}
-    70%      {opacity:1;   text-shadow:0 0 30px rgba(255,120,80,.9), 0 0 80px rgba(240,200,104,.4)}
-    71%      {opacity:.4;  text-shadow:none}
-    72%,100% {opacity:1;   text-shadow:0 0 18px rgba(194,26,18,.75), 0 0 54px rgba(194,26,18,.35)}
-  }
-  body.tekk .vrack .wip{margin:0}
-
-  /* it is gold, because that is where the track it plays ends up */
-  body.tekk .wip-c{
-    --tilt:-1.15deg;
-    --hd:.17s;
-    --hdir:-1;
-  }
-  body.tekk .wip-c .wip-tag{background:#F0C868;color:#120C02}
-  body.tekk .wip-c .wip-s{color:#B08A3C}
-  body.tekk .wip-c:hover{border-color:#F0C868;box-shadow:0 0 34px rgba(240,200,104,.3), 0 16px 40px rgba(0,0,0,.8)}
-  body.tekk .wip-c:hover .wip-s{color:#FFE9B0}
-
-  /* the second one on the wall. it is a quieter thing and it looks it. */
-  body.tekk .wip-d{
-    --tilt:.85deg;
-    --hd:.21s;
-    --hdir:1;
-  }
-  body.tekk .wip-d .wip-tag{background:#6E86A8;color:#060911}
-  body.tekk .wip-d .wip-s{color:#5E7089}
-  body.tekk .wip-d:hover{border-color:#6E86A8;box-shadow:0 0 34px rgba(110,134,168,.28), 0 16px 40px rgba(0,0,0,.8)}
-  body.tekk .wip-d:hover .wip-s{color:#C8D4E6}
-  /* Skriveno na zahtjev. Stranica /miss/ i dalje radi i dostupna je
-     izravnim linkom; makne se brisanjem ovog jednog pravila. */
-  body.tekk .wip-d{display:none}
-
-  /* and this one is wired straight to the mains */
-  body.tekk .wip-e{
-    --tilt:-.6deg;
-    --hd:.25s;
-    --hdir:-1;
-  }
-  body.tekk .wip-e .wip-tag{background:#38E8FF;color:#03121A}
-  body.tekk .wip-e .wip-s{color:#2E7A8C}
-  body.tekk .wip-e:hover{border-color:#38E8FF;box-shadow:0 0 36px rgba(56,232,255,.32), 0 16px 40px rgba(0,0,0,.8)}
-  body.tekk .wip-e:hover .wip-s{color:#9BF3FF}
-
-  /* the fourth one, and it is all candy */
-  body.tekk .wip-f{
-    --tilt:.95deg;
-    --hd:.29s;
-    --hdir:1;
-  }
-  body.tekk .wip-f .wip-tag{background:#FF2D95;color:#1A0210}
-  body.tekk .wip-f .wip-s{color:#9C3A6E}
-  body.tekk .wip-f:hover{border-color:#FF2D95;box-shadow:0 0 36px rgba(255,45,149,.32), 0 16px 40px rgba(0,0,0,.8)}
-  body.tekk .wip-f:hover .wip-s{color:#FFA8D4}
-  body.tekk .wip-g{
-    --tilt:-.7deg;
-    --hd:.33s;
-    --hdir:-1;
-  }
-  body.tekk .wip-g .wip-tag{background:#FFB338;color:#1A1002}
-  body.tekk .wip-g .wip-s{color:#9A7434}
-  body.tekk .wip-g:hover{border-color:#FFB338;box-shadow:0 0 36px rgba(255,179,56,.32), 0 16px 40px rgba(0,0,0,.8)}
-  body.tekk .wip-g:hover .wip-s{color:#FFD79A}
-
-  body.tekk .wip-tag{background:#8E0F0F;color:#040203}
-  /* the blacklist hangs lower and swings wider, like a sign outside a door */
-  body.tekk .blbar.dropping{z-index:1}
-  body.tekk .blbar{
-    display:flex;
-    margin-top:104px;
-    margin-left:auto;
-    margin-right:0;
-    width:min(100%,780px);
-    --tilt:.5deg;
-    --hd:.12s;
-    --hdir:1;
-    transform-origin:50% calc(-1 * (var(--chain,46px) + 60vh));
-    transform:rotate(var(--tilt));
-    background:
-      radial-gradient(circle at 50% 7px, #7E8898 0 3.5px, rgba(0,0,0,0) 4.5px),
-      radial-gradient(circle at 50% 7px, rgba(0,0,0,0) 0 5px, rgba(120,132,150,.45) 6px, rgba(0,0,0,0) 7px),
-      radial-gradient(140% 260% at 50% 130%, rgba(120,6,6,.34), rgba(120,6,6,0) 70%), #08070C;
-    border-color:#3E1213;
-    box-shadow:0 0 30px rgba(120,6,6,.35), inset 0 0 30px rgba(120,6,6,.14);
-  }
-  body.tekk .blbar::before{
-    content:"";position:absolute;left:0;right:0;z-index:-1;
-    top:calc(-1 * (var(--chain,46px) + 60vh));height:calc(var(--chain,46px) + 60vh);
-    pointer-events:none;
-    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='17'%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23545C6B' stroke-width='1.7'/%3E%3Cellipse cx='6' cy='8.5' rx='3.6' ry='7' fill='none' stroke='%23222833' stroke-width='.6'/%3E%3C/svg%3E");
-    background-repeat:repeat-y;
-    background-position:50% top;
-    background-size:12px 17px;
-    opacity:.8;
-    transform:none;
-  }
-  body.tekk.boom:not(.travel):not(.winch) .blbar{animation:plateHit .62s cubic-bezier(.4,0,.35,1) var(--hd,0s) both}
-
-  body.tekk .blbar:hover{
-    transform:rotate(var(--tilt,0deg));
-    box-shadow:0 0 40px rgba(194,26,18,.4), 0 16px 40px rgba(0,0,0,.8);
-  }
-  body.tekk .blbar .drip{
-    --r1x:31%; --r1w:6px; --r1h:47px;
-    --r2x:66%; --r2w:4px; --r2h:17px;
-    --r3x:12%; --r3w:3px; --r3h:10px;
-    --bt:15s;  --bd:-11s;
-    opacity:.7;
-  }
-  body.tekk .blbar{overflow:visible}
-  body.tekk .bl-t{color:#C9B7B3;text-shadow:0 0 18px rgba(180,14,14,.7)}
-  body.tekk .bl-d{color:#6E5F5C}
-  body.tekk .bl-go{color:#9A3A32}
-  body.tekk footer{color:var(--dimmer);border-color:var(--line)}
-
-  body.tekk .theme-color{color:#040203}
-
-  /* ---------- the corruption ----------
-     the theme does not swap, it gets taken over. a wipe passes down the
-     page, the type comes apart into glyphs, and it settles on the far side. */
-  .corrupt{
-    position:fixed;inset:0;z-index:65;pointer-events:none;
-    opacity:0;overflow:hidden;
-  }
-  body.corrupting .corrupt{opacity:1}
-  .corrupt .wipe{
-    position:absolute;left:-2%;right:-2%;top:0;height:100%;
-    transform:translateY(-102%);
-    background:
-      linear-gradient(180deg,
-        rgba(6,7,12,0) 0%, rgba(6,7,12,.92) 12%,
-        rgba(120,8,6,.95) 46%, rgba(200,22,14,.9) 52%,
-        rgba(6,7,12,.92) 60%, rgba(6,7,12,0) 100%);
-  }
-  /* down into it */
-  body.corrupting.desc .corrupt .wipe{animation:wipeDown 1.05s cubic-bezier(.35,0,.2,1) forwards}
-  @keyframes wipeDown{
-    0%{transform:translateY(-102%)}
-    100%{transform:translateY(102%)}
-  }
-
-  /* and back up out of it, in the other colour entirely */
-  body.corrupting.asc .corrupt .wipe{
-    animation:wipeUp 1.05s cubic-bezier(.35,0,.2,1) forwards;
-    background:
-      linear-gradient(180deg,
-        rgba(8,10,20,0) 0%, rgba(255,244,214,.06) 20%,
-        rgba(255,232,168,.72) 44%, rgba(255,255,255,.94) 51%,
-        rgba(255,224,150,.7) 58%, rgba(8,10,20,0) 100%);
-  }
-  @keyframes wipeUp{
-    0%{transform:translateY(102%)}
-    100%{transform:translateY(-102%)}
-  }
-  body.corrupting.asc .corrupt .bar{background:#FFE6A6;box-shadow:0 0 26px rgba(255,224,160,.95)}
-  body.corrupting.asc .doors,
-  body.corrupting.asc .blbar{filter:brightness(1.5) saturate(.7)}
-  body.corrupting.asc .inner{animation:rise 1.05s cubic-bezier(.3,.9,.2,1)}
-  @keyframes rise{
-    0%{transform:translateY(16px);opacity:.5;filter:blur(2px)}
-    60%{filter:blur(0)}
-    100%{transform:translateY(0);opacity:1}
-  }
-  /* the light itself, only on the way up */
-  .bloom{
-    position:absolute;left:50%;top:58%;width:10px;height:10px;
-    margin:-5px 0 0 -5px;border-radius:50%;opacity:0;
-    background:radial-gradient(circle, rgba(255,248,224,.95) 0%, rgba(255,224,150,.45) 40%, rgba(255,214,120,0) 70%);
-  }
-  body.corrupting.asc .bloom{animation:bloom 1.05s cubic-bezier(.2,.8,.3,1) forwards}
-  @keyframes bloom{
-    0%{opacity:0;transform:scale(1)}
-    22%{opacity:1}
-    100%{opacity:0;transform:scale(170)}
-  }
-  /* falling is heavier than rising */
-  body.corrupting.desc .inner{animation:cshake .34s steps(2) 3}
-  .corrupt .bar{
-    position:absolute;left:-10%;right:-10%;height:3px;
-    background:#C21A12;opacity:0;
-    box-shadow:0 0 22px rgba(194,26,18,.9);
-  }
-  body.corrupting .corrupt .bar{animation:cbar .16s steps(2) forwards}
-  .corrupt .bar:nth-child(2){top:22%;animation-delay:.10s}
-  .corrupt .bar:nth-child(3){top:47%;animation-delay:.26s}
-  .corrupt .bar:nth-child(4){top:68%;animation-delay:.42s}
-  .corrupt .bar:nth-child(5){top:35%;animation-delay:.58s}
-  @keyframes cbar{
-    0%{opacity:1;transform:translateX(-40px) scaleY(3)}
-    100%{opacity:0;transform:translateX(30px) scaleY(1)}
-  }
-  @keyframes cshake{
-    0%,100%{transform:translate(0,0)}
-    25%{transform:translate(-5px,2px)}
-    50%{transform:translate(4px,-3px)}
-    75%{transform:translate(-3px,-1px)}
-  }
-  body.corrupting .doors,
-  body.corrupting .blbar{filter:contrast(1.5) saturate(.4) brightness(.7)}
-
-  #tekkAudio, #holyAudio{display:none}
-
-  /* the whole page is one shot the camera can move */
-  #world{
-    flex:1 0 auto;display:flex;flex-direction:column;min-height:100svh;
-    transition:transform .85s cubic-bezier(.6,0,.2,1), opacity .7s ease, filter .85s ease;
-    will-change:transform;
-  }
-  body.travel #world{pointer-events:none}
-  /* wiped off to one side */
-  body.go-left  #world{transform:translateX(62vw)  rotate(1.8deg);opacity:0}
-  body.go-right #world{transform:translateX(-62vw) rotate(-1.8deg);opacity:0}
-  /* it comes at you instead */
-  body.go-lunge #world{transform:scale(1.55);opacity:0;filter:blur(9px) saturate(1.4)}
-  /* and down, a long way */
-  body.go-descend #world{transform:translateY(-72vh) scale(.88);opacity:0;filter:blur(4px) saturate(.4)}
-
-  /* a plate swinging out of the way before its section opens */
-  .swing-l{animation:swingL .5s cubic-bezier(.35,0,.25,1) forwards !important}
-  @keyframes swingL{
-    0%  {transform:rotate(var(--tilt,0deg))}
-    62% {transform:rotate(5.2deg)}
-    100%{transform:rotate(4.2deg)}
-  }
-  .swing-r{animation:swingR .5s cubic-bezier(.35,0,.25,1) forwards !important}
-  @keyframes swingR{
-    0%  {transform:rotate(var(--tilt,0deg))}
-    62% {transform:rotate(-5.2deg)}
-    100%{transform:rotate(-4.2deg)}
-  }
-  /* and back, with the overshoot a thing on a chain actually has */
-
-  .unswing-l{animation:unswingL .78s cubic-bezier(.3,.85,.3,1) forwards !important}
-  @keyframes unswingL{
-    0%  {transform:rotate(4.2deg)}
-    46% {transform:rotate(calc(var(--tilt,0deg) - 5deg))}
-    72% {transform:rotate(calc(var(--tilt,0deg) + 2.2deg))}
-    88% {transform:rotate(calc(var(--tilt,0deg) - .9deg))}
-    100%{transform:rotate(var(--tilt,0deg))}
-  }
-  .unswing-r{animation:unswingR .78s cubic-bezier(.3,.85,.3,1) forwards !important}
-  @keyframes unswingR{
-    0%  {transform:rotate(-4.2deg)}
-    46% {transform:rotate(calc(var(--tilt,0deg) + 5deg))}
-    72% {transform:rotate(calc(var(--tilt,0deg) - 2.2deg))}
-    88% {transform:rotate(calc(var(--tilt,0deg) + .9deg))}
-    100%{transform:rotate(var(--tilt,0deg))}
-  }
-  /* the blacklist is hauled back up rather than reappearing */
-  .raising{animation:raiseUp .95s cubic-bezier(.35,.05,.25,1) forwards !important}
-  @keyframes raiseUp{
-    0%  {transform:translateY(120vh) rotate(calc(var(--tilt,0deg) + .9deg))}
-    82% {transform:translateY(-10px) rotate(calc(var(--tilt,0deg) - 1.6deg))}
-    100%{transform:translateY(0) rotate(var(--tilt,0deg))}
-  }
-  body.tekk .blbar.raising::before{animation:chainRaise .95s cubic-bezier(.35,.05,.25,1) forwards}
-  @keyframes chainRaise{
-    0%  {top:calc(-1 * (var(--chain,46px) + 60vh + 120vh));
-         height:calc(var(--chain,46px) + 60vh + 120vh)}
-    82% {top:calc(-1 * (var(--chain,46px) + 60vh) + 10px);
-         height:calc(var(--chain,46px) + 60vh - 10px)}
-    100%{top:calc(-1 * (var(--chain,46px) + 60vh));
-         height:calc(var(--chain,46px) + 60vh)}
-  }
-  /* and one that simply keeps going down */
-  /* a steady pace with a little slack at each end. nothing about this
-     should read as falling. */
-  /* it is let down on the chain, and the camera goes with it. the plate
-     only creeps down the screen because the room is rising past it. */
-  /* the slack goes first, then it drops with some weight behind it */
-  .dropping{animation:dropDown 1.9s cubic-bezier(.5,.02,.72,1) forwards !important}
-  @keyframes dropDown{
-    0%  {transform:translateY(0) rotate(var(--tilt,0deg))}
-    7%  {transform:translateY(-14px) rotate(calc(var(--tilt,0deg) - 2.4deg))}
-    13% {transform:translateY(6px) rotate(calc(var(--tilt,0deg) + 1.6deg))}
-    46% {transform:translateY(38vh) rotate(calc(var(--tilt,0deg) - 1deg))}
-    100%{transform:translateY(120vh) rotate(calc(var(--tilt,0deg) + 1.4deg))}
-  }
-  /* the chain pays out behind it the whole way down */
-  body.tekk .blbar.dropping::before{
-    animation:chainDrop 1.9s cubic-bezier(.5,.02,.72,1) forwards;
-  }
-  @keyframes chainDrop{
-    0%  {top:calc(-1 * (var(--chain,46px) + 60vh));
-         height:calc(var(--chain,46px) + 60vh)}
-    7%  {top:calc(-1 * (var(--chain,46px) + 60vh) + 14px);
-         height:calc(var(--chain,46px) + 60vh - 14px)}
-    13% {top:calc(-1 * (var(--chain,46px) + 60vh) - 6px);
-         height:calc(var(--chain,46px) + 60vh + 6px)}
-    46% {top:calc(-1 * (var(--chain,46px) + 60vh + 38vh));
-         height:calc(var(--chain,46px) + 60vh + 38vh)}
-    100%{top:calc(-1 * (var(--chain,46px) + 60vh + 120vh));
-         height:calc(var(--chain,46px) + 60vh + 120vh)}
-  }
-  /* the room goes up past you. it never travels far enough to show the
-     top of a chain, because every chain now runs well off the page. */
-  body.winch #world{animation:winchDown 1.9s cubic-bezier(.5,.02,.72,1) forwards}
-  @keyframes winchDown{
-    0%  {transform:translateY(0) scale(1);opacity:1;filter:none}
-    10% {transform:translateY(3vh) scale(1.005);opacity:1}
-    72% {opacity:.8}
-    100%{transform:translateY(-46vh) scale(.9);opacity:0;filter:blur(5px) saturate(.35)}
-  }
-  body.winch{overflow:hidden}
-  body.winch .hellfx{animation:hellUp 1.9s ease-in forwards}
-  body.winch .doors{animation:quake .1s steps(2) 19}
-
-  #view{
-    position:fixed;inset:0;z-index:150;background:var(--ink);
-    opacity:0;pointer-events:none;
-    transition:transform .85s cubic-bezier(.2,.8,.2,1), opacity .6s ease;
-    will-change:transform;
-  }
-  #view.on{opacity:1;pointer-events:auto;transform:none}
-  #view.from-left{transform:translateX(-58vw)}
-  #view.from-right{transform:translateX(58vw)}
-  #view.from-lunge{transform:scale(.7)}
-  #view.from-descend{transform:translateY(66vh)}
-  #view iframe{display:block;width:100%;height:100%;border:0;background:var(--ink)}
-  .view-x{
-    position:fixed;z-index:161;
-    display:flex;align-items:center;justify-content:center;
-    gap:14px;padding:0;border:0;cursor:pointer;
-    color:var(--gold);background:transparent;
-    transition:color .25s ease, opacity .25s ease;
-    -webkit-tap-highlight-color:transparent;
-  }
-  .view-x:focus-visible{outline:2px solid var(--gold);outline-offset:-4px}
-
-  /* the strip itself: strongest at the edge, gone by the time it
-     reaches anything the page wanted to put there */
-  .view-x::before{
-    content:"";position:absolute;inset:0;pointer-events:none;
-    transition:opacity .25s ease;
-    opacity:.85;
-  }
-  .view-x:hover::before{opacity:1}
-
-  .vb-arrow{
-    position:relative;width:clamp(30px,3.4vw,46px);height:clamp(30px,3.4vw,46px);
-    border-left:4px solid currentColor;
-    border-bottom:4px solid currentColor;
-    transition:transform .25s cubic-bezier(.2,.8,.25,1);
-  }
-  /* it leans toward the way out, so you can see it is a way out */
-  #view.back-left .vb-arrow{animation:vbL 2.4s ease-in-out infinite}
-  #view.back-right .vb-arrow{animation:vbR 2.4s ease-in-out infinite}
-  #view.back-top .vb-arrow{animation:vbB 2.4s ease-in-out infinite}
-  @keyframes vbL{
-    0%,100%{transform:rotate(45deg) translate(0,0)}
-    50%    {transform:rotate(45deg) translate(5px,-5px)}
-  }
-  @keyframes vbR{
-    0%,100%{transform:rotate(-135deg) translate(0,0)}
-    50%    {transform:rotate(-135deg) translate(5px,-5px)}
-  }
-  @keyframes vbB{
-    0%,100%{transform:rotate(135deg) translate(0,0)}
-    50%    {transform:rotate(135deg) translate(5px,-5px)}
-  }
-  .view-x:hover .vb-arrow{animation-play-state:paused}
-  .vb-word{
-    position:relative;
-    font-family:var(--mono);font-size:11px;font-weight:700;
-    letter-spacing:.24em;text-transform:uppercase;
-    opacity:.8;
-  }
-  .view-x:hover .vb-word{opacity:1}
-
-  /* down the left */
-  #view.back-left .view-x{
-    left:0;top:0;bottom:0;width:clamp(66px,7vw,108px);flex-direction:column;
-  }
-  #view.back-left .view-x::before{
-    background:linear-gradient(90deg, rgba(0,0,0,.30), rgba(0,0,0,0));
-  }
-  #view.back-left .vb-arrow{transform:rotate(45deg)}
-  #view.back-left .view-x:hover .vb-arrow{transform:rotate(45deg) translate(4px,-4px)}
-  #view.back-left .vb-word{writing-mode:vertical-rl;transform:rotate(180deg)}
-
-  /* down the right */
-  #view.back-right .view-x{
-    right:0;top:0;bottom:0;width:clamp(66px,7vw,108px);flex-direction:column;
-  }
-  #view.back-right .view-x::before{
-    background:linear-gradient(270deg, rgba(0,0,0,.30), rgba(0,0,0,0));
-  }
-  #view.back-right .vb-arrow{transform:rotate(-135deg)}
-  #view.back-right .view-x:hover .vb-arrow{transform:rotate(-135deg) translate(4px,-4px)}
-  #view.back-right .vb-word{writing-mode:vertical-rl}
-
-  /* along the top, for the one you climb back out of */
-  #view.back-top .view-x{
-    left:0;right:0;top:0;height:clamp(54px,7vh,86px);flex-direction:row;
-  }
-  #view.back-top .view-x::before{
-    background:linear-gradient(180deg, rgba(0,0,0,.45), rgba(0,0,0,0));
-  }
-  #view.back-top .vb-arrow{transform:rotate(135deg)}
-  #view.back-top .view-x:hover .vb-arrow{transform:rotate(135deg) translate(4px,-4px)}
-
-  /* on the light side the edge is bright, not dark */
-  #view.back-left .view-x::before,
-  #view.back-right .view-x::before,
-  #view.back-top .view-x::before{
-    background-color:transparent;
-  }
-  body:not(.tekk) #view.back-left .view-x::before{
-    background:linear-gradient(90deg, rgba(255,252,242,.92), rgba(255,252,242,0));
-  }
-  body:not(.tekk) #view.back-right .view-x::before{
-    background:linear-gradient(270deg, rgba(255,252,242,.92), rgba(255,252,242,0));
-  }
-  body:not(.tekk) #view.back-top .view-x::before{
-    background:linear-gradient(180deg, rgba(255,252,242,.95), rgba(255,252,242,0));
-  }
-
-  body.tekk .view-x{color:#C21A12}
-  body.tekk .view-x:hover{color:#F0342A}
-  body.tekk .vb-word{font-family:"Grenze Gotisch",serif;letter-spacing:.1em;font-size:15px}
-  .view-x .alt{display:none}
-  body.tekk .view-x .std{display:none}
-  body.tekk .view-x .alt{display:inline}
-
-  /* the descent gets its own light */
-  .hellfx{
-    position:fixed;inset:0;z-index:155;pointer-events:none;opacity:0;
-    background:
-      radial-gradient(90% 60% at 50% 118%, rgba(190,14,10,.85), rgba(120,6,6,0) 62%),
-      radial-gradient(60% 40% at 50% 100%, rgba(255,90,20,.5), rgba(255,90,20,0) 70%);
-  }
-  body.go-descend .hellfx{animation:hellUp 1.6s ease-out forwards}
-  @keyframes hellUp{
-    0%{opacity:0;transform:translateY(30%)}
-    45%{opacity:1;transform:translateY(0)}
-    100%{opacity:0;transform:translateY(-10%)}
-  }
-  @keyframes quake{
-    0%  {transform:translate3d(0,0,0)}
-    25% {transform:translate3d(-7px,1px,0)}
-    50% {transform:translate3d(6px,-2px,0)}
-    75% {transform:translate3d(-4px,1px,0)}
-    100%{transform:translate3d(0,0,0)}
-  }
-
-  /* the door. a browser will not start a track on its own, so the site asks
-     you to open something first and takes that click as permission. */
-  #gate{
-    position:fixed;inset:0;z-index:200;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:16px;padding:24px;text-align:center;cursor:pointer;
-    background:var(--ink);
-    transition:opacity .55s ease;
-  }
-  #gate.gone{opacity:0;pointer-events:none}
-  .gate-k{
-    font-family:var(--mono);font-size:10.5px;font-weight:600;
-    letter-spacing:.24em;text-transform:uppercase;color:var(--dimmer);margin:0;
-  }
-  .gate-t{
-    font-family:var(--display);font-weight:800;
-    font-size:clamp(30px,6.5vw,58px);line-height:1;letter-spacing:-.01em;
-    color:var(--text);margin:0;
-  }
-  .gate-d{
-    max-width:34ch;margin:0;font-size:15px;line-height:1.6;color:var(--dim);
-  }
-  .gate-go{
-    margin-top:10px;
-    font-family:var(--mono);font-size:10.5px;font-weight:600;
-    letter-spacing:.2em;text-transform:uppercase;color:var(--gold);
-    animation:gateBreath 2.6s ease-in-out infinite;
-  }
-  @keyframes gateBreath{0%,100%{opacity:.45}50%{opacity:1}}
-  /* a thin candle of light down the middle, and nothing else */
-  .gate-lamp{
-    position:absolute;left:50%;top:0;width:2px;height:40vh;margin-left:-1px;
-    background:linear-gradient(180deg, rgba(160,122,46,0), rgba(160,122,46,.45), rgba(160,122,46,0));
-    animation:gateBreath 4s ease-in-out infinite;
-  }
-  #gate .alt, .view-x .alt{display:none}
-  body.tekk .view-x .std{display:none}
-  body.tekk .view-x .alt{display:inline}
-  body.tekk #gate{background:#06070C}
-  body.tekk #gate .std{display:none}
-  body.tekk #gate .alt{display:block}
-  body.tekk .gate-t{
-    font-family:"Grenze Gotisch","Pirata One",serif;
-    color:#A50D09;text-shadow:0 0 18px rgba(150,10,8,.5);
-  }
-  body.tekk .gate-lamp{
-    background:linear-gradient(180deg, rgba(150,10,8,0), rgba(150,10,8,.5), rgba(150,10,8,0));
-  }
-
-  @media (prefers-reduced-motion:reduce){
-    *{animation:none !important;transition:none !important}
-    h1{background:none;color:var(--gold-hot);-webkit-text-fill-color:var(--gold-hot)}
-  }
+/* Hallmark · genre: atmospheric · macrostructure: Stat-Led · theme: custom · enrichment: E-video (two real clips) · nav: N9 Edge-aligned · footer: Ft5 Statement
+ * vibe: "arena after midnight, graphite, one ember"
+ * paper oklch(16.5% 0.014 255) · accent oklch(77% 0.155 62) amber · Big Shoulders Display + Geist / Geist Mono
+ * axes: dark / display-condensed / warm
+ * Hallmark · pre-emit critique: P5 H5 E4 S5 R4 V5
+ */
+:root{
+  color-scheme:dark;
+  --color-paper:   oklch(16.5% 0.014 255);
+  --color-paper-2: oklch(20% 0.016 255);
+  --color-paper-3: oklch(24.5% 0.018 255);
+  --color-rule:    oklch(29% 0.016 255);
+  --color-rule-2:  oklch(37% 0.018 255);
+  --color-ink:     oklch(94% 0.008 250);
+  --color-ink-2:   oklch(78% 0.012 250);
+  --color-ink-3:   oklch(64% 0.014 252);
+  --color-accent:  oklch(77% 0.155 62);
+  --color-accent-dim: oklch(77% 0.155 62 / .16);
+  --color-accent-ink: oklch(20% 0.03 60);
+  --color-muted-bar: oklch(42% 0.02 255);
+  --color-bloom:   oklch(60% 0.15 50 / .13);
+  --color-bloom-2: oklch(55% 0.09 250 / .10);
+  --color-focus:   oklch(85% 0.14 70);
+
+  /* class colours: Blizzard's own, used only as small marks */
+  --class-1:#C69B6D; --class-2:#F48CBA; --class-3:#AAD372; --class-4:#FFF468;
+  --class-5:#F0F0F0; --class-6:#C41E3A; --class-7:#0070DD; --class-8:#3FC7EB;
+  --class-9:#8788EE; --class-10:#00FF98; --class-11:#FF7C0A; --class-12:#A330C9; --class-13:#33937F;
+
+  --font-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --font-body:"Geist","Segoe UI",system-ui,sans-serif;
+  --font-mono:"Geist Mono",ui-monospace,Consolas,monospace;
+
+  --text-xs:.75rem; --text-sm:.875rem; --text-base:1rem; --text-md:1.125rem;
+  --text-lg:1.375rem; --text-xl:clamp(1.6rem,1.2rem + 1.6vw,2.25rem);
+  --text-2xl:clamp(2.2rem,1.4rem + 3.4vw,3.75rem);
+  --text-figure:clamp(7rem,3rem + 19vw,15rem);
+
+  --space-2xs:4px; --space-xs:8px; --space-sm:12px; --space-md:16px; --space-lg:24px;
+  --space-xl:32px; --space-2xl:48px; --space-3xl:72px; --space-4xl:112px;
+  --gutter:clamp(16px,4vw,40px);
+  --wrap:1180px;
+  --radius:3px;
+  --ease-out:cubic-bezier(.22,1,.36,1);
+  --ease-in-out:cubic-bezier(.65,0,.35,1);
+  --dur-fast:140ms; --dur:240ms;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{overflow-x:clip}
+html{scroll-behavior:smooth;scroll-padding-top:72px;-webkit-text-size-adjust:100%}
+body{
+  margin:0;color:var(--color-ink);background-color:var(--color-paper);
+  background-image:
+    radial-gradient(60vw 50vh at 85% -5%, var(--color-bloom), transparent 70%),
+    radial-gradient(50vw 45vh at -10% 40%, var(--color-bloom-2), transparent 70%);
+  background-attachment:fixed;
+  font:400 var(--text-base)/1.6 var(--font-body);
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--color-focus);outline-offset:3px}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 var(--gutter)}
+.tnum{font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- nav: edge-aligned ---------- */
+.nav{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:20;
+  background:linear-gradient(var(--color-paper) 55%, transparent);
+}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:var(--space-lg);height:64px}
+.mark{
+  font:800 1.5rem/1 var(--font-display);letter-spacing:.06em;text-transform:uppercase;
+  text-decoration:none;color:var(--color-ink);white-space:nowrap;
+}
+.nav ul{display:flex;gap:clamp(12px,2.4vw,28px);list-style:none;margin:0;padding:0}
+.nav a.l{
+  font:500 var(--text-sm)/1 var(--font-body);color:var(--color-ink-3);text-decoration:none;
+  white-space:nowrap;padding:8px 0;border-bottom:1px solid transparent;
+  transition:color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out);
+}
+.nav a.l:hover{color:var(--color-ink);border-color:var(--color-rule-2)}
+@media (max-width:720px){ .nav li.opt{display:none} }
+
+/* ---------- hero: the figure and its words ---------- */
+.hero{padding:clamp(24px,6vh,64px) 0 var(--space-3xl)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:var(--space-xl) clamp(24px,5vw,64px);align-items:end}
+.figure{
+  font:800 var(--text-figure)/.78 var(--font-display);letter-spacing:-.01em;
+  color:var(--color-accent);margin:0;font-variant-numeric:tabular-nums;
+}
+.hero h1{
+  font:700 var(--text-2xl)/1.02 var(--font-display);letter-spacing:.005em;text-transform:uppercase;
+  margin:0;max-width:16ch;overflow-wrap:anywhere;min-width:0;
+}
+.hero h1 .sub{color:var(--color-ink-3)}
+.qual{margin:var(--space-lg) 0 0;max-width:58ch;color:var(--color-ink-2);font-size:var(--text-md)}
+.qual b{color:var(--color-ink);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:var(--space-sm);margin-top:var(--space-xl)}
+.chip{
+  display:inline-flex;align-items:center;gap:8px;white-space:nowrap;
+  font:500 var(--text-sm)/1 var(--font-body);text-decoration:none;
+  padding:12px 18px;border-radius:999px;border:1px solid var(--color-rule-2);color:var(--color-ink);
+  transition:border-color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out);
+}
+.chip:hover{border-color:var(--color-ink-3);background:var(--color-paper-2)}
+.chip:active{transform:translateY(1px)}
+.chip.solid{background:var(--color-accent);border-color:var(--color-accent);color:var(--color-accent-ink);font-weight:600}
+.chip.solid:hover{background:var(--color-focus);border-color:var(--color-focus)}
+@media (max-width:860px){ .hero-grid{grid-template-columns:minmax(0,1fr)} .figure{line-height:.8} }
+
+/* supporting stats, hairline-separated */
+.stats{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  margin-top:var(--space-3xl);border-top:1px solid var(--color-rule);
+}
+.stat{padding:var(--space-lg) var(--space-lg) 0 0}
+.stat + .stat{padding-left:var(--space-lg);border-left:1px solid var(--color-rule)}
+.stat b{display:block;font:700 clamp(2.4rem,1.8rem + 1.6vw,3.25rem)/1 var(--font-display);font-variant-numeric:tabular-nums}
+.stat span{display:block;margin-top:var(--space-xs);font-size:var(--text-sm);color:var(--color-ink-3);line-height:1.45}
+.stat span em{font-style:normal;color:var(--color-ink-2)}
+.stat span span{display:inline;margin:0}
+@media (max-width:860px){
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stat:nth-child(3){padding-left:0;border-left:0}
+  .stat:nth-child(n+3){border-top:1px solid var(--color-rule);margin-top:var(--space-lg)}
+}
+
+/* ---------- sections ---------- */
+section.s{padding:var(--space-4xl) 0 0}
+.s-head{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--space-sm);margin-bottom:var(--space-2xl);max-width:62ch}
+.s-head h2{
+  font:700 var(--text-xl)/1.05 var(--font-display);text-transform:uppercase;letter-spacing:.01em;margin:0;
+  overflow-wrap:anywhere;min-width:0;
+}
+.s-head h2 .n{color:var(--color-accent)}
+.s-head p{margin:0;color:var(--color-ink-2)}
+
+/* ladder chart */
+.chart{background:var(--color-paper-2);border-radius:var(--radius);padding:var(--space-lg) var(--space-lg) var(--space-md)}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart text{font-family:var(--font-mono);fill:var(--color-ink-3)}
+.chart .grid line{stroke:var(--color-rule);stroke-width:1}
+.chart .tier{font-size:11px;letter-spacing:.06em}
+.chart .bar-hi{fill:var(--color-accent)}
+.chart .bar-lo{fill:var(--color-muted-bar)}
+.chart .bar-now{fill:none;stroke:var(--color-rule-2);stroke-dasharray:3 3}
+.chart .lbl{font-size:10.5px;fill:var(--color-ink-2)}
+.chart .exp{font-size:11px;fill:var(--color-ink-2)}
+.chart .exp-rule{stroke:var(--color-rule-2)}
+.legend{display:flex;flex-wrap:wrap;gap:var(--space-lg);margin-top:var(--space-md);font-size:var(--text-sm);color:var(--color-ink-3)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:8px;vertical-align:-1px}
+.legend .hi{background:var(--color-accent)} .legend .lo{background:var(--color-muted-bar)}
+.legend .now{border:1px dashed var(--color-rule-2)}
+.ladder-list{display:none}
+@media (max-width:640px){
+  .chart svg.ladder-svg{display:none}
+  .ladder-list{display:block;list-style:none;margin:0;padding:0}
+  .ladder-list li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--space-sm);padding:10px 0;border-bottom:1px solid var(--color-rule);font-size:var(--text-sm)}
+  .ladder-list li:last-child{border-bottom:0}
+  .ladder-list .t{font-weight:600}
+  .ladder-list .t.hi{color:var(--color-accent)}
+  .ladder-list .x{color:var(--color-ink-3)}
+}
+
+/* climb */
+.climb{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:var(--space-xl);align-items:start}
+.climb .chart{padding-bottom:var(--space-lg)}
+.climb .line{fill:none;stroke:var(--color-accent);stroke-width:2.25;stroke-linejoin:round}
+.climb .area{fill:var(--color-accent-dim)}
+.climb .dot{fill:var(--color-accent)}
+.climb .end{font:600 13px var(--font-mono);fill:var(--color-ink)}
+.now-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--color-rule)}
+.now-list li{padding:var(--space-md) 0;border-bottom:1px solid var(--color-rule)}
+.now-list .who{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-sm)}
+.now-list .who b{font-weight:600}
+.now-list .r{font:700 1.75rem/1 var(--font-display);font-variant-numeric:tabular-nums}
+.now-list .d{display:block;margin-top:4px;font-size:var(--text-sm);color:var(--color-ink-3)}
+@media (max-width:860px){ .climb{grid-template-columns:minmax(0,1fr)} }
+
+/* clips */
+.clips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-xl)}
+.clip{margin:0}
+.clip .v{position:relative;aspect-ratio:16/9;background:var(--color-paper-2);border-radius:var(--radius);overflow:hidden}
+.clip video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:var(--color-paper-2)}
+.clip figcaption{margin-top:var(--space-md)}
+.clip .ct{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-sm)}
+.clip .ct b{font:700 var(--text-lg)/1.1 var(--font-display);text-transform:uppercase;letter-spacing:.02em}
+.clip .ct span{font:400 var(--text-xs)/1 var(--font-mono);color:var(--color-ink-3);white-space:nowrap}
+.clip p{margin:6px 0 0;color:var(--color-ink-2);font-size:var(--text-sm);max-width:52ch}
+.clip p .c{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:0}
+@media (max-width:760px){ .clips{grid-template-columns:minmax(0,1fr)} }
+
+/* alts table */
+.tools{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-md);margin-bottom:var(--space-md)}
+.toggle{
+  display:inline-flex;align-items:center;gap:10px;cursor:pointer;user-select:none;
+  font-size:var(--text-sm);color:var(--color-ink-2);white-space:nowrap;
+}
+.toggle input{appearance:none;width:34px;height:20px;border-radius:999px;background:var(--color-paper-3);border:1px solid var(--color-rule-2);position:relative;margin:0;cursor:pointer;transition:background-color var(--dur-fast) var(--ease-out)}
+.toggle input::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--color-ink-3);transition:transform var(--dur) var(--ease-out),background-color var(--dur-fast) var(--ease-out)}
+.toggle input:checked{background:var(--color-accent-dim);border-color:var(--color-accent)}
+.toggle input:checked::after{transform:translateX(14px);background:var(--color-accent)}
+.count{font:400 var(--text-xs)/1 var(--font-mono);color:var(--color-ink-3)}
+.tbl{width:100%;border-collapse:collapse;table-layout:fixed}
+.tbl th,.tbl td{padding:12px 10px;text-align:right;border-bottom:1px solid var(--color-rule);vertical-align:top}
+.tbl th:first-child,.tbl td:first-child{text-align:left;padding-left:0}
+.tbl th:last-child,.tbl td:last-child{padding-right:0}
+.tbl col.c-name{width:auto} .tbl col.c-lvl{width:64px} .tbl col.c-n{width:92px}
+.tbl thead th{font:500 var(--text-xs)/1 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--color-ink-3);border-bottom-color:var(--color-rule-2);padding-top:0}
+.tbl thead button{
+  all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;padding:4px 0;
+  transition:color var(--dur-fast) var(--ease-out);
+}
+.tbl thead button:hover{color:var(--color-ink)}
+.tbl thead button:focus-visible{outline:2px solid var(--color-focus);outline-offset:2px}
+.tbl thead button[aria-sort]{color:var(--color-ink)}
+.tbl thead button .ar{display:inline-block;width:8px;color:var(--color-accent)}
+.tbl tbody tr{transition:background-color var(--dur-fast) var(--ease-out)}
+.tbl tbody tr:hover{background:var(--color-paper-2)}
+.tbl td.num{font:500 var(--text-sm)/1.3 var(--font-mono);font-variant-numeric:tabular-nums;color:var(--color-ink)}
+.tbl td.num.z{color:var(--color-rule-2)}
+.tbl td.num.top{color:var(--color-accent)}
+.tbl td.num small{display:block;margin-top:3px;font-size:11px;color:var(--color-ink-3)}
+.tbl td.lvl{font:400 var(--text-sm)/1.3 var(--font-mono);color:var(--color-ink-3)}
+.who-c{display:grid;grid-template-columns:4px minmax(0,1fr);gap:12px;align-items:stretch}
+.who-c i{border-radius:2px;background:var(--cc)}
+.who-c b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who-c b .tag{display:inline-block;font:500 10px/1 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent-ink);background:var(--color-accent);padding:3px 6px;border-radius:2px;margin-left:8px;vertical-align:2px}
+.who-c span{display:block;font-size:var(--text-xs);color:var(--color-ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who-c .was{color:var(--color-ink-3);font-style:normal}
+.tbl tr.main td{background:var(--color-paper-2)}
+.note{margin-top:var(--space-lg);font-size:var(--text-sm);color:var(--color-ink-3);max-width:70ch}
+.note b{color:var(--color-ink-2);font-weight:500}
+@media (max-width:640px){
+  .tbl col.c-lvl{width:0}
+  .tbl th.lvl,.tbl td.lvl{padding:0;font-size:0;overflow:hidden}
+  .tbl th.lvl button{visibility:hidden}
+  .tbl col.c-n{width:54px}
+  .tbl th,.tbl td{padding:10px 4px}
+  .tbl td.num{font-size:12.5px}
+  .tbl thead th{font-size:10px;letter-spacing:.02em}
+  .who-c{gap:8px}
+}
+@media (max-width:380px){
+  .tbl col.c-n{width:42px}
+  .tbl th,.tbl td{padding:10px 2px}
+  .tbl td.num{font-size:11.5px}
+  .tbl thead th{font-size:9px}
+  .who-c b .tag{display:none}
+}
+
+/* invite */
+.points{list-style:none;margin:0;padding:0;border-top:1px solid var(--color-rule);counter-reset:p}
+.points li{display:grid;grid-template-columns:minmax(0,72px) minmax(0,1fr);gap:var(--space-lg);padding:var(--space-xl) 0;border-bottom:1px solid var(--color-rule);counter-increment:p}
+.points li::before{content:counter(p);font:800 3rem/.9 var(--font-display);color:var(--color-accent);font-variant-numeric:tabular-nums}
+.points h3{font:700 var(--text-lg)/1.15 var(--font-display);text-transform:uppercase;letter-spacing:.02em;margin:0}
+.points p{margin:var(--space-xs) 0 0;color:var(--color-ink-2);max-width:60ch}
+.ask{
+  margin-top:var(--space-2xl);padding:var(--space-xl);border-radius:var(--radius);background:var(--color-paper-2);
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-lg);
+}
+.ask p{margin:0;font:700 var(--text-xl)/1.1 var(--font-display);text-transform:uppercase;max-width:22ch;overflow-wrap:anywhere;min-width:0}
+.ask p span{color:var(--color-accent)}
+.ask small{display:block;margin-top:var(--space-xs);font:400 var(--text-sm)/1.5 var(--font-body);text-transform:none;color:var(--color-ink-3)}
+@media (max-width:520px){ .points li{grid-template-columns:minmax(0,1fr);gap:var(--space-sm)} }
+
+/* blacklist */
+.bl{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--color-rule);border:1px solid var(--color-rule);border-radius:var(--radius);overflow:hidden}
+.bl li{background:var(--color-paper);padding:var(--space-lg)}
+.bl a{font-weight:600;text-decoration:none;border-bottom:1px solid var(--color-rule-2);transition:border-color var(--dur-fast) var(--ease-out)}
+.bl a:hover{border-color:var(--color-accent)}
+.bl .rl{display:block;font:400 var(--text-xs)/1.4 var(--font-mono);color:var(--color-ink-3);margin-top:4px}
+.bl p{margin:var(--space-sm) 0 0;font-size:var(--text-sm);color:var(--color-ink-2)}
+.bl p.none{color:var(--color-ink-3)}
+.bl-foot{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:var(--space-md);margin-top:var(--space-lg);font-size:var(--text-sm);color:var(--color-ink-3)}
+.bl-foot b{font:700 1.5rem/1 var(--font-display);color:var(--color-ink);margin-right:6px}
+.tl{color:var(--color-ink);text-decoration:none;border-bottom:1px solid var(--color-rule-2);white-space:nowrap;transition:border-color var(--dur-fast) var(--ease-out)}
+.tl:hover{border-color:var(--color-accent)}
+@media (max-width:640px){ .bl{grid-template-columns:minmax(0,1fr)} }
+
+/* games index */
+.games{list-style:none;margin:0;padding:0;border-top:1px solid var(--color-rule)}
+.games a{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) auto;gap:var(--space-lg);align-items:baseline;
+  padding:var(--space-lg) 0;border-bottom:1px solid var(--color-rule);text-decoration:none;
+  transition:background-color var(--dur-fast) var(--ease-out),padding var(--dur) var(--ease-out);
+}
+.games a:hover{background:var(--color-paper-2)}
+.games b{font:700 var(--text-lg)/1.1 var(--font-display);text-transform:uppercase;letter-spacing:.02em;white-space:nowrap}
+.games span{color:var(--color-ink-2);font-size:var(--text-sm)}
+.games em{font:400 var(--text-xs)/1 var(--font-mono);font-style:normal;color:var(--color-ink-3);white-space:nowrap}
+.games a:hover em{color:var(--color-accent)}
+@media (max-width:640px){
+  .games a{grid-template-columns:minmax(0,1fr) auto;gap:4px var(--space-md)}
+  .games span{grid-column:1 / -1;grid-row:2}
+  .games b{white-space:normal}
+}
+
+/* footer: statement */
+footer{padding:var(--space-4xl) 0 var(--space-2xl)}
+footer .st{font:800 clamp(2.4rem,1rem + 5.5vw,5.5rem)/.95 var(--font-display);text-transform:uppercase;margin:0;max-width:18ch;overflow-wrap:anywhere;min-width:0}
+footer .st span{color:var(--color-ink-3)}
+footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(--space-md);margin-top:var(--space-2xl);padding-top:var(--space-lg);border-top:1px solid var(--color-rule);font:400 var(--text-xs)/1.6 var(--font-mono);color:var(--color-ink-3)}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition-duration:1ms !important;animation:none !important}
+}
 </style>
 </head>
 <body>
 
-<div class="glory-eye" aria-hidden="true"></div>
-<div class="glory" aria-hidden="true"></div>
-<div class="plumes" id="plumes" aria-hidden="true"></div>
-<div id="room" aria-hidden="true">
-<div class="smear" aria-hidden="true"></div>
-<div class="shafts" aria-hidden="true"></div>
-<div class="dust" id="dust" aria-hidden="true"></div>
-<div class="arch" aria-hidden="true">
-  <svg viewBox="0 0 1200 900" preserveAspectRatio="xMidYMin slice">
-    <defs>
-      <linearGradient id="moon" x1="0" y1="0" x2="0" y2="1">
-        <stop class="m1" offset="0%"   stop-color="#9FB4D8" stop-opacity=".30"/>
-        <stop class="m2" offset="55%"  stop-color="#6E82A8" stop-opacity=".10"/>
-        <stop class="m3" offset="100%" stop-color="#6E82A8" stop-opacity="0"/>
-      </linearGradient>
-      <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1">
-        <stop class="s1" offset="0%"   stop-color="#10131B"/>
-        <stop class="s2" offset="100%" stop-color="#07080D"/>
-      </linearGradient>
-      <clipPath id="win">
-        <path d="M600 84 C742 84 830 190 830 322 L830 700 L370 700 L370 322 C370 190 458 84 600 84 Z"/>
-      </clipPath>
-    </defs>
+<nav class="nav" aria-label="Sections">
+  <div class="wrap">
+    <a class="mark" href="/">Shaiyex</a>
+    <ul>
+      <li class="opt"><a class="l" href="#record">Record</a></li>
+      <li><a class="l" href="#clips">Clips</a></li>
+      <li><a class="l" href="#alts">Alts</a></li>
+      <li><a class="l" href="#invite">Invite</a></li>
+      <li class="opt"><a class="l" href="#blacklist">Blacklist</a></li>
+      <li class="opt"><a class="l" href="#games">Games</a></li>
+    </ul>
+  </div>
+</nav>
 
-    <!-- light coming through the glass -->
-    <g clip-path="url(#win)">
-      <rect x="330" y="60" width="540" height="660" fill="url(#moon)"/>
-    </g>
-
-    <!-- the window itself, tracery only, no fill -->
-    <g class="tracery" fill="none" stroke="#1B2130" stroke-width="7">
-      <path d="M600 84 C742 84 830 190 830 322 L830 700 L370 700 L370 322 C370 190 458 84 600 84 Z"/>
-      <path d="M600 150 C706 150 770 232 770 330 L770 700"/>
-      <path d="M600 150 C494 150 430 232 430 330 L430 700"/>
-      <path d="M600 150 L600 700"/>
-      <path d="M430 430 L770 430 M430 560 L770 560"/>
-      <circle cx="600" cy="300" r="58"/>
-      <path d="M600 242 L600 358 M542 300 L658 300"/>
-    </g>
-
-    <!-- pillars either side -->
-    <g class="pillars" fill="url(#stone)" stroke="#161B26" stroke-width="4">
-      <rect x="150" y="120" width="86" height="780" rx="6"/>
-      <rect x="964" y="120" width="86" height="780" rx="6"/>
-      <path d="M138 120 L248 120 L228 74 L158 74 Z"/>
-      <path d="M952 120 L1062 120 L1042 74 L972 74 Z"/>
-    </g>
-
-    <!-- arcade running off to both sides -->
-    <g class="arcade" fill="none" stroke="#131824" stroke-width="5">
-      <path d="M0 250 C60 250 96 300 96 356 L96 900"/>
-      <path d="M1200 250 C1140 250 1104 300 1104 356 L1104 900"/>
-    </g>
-  </svg>
-</div>
-<div class="fog" aria-hidden="true"></div>
-<div class="motes" id="motes" aria-hidden="true"></div>
-</div>
-
-<div class="vig" aria-hidden="true"></div>
-<div class="corrupt" aria-hidden="true">
-  <div class="wipe"></div>
-  <div class="bloom"></div>
-  <div class="bar"></div><div class="bar"></div>
-  <div class="bar"></div><div class="bar"></div>
-</div>
-
-<span id="themeHint">&uarr; what is he without it</span>
-<button id="themeSw" type="button" aria-pressed="false" title="Renounce">
-  <span class="rune" aria-hidden="true"></span>
-  <span class="t1" id="themeLbl" hidden>Renounce</span>
-</button>
-
-<div id="gate" role="button" tabindex="0" aria-label="Enter">
-  <div class="gate-lamp" aria-hidden="true"></div>
-  <p class="gate-k std">Argent Dawn &middot; a small shrine, kept clean</p>
-  <p class="gate-k alt">Nobody has lit a candle here in a while</p>
-  <h2 class="gate-t std">Enter the shrine</h2>
-  <h2 class="gate-t alt">Come in anyway</h2>
-  <p class="gate-d std">Leave your key at the door. The Light is patient, the group finder is not.</p>
-  <p class="gate-d alt">The door was already open. It usually is.</p>
-  <p class="gate-go">Click anywhere</p>
-</div>
-
-<audio id="tekkAudio" src="/mercy.mp3" loop preload="none"></audio>
-<audio id="holyAudio" src="/tirion.mp3" loop preload="none"></audio>
-
-<div id="world">
+<main>
 <header class="hero">
-  <canvas id="rays" aria-hidden="true"></canvas>
-  <div class="inner">
-    <div class="avatar-wrap">
-      <img class="avatar" src="data:image/jpeg;base64,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" alt="Draenei character portrait">
+  <div class="wrap">
+    <div class="hero-grid">
+      <p class="figure" id="fig" aria-hidden="true">2400</p>
+      <div>
+        <h1><span class="sr">2400 rating. </span>Elite in Dragonflight Season&nbsp;1. <span class="sub">Duelist in eight more.</span></h1>
+        <p class="qual"><b>Shaiyex</b>, EU Argent Dawn. Rated arena since Battle for Azeroth, healer and DPS. This season on <b id="mainName">Norayne</b>, <span id="mainSpec">a Night Elf Marksmanship Hunter</span>.</p>
+        <div class="chips">
+          <a class="chip solid" href="#invite">Why invite me</a>
+          <a class="chip" href="https://check-pvp.fr/eu/Argent%20Dawn/Norayne" rel="noopener">check-pvp profile ↗</a>
+        </div>
+      </div>
     </div>
 
-    <p class="kicker">Holy Paladin</p>
-    <h1>Shaiyex</h1>
-    <p class="tag" id="tekkTag"><span class="un">Un</span>holy Paladin</p>
-    <div class="doors">
-      <a class="door door-1" href="/about/" data-go="left" data-go-tekk="swing-left">
-        <span class="door-k" data-t="Required reading">Nice to meet you</span>
-        <span class="door-t" data-t="Who you are dealing with">About me</span>
-        <span class="door-d" data-t="Not a CV. A reminder. You have run with people who play this game. You have not run with me.">Score, this season’s keys, raid progression and the logs for every class I play. Have a look.</span>
-        <span class="drip" aria-hidden="true"></span>
-        <span class="door-go" data-t="Look at it →">Read it →</span>
-      </a>
-
-      <a class="door door-4" href="/pitch/" data-h="/why/" data-go="right" data-go-tekk="lunge" data-hush-tekk>
-        <span class="door-k" data-t="Not a request">The pitch</span>
-        <span class="door-t" data-t="Do not fight the invite">Why invite me</span>
-        <span class="door-d" data-t="You were going to bring me anyway. This is only the part where you find out why.">Three honest reasons to bring me along, and what I actually do for a group.</span>
-        <span class="drip" aria-hidden="true"></span>
-        <span class="door-go" data-t="Stop resisting →">Hear it →</span>
-      </a>
-
-      <a class="door door-2" href="/kick/" data-go="swing-right" data-hush data-silent>
-        <span class="door-k" data-t="Not optional">Fancy a go</span>
-        <span class="door-t" data-t="Think you can keep up?">Test your interrupt skills</span>
-        <span class="door-d" data-t="One button. One cast bar. Miss it and you find out how quickly a group can be four people.">A cast bar appears, you press one key. See how many you catch. No score is sent anywhere.</span>
-        <span class="drip" aria-hidden="true"></span>
-        <span class="door-go" data-t="Prove it →">Try it →</span>
-      </a>
+    <div class="stats" role="list">
+      <div class="stat" role="listitem"><b>8</b><span>Duelist titles, across <em>four expansions</em></span></div>
+      <div class="stat" role="listitem"><b>2275</b><span>best 2v2, on <em>Shaiyex</em>, Holy Paladin</span></div>
+      <div class="stat" role="listitem"><b>2375</b><span>best Solo Shuffle, on <em>Domirella</em>, Demon Hunter</span></div>
+      <div class="stat" role="listitem"><b id="nowBlitz">1899</b><span>Blitz right now, on <em>Norayne</em><span id="nowRank">, rank 322</span></span></div>
     </div>
-
-    <a class="wip" href="/beat/" data-go="swing-left" data-hush>
-      <span>
-        <span class="wip-t" data-t="Interrupt on the beat">Interrupt on the beat</span>
-        <span class="wip-s" data-t="Prove it in time">Rhythm mode</span>
-      </span>
-      <span class="wip-tag">WIP</span>
-      <span class="drip" aria-hidden="true"></span>
-    </a>
-
-    <a class="wip wip-b" href="/raid/" data-go="swing-left" data-hush>
-      <span>
-        <span class="wip-t" data-t="Learn the abyss">Learn the abyss</span>
-        <span class="wip-s" data-t="Before it learns you">Raid trainer</span>
-      </span>
-      <span class="wip-tag">NEW</span>
-      <span class="drip" aria-hidden="true"></span>
-    </a>
-
-    <div class="vrack">
-      <span class="vrack-sign" aria-hidden="true">Music<br>visualisers</span>
-
-      <a class="wip wip-c" href="/anathema/" data-go="swing-right" data-hush>
-        <span>
-          <span class="wip-t" data-t="Anathema">Anathema</span>
-          <span class="wip-s" data-t="The sentence, read out in full">Three minutes, and it does not stay like this</span>
-        </span>
-        <span class="wip-tag">LOUD</span>
-        <span class="drip" aria-hidden="true"></span>
-      </a>
-
-      <a class="wip wip-d" href="/miss/" data-go="swing-right" data-hush>
-        <span>
-          <span class="wip-t" data-t="did i tell u that i miss u">did i tell u that i miss u</span>
-          <span class="wip-s" data-t="Two minutes, and then twelve seconds of nothing">adore &middot; no words on it</span>
-        </span>
-        <span class="wip-tag">SLOW</span>
-        <span class="drip" aria-hidden="true"></span>
-      </a>
-
-      <a class="wip wip-e" href="/overdrive/" data-go="swing-right" data-hush>
-        <span>
-          <span class="wip-t" data-t="OVERDRIVE">OVERDRIVE</span>
-          <span class="wip-s" data-t="210 bpm, and it does not let up">Seven scenes and a rev counter</span>
-        </span>
-        <span class="wip-tag">MAX</span>
-        <span class="drip" aria-hidden="true"></span>
-      </a>
-
-      <a class="wip wip-f" href="/loud/" data-go="swing-right" data-hush>
-        <span>
-          <span class="wip-t" data-t="PLAY IT LOUD">PLAY IT LOUD</span>
-          <span class="wip-s" data-t="Anime happy hardcore, and a dead stop at 1:32">S3RL and Remzcore at 190</span>
-        </span>
-        <span class="wip-tag">190</span>
-        <span class="drip" aria-hidden="true"></span>
-      </a>
-      <a class="wip wip-g" href="/drift/" data-go="swing-left" data-hush>
-        <span>
-          <span class="wip-t" data-t="TOKYO DRIFT">TOKYO DRIFT</span>
-          <span class="wip-s" data-t="Svaka krivina pada na frazu, auto ne ide ravno">Nocna serpentina na 180</span>
-        </span>
-        <span class="wip-tag">180</span>
-        <span class="drip" aria-hidden="true"></span>
-      </a>
-    </div>
-
-    <a class="blbar" href="/deplete/" data-go="drop" data-hush>
-      <span class="bl-t" data-t="Blacklist">Blacklist</span>
-      <span class="bl-d" data-t="The names that cost me a key. They are on here for good.">What went wrong in a depleted key, and the names I would rather not run with again.</span>
-      <span class="bl-go" data-t="See who →">Open it →</span>
-    <span class="drip" aria-hidden="true"></span>
-    </a>
   </div>
 </header>
 
-<footer>
-  <div data-t="SHAIYEX · UNHOLY PALADIN · YOU ARE WELCOME">SHAIYEX · LIGHTFORGED DRAENEI · HOLY PALADIN</div>
-  <div data-t="You are alive because I was in the group.">Raid spot: About me. Running a key together: everything else.</div>
-</footer>
-</div>
+<section class="s" id="record" aria-labelledby="h-record">
+  <div class="wrap">
+    <div class="s-head">
+      <h2 id="h-record"><span class="n">16</span> seasons, every one titled</h2>
+      <p>Each bar is the lowest rating that season's title needs, so the real peak sat at or above it. Midnight Season 3 is the one being played now.</p>
+    </div>
+    <div class="chart">
+      <svg class="ladder-svg" id="ladder" viewBox="0 0 1000 340" role="img" aria-labelledby="ladder-t"><title id="ladder-t">Season titles from Battle for Azeroth Season 1 to Midnight Season 2</title></svg>
+      <ol class="ladder-list" id="ladderList" reversed></ol>
+      <div class="legend">
+        <span><i class="hi"></i>Duelist or Elite</span>
+        <span><i class="lo"></i>Rival or Challenger</span>
+        <span><i class="now"></i>In progress</span>
+      </div>
+    </div>
+  </div>
+</section>
 
-<div class="hellfx" aria-hidden="true"></div>
-<div class="boomfx" aria-hidden="true">
-  <i class="bf-flash"></i>
-</div>
-<div id="view" hidden>
-  <button class="view-x" id="viewX" type="button" aria-label="Back">
-    <span class="vb-arrow" aria-hidden="true"></span>
-    <span class="vb-word"><span class="std">Back</span><span class="alt">Crawl back</span></span>
-  </button>
-  <iframe id="viewFrame" title="Shaiyex" src="about:blank"></iframe>
-</div>
+<section class="s" id="now" aria-labelledby="h-now">
+  <div class="wrap">
+    <div class="s-head">
+      <h2 id="h-now">Norayne, <span class="n" id="climbFrom">288</span> to <span class="n" id="climbTo">1899</span> in <span id="climbDays">four days</span></h2>
+      <p>The new main hit level 90 and went straight into Blitz. Every point below is a ladder snapshot.</p>
+    </div>
+    <div class="climb">
+      <div class="chart"><svg id="climb" viewBox="0 0 640 300" role="img" aria-labelledby="climb-t"><title id="climb-t">Norayne's Blitz rating over the last days</title></svg></div>
+      <ul class="now-list" id="nowList"></ul>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="clips" aria-labelledby="h-clips">
+  <div class="wrap">
+    <div class="s-head">
+      <h2 id="h-clips">Two rounds, cut to music</h2>
+      <p>Solo Shuffle, Tol'viron Arena. Both have sound.</p>
+    </div>
+    <div class="clips">
+      <figure class="clip">
+        <div class="v"><video controls preload="none" playsinline poster="clips/holy.jpg" aria-label="Shaiyex, Holy Paladin, Solo Shuffle round 5"><source src="clips/holy.mp4" type="video/mp4"></video></div>
+        <figcaption>
+          <div class="ct"><b>Shaiyex</b><span>0:26</span></div>
+          <p><i class="c" style="background:var(--class-2)"></i>Holy Paladin, round 5. Lay on Hands, Hammer of Justice on their healer, then a 131,149 Judgment to close it.</p>
+        </figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="v"><video controls preload="none" playsinline poster="clips/unholy.jpg" aria-label="Besthealer, Unholy Death Knight, Solo Shuffle round 1"><source src="clips/unholy.mp4" type="video/mp4"></video></div>
+        <figcaption>
+          <div class="ct"><b>Besthealer</b><span>0:38</span></div>
+          <p><i class="c" style="background:var(--class-6)"></i>Unholy Death Knight, round 1. Grip, Blinding Sleet, all three of them locked at once, kill.</p>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="alts" aria-labelledby="h-alts">
+  <div class="wrap">
+    <div class="s-head">
+      <h2 id="h-alts">Every character, one row each</h2>
+      <p>Highest rating each character has reached per bracket. Where a character is climbing Blitz right now, the current number sits underneath.</p>
+    </div>
+    <div class="tools">
+      <label class="toggle"><input type="checkbox" id="maxOnly"> Level 90 only</label>
+      <span class="count" id="altCount"></span>
+    </div>
+    <table class="tbl" id="altTbl">
+      <colgroup><col class="c-name"><col class="c-lvl"><col class="c-n"><col class="c-n"><col class="c-n"><col class="c-n"></colgroup>
+      <thead><tr>
+        <th scope="col"><button type="button" data-k="name">Character<span class="ar"></span></button></th>
+        <th scope="col" class="lvl"><button type="button" data-k="level">Lvl<span class="ar"></span></button></th>
+        <th scope="col"><button type="button" data-k="max2v2">2v2<span class="ar"></span></button></th>
+        <th scope="col"><button type="button" data-k="max3v3">3v3<span class="ar"></span></button></th>
+        <th scope="col"><button type="button" data-k="maxShuffle">Shuffle<span class="ar"></span></button></th>
+        <th scope="col"><button type="button" data-k="maxBlitz">Blitz<span class="ar"></span></button></th>
+      </tr></thead>
+      <tbody id="altBody"><tr><td colspan="6" class="note">Loading characters.</td></tr></tbody>
+    </table>
+    <p class="note" id="mergeNote"></p>
+  </div>
+</section>
+
+<section class="s" id="invite" aria-labelledby="h-invite">
+  <div class="wrap">
+    <div class="s-head">
+      <h2 id="h-invite">Why invite me</h2>
+      <p>Three things, plainly.</p>
+    </div>
+    <ol class="points">
+      <li><div><h3>Either side of the healer bar</h3><p>Rated on healers and on DPS: Holy Paladin, Unholy Death Knight, Demon Hunter, and Marksmanship Hunter this season. Tell me what the comp is missing and I bring that.</p></div></li>
+      <li><div><h3>The same rating every season</h3><p>Duelist in eight seasons across four expansions and Elite once. Sixteen seasons on the record, none of them without a title.</p></div></li>
+      <li><div><h3>Quiet on comms</h3><p>I call things once, clearly, and I do not spend the game talking. If a round goes wrong I say what I would do differently first. No blame in chat.</p></div></li>
+    </ol>
+    <div class="ask">
+      <p>Whisper <span>Norayne</span> or <span>Shaiyex</span><small>Argent Dawn, EU. Alliance.</small></p>
+      <a class="chip" href="/why/">The loud version</a>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="blacklist" aria-labelledby="h-bl">
+  <div class="wrap">
+    <div class="s-head">
+      <h2 id="h-bl">Blacklist</h2>
+      <p>People I will not queue with again, with the reason next to each name.</p>
+    </div>
+    <ul class="bl" id="blList"><li><p class="none">Loading the list.</p></li></ul>
+    <div class="bl-foot">
+      <span><b id="blCount">16</b>keys depleted and counted</span>
+      <a class="tl" href="/deplete/">Read the post-mortem</a>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="games" aria-labelledby="h-games">
+  <div class="wrap">
+    <div class="s-head">
+      <h2 id="h-games">Minigames</h2>
+      <p>Made between queues. All run in the browser.</p>
+    </div>
+    <ul class="games">
+      <li><a href="/beat/"><b>Interrupt On The Beat</b><span>Rhythm game. Kick real dungeon casts on the beat, ten songs, three difficulties, a leaderboard.</span><em>Play →</em></a></li>
+      <li><a href="/kick/"><b>Kick or Leave</b><span>Five interrupts in a row and you are in. Two misses and it is over.</span><em>Play →</em></a></li>
+      <li><a href="/raid/"><b>Abyss Training</b><span>Learn the boss shapes in three roles, scored per role.</span><em>Play →</em></a></li>
+      <li><a href="/deplete/"><b>Key Depleted</b><span>The post-mortem after a broken key, with the running count.</span><em>Open →</em></a></li>
+      <li><a href="/classic/"><b>Previous homepage</b><span>The old shrine with the music pages: Tokyo Drift, Play It Loud, Overdrive, Anathema.</span><em>Open →</em></a></li>
+    </ul>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="st">Same player, <span>whichever name is on the ladder.</span></p>
+    <div class="meta">
+      <span>Ratings from check-pvp.fr, snapshot <span id="snap">04.10.2026</span></span>
+      <span>shaiyex.com</span>
+    </div>
+  </div>
+</footer>
 
 <script>
-/* ---- hardtekk switch ---- */
 (function(){
-  var body   = document.body;
-  var btn    = document.getElementById('themeSw');
-  var lbl    = document.getElementById('themeLbl');
-  var audio  = document.getElementById('tekkAudio');
-  var holy   = document.getElementById('holyAudio');
-  /* whatever happened last visit, you come in through the shrine */
-  var on = false;
-  try { localStorage.setItem('shy.tekk', '0'); } catch(e){}
+  'use strict';
+  var NS = 'http://www.w3.org/2000/svg';
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var HI = { 'Duelist':1, 'Elite':1, 'Gladiator':1 };
+  var EXP_SHORT = { 'Battle for Azeroth':'BfA', 'Shadowlands':'Shadowlands', 'Dragonflight':'Dragonflight', 'The War Within':'War Within', 'Midnight':'Midnight' };
 
-  /* the light track runs across the whole site. its position lives in
-     sessionStorage so the next page carries on instead of starting over. */
-  var HKEY = 'shy.holy.t';
-  var holyAt = 0;
-  try { holyAt = parseFloat(sessionStorage.getItem(HKEY) || '0') || 0; } catch(e){}
-  function holySave(){
-    try { sessionStorage.setItem(HKEY, holy.currentTime.toFixed(2)); } catch(e){}
+  function el(tag, attrs, parent){
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
   }
-  var lastSave = 0;
-  holy.addEventListener('timeupdate', function(){
-    var n = Date.now();
-    if (n - lastSave < 900) return;
-    lastSave = n;
-    holySave();
-  });
-  window.addEventListener('pagehide', holySave);
-  window.addEventListener('beforeunload', holySave);
+  function txt(tag, attrs, s, parent){ var e = el(tag, attrs, parent); e.textContent = s; return e; }
+  function h(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function n(v){ return v > 0 ? String(v) : '-'; }
+  function onRealm(s){ var i = s.indexOf('-'); return s.slice(0, i) + ' on ' + s.slice(i + 1); }
+  function word(k){ var w = ['No','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten']; return w[k] || String(k); }
 
-  /* feathers and motes, seeded once */
+  /* hero figure ticks up once */
   (function(){
-    var p = document.getElementById('plumes');
-    if (!p) return;
-    for (var i = 0; i < 26; i++){
-      var e = document.createElement(i % 3 === 0 ? 'b' : 'i');
-      e.style.left = (1 + Math.random() * 98).toFixed(1) + 'vw';
-      e.style.animationDuration = (11 + Math.random() * 15).toFixed(1) + 's';
-      e.style.animationDelay = (-Math.random() * 26).toFixed(1) + 's';
-      e.style.setProperty('--dx', ((Math.random() - 0.5) * 220).toFixed(0) + 'px');
-      if (e.tagName === 'I'){
-        var s = (0.55 + Math.random() * 0.75).toFixed(2);
-        e.style.width = (8 * s).toFixed(1) + 'px';
-        e.style.height = (20 * s).toFixed(1) + 'px';
-      }
-      p.appendChild(e);
+    var f = document.getElementById('fig');
+    if (reduce || !f) return;
+    var target = 2400, t0 = null;
+    function step(t){
+      if (!t0) t0 = t;
+      var p = Math.min(1, (t - t0) / 520), e = 1 - Math.pow(1 - p, 3);
+      f.textContent = Math.round(target * e);
+      if (p < 1) requestAnimationFrame(step);
     }
+    f.textContent = '0';
+    requestAnimationFrame(step);
   })();
 
-  /* dust in the shafts, seeded the same way */
-  (function(){
-    var d = document.getElementById('dust');
-    if (!d) return;
-    for (var i = 0; i < 22; i++){
-      var e = document.createElement('i');
-      e.style.left = (2 + Math.random() * 96).toFixed(1) + 'vw';
-      e.style.animationDuration = (22 + Math.random() * 26).toFixed(1) + 's';
-      e.style.animationDelay = (-Math.random() * 40).toFixed(1) + 's';
-      e.style.setProperty('--dx', ((Math.random() - 0.5) * 70).toFixed(0) + 'px');
-      d.appendChild(e);
-    }
-  })();
-
-  /* a dozen embers, seeded once, each with its own drift and pace */
-  (function(){
-    var m = document.getElementById('motes');
-    if (!m) return;
-    for (var i = 0; i < 14; i++){
-      var e = document.createElement('i');
-      e.style.left = (4 + Math.random() * 92).toFixed(1) + 'vw';
-      e.style.animationDuration = (16 + Math.random() * 20).toFixed(1) + 's';
-      e.style.animationDelay = (-Math.random() * 30).toFixed(1) + 's';
-      e.style.setProperty('--dx', ((Math.random() - 0.5) * 90).toFixed(0) + 'px');
-      if (Math.random() < 0.3){
-        e.style.background = '#8FA6CC';
-        e.style.boxShadow = '0 0 7px rgba(150,175,220,.8)';
-      }
-      m.appendChild(e);
-    }
-  })();
-
-  /* every line with a data-t has a second, worse version */
-  var swaps = [].slice.call(document.querySelectorAll('[data-t]'));
-  swaps.forEach(function(el){ el.setAttribute('data-n', el.textContent); });
-
-  /* some doors lead somewhere else depending on which side you are on */
-  var links = [].slice.call(document.querySelectorAll('[data-h]'));
-  links.forEach(function(el){ el.setAttribute('data-hn', el.getAttribute('href')); });
-
-  function copy(){
-    swaps.forEach(function(el){
-      el.textContent = el.getAttribute(on ? 'data-t' : 'data-n');
-    });
-    links.forEach(function(el){
-      el.setAttribute('href', el.getAttribute(on ? 'data-h' : 'data-hn'));
-    });
-  }
-
-  var hint = document.getElementById('themeHint');
-
-  function paint(){
-    body.classList.toggle('tekk', on);
-    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-    lbl.textContent = on ? 'Redeem' : 'Renounce';
-    btn.title = on ? 'Redeem' : 'Renounce';
-    copy();
-    document.documentElement.style.setProperty('color-scheme', 'dark');
-    var m = document.querySelector('meta[name="theme-color"]');
-    if (m) m.setAttribute('content', on ? '#06070C' : '#F7F2E6');
-  }
-
-  /* one side plays, the other stops. a track always starts from the top,
-     so the fade in at the head of each file does the work. */
-  function seek(el, at){
-    if (el.readyState > 0){ try { el.currentTime = at; } catch(e){} }
-    else el.addEventListener('loadedmetadata', function(){
-      try { el.currentTime = at; } catch(e){}
-    }, { once: true });
-  }
-  function start(el, vol, fresh){
-    try {
-      /* if it is already running, leave it alone. only a deliberate side
-         change starts a track over, and only then does the fade in land. */
-      el.volume = vol;
-      if (!el.paused && !el.ended){
-        if (!fresh) return;
-      }
-      if (fresh) el.currentTime = 0;
-      else if (el === holy && holyAt > 0){ seek(el, holyAt); holyAt = 0; }
-      else if (el.paused && el.currentTime === 0) el.currentTime = 0;
-      var p = el.play();
-      if (p && p.catch) p.catch(function(){});
-    } catch(e){}
-  }
-  function stop(el){
-    try { el.pause(); } catch(e){}
-  }
-  function play(fresh){
-    if (on){ stop(holy); start(audio, 0.55, fresh); }
-    else   { stop(audio); start(holy, 0.34, fresh); }
-  }
-
-  /* letters coming apart, then knitting back together */
-  var GLYPH = '\u2020\u2021\u00a7\u00b6\u2020\u25a0\u25ac\u2593\u2592\u2591XVIM\u00c6\u00d8';
-  function eat(el, done){
-    if (!el) { if (done) done(); return; }
-    var html = el.innerHTML;
-    var plain = el.textContent;
-    var n = 0;
-    var iv = setInterval(function(){
-      n++;
-      el.textContent = plain.replace(/\S/g, function(c){
-        return Math.random() > 0.45 ? c : GLYPH.charAt(Math.floor(Math.random() * GLYPH.length));
+  /* ---------- season ladder ---------- */
+  function ladder(seasons){
+    var flat = [];
+    seasons.slice().reverse().forEach(function(x){
+      x.seasons.slice().sort(function(a,b){ return a.season - b.season; }).forEach(function(s){
+        flat.push({ exp:x.expansion, season:s.season, title:s.title, floor:s.from || 0 });
       });
-      if (n > 5){
-        clearInterval(iv);
-        el.innerHTML = html;
-        if (done) done();
-      }
-    }, 55);
-  }
+    });
+    var last = flat[flat.length - 1];
+    if (last) flat.push({ exp:last.exp, season:last.season + 1, title:null, floor:0, now:true });
 
-  var busy = false;
-  btn.addEventListener('click', function(){
-    if (busy) return;
-    busy = true;
-    on = !on;
-    try { localStorage.setItem('shy.tekk', on ? '1' : '0'); } catch(e){}
-
-    if (hint) hint.classList.add('gone');
-    try { localStorage.setItem('shy.dispelled', '1'); } catch(e){}
-
-    /* the cross goes over first, on the press itself. everything after
-       this is a consequence of it. */
-    btn.classList.toggle('turned', on);
-
-    /* and the room answers it, once it is over */
-    setTimeout(function(){
-      body.classList.remove('desc', 'asc');
-      body.classList.add(on ? 'desc' : 'asc');
-      body.classList.add('corrupting');
-      eat(document.querySelector('h1'));
-      eat(document.querySelector('.sub'));
-    }, 120);
-    setTimeout(chains, 500);
-    setTimeout(chains, 1370);
-
-    /* flip under the cover of the wipe, not before it */
-    setTimeout(paint, 480);
-    setTimeout(function(){
-      body.classList.remove('corrupting', 'desc', 'asc');
-      busy = false;
-    }, 1220);
-    /* this click is the gesture the browser wants, so the track is
-       allowed to start here and nowhere else */
-    /* swap the music under the wipe, not before it */
-    setTimeout(function(){
-      play(true);
-      if (on){
-        listen();
-        if (AC && AC.state === 'suspended'){ try { AC.resume(); } catch(e){} }
+    var svg = document.getElementById('ladder');
+    var W = 1000, H = 340, L = 92, R = 8, T = 18, B = 62;
+    var lo = 1200, hi = 2500;
+    function y(v){ return T + (H - T - B) * (1 - (v - lo) / (hi - lo)); }
+    var g = el('g', { 'class':'grid' }, svg);
+    [[1400,'Challenger'],[1800,'Rival'],[2100,'Duelist'],[2400,'Elite']].forEach(function(r){
+      el('line', { x1:L, x2:W - R, y1:y(r[0]), y2:y(r[0]) }, g);
+      txt('text', { x:0, y:y(r[0]) + 4, 'class':'tier' }, r[0], svg);
+      txt('text', { x:0, y:y(r[0]) + 17, 'class':'tier', opacity:.7 }, r[1], svg);
+    });
+    var slot = (W - L - R) / flat.length, bw = Math.min(38, slot * 0.62);
+    var groups = {};
+    flat.forEach(function(s, i){
+      var cx = L + slot * (i + .5), x = cx - bw / 2;
+      if (s.now){
+        el('rect', { x:x, y:y(2100), width:bw, height:y(lo) - y(2100), rx:2, 'class':'bar-now' }, svg);
+        txt('text', { x:cx, y:y(2100) - 8, 'text-anchor':'middle', 'class':'lbl' }, 'now', svg);
       } else {
-        stopCycle();
-        body.classList.remove('live');
-        document.documentElement.style.setProperty('--pulse', '0');
-        lastQ = -1;
+        var yy = y(s.floor);
+        el('rect', { x:x, y:yy, width:bw, height:y(lo) - yy, rx:2, 'class': HI[s.title] ? 'bar-hi' : 'bar-lo' }, svg)
+          .appendChild(document.createElementNS(NS,'title')).textContent = s.exp + ' Season ' + s.season + ': ' + s.title + ' (' + s.floor + '+)';
+        var short = s.title.replace('Challenger','Chall.').replace('Duelist','Duel.').replace('Rival','Riv.');
+        txt('text', { x:cx, y:yy - 8, 'text-anchor':'middle', 'class':'lbl' }, short, svg);
       }
-    }, 420);
-    if (on) setTimeout(startCycle, 480);
-  });
+      txt('text', { x:cx, y:H - B + 18, 'text-anchor':'middle', 'class':'lbl' }, 'S' + s.season, svg);
+      (groups[s.exp] = groups[s.exp] || []).push(cx);
+    });
+    Object.keys(groups).forEach(function(k){
+      var xs = groups[k], a = xs[0] - bw / 2, b = xs[xs.length - 1] + bw / 2;
+      el('line', { x1:a, x2:b, y1:H - B + 30, y2:H - B + 30, 'class':'exp-rule' }, svg);
+      txt('text', { x:(a + b) / 2, y:H - B + 48, 'text-anchor':'middle', 'class':'exp' }, EXP_SHORT[k] || k, svg);
+    });
 
-  /* every chain runs all the way up out of the page. the length is
-     whatever the drop happens to be, so it is measured, not guessed. */
-  var hung = [].slice.call(document.querySelectorAll('.door, .blbar, .wip'));
-  function chains(){
-    if (!on) return;
-    for (var i = 0; i < hung.length; i++){
-      var el = hung[i];
-      var r = el.getBoundingClientRect();
-      if (!r.height) continue;
-      var top = r.top + (window.pageYOffset || document.documentElement.scrollTop || 0);
-      el.style.setProperty('--chain', Math.max(48, Math.round(top)) + 'px');
-    }
-  }
-  chains();
-  window.addEventListener('load', chains);
-  /* the gothic faces are wider than the fallback, so the whole column
-     moves when they land. measure again once they have. */
-  try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(chains); } catch(e){}
-  /* and once more after the room has finished settling */
-  setTimeout(chains, 2600);
-  var chainT;
-  window.addEventListener('resize', function(){
-    clearTimeout(chainT);
-    chainT = setTimeout(chains, 160);
-  });
-
-  /* ---- the camera ---- */
-  var view  = document.getElementById('view');
-  var frame = document.getElementById('viewFrame');
-  var viewX = document.getElementById('viewX');
-
-  var DIRS = ['left', 'right', 'lunge', 'descend'];
-  function fromClass(how){
-    return 'from-' + (DIRS.indexOf(how) > -1 ? how : 'left');
-  }
-  function clearFrom(){
-    for (var i = 0; i < DIRS.length; i++) view.classList.remove('from-' + DIRS[i]);
-  }
-  /* the way out is the edge you came in through */
-  var BACK = { left:'right', right:'left', lunge:'left', descend:'top' };
-  function markBack(how){
-    view.classList.remove('back-left', 'back-right', 'back-top');
-    view.classList.add('back-' + (BACK[how] || 'right'));
-  }
-  /* some doors do something first, then leave in a direction */
-  var PRE = {
-    'swing-left':  { cls: 'swing-l', wait: 470, dir: 'left'  },
-    'swing-right': { cls: 'swing-r', wait: 470, dir: 'right' },
-    'drop':        { cls: 'dropping', wait: 1780, dir: 'descend' }
-  };
-
-  var vOpen = false, moving = false, dir = 'left', pre = null, wantShut = false;
-  var quiet = false, fadeT = null, silent = false;
-
-  function nowPlaying(){ return on ? audio : holy; }
-  function fullVol(){ return on ? 0.55 : 0.34; }
-
-  /* a track never cuts, it walks down and back up again */
-  function fade(el, to, ms, done){
-    clearInterval(fadeT);
-    var from = el.volume, step = 40, n = Math.max(1, Math.round(ms / step)), i = 0;
-    fadeT = setInterval(function(){
-      i++;
-      var v = from + (to - from) * (i / n);
-      try { el.volume = Math.max(0, Math.min(1, v)); } catch(e){}
-      if (i >= n){
-        clearInterval(fadeT);
-        if (done) done();
-      }
-    }, step);
+    /* small screens get a list instead of a squeezed chart */
+    var ol = document.getElementById('ladderList');
+    ol.innerHTML = flat.slice().reverse().map(function(s){
+      if (s.now) return '<li><span class="t">' + h(s.exp) + ' S' + s.season + '</span><span class="x">in progress</span></li>';
+      return '<li><span><span class="t' + (HI[s.title] ? ' hi' : '') + '">' + h(s.title) + '</span> <span class="x">' + h(s.exp) + ' S' + s.season + '</span></span><span class="x tnum">' + s.floor + '+</span></li>';
+    }).join('');
   }
 
-  function hush(){
-    quiet = true;
-    var el = nowPlaying();
-    fade(el, 0, 620, function(){ try { el.pause(); } catch(e){} });
-  }
-  function unhush(){
-    if (!quiet) return;
-    quiet = false;
-    var el = nowPlaying();
-    try { el.volume = 0; var p = el.play(); if (p && p['catch']) p['catch'](function(){}); } catch(e){}
-    fade(el, fullVol(), 900);
-  }
-
-  function dressFrame(){
-    /* same origin, so the view can be told it is being looked at from
-       here: no back link of its own, and no second copy of the track. */
-    try {
-      var d = frame.contentDocument;
-      if (!d) return;
-      d.documentElement.classList.add('embed');
-      var s = d.createElement('style');
-      s.textContent = '.backlink{display:none !important}';
-      d.head.appendChild(s);
-      var mute = ['holyAudio', 'tekkAudio'];
-      if (silent) mute = mute.concat(['bgsong', 'hsong']);
-      mute.forEach(function(id){
-        var a = d.getElementById(id);
-        if (a){ try { a.pause(); a.muted = true; } catch(e){} }
+  /* ---------- the climb ---------- */
+  function climb(pts, main, featured){
+    var svg = document.getElementById('climb');
+    if (pts.length > 1){
+      var W = Math.max(300, Math.min(640, (svg.parentNode.clientWidth || 640) - 48)), H = W < 500 ? 230 : 300, L = 44, R = 52, T = 18, B = 34;
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      var t0 = pts[0].t, t1 = pts[pts.length - 1].t;
+      var lo = 0, hi = 2100;
+      function x(t){ return L + (W - L - R) * (t - t0) / (t1 - t0); }
+      function y(v){ return T + (H - T - B) * (1 - (v - lo) / (hi - lo)); }
+      var g = el('g', { 'class':'grid' }, svg);
+      [0, 500, 1000, 1500, 2000].forEach(function(v){
+        el('line', { x1:L, x2:W - R, y1:y(v), y2:y(v) }, g);
+        txt('text', { x:0, y:y(v) + 4, 'class':'tier' }, v, svg);
       });
-      if (silent){
-        /* it can start one later on a click of its own, so keep watching */
-        setTimeout(function(){
-          mute.forEach(function(id){
-            var a = d.getElementById(id);
-            if (a){ try { a.pause(); a.muted = true; } catch(e){} }
-          });
-        }, 900);
-      }
-      var back = d.querySelector('.backlink');
-      if (back) back.addEventListener('click', function(e){ e.preventDefault(); shut(); });
-      d.addEventListener('keydown', function(e){ if (e.key === 'Escape') shut(); });
-    } catch(e){}
-  }
-  frame.addEventListener('load', dressFrame);
-
-  function go(url, how, opts){
-    if (vOpen || moving) return;
-    moving = true; vOpen = true; dir = how;
-    silent = !!(opts && opts.silent);
-    if (opts && opts.hush) hush();
-    body.classList.remove('winch');
-    body.classList.add('travel', 'go-' + how);
-    frame.src = url;
-    clearFrom();
-    markBack(how);
-    view.classList.add(fromClass(how));
-    view.hidden = false;
-    document.documentElement.style.overflow = 'hidden';
-    /* make the browser read the starting position before moving off it */
-    void view.offsetHeight;
-    view.classList.remove(fromClass(how));
-    view.classList.add('on');
-    /* the world stays where it went until you come back for it */
-    setTimeout(function(){
-      moving = false;
-      /* a press during the settle used to be dropped on the floor, which
-         on the long descent is most of the time you are looking at it */
-      if (wantShut){ wantShut = false; shut(); }
-    }, 900);
-  }
-
-  function travel(el, how){
-    var opts = {
-      hush:   el.hasAttribute('data-hush') ||
-              (on && el.hasAttribute('data-hush-tekk')),
-      silent: el.hasAttribute('data-silent')
-    };
-    var p = PRE[how];
-    if (!p) return go(el.getAttribute('href'), how, opts);
-    if (vOpen || moving) return;
-    pre = el;
-    el.classList.add(p.cls);
-    if (p.cls === 'dropping') body.classList.add('winch');
-    if (opts.hush) hush();
-    opts.hush = false;
-    setTimeout(function(){ go(el.getAttribute('href'), p.dir, opts); }, p.wait);
-  }
-
-  function shut(){
-    if (!vOpen) return;
-    if (moving){ wantShut = true; return; }
-    moving = true;
-    view.classList.remove('on');
-    view.classList.add(fromClass(dir));
-    body.classList.remove('go-' + dir);
-
-    /* whatever swung or dropped out of the way rides back with the room */
-    if (pre){
-      var back = pre.classList.contains('swing-l') ? 'unswing-l'
-               : pre.classList.contains('swing-r') ? 'unswing-r'
-               : pre.classList.contains('dropping') ? 'raising' : '';
-      pre.classList.remove('swing-l', 'swing-r', 'dropping');
-      if (back){
-        var el = pre;
-        el.classList.add(back);
-        setTimeout(function(){ el.classList.remove(back); }, 1000);
-      }
-      pre = null;
+      var d = '', prev = null;
+      pts.forEach(function(p, i){
+        var px = x(p.t), py = y(p.rating);
+        d += i ? ' L' + px.toFixed(1) + ' ' + py.toFixed(1) : 'M' + px.toFixed(1) + ' ' + py.toFixed(1);
+      });
+      el('path', { d: d + ' L' + x(t1) + ' ' + y(lo) + ' L' + x(t0) + ' ' + y(lo) + ' Z', 'class':'area' }, svg);
+      el('path', { d:d, 'class':'line' }, svg);
+      pts.forEach(function(p){
+        el('circle', { cx:x(p.t), cy:y(p.rating), r:3, 'class':'dot' }, svg)
+          .appendChild(document.createElementNS(NS,'title')).textContent = p.rating + ' (' + p.win + '-' + p.lose + ')';
+      });
+      var e = pts[pts.length - 1];
+      txt('text', { x:x(e.t) + 10, y:y(e.rating) + 4, 'class':'end' }, e.rating, svg);
+      var days = {}, fmt = function(t){ var dt = new Date(t * 1000); return dt.getDate() + '.' + (dt.getMonth() + 1) + '.'; };
+      for (var t = t0; t <= t1 + 1; t += 86400) days[fmt(t)] = t;
+      Object.keys(days).forEach(function(k){
+        txt('text', { x:x(days[k]), y:H - 8, 'text-anchor':'middle', 'class':'tier' }, k, svg);
+      });
+      var span = Math.round((t1 - t0) / 86400);
+      var words = ['zero','one','two','three','four','five','six','seven'];
+      document.getElementById('climbFrom').textContent = pts[0].rating;
+      document.getElementById('climbTo').textContent = e.rating;
+      document.getElementById('climbDays').textContent = (span <= 1 ? 'a day' : (words[span] || span) + ' days');
     }
-    setTimeout(function(){
-      body.classList.remove('travel');
-      view.hidden = true;
-      frame.src = 'about:blank';
-      document.documentElement.style.overflow = '';
-      body.classList.remove('winch');
-      clearFrom();
-      silent = false;
-      unhush();
-      vOpen = false; moving = false; wantShut = false;
-      chains();
-    }, 880);
+
+    var rows = [];
+    (main.blitz || []).forEach(function(b){
+      rows.push({ who:main.name, cls:main.class, spec:b.spec, br:'Blitz', r:b.rating, best:b.best, w:b.win, l:b.lose });
+    });
+    featured.forEach(function(c){
+      (c.shuffle || []).forEach(function(s){
+        /* current shuffle rating drops hard after a leave, so the season best is the honest number */
+        if (s.best > 0 && (s.rating > 0 || s.win + s.lose > 0)) rows.push({ who:c.name, cls:c.class, spec:s.spec, br:'Solo Shuffle', r:s.best, seasonBest:true });
+      });
+    });
+    document.getElementById('nowList').innerHTML = rows.map(function(r){
+      return '<li><div class="who"><b>' + h(r.who) + '</b><span class="r tnum">' + r.r + '</span></div>' +
+        '<span class="d">' + h(r.spec + ' ' + r.cls) + ', ' + h(r.br) + (r.seasonBest ? '. Best this season.' : '. ' + r.w + ' won, ' + r.l + ' lost this season. Best ' + r.best + '.') + '</span></li>';
+    }).join('');
   }
 
-  viewX.addEventListener('click', shut);
-  window.addEventListener('keydown', function(e){ if (e.key === 'Escape') shut(); });
-
-  [].slice.call(document.querySelectorAll('[data-go]')).forEach(function(a){
-    a.addEventListener('click', function(e){
-      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
-      e.preventDefault();
-      travel(a, (on && a.getAttribute('data-go-tekk')) || a.getAttribute('data-go'));
+  /* ---------- alts ---------- */
+  var ALTS = [], sortK = 'best', sortDir = -1;
+  function best(a){ return Math.max(a.max2v2, a.max3v3, a.maxShuffle, a.maxBlitz); }
+  function renderAlts(){
+    var only = document.getElementById('maxOnly').checked;
+    var list = ALTS.filter(function(a){ return !only || a.level >= 90; });
+    var main = list.filter(function(a){ return a.main; });
+    var rest = list.filter(function(a){ return !a.main; });
+    rest.sort(function(a, b){
+      var va = sortK === 'best' ? best(a) : a[sortK], vb = sortK === 'best' ? best(b) : b[sortK];
+      if (typeof va === 'string') return sortDir * va.localeCompare(vb);
+      return sortDir * (va - vb) || best(b) - best(a);
+    });
+    var tops = {};
+    ['max2v2','max3v3','maxShuffle','maxBlitz'].forEach(function(k){
+      tops[k] = Math.max.apply(null, list.map(function(a){ return a[k]; }));
+    });
+    function cell(a, k, cur){
+      var v = a[k], c = 'num' + (v > 0 ? '' : ' z') + (v > 0 && v === tops[k] ? ' top' : '');
+      return '<td class="' + c + '">' + n(v) + (cur > 0 ? '<small>now ' + cur + '</small>' : '') + '</td>';
+    }
+    document.getElementById('altBody').innerHTML = main.concat(rest).map(function(a){
+      var was = a.formerly && a.formerly.length ? ', <em class="was">was ' + h(a.formerly.map(onRealm).join(', ')) + '</em>' : '';
+      return '<tr' + (a.main ? ' class="main"' : '') + '>' +
+        '<td><div class="who-c" style="--cc:var(--class-' + a.classId + ')"><i></i><div>' +
+          '<b>' + h(a.name) + (a.main ? '<span class="tag">main</span>' : '') + '</b>' +
+          '<span>' + h(a.class) + ', ' + h(a.realm) + (a.faction === 'Horde' ? ', Horde' : '') + was + '</span>' +
+        '</div></div></td>' +
+        '<td class="lvl">' + a.level + '</td>' +
+        cell(a, 'max2v2') + cell(a, 'max3v3') + cell(a, 'maxShuffle') + cell(a, 'maxBlitz', a.curBlitz) +
+      '</tr>';
+    }).join('');
+    document.getElementById('altCount').textContent = list.length + ' characters';
+    [].forEach.call(document.querySelectorAll('#altTbl thead button'), function(b){
+      var on = b.getAttribute('data-k') === sortK;
+      if (on) b.setAttribute('aria-sort', sortDir < 0 ? 'descending' : 'ascending'); else b.removeAttribute('aria-sort');
+      b.querySelector('.ar').textContent = on ? (sortDir < 0 ? '↓' : '↑') : '';
+    });
+  }
+  function alts(d){
+    var m = d.main;
+    ALTS = [{ name:m.name, realm:m.realm, class:m.class, classId:3, faction:m.faction, level:m.level,
+              max2v2:m.max2v2, max3v3:m.max3v3, maxShuffle:m.maxShuffle, maxBlitz:m.maxBlitz,
+              curShuffle:m.curShuffle, curBlitz:m.curBlitz, formerly:[], main:true }].concat(d.alts);
+    var ids = { Warrior:1, Paladin:2, Hunter:3, Rogue:4, Priest:5, 'Death Knight':6, Shaman:7, Mage:8, Warlock:9, Monk:10, Druid:11, 'Demon Hunter':12, Evoker:13 };
+    ALTS[0].classId = ids[m.class] || 3;
+    var merged = d.alts.filter(function(a){ return a.formerly.length; });
+    var gone = merged.reduce(function(s, a){ return s + a.formerly.length; }, 0);
+    document.getElementById('mergeNote').innerHTML =
+      '<b>' + d.altsRaw + ' alts on check-pvp, ' + d.alts.length + ' here.</b> ' + word(gone) +
+      ' of those were the same character listed again under an older name after a rename or realm move. They are merged into one row and keep the best rating across every name: ' +
+      merged.map(function(a){ return h(a.name) + ' on ' + h(a.realm) + ' (was ' + h(a.formerly.map(onRealm).join(', ')) + ')'; }).join('; ') +
+      '. Rated Battleground is left out because check-pvp reports the account achievement, 1800, on every character.';
+    renderAlts();
+  }
+  document.getElementById('maxOnly').addEventListener('change', renderAlts);
+  [].forEach.call(document.querySelectorAll('#altTbl thead button'), function(b){
+    b.addEventListener('click', function(){
+      var k = b.getAttribute('data-k');
+      if (sortK === k) sortDir = -sortDir; else { sortK = k; sortDir = k === 'name' ? 1 : -1; }
+      renderAlts();
     });
   });
 
-  paint();
-  /* the nudge is for people who have never pressed it */
-  try {
-    if (localStorage.getItem('shy.dispelled') === '1' && hint) hint.classList.add('gone');
-  } catch(e){}
-  if (on && hint) hint.classList.add('gone');
+  /* ---------- data ---------- */
+  fetch('data/pvp.json', { cache:'no-cache' }).then(function(r){ return r.json(); }).then(function(d){
+    ladder(d.seasons || []);
+    climb(d.climb || [], d.main, d.featured || []);
+    alts(d);
+    var m = d.main;
+    document.getElementById('mainName').textContent = m.name;
+    document.getElementById('mainSpec').textContent = (/^[AEIOU]/.test(m.race) ? 'an ' : 'a ') + m.race + ' ' + m.spec + ' ' + m.class;
+    if (m.curBlitz > 0) document.getElementById('nowBlitz').textContent = m.curBlitz;
+    var last = (d.climb || [])[d.climb.length - 1];
+    document.getElementById('nowRank').textContent = last && last.rank ? ', rank ' + last.rank : '';
+    if (d.updated){ var p = d.updated.split('-'); document.getElementById('snap').textContent = p[2] + '.' + p[1] + '.' + p[0]; }
+  }).catch(function(){
+    document.getElementById('altBody').innerHTML = '<tr><td colspan="6" class="note">The character list did not load. It is at check-pvp.fr in the meantime.</td></tr>';
+  });
 
-  /* a reload cannot start audio on its own. the door handles that on the
-     first visit, and any gesture does after it has been opened. */
-  function begin(){
-    play();
-    if (on){
-      listen(); startCycle();
-      if (AC && AC.state === 'suspended'){ try { AC.resume(); } catch(e){} }
-    }
-  }
-
-  (function(){
-    var gate = document.getElementById('gate');
-    if (!gate) return;
-
-    var seen = false;
-    try { seen = sessionStorage.getItem('shy.entered') === '1'; } catch(e){}
-
-    function drop(){
-      if (gate.parentNode) gate.parentNode.removeChild(gate);
-    }
-    if (seen){
-      drop();
-      var once = function(){
-        begin();
-        window.removeEventListener('pointerdown', once);
-        window.removeEventListener('keydown', once);
-      };
-      window.addEventListener('pointerdown', once);
-      window.addEventListener('keydown', once);
-      return;
-    }
-
-    document.documentElement.style.overflow = 'hidden';
-    var opened = false;
-    function open(){
-      if (opened) return;
-      opened = true;
-      try { sessionStorage.setItem('shy.entered', '1'); } catch(e){}
-      gate.classList.add('gone');
-      document.documentElement.style.overflow = '';
-      begin();
-      setTimeout(drop, 700);
-    }
-    gate.addEventListener('click', open);
-    window.addEventListener('keydown', open);
-  })();
-
-  /* ---- the line under the name ---- */
-  var tag = document.getElementById('tekkTag');
-  var LINES = [
-    '<span class="un">Un</span>holy Paladin',
-    'I decide who lives',
-    'You die when I allow it',
-    'You depend on my decisions',
-    'Your health bar is a favour',
-    'Mercy is a cooldown, and it is mine',
-    'You were dead. I reconsidered.',
-    'The Light answers to me',
-    'Nothing in this group happens without me',
-    'I have never been the problem',
-    'Say thank you'
-  ];
-  var li = 0, tagT = null;
-  function cycle(){
-    li = (li + 1) % LINES.length;
-    tag.innerHTML = LINES[li];
-    tag.classList.remove('swap');
-    void tag.offsetWidth;
-    tag.classList.add('swap');
-    tagT = setTimeout(cycle, li === 0 ? 7000 : 4200);
-  }
-  function startCycle(){
-    if (tagT) clearTimeout(tagT);
-    li = 0;
-    tag.innerHTML = LINES[0];
-    tagT = setTimeout(cycle, 7000);
-  }
-  function stopCycle(){
-    if (tagT){ clearTimeout(tagT); tagT = null; }
-    li = 0;
-    tag.innerHTML = LINES[0];
-  }
-
-  /* ---- pulse, taken from the track rather than guessed ---- */
-  var AC = null, ANA = null, DATA = null, raf = 0, lastQ = -1;
-  function listen(){
-    if (ANA) return;
-    try {
-      var C = window.AudioContext || window.webkitAudioContext;
-      if (!C) return;
-      AC = new C();
-      var src = AC.createMediaElementSource(audio);
-      ANA = AC.createAnalyser();
-      ANA.fftSize = 256;
-      ANA.smoothingTimeConstant = 0.75;
-      DATA = new Uint8Array(ANA.frequencyBinCount);
-      /* the graph has to reach the speakers or the page goes silent */
-      src.connect(ANA);
-      ANA.connect(AC.destination);
-      body.classList.add('live');
-      loop();
-    } catch(e){ /* no analyser, the css keyframe heartbeat carries on */ }
-  }
-  /* a kick is the bottom of the spectrum rising sharply. keep a running
-     idea of how much it usually rises between frames, fire when one rise
-     is a couple of times that, and refuse to fire again for a while so a
-     long note does not rattle the room continuously. */
-  var lowPrev = 0, rise = 0, lastKick = 0, boomT = null, boomRaf = 0;
-  var kickHard = 0;
-  function kick(){
-    /* how hard this one lands is settled here and held for the whole
-       swing. read it live and every plate re-computes mid flight, which
-       is a twitch rather than a swing. */
-    var hard = kickHard;
-    var root = document.documentElement.style;
-    root.setProperty('--amp',  (0.45 + hard * 0.85).toFixed(2));
-    root.setProperty('--rack', (0.45 + hard * 0.7).toFixed(2));
-
-    if (boomT) clearTimeout(boomT);
-    /* restarting across a frame rather than forcing a reflow: the same
-       restart without a synchronous layout two or three times a second,
-       which was a hitch of its own */
-    body.classList.remove('boom');
-    if (boomRaf) cancelAnimationFrame(boomRaf);
-    boomRaf = requestAnimationFrame(function(){
-      boomRaf = 0;
-      body.classList.add('boom');
-    });
-    /* the class outlives the longest thing it starts, so nothing is ever
-       cut off half way and snapped back to where it started */
-    boomT = setTimeout(function(){
-      body.classList.remove('boom');
-      boomT = null;
-    }, 700);
-  }
-
-  function loop(){
-    raf = requestAnimationFrame(loop);
-    if (!ANA || audio.paused) return;
-    ANA.getByteFrequencyData(DATA);
-    /* weight the low end, that is what you feel */
-    var lo = 0, n = 10;
-    for (var i = 0; i < n; i++) lo += DATA[i];
-    var raw = (lo / n) / 190;
-    var v = Math.max(0, Math.min(1, raw));
-    v = v * v;                       /* squash the quiet parts */
-    var q = Math.round(v * 12) / 12; /* steps, so the glow is not repainted 60 times a second */
-    if (q !== lastQ){
-      lastQ = q;
-      document.documentElement.style.setProperty('--pulse', q.toFixed(3));
-    }
-
-    /* how far the low end climbed since the last frame, and how far it
-       usually climbs */
-    var d = raw - lowPrev;
-    lowPrev = raw;
-    if (d < 0) d = 0;
-    rise = rise * 0.94 + d * 0.06;
-
-    var now = performance.now();
-    if (d > Math.max(rise * 2.4, 0.008) && raw > 0.1 && now - lastKick > 300){
-      lastKick = now;
-      /* a bigger jump is a harder hit, measured against the usual one */
-      kickHard = Math.max(0, Math.min(1, d / Math.max(0.03, rise * 8)));
-      kick();
-    }
-  }
-
-  window.__tekk = function(){ return on; };
-  window.__pulse = function(){ return lastQ < 0 ? 0 : lastQ; };
-})();
-
-(function(){
-  var c = document.getElementById('rays');
-  if(!c || !c.getContext) return;
-  var ctx = c.getContext('2d');
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var RAYS = 15, w = 0, h = 0, cx = 0, cy = 0, R = 0;
-
-  function size(){
-    var r = c.getBoundingClientRect();
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    w = Math.max(r.width, 1); h = Math.max(r.height, 1);
-    c.width = Math.round(w * dpr);
-    c.height = Math.round(h * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    cx = w / 2; cy = h * 0.34;
-    R = Math.sqrt(w * w + h * h);
-  }
-
-  function draw(t){
-    ctx.clearRect(0, 0, w, h);
-    ctx.globalCompositeOperation = 'lighter';
-    for (var i = 0; i < RAYS; i++){
-      var base = (i / RAYS) * Math.PI * 2;
-      var drift = Math.sin(t * 0.00013 + i * 1.7) * 0.09;
-      var a = base + t * 0.000035 + drift;
-      var spread = 0.026 + 0.016 * (0.5 + 0.5 * Math.sin(t * 0.0004 + i * 2.3));
-      var alpha = 0.10 + 0.07 * (0.5 + 0.5 * Math.sin(t * 0.0006 + i));
-      if (window.__pulse) alpha *= 1 + window.__pulse() * 1.1;
-      var g = ctx.createLinearGradient(cx, cy, cx + Math.cos(a) * R, cy + Math.sin(a) * R);
-      var tk = window.__tekk && window.__tekk();
-      var c0 = tk ? '170,26,14' : '255,224,160';
-      var c1 = tk ? '96,4,4'     : '240,200,104';
-      g.addColorStop(0, 'rgba(' + c0 + ',' + alpha.toFixed(3) + ')');
-      g.addColorStop(0.45, 'rgba(' + c1 + ',' + (alpha * 0.45).toFixed(3) + ')');
-      g.addColorStop(1, 'rgba(' + c1 + ',0)');
-      ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(cx + Math.cos(a - spread) * R, cy + Math.sin(a - spread) * R);
-      ctx.lineTo(cx + Math.cos(a + spread) * R, cy + Math.sin(a + spread) * R);
-      ctx.closePath();
-      ctx.fillStyle = g;
-      ctx.fill();
-    }
-    var core = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(w, h) * 0.52);
-    var ctk = (window.__tekk && window.__tekk()) ? '120,10,6' : '255,229,175';
-    core.addColorStop(0, 'rgba(' + ctk + ',0.20)');
-    core.addColorStop(1, 'rgba(' + ctk + ',0)');
-    ctx.fillStyle = core;
-    ctx.fillRect(0, 0, w, h);
-    ctx.globalCompositeOperation = 'source-over';
-  }
-
-  function loop(t){ draw(t); requestAnimationFrame(loop); }
-
-  size();
-  window.addEventListener('resize', function(){ size(); if (reduce) draw(0); });
-  if (reduce) { draw(0); } else { requestAnimationFrame(loop); }
+  fetch('blacklist.json', { cache:'no-cache' }).then(function(r){ return r.json(); }).then(function(d){
+    var ul = document.getElementById('blList');
+    if (typeof d.depleted === 'number') document.getElementById('blCount').textContent = d.depleted;
+    if (!d.entries || !d.entries.length){ ul.innerHTML = '<li><p class="none">Nobody listed yet.</p></li>'; return; }
+    ul.innerHTML = d.entries.map(function(e){
+      var name = e.link ? '<a href="' + h(e.link) + '" rel="noopener nofollow">' + h(e.name) + '</a>' : h(e.name);
+      return '<li>' + name + '<span class="rl">' + h(e.realm || '') + '</span>' +
+        (e.note ? '<p>' + h(e.note) + '</p>' : '<p class="none">No note.</p>') + '</li>';
+    }).join('');
+  }).catch(function(){
+    document.getElementById('blList').innerHTML = '<li><p class="none">The list did not load.</p></li>';
+  });
 })();
 </script>
 </body>

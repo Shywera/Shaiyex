@@ -33,7 +33,8 @@ radi). Dok to vezanje ne postoji, vraćaju `503`, a stranice to podnose.
 
 | Ruta | Što je | Zvuk |
 | --- | --- | --- |
-| `/` | Ulazna stranica: svetište koje se otvara na klik, pa popis svega ostalog | `mercy.mp3`, `tirion.mp3` |
+| `/` | PvP početna, samo tamna tema: rekord po sezonama, Norayneov uspon, dva klipa, svi likovi (altovi), why invite me, blacklist, mini igre. Brojke iz `data/pvp.json` | `clips/holy.mp4`, `clips/unholy.mp4` |
+| `/classic/` | Stara početna (svetište), sačuvana kakva je bila do 04.10.2026. Nije linkana iz izbornika, samo iz popisa mini igara | `mercy.mp3`, `tirion.mp3` |
 | `/about/` | Who This Guy: M+ score, napredak po tierovima, logovi. Brojke dolaze s raider.io API-ja | |
 | `/pitch/` | Why invite me: mirna, kratka verzija. Bez igre, bez zvuka, 7 kB | |
 | `/why/` | Why Me: ista poruka, ali glasna i namjerno neugodna. Faze, glazba, 145 BPM | `track.mp3`, `ach.mp3` |
@@ -53,6 +54,21 @@ radi). Dok to vezanje ne postoji, vraćaju `503`, a stranice to podnose.
 `/pitch/`, `/why/` i `/the-quiet-part/` nose istu poruku u tri registra: pristojnom,
 umišljenom i iskrenom. To nije nedosljednost nego cijela poanta, i `/the-quiet-part/`
 to izgovori naglas. Ako se jedna od njih mijenja, mijenja se i odnos prema drugima.
+
+## PvP podaci (`/data/pvp.json`)
+
+Početna čita `public/data/pvp.json`. Puni ga `tools/pvp_snapshot.py`:
+
+```bash
+python tools/pvp_snapshot.py
+```
+
+- check-pvp.fr vraća `403` na svoj API izvan preglednika, pa skripta otvara profil u headless Edgeu, snimi mrežni log s tijelima odgovora i iz njega izvuče JSON koji je stranica sama dobila. Popis sezonskih titula čita iz iscrtanog DOM-a.
+- Glavni lik je `MAIN` u skripti (sada Norayne). `FEATURED` su likovi čiji se trenutni Solo Shuffle prikazuje pod usponom.
+- **Preimenovani likovi se spajaju.** check-pvp nakon preimenovanja ili prebacivanja na drugi realm prikazuje isti lik dvaput. Ista klasa, ista frakcija i isti 2v2 i 3v3 vrh znače isti lik: zadržava se najnovije ime, a vrhovi su najbolji preko svih imena. Stara imena idu u `formerly` i ispisuju se u tablici.
+- Rated Battleground se ne prikazuje po liku jer check-pvp na svakom liku vraća račun-razinski achievement (1800).
+
+Klipovi u `public/clips/` su prekodirani za web (H.264, CRF 23, max 4.8 Mbps, `+faststart`) jer Cloudflare Pages ne prima datoteke veće od 25 MiB.
 
 ## `/beat/`
 

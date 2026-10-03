@@ -1,0 +1,694 @@
+{
+ "source": "check-pvp.fr",
+ "updated": "2026-10-04",
+ "main": {
+  "name": "Norayne",
+  "realm": "Argent Dawn",
+  "level": 90,
+  "class": "Hunter",
+  "spec": "Marksmanship",
+  "race": "Night Elf",
+  "faction": "Alliance",
+  "ilvl": 272,
+  "pvpIlvl": 335,
+  "max2v2": 0,
+  "max3v3": 0,
+  "maxRbg": 1800,
+  "maxShuffle": 0,
+  "maxBlitz": 1899,
+  "curShuffle": 0,
+  "curBlitz": 1899,
+  "shuffle": [],
+  "blitz": [
+   {
+    "spec": "Marksmanship",
+    "rating": 1899,
+    "best": 1899,
+    "win": 18,
+    "lose": 12
+   }
+  ]
+ },
+ "achievementPoints": 20660,
+ "account": [
+  {
+   "name": "Just the Two of Us: 2200",
+   "desc": "Earn a 2200 personal rating in the 2v2 bracket of the arena."
+  },
+  {
+   "name": "Three's Company: 1750",
+   "desc": "Earn a 1750 personal rating in the 3v3 bracket of the arena."
+  },
+  {
+   "name": "Elite",
+   "desc": "Earn the Elite title in a season."
+  },
+  {
+   "name": "Knight-Captain",
+   "desc": "Earn a battleground rating of 1800."
+  }
+ ],
+ "seasons": [
+  {
+   "expansion": "Midnight",
+   "seasons": [
+    {
+     "title": "Rival I",
+     "season": 2,
+     "from": 1800,
+     "to": 1949
+    },
+    {
+     "title": "Duelist",
+     "season": 1,
+     "from": 2100,
+     "to": 2299
+    }
+   ]
+  },
+  {
+   "expansion": "The War Within",
+   "seasons": [
+    {
+     "title": "Rival II",
+     "season": 3,
+     "from": 1950,
+     "to": 2099
+    },
+    {
+     "title": "Rival I",
+     "season": 2,
+     "from": 1800,
+     "to": 1949
+    },
+    {
+     "title": "Challenger I",
+     "season": 1,
+     "from": 1400,
+     "to": 1599
+    }
+   ]
+  },
+  {
+   "expansion": "Dragonflight",
+   "seasons": [
+    {
+     "title": "Duelist",
+     "season": 4,
+     "from": 2100,
+     "to": 2399
+    },
+    {
+     "title": "Duelist",
+     "season": 3,
+     "from": 2100,
+     "to": 2399
+    },
+    {
+     "title": "Duelist",
+     "season": 2,
+     "from": 2100,
+     "to": 2399
+    },
+    {
+     "title": "Elite",
+     "season": 1,
+     "from": 2400,
+     "to": null
+    }
+   ]
+  },
+  {
+   "expansion": "Shadowlands",
+   "seasons": [
+    {
+     "title": "Duelist",
+     "season": 3,
+     "from": 2100,
+     "to": 2399
+    },
+    {
+     "title": "Duelist",
+     "season": 2,
+     "from": 2100,
+     "to": 2399
+    },
+    {
+     "title": "Duelist",
+     "season": 1,
+     "from": 2100,
+     "to": 2399
+    }
+   ]
+  },
+  {
+   "expansion": "Battle for Azeroth",
+   "seasons": [
+    {
+     "title": "Duelist",
+     "season": 4,
+     "from": 2100,
+     "to": 2399
+    },
+    {
+     "title": "Rival",
+     "season": 3,
+     "from": 1800,
+     "to": 2099
+    },
+    {
+     "title": "Rival",
+     "season": 2,
+     "from": 1800,
+     "to": 2099
+    },
+    {
+     "title": "Rival",
+     "season": 1,
+     "from": 1800,
+     "to": 2099
+    }
+   ]
+  }
+ ],
+ "climb": [
+  {
+   "t": 1790717833,
+   "rating": 288,
+   "rank": 2101,
+   "win": 1,
+   "lose": 0
+  },
+  {
+   "t": 1790785384,
+   "rating": 576,
+   "rank": 1797,
+   "win": 2,
+   "lose": 0
+  },
+  {
+   "t": 1790802086,
+   "rating": 1672,
+   "rank": 784,
+   "win": 6,
+   "lose": 0
+  },
+  {
+   "t": 1790812886,
+   "rating": 1677,
+   "rank": 768,
+   "win": 7,
+   "lose": 2
+  },
+  {
+   "t": 1790834486,
+   "rating": 1656,
+   "rank": 842,
+   "win": 7,
+   "lose": 4
+  },
+  {
+   "t": 1790893820,
+   "rating": 1693,
+   "rank": 753,
+   "win": 9,
+   "lose": 5
+  },
+  {
+   "t": 1790904620,
+   "rating": 1720,
+   "rank": 679,
+   "win": 11,
+   "lose": 7
+  },
+  {
+   "t": 1790947820,
+   "rating": 1738,
+   "rank": 647,
+   "win": 12,
+   "lose": 9
+  },
+  {
+   "t": 1791029386,
+   "rating": 1762,
+   "rank": 622,
+   "win": 13,
+   "lose": 9
+  },
+  {
+   "t": 1791037088,
+   "rating": 1816,
+   "rank": 456,
+   "win": 15,
+   "lose": 9
+  },
+  {
+   "t": 1791047888,
+   "rating": 1816,
+   "rank": 461,
+   "win": 15,
+   "lose": 11
+  },
+  {
+   "t": 1791065238,
+   "rating": 1899,
+   "rank": 322,
+   "win": 18,
+   "lose": 12
+  }
+ ],
+ "featured": [
+  {
+   "name": "Shaiyex",
+   "realm": "Argent Dawn",
+   "level": 90,
+   "class": "Paladin",
+   "spec": "Holy",
+   "race": "Lightforged Draenei",
+   "faction": "Alliance",
+   "ilvl": 325,
+   "pvpIlvl": 326,
+   "max2v2": 2275,
+   "max3v3": 1859,
+   "maxRbg": 1800,
+   "maxShuffle": 1893,
+   "maxBlitz": 0,
+   "curShuffle": 1736,
+   "curBlitz": 0,
+   "shuffle": [
+    {
+     "spec": "Holy",
+     "rating": 1736,
+     "best": 1893,
+     "win": 34,
+     "lose": 34
+    }
+   ],
+   "blitz": []
+  },
+  {
+   "name": "Besthealer",
+   "realm": "Argent Dawn",
+   "level": 90,
+   "class": "Death Knight",
+   "spec": "Unholy",
+   "race": "Nightborne",
+   "faction": "Horde",
+   "ilvl": 235,
+   "pvpIlvl": 292,
+   "max2v2": 1041,
+   "max3v3": 0,
+   "maxRbg": 1800,
+   "maxShuffle": 2132,
+   "maxBlitz": 288,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "shuffle": [
+    {
+     "spec": "Unholy",
+     "rating": 0,
+     "best": 2132,
+     "win": 0,
+     "lose": 0
+    }
+   ],
+   "blitz": [
+    {
+     "spec": "Unholy",
+     "rating": 0,
+     "best": 288,
+     "win": 0,
+     "lose": 0
+    }
+   ]
+  }
+ ],
+ "altsRaw": 26,
+ "alts": [
+  {
+   "name": "Domirella",
+   "realm": "Argent Dawn",
+   "region": "eu",
+   "class": "Demon Hunter",
+   "classId": 12,
+   "faction": "Alliance",
+   "level": 80,
+   "max2v2": 1581,
+   "max3v3": 672,
+   "maxShuffle": 2375,
+   "maxBlitz": 0,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [],
+   "seen": 1765146376
+  },
+  {
+   "name": "Shaiyex",
+   "realm": "Argent Dawn",
+   "region": "eu",
+   "class": "Paladin",
+   "classId": 2,
+   "faction": "Alliance",
+   "level": 90,
+   "max2v2": 2275,
+   "max3v3": 1859,
+   "maxShuffle": 1950,
+   "maxBlitz": 0,
+   "curShuffle": 1736,
+   "curBlitz": 0,
+   "formerly": [
+    "Shyabel-Ravencrest",
+    "Novaren-Ravencrest"
+   ],
+   "seen": 1790777803
+  },
+  {
+   "name": "Bloodyshy",
+   "realm": "Kazzak",
+   "region": "eu",
+   "class": "Druid",
+   "classId": 11,
+   "faction": "Horde",
+   "level": 60,
+   "max2v2": 2235,
+   "max3v3": 1630,
+   "maxShuffle": 0,
+   "maxBlitz": 0,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [],
+   "seen": 1686870233
+  },
+  {
+   "name": "Besthealer",
+   "realm": "Argent Dawn",
+   "region": "eu",
+   "class": "Death Knight",
+   "classId": 6,
+   "faction": "Horde",
+   "level": 90,
+   "max2v2": 1041,
+   "max3v3": 0,
+   "maxShuffle": 2132,
+   "maxBlitz": 1263,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [
+    "Muffinbuns-Argent Dawn"
+   ],
+   "seen": 1784986754
+  },
+  {
+   "name": "Shyex",
+   "realm": "Argent Dawn",
+   "region": "eu",
+   "class": "Warrior",
+   "classId": 1,
+   "faction": "Alliance",
+   "level": 90,
+   "max2v2": 2115,
+   "max3v3": 1557,
+   "maxShuffle": 1905,
+   "maxBlitz": 576,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [
+    "Shyex-Ravencrest",
+    "Shaille-Ravencrest"
+   ],
+   "seen": 1787347700
+  },
+  {
+   "name": "Shyabel",
+   "realm": "Argent Dawn",
+   "region": "eu",
+   "class": "Hunter",
+   "classId": 3,
+   "faction": "Alliance",
+   "level": 70,
+   "max2v2": 2104,
+   "max3v3": 1592,
+   "maxShuffle": 2030,
+   "maxBlitz": 0,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [],
+   "seen": 1768662166
+  },
+  {
+   "name": "Shaiye",
+   "realm": "Ravencrest",
+   "region": "eu",
+   "class": "Shaman",
+   "classId": 7,
+   "faction": "Horde",
+   "level": 70,
+   "max2v2": 1982,
+   "max3v3": 1742,
+   "maxShuffle": 1468,
+   "maxBlitz": 0,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [],
+   "seen": 1713212394
+  },
+  {
+   "name": "Shyvella",
+   "realm": "Ravencrest",
+   "region": "eu",
+   "class": "Priest",
+   "classId": 5,
+   "faction": "Alliance",
+   "level": 70,
+   "max2v2": 192,
+   "max3v3": 0,
+   "maxShuffle": 1900,
+   "maxBlitz": 0,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [],
+   "seen": 1723219206
+  },
+  {
+   "name": "Shywera",
+   "realm": "Silvermoon",
+   "region": "eu",
+   "class": "Paladin",
+   "classId": 2,
+   "faction": "Alliance",
+   "level": 50,
+   "max2v2": 1822,
+   "max3v3": 1598,
+   "maxShuffle": 0,
+   "maxBlitz": 0,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [],
+   "seen": 1722635957
+  },
+  {
+   "name": "Yirith",
+   "realm": "Argent Dawn",
+   "region": "eu",
+   "class": "Rogue",
+   "classId": 4,
+   "faction": "Horde",
+   "level": 60,
+   "max2v2": 1803,
+   "max3v3": 1655,
+   "maxShuffle": 0,
+   "maxBlitz": 0,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [],
+   "seen": 1675855789
+  },
+  {
+   "name": "Shyveth",
+   "realm": "Argent Dawn",
+   "region": "eu",
+   "class": "Mage",
+   "classId": 8,
+   "faction": "Horde",
+   "level": 80,
+   "max2v2": 1206,
+   "max3v3": 0,
+   "maxShuffle": 1612,
+   "maxBlitz": 0,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [],
+   "seen": 1732711982
+  },
+  {
+   "name": "Shyrawr",
+   "realm": "Argent Dawn",
+   "region": "eu",
+   "class": "Druid",
+   "classId": 11,
+   "faction": "Alliance",
+   "level": 84,
+   "max2v2": 1385,
+   "max3v3": 0,
+   "maxShuffle": 1591,
+   "maxBlitz": 0,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [],
+   "seen": 1789235379
+  },
+  {
+   "name": "Shaiye",
+   "realm": "Argent Dawn",
+   "region": "eu",
+   "class": "Warrior",
+   "classId": 1,
+   "faction": "Alliance",
+   "level": 51,
+   "max2v2": 1436,
+   "max3v3": 576,
+   "maxShuffle": 0,
+   "maxBlitz": 0,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [],
+   "seen": 1748792528
+  },
+  {
+   "name": "Shyrilxz",
+   "realm": "Argent Dawn",
+   "region": "eu",
+   "class": "Warlock",
+   "classId": 9,
+   "faction": "Alliance",
+   "level": 80,
+   "max2v2": 1380,
+   "max3v3": 191,
+   "maxShuffle": 0,
+   "maxBlitz": 0,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [],
+   "seen": 1786964063
+  },
+  {
+   "name": "Felynsia",
+   "realm": "Draenor",
+   "region": "eu",
+   "class": "Demon Hunter",
+   "classId": 12,
+   "faction": "Horde",
+   "level": 59,
+   "max2v2": 1211,
+   "max3v3": 0,
+   "maxShuffle": 0,
+   "maxBlitz": 0,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [],
+   "seen": 1667076359
+  },
+  {
+   "name": "Vynrill",
+   "realm": "Argent Dawn",
+   "region": "eu",
+   "class": "Warlock",
+   "classId": 9,
+   "faction": "Horde",
+   "level": 70,
+   "max2v2": 1149,
+   "max3v3": 191,
+   "maxShuffle": 0,
+   "maxBlitz": 0,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [],
+   "seen": 1715679599
+  },
+  {
+   "name": "Shaiyex",
+   "realm": "Ravencrest",
+   "region": "eu",
+   "class": "Rogue",
+   "classId": 4,
+   "faction": "Alliance",
+   "level": 80,
+   "max2v2": 959,
+   "max3v3": 0,
+   "maxShuffle": 0,
+   "maxBlitz": 0,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [],
+   "seen": 1772986157
+  },
+  {
+   "name": "Shygodx",
+   "realm": "Argent Dawn",
+   "region": "eu",
+   "class": "Priest",
+   "classId": 5,
+   "faction": "Horde",
+   "level": 60,
+   "max2v2": 957,
+   "max3v3": 0,
+   "maxShuffle": 0,
+   "maxBlitz": 0,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [],
+   "seen": 1718218994
+  },
+  {
+   "name": "Oloraka",
+   "realm": "Silvermoon",
+   "region": "eu",
+   "class": "Mage",
+   "classId": 8,
+   "faction": "Alliance",
+   "level": 50,
+   "max2v2": 672,
+   "max3v3": 96,
+   "maxShuffle": 0,
+   "maxBlitz": 0,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [],
+   "seen": 1654375726
+  },
+  {
+   "name": "Shaiyel",
+   "realm": "Kazzak",
+   "region": "eu",
+   "class": "Death Knight",
+   "classId": 6,
+   "faction": "Alliance",
+   "level": 70,
+   "max2v2": 0,
+   "max3v3": 0,
+   "maxShuffle": 0,
+   "maxBlitz": 0,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [],
+   "seen": 1748704696
+  },
+  {
+   "name": "Shayve",
+   "realm": "Argent Dawn",
+   "region": "eu",
+   "class": "Shaman",
+   "classId": 7,
+   "faction": "Alliance",
+   "level": 80,
+   "max2v2": 0,
+   "max3v3": 0,
+   "maxShuffle": 0,
+   "maxBlitz": 0,
+   "curShuffle": 0,
+   "curBlitz": 0,
+   "formerly": [],
+   "seen": 1767287673
+  }
+ ]
+}
