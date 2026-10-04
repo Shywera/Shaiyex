@@ -34,10 +34,11 @@ radi). Dok to vezanje ne postoji, vraćaju `503`, a stranice to podnose.
 | Ruta | Što je | Zvuk |
 | --- | --- | --- |
 | `/` | PvP početna, samo tamna tema: rekord po sezonama, Norayneov uspon, dva klipa, svi likovi (altovi), why invite me, blacklist, mini igre. Brojke iz `data/pvp.json` | `clips/holy.mp4`, `clips/unholy.mp4` |
-| `/classic/` | Stara početna (svetište), sačuvana kakva je bila do 04.10.2026. Nije linkana iz izbornika, samo iz popisa mini igara | `mercy.mp3`, `tirion.mp3` |
+| `/classic/` | Stara početna, sada samo tamna strana (svijetlo svetište je maknuto). Križ gore desno vodi natrag na `/` ("PvP side"); na novoj početnoj isti križ vodi ovamo ("PvE side"). Original je u tagu `backup-live-2026-10-04` | `mercy.mp3` |
+| `/classic/why/` | Originalni glasni Why Me (Mythic+ verzija), linkan s tamne strane stare početne | `track.mp3`, `ach.mp3` |
 | `/about/` | Who This Guy: M+ score, napredak po tierovima, logovi. Brojke dolaze s raider.io API-ja | |
 | `/pitch/` | Why invite me: mirna, kratka verzija. Bez igre, bez zvuka, 7 kB | |
-| `/why/` | Why Me: ista poruka, ali glasna i namjerno neugodna. Faze, glazba, 145 BPM | `track.mp3`, `ach.mp3` |
+| `/why/` | Why Me, PvP verzija: glasna i namjerno neugodna, faze, glazba, 145 BPM. Vodi do nje duga ploča na početnoj | `track.mp3`, `ach.mp3` |
 | `/the-quiet-part/` | Nije linkano niotkuda. Iskrena verzija, bez prodaje. Piše u knjigu preko `/api/vault` | |
 | `/kick/` | Kick or Leave: prekid kao ulaznica. Pet zaredom i ulazite, dva promašaja i gotovo | `bg.mp3`, `shrine.mp3` |
 | `/beat/` | Interrupt On The Beat: ritamska igra u četiri trake, leaderboard | 10 pjesama |

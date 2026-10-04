@@ -21,7 +21,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
 <link rel="preload" href="data/pvp.json" as="fetch" crossorigin>
 <style>
-/* Hallmark · genre: atmospheric · macrostructure: Stat-Led · theme: custom · enrichment: E-video (two real clips) · nav: N9 Edge-aligned · footer: Ft5 Statement
+/* Hallmark · genre: atmospheric · macrostructure: Marquee Hero · theme: custom · enrichment: E-video (two real clips) · nav: N9 Edge-aligned · footer: Ft5 Statement
  * vibe: "arena after midnight, graphite, one ember"
  * paper oklch(16.5% 0.014 255) · accent oklch(77% 0.155 62) amber · Big Shoulders Display + Geist / Geist Mono
  * axes: dark / display-condensed / warm
@@ -44,6 +44,17 @@
   --color-bloom:   oklch(60% 0.15 50 / .13);
   --color-bloom-2: oklch(55% 0.09 250 / .10);
   --color-focus:   oklch(85% 0.14 70);
+  /* the old site's cross, its red, and its glow */
+  --color-blood:      oklch(50% 0.2 29);
+  --color-blood-hot:  oklch(60% 0.22 29);
+  --color-blood-glow: oklch(50% 0.2 29 / .85);
+  --color-blood-haze: oklch(50% 0.2 29 / .35);
+  --color-blood-mist: oklch(50% 0.2 29 / .3);
+  /* chroma ring for the Why Me door, one full turn of hue */
+  --chroma-1: oklch(65% 0.26 15);  --chroma-2: oklch(75% 0.19 55);  --chroma-3: oklch(90% 0.19 100);
+  --chroma-4: oklch(85% 0.23 150); --chroma-5: oklch(78% 0.15 220); --chroma-6: oklch(62% 0.22 290);
+  --chroma-7: oklch(68% 0.29 330);
+  --chroma: conic-gradient(from var(--ang), var(--chroma-1), var(--chroma-2), var(--chroma-3), var(--chroma-4), var(--chroma-5), var(--chroma-6), var(--chroma-7), var(--chroma-1));
 
   /* class colours: Blizzard's own, used only as small marks */
   --class-1:#C69B6D; --class-2:#F48CBA; --class-3:#AAD372; --class-4:#FFF468;
@@ -105,21 +116,20 @@ a{color:inherit}
 .nav a.l:hover{color:var(--color-ink);border-color:var(--color-rule-2)}
 @media (max-width:720px){ .nav li.opt{display:none} }
 
-/* ---------- hero: the figure and its words ---------- */
-.hero{padding:clamp(24px,6vh,64px) 0 var(--space-3xl)}
-.hero-grid{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:var(--space-xl) clamp(24px,5vw,64px);align-items:end}
-.figure{
-  font:800 var(--text-figure)/.78 var(--font-display);letter-spacing:-.01em;
-  color:var(--color-accent);margin:0;font-variant-numeric:tabular-nums;
+/* ---------- hero: the name ---------- */
+.hero{padding:clamp(16px,4vh,48px) 0 var(--space-3xl)}
+.word{
+  font:800 clamp(5.2rem,1rem + 19.5vw,17rem)/.8 var(--font-display);letter-spacing:.005em;
+  text-transform:uppercase;margin:0 0 0 -.04em;color:var(--color-ink);
+  overflow-wrap:anywhere;min-width:0;
 }
-.hero h1{
-  font:700 var(--text-2xl)/1.02 var(--font-display);letter-spacing:.005em;text-transform:uppercase;
-  margin:0;max-width:16ch;overflow-wrap:anywhere;min-width:0;
+.hero-row{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--space-lg) var(--space-2xl);
+  align-items:end;margin-top:var(--space-xl);
 }
-.hero h1 .sub{color:var(--color-ink-3)}
-.qual{margin:var(--space-lg) 0 0;max-width:58ch;color:var(--color-ink-2);font-size:var(--text-md)}
+.qual{margin:0;max-width:52ch;color:var(--color-ink-2);font-size:var(--text-md)}
 .qual b{color:var(--color-ink);font-weight:600}
-.chips{display:flex;flex-wrap:wrap;gap:var(--space-sm);margin-top:var(--space-xl)}
+.chips{display:flex;flex-wrap:wrap;gap:var(--space-sm)}
 .chip{
   display:inline-flex;align-items:center;gap:8px;white-space:nowrap;
   font:500 var(--text-sm)/1 var(--font-body);text-decoration:none;
@@ -130,7 +140,52 @@ a{color:inherit}
 .chip:active{transform:translateY(1px)}
 .chip.solid{background:var(--color-accent);border-color:var(--color-accent);color:var(--color-accent-ink);font-weight:600}
 .chip.solid:hover{background:var(--color-focus);border-color:var(--color-focus)}
-@media (max-width:860px){ .hero-grid{grid-template-columns:minmax(0,1fr)} .figure{line-height:.8} }
+.chip.chroma{position:relative;border-color:transparent;background:var(--color-paper);font-weight:600}
+.chip.chroma:hover{background:var(--color-paper-2)}
+.chip.chroma::before{
+  content:"";position:absolute;inset:-2px;border-radius:inherit;z-index:-1;
+  background:var(--chroma);animation:chroma-turn 4s linear infinite;
+}
+.chip.chroma::after{
+  content:"";position:absolute;inset:-2px;border-radius:inherit;z-index:-2;
+  background:var(--chroma);filter:blur(10px);
+  animation:chroma-turn 4s linear infinite, chroma-beat .41394s var(--ease-out) infinite;
+}
+@media (max-width:760px){ .hero-row{grid-template-columns:minmax(0,1fr)} }
+
+/* the cross: the door to the PvE side. Upright here, it turns over on the
+   way through, the same gesture the old site used. */
+.hero .wrap{position:relative}
+.pve{
+  position:absolute;top:0;right:var(--gutter);z-index:2;
+  display:grid;justify-items:center;gap:22px;width:72px;padding-top:6px;text-decoration:none;
+}
+.pve .rune{
+  position:relative;width:3px;height:58px;border-radius:1px;background:var(--color-blood);
+  box-shadow:0 0 9px var(--color-blood-glow),0 0 26px var(--color-blood-haze);
+  transition:transform 160ms var(--ease-out),background-color var(--dur) var(--ease-out);
+}
+.pve .rune::before{
+  content:"";position:absolute;left:50%;top:15px;margin-left:-13px;width:27px;height:3px;border-radius:1px;
+  background:inherit;box-shadow:inherit;
+}
+.pve .rune::after{
+  content:"";position:absolute;inset:-26px -30px;pointer-events:none;
+  background:radial-gradient(circle,var(--color-blood-mist),transparent 68%);
+  animation:cross-breath 3.4s var(--ease-in-out) infinite;
+}
+@keyframes cross-breath{0%,100%{opacity:.35;transform:scale(.9)}50%{opacity:1;transform:scale(1.08)}}
+.pve:hover .rune{background:var(--color-blood-hot)}
+.pve.turned .rune{transform:rotate(180deg)}
+.pve .side{
+  font:700 10px/1 var(--font-mono);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;
+  color:var(--color-blood-hot);animation:cross-nudge 1.9s var(--ease-in-out) infinite;
+}
+@keyframes cross-nudge{0%,100%{opacity:.6;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}}
+.pve:focus-visible{outline:2px solid var(--color-blood-hot);outline-offset:6px}
+@media (max-width:760px){
+  .pve{position:relative;top:auto;right:auto;margin:0 0 var(--space-md) auto;gap:18px}
+}
 
 /* supporting stats, hairline-separated */
 .stats{
@@ -244,13 +299,13 @@ section.s{padding:var(--space-4xl) 0 0}
 .tbl td.num{font:500 var(--text-sm)/1.3 var(--font-mono);font-variant-numeric:tabular-nums;color:var(--color-ink)}
 .tbl td.num.z{color:var(--color-rule-2)}
 .tbl td.num.top{color:var(--color-accent)}
-.tbl td.num small{display:block;margin-top:3px;font-size:11px;color:var(--color-ink-3)}
+.tbl td.num small{display:block;margin-top:3px;font:400 11px/1.3 var(--font-body);color:var(--color-ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tbl td.lvl{font:400 var(--text-sm)/1.3 var(--font-mono);color:var(--color-ink-3)}
 .who-c{display:grid;grid-template-columns:4px minmax(0,1fr);gap:12px;align-items:stretch}
 .who-c i{border-radius:2px;background:var(--cc)}
 .who-c b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .who-c b .tag{display:inline-block;font:500 10px/1 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent-ink);background:var(--color-accent);padding:3px 6px;border-radius:2px;margin-left:8px;vertical-align:2px}
-.who-c span{display:block;font-size:var(--text-xs);color:var(--color-ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who-c span{display:block;font-size:var(--text-xs);line-height:1.45;color:var(--color-ink-3)}
 .who-c .was{color:var(--color-ink-3);font-style:normal}
 .tbl tr.main td{background:var(--color-paper-2)}
 .note{margin-top:var(--space-lg);font-size:var(--text-sm);color:var(--color-ink-3);max-width:70ch}
@@ -262,6 +317,7 @@ section.s{padding:var(--space-4xl) 0 0}
   .tbl col.c-n{width:54px}
   .tbl th,.tbl td{padding:10px 4px}
   .tbl td.num{font-size:12.5px}
+  .tbl td.num small{font-size:9.5px}
   .tbl thead th{font-size:10px;letter-spacing:.02em}
   .who-c{gap:8px}
 }
@@ -273,34 +329,39 @@ section.s{padding:var(--space-4xl) 0 0}
   .who-c b .tag{display:none}
 }
 
-/* invite */
-.points{list-style:none;margin:0;padding:0;border-top:1px solid var(--color-rule);counter-reset:p}
-.points li{display:grid;grid-template-columns:minmax(0,72px) minmax(0,1fr);gap:var(--space-lg);padding:var(--space-xl) 0;border-bottom:1px solid var(--color-rule);counter-increment:p}
-.points li::before{content:counter(p);font:800 3rem/.9 var(--font-display);color:var(--color-accent);font-variant-numeric:tabular-nums}
-.points h3{font:700 var(--text-lg)/1.15 var(--font-display);text-transform:uppercase;letter-spacing:.02em;margin:0}
-.points p{margin:var(--space-xs) 0 0;color:var(--color-ink-2);max-width:60ch}
-.ask{
-  margin-top:var(--space-2xl);padding:var(--space-xl);border-radius:var(--radius);background:var(--color-paper-2);
-  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-lg);
+/* invite: the door to /why/. A rainbow ring that turns, and a glow that
+   beats at the track's 145 BPM (one beat = .41394s). */
+@property --ang{syntax:'<angle>';initial-value:0deg;inherits:false}
+@keyframes chroma-turn{to{--ang:360deg}}
+@keyframes chroma-beat{0%{opacity:.95;transform:scale(1.012)}55%{opacity:.35;transform:scale(1)}100%{opacity:.35;transform:scale(1)}}
+.door-wrap{position:relative;isolation:isolate}
+.door-wrap::before{
+  content:"";position:absolute;inset:-3px;border-radius:calc(var(--radius) + 3px);z-index:-1;
+  background:var(--chroma);filter:blur(18px);
+  animation:chroma-turn 4s linear infinite, chroma-beat .41394s var(--ease-out) infinite;
 }
-.ask p{margin:0;font:700 var(--text-xl)/1.1 var(--font-display);text-transform:uppercase;max-width:22ch;overflow-wrap:anywhere;min-width:0}
-.ask p span{color:var(--color-accent)}
-.ask small{display:block;margin-top:var(--space-xs);font:400 var(--text-sm)/1.5 var(--font-body);text-transform:none;color:var(--color-ink-3)}
-@media (max-width:520px){ .points li{grid-template-columns:minmax(0,1fr);gap:var(--space-sm)} }
-
-/* blacklist */
-.bl{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--color-rule);border:1px solid var(--color-rule);border-radius:var(--radius);overflow:hidden}
-.bl li{background:var(--color-paper);padding:var(--space-lg)}
-.bl a{font-weight:600;text-decoration:none;border-bottom:1px solid var(--color-rule-2);transition:border-color var(--dur-fast) var(--ease-out)}
-.bl a:hover{border-color:var(--color-accent)}
-.bl .rl{display:block;font:400 var(--text-xs)/1.4 var(--font-mono);color:var(--color-ink-3);margin-top:4px}
-.bl p{margin:var(--space-sm) 0 0;font-size:var(--text-sm);color:var(--color-ink-2)}
-.bl p.none{color:var(--color-ink-3)}
-.bl-foot{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:var(--space-md);margin-top:var(--space-lg);font-size:var(--text-sm);color:var(--color-ink-3)}
-.bl-foot b{font:700 1.5rem/1 var(--font-display);color:var(--color-ink);margin-right:6px}
-.tl{color:var(--color-ink);text-decoration:none;border-bottom:1px solid var(--color-rule-2);white-space:nowrap;transition:border-color var(--dur-fast) var(--ease-out)}
-.tl:hover{border-color:var(--color-accent)}
-@media (max-width:640px){ .bl{grid-template-columns:minmax(0,1fr)} }
+.door{
+  position:relative;display:grid;gap:var(--space-md);text-decoration:none;
+  padding:clamp(28px,5vw,56px);border-radius:var(--radius);
+  background:
+    radial-gradient(80% 120% at 100% 0%, var(--color-bloom), transparent 60%),
+    var(--color-paper-2);
+  border:0;
+}
+.door::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;padding:2px;
+  background:var(--chroma);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  animation:chroma-turn 4s linear infinite;
+}
+.door:hover::after{padding:3px}
+.door-k{display:inline-flex;align-items:center;gap:10px;font:500 var(--text-xs)/1 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--color-ink-3)}
+.door-k .rec{width:8px;height:8px;border-radius:50%;background:var(--color-accent)}
+.door-t{font:800 clamp(3rem,1.6rem + 6vw,6.5rem)/.9 var(--font-display);text-transform:uppercase;color:var(--color-ink);overflow-wrap:anywhere;min-width:0}
+.door-d{color:var(--color-ink-2);max-width:56ch}
+.door-go{font:600 var(--text-md)/1 var(--font-body);color:var(--color-accent);white-space:nowrap}
+.door:hover .door-go{color:var(--color-focus)}
 
 /* games index */
 .games{list-style:none;margin:0;padding:0;border-top:1px solid var(--color-rule)}
@@ -322,9 +383,7 @@ section.s{padding:var(--space-4xl) 0 0}
 
 /* footer: statement */
 footer{padding:var(--space-4xl) 0 var(--space-2xl)}
-footer .st{font:800 clamp(2.4rem,1rem + 5.5vw,5.5rem)/.95 var(--font-display);text-transform:uppercase;margin:0;max-width:18ch;overflow-wrap:anywhere;min-width:0}
-footer .st span{color:var(--color-ink-3)}
-footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(--space-md);margin-top:var(--space-2xl);padding-top:var(--space-lg);border-top:1px solid var(--color-rule);font:400 var(--text-xs)/1.6 var(--font-mono);color:var(--color-ink-3)}
+footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(--space-md);padding-top:var(--space-lg);border-top:1px solid var(--color-rule);font:400 var(--text-xs)/1.6 var(--font-mono);color:var(--color-ink-3)}
 
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
@@ -341,8 +400,7 @@ footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(-
       <li class="opt"><a class="l" href="#record">Record</a></li>
       <li><a class="l" href="#clips">Clips</a></li>
       <li><a class="l" href="#alts">Alts</a></li>
-      <li><a class="l" href="#invite">Invite</a></li>
-      <li class="opt"><a class="l" href="#blacklist">Blacklist</a></li>
+      <li><a class="l" href="/why/">Invite</a></li>
       <li class="opt"><a class="l" href="#games">Games</a></li>
     </ul>
   </div>
@@ -351,21 +409,19 @@ footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(-
 <main>
 <header class="hero">
   <div class="wrap">
-    <div class="hero-grid">
-      <p class="figure" id="fig" aria-hidden="true">2400</p>
-      <div>
-        <h1><span class="sr">2400 rating. </span>Elite in Dragonflight Season&nbsp;1. <span class="sub">Duelist in eight more.</span></h1>
-        <p class="qual"><b>Shaiyex</b>, EU Argent Dawn. Rated arena since Battle for Azeroth, healer and DPS. This season on <b id="mainName">Norayne</b>, <span id="mainSpec">a Night Elf Marksmanship Hunter</span>.</p>
-        <div class="chips">
-          <a class="chip solid" href="#invite">Why invite me</a>
-          <a class="chip" href="https://check-pvp.fr/eu/Argent%20Dawn/Norayne" rel="noopener">check-pvp profile ↗</a>
-        </div>
+    <a class="pve" href="/classic/" id="pve"><span class="rune" aria-hidden="true"></span><span class="side">PvE side</span></a>
+    <h1 class="word">Shaiyex</h1>
+    <div class="hero-row">
+      <p class="qual"><b>Rated PvP on EU Argent Dawn.</b> Elite once, Duelist eight times, on healers and on DPS. This season on <b id="mainName">Norayne</b>, <span id="mainSpec">a Night Elf Marksmanship Hunter</span>.</p>
+      <div class="chips">
+        <a class="chip chroma" href="/why/">Why invite me</a>
+        <a class="chip" href="https://check-pvp.fr/eu/Argent%20Dawn/Norayne" rel="noopener">check-pvp profile ↗</a>
       </div>
     </div>
 
     <div class="stats" role="list">
       <div class="stat" role="listitem"><b>8</b><span>Duelist titles, across <em>four expansions</em></span></div>
-      <div class="stat" role="listitem"><b>2275</b><span>best 2v2, on <em>Shaiyex</em>, Holy Paladin</span></div>
+      <div class="stat" role="listitem"><b>2400</b><span>Elite, <em>Dragonflight Season 1</em></span></div>
       <div class="stat" role="listitem"><b>2375</b><span>best Solo Shuffle, on <em>Domirella</em>, Demon Hunter</span></div>
       <div class="stat" role="listitem"><b id="nowBlitz">1899</b><span>Blitz right now, on <em>Norayne</em><span id="nowRank">, rank 322</span></span></div>
     </div>
@@ -376,7 +432,6 @@ footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(-
   <div class="wrap">
     <div class="s-head">
       <h2 id="h-record"><span class="n">16</span> seasons, every one titled</h2>
-      <p>Each bar is the lowest rating that season's title needs, so the real peak sat at or above it. Midnight Season 3 is the one being played now.</p>
     </div>
     <div class="chart">
       <svg class="ladder-svg" id="ladder" viewBox="0 0 1000 340" role="img" aria-labelledby="ladder-t"><title id="ladder-t">Season titles from Battle for Azeroth Season 1 to Midnight Season 2</title></svg>
@@ -394,7 +449,6 @@ footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(-
   <div class="wrap">
     <div class="s-head">
       <h2 id="h-now">Norayne, <span class="n" id="climbFrom">288</span> to <span class="n" id="climbTo">1899</span> in <span id="climbDays">four days</span></h2>
-      <p>The new main hit level 90 and went straight into Blitz. Every point below is a ladder snapshot.</p>
     </div>
     <div class="climb">
       <div class="chart"><svg id="climb" viewBox="0 0 640 300" role="img" aria-labelledby="climb-t"><title id="climb-t">Norayne's Blitz rating over the last days</title></svg></div>
@@ -407,21 +461,18 @@ footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(-
   <div class="wrap">
     <div class="s-head">
       <h2 id="h-clips">Two rounds, cut to music</h2>
-      <p>Solo Shuffle, Tol'viron Arena. Both have sound.</p>
     </div>
     <div class="clips">
       <figure class="clip">
         <div class="v"><video controls preload="none" playsinline poster="clips/holy.jpg" aria-label="Shaiyex, Holy Paladin, Solo Shuffle round 5"><source src="clips/holy.mp4" type="video/mp4"></video></div>
         <figcaption>
-          <div class="ct"><b>Shaiyex</b><span>0:26</span></div>
-          <p><i class="c" style="background:var(--class-2)"></i>Holy Paladin, round 5. Lay on Hands, Hammer of Justice on their healer, then a 131,149 Judgment to close it.</p>
+          <div class="ct"><b>Shaiyex</b><span>Holy Paladin · 0:26</span></div>
         </figcaption>
       </figure>
       <figure class="clip">
         <div class="v"><video controls preload="none" playsinline poster="clips/unholy.jpg" aria-label="Besthealer, Unholy Death Knight, Solo Shuffle round 1"><source src="clips/unholy.mp4" type="video/mp4"></video></div>
         <figcaption>
-          <div class="ct"><b>Besthealer</b><span>0:38</span></div>
-          <p><i class="c" style="background:var(--class-6)"></i>Unholy Death Knight, round 1. Grip, Blinding Sleet, all three of them locked at once, kill.</p>
+          <div class="ct"><b>Besthealer</b><span>Unholy Death Knight · 0:38</span></div>
         </figcaption>
       </figure>
     </div>
@@ -431,58 +482,33 @@ footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(-
 <section class="s" id="alts" aria-labelledby="h-alts">
   <div class="wrap">
     <div class="s-head">
-      <h2 id="h-alts">Every character, one row each</h2>
-      <p>Highest rating each character has reached per bracket. Where a character is climbing Blitz right now, the current number sits underneath.</p>
+      <h2 id="h-alts">Best rating per class</h2>
     </div>
     <div class="tools">
-      <label class="toggle"><input type="checkbox" id="maxOnly"> Level 90 only</label>
       <span class="count" id="altCount"></span>
     </div>
     <table class="tbl" id="altTbl">
-      <colgroup><col class="c-name"><col class="c-lvl"><col class="c-n"><col class="c-n"><col class="c-n"><col class="c-n"></colgroup>
+      <colgroup><col class="c-name"><col class="c-n"><col class="c-n"><col class="c-n"><col class="c-n"></colgroup>
       <thead><tr>
-        <th scope="col"><button type="button" data-k="name">Character<span class="ar"></span></button></th>
-        <th scope="col" class="lvl"><button type="button" data-k="level">Lvl<span class="ar"></span></button></th>
+        <th scope="col"><button type="button" data-k="name">Class<span class="ar"></span></button></th>
         <th scope="col"><button type="button" data-k="max2v2">2v2<span class="ar"></span></button></th>
         <th scope="col"><button type="button" data-k="max3v3">3v3<span class="ar"></span></button></th>
         <th scope="col"><button type="button" data-k="maxShuffle">Shuffle<span class="ar"></span></button></th>
         <th scope="col"><button type="button" data-k="maxBlitz">Blitz<span class="ar"></span></button></th>
       </tr></thead>
-      <tbody id="altBody"><tr><td colspan="6" class="note">Loading characters.</td></tr></tbody>
+      <tbody id="altBody"><tr><td colspan="5" class="note">Loading classes.</td></tr></tbody>
     </table>
-    <p class="note" id="mergeNote"></p>
   </div>
 </section>
 
 <section class="s" id="invite" aria-labelledby="h-invite">
   <div class="wrap">
-    <div class="s-head">
-      <h2 id="h-invite">Why invite me</h2>
-      <p>Three things, plainly.</p>
-    </div>
-    <ol class="points">
-      <li><div><h3>Either side of the healer bar</h3><p>Rated on healers and on DPS: Holy Paladin, Unholy Death Knight, Demon Hunter, and Marksmanship Hunter this season. Tell me what the comp is missing and I bring that.</p></div></li>
-      <li><div><h3>The same rating every season</h3><p>Duelist in eight seasons across four expansions and Elite once. Sixteen seasons on the record, none of them without a title.</p></div></li>
-      <li><div><h3>Quiet on comms</h3><p>I call things once, clearly, and I do not spend the game talking. If a round goes wrong I say what I would do differently first. No blame in chat.</p></div></li>
-    </ol>
-    <div class="ask">
-      <p>Whisper <span>Norayne</span> or <span>Shaiyex</span><small>Argent Dawn, EU. Alliance.</small></p>
-      <a class="chip" href="/why/">The loud version</a>
-    </div>
-  </div>
-</section>
-
-<section class="s" id="blacklist" aria-labelledby="h-bl">
-  <div class="wrap">
-    <div class="s-head">
-      <h2 id="h-bl">Blacklist</h2>
-      <p>People I will not queue with again, with the reason next to each name.</p>
-    </div>
-    <ul class="bl" id="blList"><li><p class="none">Loading the list.</p></li></ul>
-    <div class="bl-foot">
-      <span><b id="blCount">16</b>keys depleted and counted</span>
-      <a class="tl" href="/deplete/">Read the post-mortem</a>
-    </div>
+    <div class="door-wrap"><a class="door" href="/why/">
+      <span class="door-k"><i class="rec"></i>145 BPM · sound on</span>
+      <span class="door-t" id="h-invite">Why invite me</span>
+      <span class="door-d">Three reasons to queue with me, set to music. It flashes a lot. There is a button inside to turn the effects off and just read.</span>
+      <span class="door-go">Hear me out →</span>
+    </a></div>
   </div>
 </section>
 
@@ -490,7 +516,6 @@ footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(-
   <div class="wrap">
     <div class="s-head">
       <h2 id="h-games">Minigames</h2>
-      <p>Made between queues. All run in the browser.</p>
     </div>
     <ul class="games">
       <li><a href="/beat/"><b>Interrupt On The Beat</b><span>Rhythm game. Kick real dungeon casts on the beat, ten songs, three difficulties, a leaderboard.</span><em>Play →</em></a></li>
@@ -505,7 +530,6 @@ footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(-
 
 <footer>
   <div class="wrap">
-    <p class="st">Same player, <span>whichever name is on the ladder.</span></p>
     <div class="meta">
       <span>Ratings from check-pvp.fr, snapshot <span id="snap">04.10.2026</span></span>
       <span>shaiyex.com</span>
@@ -530,22 +554,19 @@ footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(-
   function txt(tag, attrs, s, parent){ var e = el(tag, attrs, parent); e.textContent = s; return e; }
   function h(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   function n(v){ return v > 0 ? String(v) : '-'; }
-  function onRealm(s){ var i = s.indexOf('-'); return s.slice(0, i) + ' on ' + s.slice(i + 1); }
-  function word(k){ var w = ['No','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten']; return w[k] || String(k); }
 
-  /* hero figure ticks up once */
+  /* the cross turns over before it lets you through */
   (function(){
-    var f = document.getElementById('fig');
-    if (reduce || !f) return;
-    var target = 2400, t0 = null;
-    function step(t){
-      if (!t0) t0 = t;
-      var p = Math.min(1, (t - t0) / 520), e = 1 - Math.pow(1 - p, 3);
-      f.textContent = Math.round(target * e);
-      if (p < 1) requestAnimationFrame(step);
-    }
-    f.textContent = '0';
-    requestAnimationFrame(step);
+    var x = document.getElementById('pve');
+    if (!x) return;
+    x.addEventListener('click', function(e){
+      if (reduce || e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+      e.preventDefault();
+      x.classList.add('turned');
+      setTimeout(function(){ window.location.href = x.getAttribute('href'); }, 180);
+    });
+    /* coming back with the Back button finds it upright again */
+    window.addEventListener('pageshow', function(){ x.classList.remove('turned'); });
   })();
 
   /* ---------- season ladder ---------- */
@@ -656,39 +677,31 @@ footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(-
     }).join('');
   }
 
-  /* ---------- alts ---------- */
-  var ALTS = [], sortK = 'best', sortDir = -1;
+  /* ---------- best per class ---------- */
+  var KEYS = ['max2v2','max3v3','maxShuffle','maxBlitz'];
+  var ROWS = [], sortK = 'best', sortDir = -1;
   function best(a){ return Math.max(a.max2v2, a.max3v3, a.maxShuffle, a.maxBlitz); }
   function renderAlts(){
-    var only = document.getElementById('maxOnly').checked;
-    var list = ALTS.filter(function(a){ return !only || a.level >= 90; });
-    var main = list.filter(function(a){ return a.main; });
-    var rest = list.filter(function(a){ return !a.main; });
-    rest.sort(function(a, b){
+    var rows = ROWS.slice().sort(function(a, b){
       var va = sortK === 'best' ? best(a) : a[sortK], vb = sortK === 'best' ? best(b) : b[sortK];
       if (typeof va === 'string') return sortDir * va.localeCompare(vb);
       return sortDir * (va - vb) || best(b) - best(a);
     });
     var tops = {};
-    ['max2v2','max3v3','maxShuffle','maxBlitz'].forEach(function(k){
-      tops[k] = Math.max.apply(null, list.map(function(a){ return a[k]; }));
-    });
-    function cell(a, k, cur){
-      var v = a[k], c = 'num' + (v > 0 ? '' : ' z') + (v > 0 && v === tops[k] ? ' top' : '');
-      return '<td class="' + c + '">' + n(v) + (cur > 0 ? '<small>now ' + cur + '</small>' : '') + '</td>';
+    KEYS.forEach(function(k){ tops[k] = Math.max.apply(null, rows.map(function(r){ return r[k]; })); });
+    function cell(r, k){
+      var v = r[k], c = 'num' + (v > 0 ? '' : ' z') + (v > 0 && v === tops[k] ? ' top' : '');
+      return '<td class="' + c + '">' + n(v) + (v > 0 ? '<small>' + h(r.by[k]) + '</small>' : '') + '</td>';
     }
-    document.getElementById('altBody').innerHTML = main.concat(rest).map(function(a){
-      var was = a.formerly && a.formerly.length ? ', <em class="was">was ' + h(a.formerly.map(onRealm).join(', ')) + '</em>' : '';
-      return '<tr' + (a.main ? ' class="main"' : '') + '>' +
-        '<td><div class="who-c" style="--cc:var(--class-' + a.classId + ')"><i></i><div>' +
-          '<b>' + h(a.name) + (a.main ? '<span class="tag">main</span>' : '') + '</b>' +
-          '<span>' + h(a.class) + ', ' + h(a.realm) + (a.faction === 'Horde' ? ', Horde' : '') + was + '</span>' +
+    document.getElementById('altBody').innerHTML = rows.map(function(r){
+      return '<tr' + (r.main ? ' class="main"' : '') + '>' +
+        '<td><div class="who-c" style="--cc:var(--class-' + r.classId + ')"><i></i><div>' +
+          '<b>' + h(r.name) + (r.main ? '<span class="tag">main</span>' : '') + '</b>' +
+          '<span>' + h(r.chars.join(', ')) + '</span>' +
         '</div></div></td>' +
-        '<td class="lvl">' + a.level + '</td>' +
-        cell(a, 'max2v2') + cell(a, 'max3v3') + cell(a, 'maxShuffle') + cell(a, 'maxBlitz', a.curBlitz) +
+        KEYS.map(function(k){ return cell(r, k); }).join('') +
       '</tr>';
     }).join('');
-    document.getElementById('altCount').textContent = list.length + ' characters';
     [].forEach.call(document.querySelectorAll('#altTbl thead button'), function(b){
       var on = b.getAttribute('data-k') === sortK;
       if (on) b.setAttribute('aria-sort', sortDir < 0 ? 'descending' : 'ascending'); else b.removeAttribute('aria-sort');
@@ -697,21 +710,22 @@ footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(-
   }
   function alts(d){
     var m = d.main;
-    ALTS = [{ name:m.name, realm:m.realm, class:m.class, classId:3, faction:m.faction, level:m.level,
-              max2v2:m.max2v2, max3v3:m.max3v3, maxShuffle:m.maxShuffle, maxBlitz:m.maxBlitz,
-              curShuffle:m.curShuffle, curBlitz:m.curBlitz, formerly:[], main:true }].concat(d.alts);
     var ids = { Warrior:1, Paladin:2, Hunter:3, Rogue:4, Priest:5, 'Death Knight':6, Shaman:7, Mage:8, Warlock:9, Monk:10, Druid:11, 'Demon Hunter':12, Evoker:13 };
-    ALTS[0].classId = ids[m.class] || 3;
-    var merged = d.alts.filter(function(a){ return a.formerly.length; });
-    var gone = merged.reduce(function(s, a){ return s + a.formerly.length; }, 0);
-    document.getElementById('mergeNote').innerHTML =
-      '<b>' + d.altsRaw + ' alts on check-pvp, ' + d.alts.length + ' here.</b> ' + word(gone) +
-      ' of those were the same character listed again under an older name after a rename or realm move. They are merged into one row and keep the best rating across every name: ' +
-      merged.map(function(a){ return h(a.name) + ' on ' + h(a.realm) + ' (was ' + h(a.formerly.map(onRealm).join(', ')) + ')'; }).join('; ') +
-      '. Rated Battleground is left out because check-pvp reports the account achievement, 1800, on every character.';
+    var chars = [{ name:m.name, class:m.class, classId:ids[m.class] || 3,
+                   max2v2:m.max2v2, max3v3:m.max3v3, maxShuffle:m.maxShuffle, maxBlitz:m.maxBlitz, main:true }].concat(d.alts);
+    var by = {};
+    chars.forEach(function(c){
+      var r = by[c.class] || (by[c.class] = { name:c.class, classId:c.classId, count:0, chars:[], by:{}, main:false,
+                                               max2v2:0, max3v3:0, maxShuffle:0, maxBlitz:0 });
+      r.count++;
+      r.chars.push(c.name);
+      if (c.main) r.main = true;
+      KEYS.forEach(function(k){ if (c[k] > r[k]){ r[k] = c[k]; r.by[k] = c.name; } });
+    });
+    ROWS = Object.keys(by).map(function(k){ return by[k]; });
+    document.getElementById('altCount').textContent = ROWS.length + ' classes, ' + chars.length + ' characters';
     renderAlts();
   }
-  document.getElementById('maxOnly').addEventListener('change', renderAlts);
   [].forEach.call(document.querySelectorAll('#altTbl thead button'), function(b){
     b.addEventListener('click', function(){
       var k = b.getAttribute('data-k');
@@ -720,7 +734,7 @@ footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(-
     });
   });
 
-  /* ---------- data ---------- */
+
   fetch('data/pvp.json', { cache:'no-cache' }).then(function(r){ return r.json(); }).then(function(d){
     ladder(d.seasons || []);
     climb(d.climb || [], d.main, d.featured || []);
@@ -733,21 +747,9 @@ footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(-
     document.getElementById('nowRank').textContent = last && last.rank ? ', rank ' + last.rank : '';
     if (d.updated){ var p = d.updated.split('-'); document.getElementById('snap').textContent = p[2] + '.' + p[1] + '.' + p[0]; }
   }).catch(function(){
-    document.getElementById('altBody').innerHTML = '<tr><td colspan="6" class="note">The character list did not load. It is at check-pvp.fr in the meantime.</td></tr>';
+    document.getElementById('altBody').innerHTML = '<tr><td colspan="5" class="note">The ratings did not load. They are on check-pvp.fr in the meantime.</td></tr>';
   });
 
-  fetch('blacklist.json', { cache:'no-cache' }).then(function(r){ return r.json(); }).then(function(d){
-    var ul = document.getElementById('blList');
-    if (typeof d.depleted === 'number') document.getElementById('blCount').textContent = d.depleted;
-    if (!d.entries || !d.entries.length){ ul.innerHTML = '<li><p class="none">Nobody listed yet.</p></li>'; return; }
-    ul.innerHTML = d.entries.map(function(e){
-      var name = e.link ? '<a href="' + h(e.link) + '" rel="noopener nofollow">' + h(e.name) + '</a>' : h(e.name);
-      return '<li>' + name + '<span class="rl">' + h(e.realm || '') + '</span>' +
-        (e.note ? '<p>' + h(e.note) + '</p>' : '<p class="none">No note.</p>') + '</li>';
-    }).join('');
-  }).catch(function(){
-    document.getElementById('blList').innerHTML = '<li><p class="none">The list did not load.</p></li>';
-  });
 })();
 </script>
 </body>

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Shaiyex - Holy Paladin. Mythic+ score, current keys, raid progression and logs.">
-<meta name="theme-color" content="#EDE9DE">
+<meta name="theme-color" content="#06070C">
 <meta property="og:type" content="profile">
 <meta property="og:title" content="Shaiyex">
 <meta property="og:description" content="Holy Paladin. Mythic+ score, keys, progression and logs.">
@@ -570,6 +570,14 @@
      on the theme, so the turn happens on the press rather than waiting
      for the theme to come round to it. */
   #themeSw.turned .rune{transform:rotate(180deg)}
+  #themeSw{text-decoration:none}
+  #themeSw .side{
+    position:absolute;top:calc(100% + 34px);left:50%;transform:translateX(-50%);
+    font-family:var(--mono);font-size:10px;font-weight:700;
+    letter-spacing:.14em;text-transform:uppercase;color:#C21A12;white-space:nowrap;
+    animation:nudge 1.9s ease-in-out infinite;
+  }
+  #themeSw:hover .side{color:#F0342A}
   #themeSw.turned:active .rune{transform:rotate(180deg) scale(.94)}
 
   /* something has run down the wall under it */
@@ -1688,7 +1696,7 @@
   }
 </style>
 </head>
-<body>
+<body class="tekk">
 
 <div class="glory-eye" aria-hidden="true"></div>
 <div class="glory" aria-hidden="true"></div>
@@ -1757,11 +1765,12 @@
   <div class="bar"></div><div class="bar"></div>
 </div>
 
-<span id="themeHint">&uarr; what is he without it</span>
-<button id="themeSw" type="button" aria-pressed="false" title="Renounce">
+<span id="themeHint" class="gone"></span>
+<a id="themeSw" class="turned" href="/" title="PvP side">
   <span class="rune" aria-hidden="true"></span>
-  <span class="t1" id="themeLbl" hidden>Renounce</span>
-</button>
+  <span class="t1" id="themeLbl" hidden>PvP side</span>
+  <span class="side">PvP side</span>
+</a>
 
 <div id="gate" role="button" tabindex="0" aria-label="Enter">
   <div class="gate-lamp" aria-hidden="true"></div>
@@ -1797,7 +1806,7 @@
         <span class="door-go" data-t="Look at it →">Read it →</span>
       </a>
 
-      <a class="door door-4" href="/pitch/" data-h="/why/" data-go="right" data-go-tekk="lunge" data-hush-tekk>
+      <a class="door door-4" href="/pitch/" data-h="/classic/why/" data-go="right" data-go-tekk="lunge" data-hush-tekk>
         <span class="door-k" data-t="Not a request">The pitch</span>
         <span class="door-t" data-t="Do not fight the invite">Why invite me</span>
         <span class="door-d" data-t="You were going to bring me anyway. This is only the part where you find out why.">Three honest reasons to bring me along, and what I actually do for a group.</span>
@@ -1916,8 +1925,10 @@
   var audio  = document.getElementById('tekkAudio');
   var holy   = document.getElementById('holyAudio');
   /* whatever happened last visit, you come in through the shrine */
-  var on = false;
-  try { localStorage.setItem('shy.tekk', '0'); } catch(e){}
+  /* the light side is gone: the old site is the dark side now, and the
+     cross is the way back to the PvP page */
+  var on = true;
+  try { localStorage.setItem('shy.tekk', '1'); } catch(e){}
 
   /* the light track runs across the whole site. its position lives in
      sessionStorage so the next page carries on instead of starting over. */
@@ -2009,10 +2020,7 @@
 
   function paint(){
     body.classList.toggle('tekk', on);
-    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-    lbl.textContent = on ? 'Redeem' : 'Renounce';
-    btn.title = on ? 'Redeem' : 'Renounce';
-    copy();
+        copy();
     document.documentElement.style.setProperty('color-scheme', 'dark');
     var m = document.querySelector('meta[name="theme-color"]');
     if (m) m.setAttribute('content', on ? '#06070C' : '#F7F2E6');
@@ -2049,74 +2057,15 @@
     else   { stop(audio); start(holy, 0.34, fresh); }
   }
 
-  /* letters coming apart, then knitting back together */
-  var GLYPH = '\u2020\u2021\u00a7\u00b6\u2020\u25a0\u25ac\u2593\u2592\u2591XVIM\u00c6\u00d8';
-  function eat(el, done){
-    if (!el) { if (done) done(); return; }
-    var html = el.innerHTML;
-    var plain = el.textContent;
-    var n = 0;
-    var iv = setInterval(function(){
-      n++;
-      el.textContent = plain.replace(/\S/g, function(c){
-        return Math.random() > 0.45 ? c : GLYPH.charAt(Math.floor(Math.random() * GLYPH.length));
-      });
-      if (n > 5){
-        clearInterval(iv);
-        el.innerHTML = html;
-        if (done) done();
-      }
-    }, 55);
-  }
-
-  var busy = false;
-  btn.addEventListener('click', function(){
-    if (busy) return;
-    busy = true;
-    on = !on;
-    try { localStorage.setItem('shy.tekk', on ? '1' : '0'); } catch(e){}
-
-    if (hint) hint.classList.add('gone');
-    try { localStorage.setItem('shy.dispelled', '1'); } catch(e){}
-
-    /* the cross goes over first, on the press itself. everything after
-       this is a consequence of it. */
-    btn.classList.toggle('turned', on);
-
-    /* and the room answers it, once it is over */
-    setTimeout(function(){
-      body.classList.remove('desc', 'asc');
-      body.classList.add(on ? 'desc' : 'asc');
-      body.classList.add('corrupting');
-      eat(document.querySelector('h1'));
-      eat(document.querySelector('.sub'));
-    }, 120);
-    setTimeout(chains, 500);
-    setTimeout(chains, 1370);
-
-    /* flip under the cover of the wipe, not before it */
-    setTimeout(paint, 480);
-    setTimeout(function(){
-      body.classList.remove('corrupting', 'desc', 'asc');
-      busy = false;
-    }, 1220);
-    /* this click is the gesture the browser wants, so the track is
-       allowed to start here and nowhere else */
-    /* swap the music under the wipe, not before it */
-    setTimeout(function(){
-      play(true);
-      if (on){
-        listen();
-        if (AC && AC.state === 'suspended'){ try { AC.resume(); } catch(e){} }
-      } else {
-        stopCycle();
-        body.classList.remove('live');
-        document.documentElement.style.setProperty('--pulse', '0');
-        lastQ = -1;
-      }
-    }, 420);
-    if (on) setTimeout(startCycle, 480);
+  /* pressing it turns the cross back upright on the way out */
+  btn.addEventListener('click', function(e){
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+    e.preventDefault();
+    btn.classList.remove('turned');
+    setTimeout(function(){ window.location.href = btn.getAttribute('href'); }, 160);
   });
+  /* coming back with the Back button finds it turned over again */
+  window.addEventListener('pageshow', function(){ btn.classList.add('turned'); });
 
   /* every chain runs all the way up out of the page. the length is
      whatever the drop happens to be, so it is measured, not guessed. */
