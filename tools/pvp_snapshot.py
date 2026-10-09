@@ -45,32 +45,75 @@ RACES = {1: "Human", 3: "Dwarf", 4: "Night Elf", 7: "Gnome", 11: "Draenei",
          36: "Mag'har Orc", 85: "Earthen"}
 
 
+def read_netlog(path, wait=20):
+    """Load Edge's net log. It can still be flushing when --dump-dom returns,
+    and a log Edge never closed just stops after the last event, so wait for
+    it to settle and then close the events array ourselves if we must."""
+    last, text = -1, ""
+    for _ in range(wait * 2):
+        size = os.path.getsize(path) if os.path.exists(path) else 0
+        if size and size == last:
+            break
+        last = size
+        time.sleep(0.5)
+    text = open(path, encoding="utf-8", errors="ignore").read()
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+    # one event per line: drop lines off the end until the rest closes cleanly
+    lines = text.rstrip().split("\n")
+    for _ in range(5):
+        try:
+            return json.loads("\n".join(lines).rstrip().rstrip(",") + "]}")
+        except json.JSONDecodeError:
+            lines.pop()
+    raise RuntimeError(f"net log at {path} is not readable")
+
+
 def capture(region, realm, name):
-    """Render one profile; return (character json, rendered dom)."""
+    """Render one profile; return (character json, rendered dom).
+    The character request sometimes lands after the virtual time budget runs
+    out, so try again with a longer budget before giving up."""
+    for budget in (20000, 35000, 50000):
+        found = capture_once(region, realm, name, budget)
+        if found:
+            return found
+    raise RuntimeError(f"no character json captured for {name}-{realm}")
+
+
+def capture_once(region, realm, name, budget):
     url = f"https://check-pvp.fr/{region}/{realm.replace(' ', '%20')}/{name}"
-    with tempfile.TemporaryDirectory() as tmp:
+    # Edge's helper processes can outlive the main one and keep the profile
+    # locked, so cleanup failures are not worth crashing over.
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
         log = os.path.join(tmp, "net.json")
         dom = subprocess.run(
-            [EDGE, "--headless=new", "--disable-gpu", "--virtual-time-budget=20000",
+            [EDGE, "--headless=new", "--disable-gpu", f"--virtual-time-budget={budget}",
              f"--user-data-dir={os.path.join(tmp, 'profile')}",
              f"--log-net-log={log}", "--net-log-capture-mode=Everything",
              "--dump-dom", url],
-            capture_output=True, timeout=180).stdout.decode("utf-8", "replace")
-        time.sleep(1)
-        net = json.load(open(log, encoding="utf-8", errors="ignore"))
+            capture_output=True, timeout=240).stdout.decode("utf-8", "replace")
+        net = read_netlog(log)
     types = {v: k for k, v in net["constants"]["logEventTypes"].items()}
     urls, chunks = {}, {}
     for e in net["events"]:
         t, sid, p = types.get(e["type"]), e["source"]["id"], e.get("params", {})
         if t == "URL_REQUEST_START_JOB" and "url" in p:
             urls[sid] = p["url"]
-        elif t == "URL_REQUEST_JOB_FILTERED_BYTES_READ" and "bytes" in p:
-            chunks.setdefault(sid, []).append(base64.b64decode(p["bytes"]))
+        elif t in ("URL_REQUEST_JOB_FILTERED_BYTES_READ", "URL_REQUEST_JOB_BYTES_READ") and "bytes" in p:
+            chunks.setdefault((sid, t), []).append(base64.b64decode(p["bytes"]))
     want = f"/api/characters/{region}/"
     for sid, u in urls.items():
-        if want in u and u.lower().endswith("/" + name.lower()) and sid in chunks:
-            return json.loads(b"".join(chunks[sid])), dom
-    raise RuntimeError(f"no character json captured for {name}-{realm}")
+        if want not in u or not u.lower().endswith("/" + name.lower()):
+            continue
+        # the filtered stream is the decompressed body; fall back to the raw one
+        for t in ("URL_REQUEST_JOB_FILTERED_BYTES_READ", "URL_REQUEST_JOB_BYTES_READ"):
+            try:
+                return json.loads(b"".join(chunks.get((sid, t), []))), dom
+            except ValueError:
+                continue
+    return None
 
 
 def season_titles(dom):
@@ -160,13 +203,22 @@ def brief(c):
 
 def main():
     main_json, main_dom = capture(*MAIN)
+    seasons, account = season_titles(main_dom), account_achievements(main_dom)
+    if not seasons:
+        # Edge 154 stopped printing --dump-dom on Windows. Past season titles
+        # never change, so the previous snapshot's list is still right; the
+        # running season only gets a title once it ends.
+        prev = json.loads(OUT.read_text(encoding="utf-8")) if OUT.exists() else {}
+        seasons, account = prev.get("seasons", []), prev.get("account", [])
+        print("warning: page text was empty, kept season titles from the previous snapshot",
+              file=sys.stderr)
     data = {
         "source": "check-pvp.fr",
         "updated": time.strftime("%Y-%m-%d"),
         "main": brief(main_json),
         "achievementPoints": main_json["achievementPoints"],
-        "account": account_achievements(main_dom),
-        "seasons": season_titles(main_dom),
+        "account": account,
+        "seasons": seasons,
         "climb": [{"t": h["date"], "rating": h["rating"], "rank": h["rank"],
                    "win": h["win"], "lose": h["lose"]}
                   for a in main_json.get("activity", []) for h in reversed(a["history"])

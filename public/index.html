@@ -423,7 +423,7 @@ footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(-
       <div class="stat" role="listitem"><b>8</b><span>Duelist titles, across <em>four expansions</em></span></div>
       <div class="stat" role="listitem"><b>2400</b><span>Elite, <em>Dragonflight Season 1</em></span></div>
       <div class="stat" role="listitem"><b>2375</b><span>best Solo Shuffle, on <em>Domirella</em>, Demon Hunter</span></div>
-      <div class="stat" role="listitem"><b id="nowBlitz">1899</b><span>Blitz right now, on <em>Norayne</em><span id="nowRank">, rank 322</span></span></div>
+      <div class="stat" role="listitem"><b id="nowBlitz">2313</b><span>Blitz right now, on <em>Norayne</em><span id="nowRank">, rank 83</span></span></div>
     </div>
   </div>
 </header>
@@ -448,7 +448,7 @@ footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(-
 <section class="s" id="now" aria-labelledby="h-now">
   <div class="wrap">
     <div class="s-head">
-      <h2 id="h-now">Norayne, <span class="n" id="climbFrom">288</span> to <span class="n" id="climbTo">1899</span> in <span id="climbDays">four days</span></h2>
+      <h2 id="h-now">Norayne, <span class="n" id="climbFrom">288</span> to <span class="n" id="climbTo">2313</span> in <span id="climbDays">seven days</span></h2>
     </div>
     <div class="climb">
       <div class="chart"><svg id="climb" viewBox="0 0 640 300" role="img" aria-labelledby="climb-t"><title id="climb-t">Norayne's Blitz rating over the last days</title></svg></div>
@@ -628,11 +628,13 @@ footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(-
       var W = Math.max(300, Math.min(640, (svg.parentNode.clientWidth || 640) - 48)), H = W < 500 ? 230 : 300, L = 44, R = 52, T = 18, B = 34;
       svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
       var t0 = pts[0].t, t1 = pts[pts.length - 1].t;
-      var lo = 0, hi = 2100;
+      var top = Math.max.apply(null, pts.map(function(p){ return p.rating; }));
+      var lo = 0, hi = Math.max(1000, Math.ceil((top + 150) / 500) * 500);
       function x(t){ return L + (W - L - R) * (t - t0) / (t1 - t0); }
       function y(v){ return T + (H - T - B) * (1 - (v - lo) / (hi - lo)); }
       var g = el('g', { 'class':'grid' }, svg);
-      [0, 500, 1000, 1500, 2000].forEach(function(v){
+      var ticks = []; for (var tv = 0; tv <= hi; tv += 500) ticks.push(tv);
+      ticks.forEach(function(v){
         el('line', { x1:L, x2:W - R, y1:y(v), y2:y(v) }, g);
         txt('text', { x:0, y:y(v) + 4, 'class':'tier' }, v, svg);
       });
@@ -650,12 +652,14 @@ footer .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(-
       var e = pts[pts.length - 1];
       txt('text', { x:x(e.t) + 10, y:y(e.rating) + 4, 'class':'end' }, e.rating, svg);
       var days = {}, fmt = function(t){ var dt = new Date(t * 1000); return dt.getDate() + '.' + (dt.getMonth() + 1) + '.'; };
-      for (var t = t0; t <= t1 + 1; t += 86400) days[fmt(t)] = t;
+      /* one label a day, every other day once a phone runs out of room */
+      var dstep = (W < 500 && (t1 - t0) / 86400 > 5) ? 2 : 1;
+      for (var t = t0; t <= t1 + 1; t += 86400 * dstep) days[fmt(t)] = t;
       Object.keys(days).forEach(function(k){
         txt('text', { x:x(days[k]), y:H - 8, 'text-anchor':'middle', 'class':'tier' }, k, svg);
       });
       var span = Math.round((t1 - t0) / 86400);
-      var words = ['zero','one','two','three','four','five','six','seven'];
+      var words = ['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen'];
       document.getElementById('climbFrom').textContent = pts[0].rating;
       document.getElementById('climbTo').textContent = e.rating;
       document.getElementById('climbDays').textContent = (span <= 1 ? 'a day' : (words[span] || span) + ' days');

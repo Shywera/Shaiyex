@@ -1,6 +1,6 @@
 {
  "source": "check-pvp.fr",
- "updated": "2026-10-04",
+ "updated": "2026-10-09",
  "main": {
   "name": "Norayne",
   "realm": "Argent Dawn",
@@ -9,27 +9,35 @@
   "spec": "Marksmanship",
   "race": "Night Elf",
   "faction": "Alliance",
-  "ilvl": 272,
-  "pvpIlvl": 335,
+  "ilvl": 284,
+  "pvpIlvl": 340,
   "max2v2": 0,
-  "max3v3": 0,
-  "maxRbg": 1800,
-  "maxShuffle": 0,
-  "maxBlitz": 1899,
-  "curShuffle": 0,
-  "curBlitz": 1899,
-  "shuffle": [],
+  "max3v3": 672,
+  "maxRbg": 2300,
+  "maxShuffle": 384,
+  "maxBlitz": 2313,
+  "curShuffle": 384,
+  "curBlitz": 2313,
+  "shuffle": [
+   {
+    "spec": "Marksmanship",
+    "rating": 384,
+    "best": 384,
+    "win": 4,
+    "lose": 2
+   }
+  ],
   "blitz": [
    {
     "spec": "Marksmanship",
-    "rating": 1899,
-    "best": 1899,
-    "win": 18,
-    "lose": 12
+    "rating": 2313,
+    "best": 2313,
+    "win": 33,
+    "lose": 21
    }
   ]
  },
- "achievementPoints": 20660,
+ "achievementPoints": 20750,
  "account": [
   {
    "name": "Just the Two of Us: 2200",
@@ -255,6 +263,62 @@
    "rank": 322,
    "win": 18,
    "lose": 12
+  },
+  {
+   "t": 1791076038,
+   "rating": 1950,
+   "rank": 272,
+   "win": 20,
+   "lose": 14
+  },
+  {
+   "t": 1791119238,
+   "rating": 1978,
+   "rank": 239,
+   "win": 21,
+   "lose": 14
+  },
+  {
+   "t": 1791132218,
+   "rating": 2006,
+   "rank": 225,
+   "win": 22,
+   "lose": 14
+  },
+  {
+   "t": 1791143018,
+   "rating": 2149,
+   "rank": 135,
+   "win": 27,
+   "lose": 17
+  },
+  {
+   "t": 1791237864,
+   "rating": 2205,
+   "rank": 113,
+   "win": 29,
+   "lose": 19
+  },
+  {
+   "t": 1791309012,
+   "rating": 2261,
+   "rank": 102,
+   "win": 31,
+   "lose": 19
+  },
+  {
+   "t": 1791319812,
+   "rating": 2313,
+   "rank": 83,
+   "win": 33,
+   "lose": 20
+  },
+  {
+   "t": 1791330612,
+   "rating": 2313,
+   "rank": 83,
+   "win": 33,
+   "lose": 21
   }
  ],
  "featured": [
@@ -266,11 +330,11 @@
    "spec": "Holy",
    "race": "Lightforged Draenei",
    "faction": "Alliance",
-   "ilvl": 325,
-   "pvpIlvl": 326,
+   "ilvl": 327,
+   "pvpIlvl": 328,
    "max2v2": 2275,
    "max3v3": 1859,
-   "maxRbg": 1800,
+   "maxRbg": 2300,
    "maxShuffle": 1893,
    "maxBlitz": 0,
    "curShuffle": 1736,
@@ -360,7 +424,7 @@
     "Shyabel-Ravencrest",
     "Novaren-Ravencrest"
    ],
-   "seen": 1790777803
+   "seen": 1791486500
   },
   {
    "name": "Bloodyshy",
