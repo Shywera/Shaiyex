@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="A welcome video for Ani, our new healer. Sound on.">
+<meta name="theme-color" content="#0E0B12">
+<meta property="og:type" content="video.other">
+<meta property="og:title" content="Welcome, Ani">
+<meta property="og:description" content="Achievement earned: Found a Healer Who Doesn't Tilt. Sound on.">
+<meta property="og:url" content="https://shaiyex.com/ani/">
+<meta property="og:image" content="https://shaiyex.com/ani/poster.jpg">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="720">
+<meta property="og:video" content="https://shaiyex.com/ani/welcome-ani.mp4">
+<meta property="og:video:secure_url" content="https://shaiyex.com/ani/welcome-ani.mp4">
+<meta property="og:video:type" content="video/mp4">
+<meta property="og:video:width" content="1920">
+<meta property="og:video:height" content="1080">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://shaiyex.com/ani/poster.jpg">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>Welcome, Ani</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;600;800&display=swap">
+<style>
+:root{
+  --bg:#0E0B12;
+  --ink:#F4F1EA;
+  --mute:#A49FA8;
+  --pink:#FF5CAA;
+  --gold:#FFCC00;
+  --line:#2A2330;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{
+  font-family:"Onest",system-ui,sans-serif;
+  min-height:100svh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px 16px calc(32px + env(safe-area-inset-bottom,0px));
+  background:radial-gradient(ellipse 70% 55% at 50% 45%, #2A0F24 0%, var(--bg) 70%);
+}
+main{width:100%;max-width:1100px}
+h1{
+  margin:0 0 6px;font-weight:800;letter-spacing:-.02em;
+  font-size:clamp(34px,6vw,64px);line-height:1;
+}
+h1 span{color:var(--pink)}
+.sub{margin:0 0 22px;color:var(--mute);font-size:clamp(15px,2vw,18px)}
+.frame{
+  border-radius:14px;overflow:hidden;
+  border:1px solid var(--line);
+  box-shadow:0 30px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,92,170,.08);
+  background:#000;aspect-ratio:16/9;
+}
+video{display:block;width:100%;height:100%}
+.foot{
+  margin-top:18px;display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between;
+  color:var(--mute);font-size:14px;
+}
+.foot b{color:var(--gold);font-weight:600}
+a{color:var(--mute)}
+</style>
+</head>
+<body>
+<main>
+  <h1>Welcome, <span>Ani</span>.</h1>
+  <p class="sub">We made you something. Sound on.</p>
+  <div class="frame">
+    <video src="/ani/welcome-ani.mp4" poster="/ani/poster.jpg" controls playsinline preload="metadata"></video>
+  </div>
+  <div class="foot">
+    <span>from <b>Shy</b> and <b>Zinzie</b>, your new DPS</span>
+    <span>it is a gift. you cannot return it.</span>
+  </div>
+</main>
+</body>
+</html>
